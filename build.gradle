@@ -1,0 +1,65 @@
+buildscript {
+    ext {
+        springBootVersion = '3.2.4'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+    }
+}
+
+plugins {
+    id 'org.springframework.boot' version '3.2.4' apply false
+    id 'io.spring.dependency-management' version '1.1.4' apply false
+}
+
+allprojects {
+    group = 'com.ubiquia'
+    version = '0.1.0'
+
+    repositories {
+        mavenCentral()
+        // maven {
+        //     url 'https://jitpack.io'
+        // }
+    }
+
+    apply plugin: "java"
+    apply plugin: "checkstyle"
+    apply plugin: "jacoco"
+    apply plugin: "io.spring.dependency-management"
+    apply plugin: 'org.springframework.boot'
+}
+
+checkstyle {
+    configFile file("${rootDir}/config/checkstyle/checkstyle.xml")
+    toolVersion '10.23.1';
+}
+
+jacoco {
+    toolVersion = '0.8.8'
+}
+
+ext {
+    H2_VERSION='2.2.224'
+    INSTANCIO_VERSION='4.3.2'
+    JACKSON_DATA_FORMAT_VERSION='2.17.2'
+    JSON_SCHEMA_FRIEND_VERSION='0.12.3'
+    JAVA_JSON_TOOLS='1.2.14'
+    INSTANCIO_VERSION='4.3.2'
+    KUBECTL_CLIENT_VERSION='20.0.1'
+    LOGBACK_VERSION='1.5.6'
+    MACHINA_SDA_COMMON_VERSION='0.50.2'
+    MICROMETER_VERSION='1.12.4'
+    REFLECTIONS_VERSION='0.10.2'
+    SPRING_BOOT_VERSION='3.2.4'
+    SPRING_BOOT_KAFKA_VERSION='3.1.2'
+    SPRING_DOC_VERSION='2.6.0'
+}
+
+// Disable Spring Boot's bootJar in the root project
+tasks.named('bootJar') {
+    enabled = false
+}
