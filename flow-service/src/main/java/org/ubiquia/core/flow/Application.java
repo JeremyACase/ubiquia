@@ -1,7 +1,6 @@
 package org.ubiquia.core.flow;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +12,8 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 /**
+ * The top level application class for our Flow Service.
+ *
  * @author <a href="jeremycase@odysseyconsult.com">Jeremy Case</a>
  */
 @SpringBootApplication

@@ -1,0 +1,35 @@
+package org.ubiquia.core.flow.interfaces;
+
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.List;
+import org.ubiquia.core.flow.model.dto.AbstractEntityDto;
+import org.ubiquia.core.flow.model.entity.AbstractEntity;
+
+/**
+ * An interface that can be used to map from database entities to their Data Transfer Object
+ * representations.
+ *
+ * @param <F> The entity class we're mapping from.
+ * @param <T> The DTO class we're mapping to.
+ */
+public interface IEntityToDTOMapper<F extends AbstractEntity, T extends AbstractEntityDto> {
+
+    /**
+     * Map an Amigos Event entity to a DTO.
+     *
+     * @param from The entity to map from.
+     * @return A DTO mapped from the entity.
+     * @throws JsonProcessingException Exception from mapping payload strings to objects.
+     */
+    T map(F from) throws JsonProcessingException;
+
+    /**
+     * Map from a list of database entities to a list of DTO's.
+     *
+     * @param froms The entities to map from.
+     * @return The mapped DTO's.
+     * @throws JsonProcessingException Exception from mapping payload strings to objects.
+     */
+    List<T> map(List<F> froms) throws JsonProcessingException;
+}

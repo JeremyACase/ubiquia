@@ -9,12 +9,10 @@ import jakarta.annotation.PostConstruct;
 import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -70,7 +68,7 @@ public class Config implements WebMvcConfigurer {
      * Bean towards using time aspect for micrometer.
      *
      * @param registry The registry we're using time aspect for.
-     * @return A timeaspect bean.
+     * @return A timedAspect bean.
      */
     @Bean
     public TimedAspect timedAspect(MeterRegistry registry) {
