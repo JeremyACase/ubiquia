@@ -24,7 +24,7 @@ public class GraphDtoMapper extends GenericDtoMapper<Graph, GraphDto> {
         GraphDto to = null;
         if (Objects.nonNull(from)) {
             to = new GraphDto();
-            super.setAEntityFields(from, to);
+            super.setAbstractEntityFields(from, to);
 
             to.setAuthor(from.getAuthor());
             to.setCapabilities(from.getCapabilities());
@@ -32,11 +32,11 @@ public class GraphDtoMapper extends GenericDtoMapper<Graph, GraphDto> {
             to.setGraphName(from.getGraphName());
             to.setVersion(from.getVersion());
 
-            to.setDomainOntology(new NameAndVersionPair());
-            to.getDomainOntology().setName(from.getDomainOntology().getDomain());
-            to.getDomainOntology().setVersion(from.getDomainOntology().getVersion());
+            to.setAgentCommunicationLanguage(new NameAndVersionPair());
+            to.getAgentCommunicationLanguage().setName(from.getAgentCommunicationLanguage().getDomain());
+            to.getAgentCommunicationLanguage().setVersion(from.getAgentCommunicationLanguage().getVersion());
 
-            to.setDataTransforms(this.agentDtoMapper.map(from.getDataTransforms()));
+            to.setAgents(this.agentDtoMapper.map(from.getAgents()));
             to.setAdapters(this.adapterDtoMapper.map(from.getAdapters()));
         }
 

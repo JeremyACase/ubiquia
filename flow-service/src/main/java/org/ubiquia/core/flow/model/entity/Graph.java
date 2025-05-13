@@ -87,20 +87,20 @@ public class Graph extends AbstractEntity {
     }
 
     @NotNull
-    public List<Agent> getDataTransforms() {
+    public List<Agent> getAgents() {
         return agents;
     }
 
-    public void setDataTransforms(List<Agent> agents) {
+    public void setAgents(List<Agent> agents) {
         this.agents = agents;
     }
 
     @NotNull
-    public AgentCommunicationLanguage getDomainOntology() {
+    public AgentCommunicationLanguage getAgentCommunicationLanguage() {
         return agentCommunicationLanguage;
     }
 
-    public void setDomainOntology(AgentCommunicationLanguage agentCommunicationLanguage) {
+    public void setAgentCommunicationLanguage(AgentCommunicationLanguage agentCommunicationLanguage) {
         this.agentCommunicationLanguage = agentCommunicationLanguage;
     }
 

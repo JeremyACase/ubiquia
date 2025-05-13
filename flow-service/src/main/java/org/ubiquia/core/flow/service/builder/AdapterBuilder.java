@@ -5,18 +5,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.component.adapter.AAdapter;
-import org.ubiquia.core.flow.model.adapter.AdapterContext;
+import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.model.dto.AdapterDto;
 import org.ubiquia.core.flow.model.embeddable.GraphDeployment;
 import org.ubiquia.core.flow.model.entity.Adapter;
 import org.ubiquia.core.flow.model.entity.Graph;
+import org.ubiquia.core.flow.service.decorator.override.AdapterOverrideDecorator;
+import org.ubiquia.core.flow.service.logic.adapter.AdapterTypeLogic;
 import org.ubiquia.core.flow.service.mapper.AdapterDtoMapper;
 
 /**
@@ -27,7 +26,7 @@ public class AdapterBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(AdapterBuilder.class);
     @Autowired
-    private AdapterDtoMapper adapterDTOMapper;
+    private AdapterDtoMapper adapterDtoMapper;
     @Autowired
     private AdapterContextBuilder adapterContextBuilder;
     @Autowired
@@ -48,7 +47,7 @@ public class AdapterBuilder {
      */
     @Transactional
     public void buildAdapter(
-        AAdapter adapter,
+        AbstractAdapter adapter,
         final Adapter adapterEntity,
         final Graph graphEntity,
         final GraphDeployment graphDeployment)
@@ -62,7 +61,7 @@ public class AdapterBuilder {
             graphEntity.getGraphName(),
             graphDeployment.getGraphSettings());
 
-        var adapterData = this.adapterDTOMapper.map(adapterEntity);
+        var adapterData = this.adapterDtoMapper.map(adapterEntity);
 
         var context = this.adapterContextBuilder.buildAdapterContext(
             adapterData,
@@ -108,37 +107,39 @@ public class AdapterBuilder {
      * @param adapterData The adapter data from the database.
      * @throws URISyntaxException Exceptions from parsing endpoints.
      */
-    private void trySetAdapterEndpoint(AAdapter adapter, final AdapterDto adapterData)
+    private void trySetAdapterEndpoint(AbstractAdapter adapter, final AdapterDto adapterData)
         throws URISyntaxException {
 
+        var agentData = adapterData.getAgent();
+        var adapterContext = adapter.getAdapterContext();
         if (!adapterData.getAdapterSettings().getIsPassthrough()) {
 
-            if (this.adapterTypeLogic.adapterTypeRequiresDataTransform(
+            if (this.adapterTypeLogic.adapterTypeRequiresAgent(
                 adapterData.getAdapterType())) {
 
-                switch (adapterData.getDataTransform().getDataTransformType()) {
+                switch (agentData.getDataTransformType()) {
 
                     // If we have a Kubernetes service to use...
                     case POD: {
-                        adapter.setEndpointURI(this.getTransformURIFrom(adapterData));
+                        adapterContext.setEndpointUri(this.getTransformURIFrom(adapterData));
                     }
                     break;
 
                     // ...use full endpoint for NONE type...
                     case NONE: {
-                        adapter.setEndpointURI(new URI(adapterData.getEndpoint()));
+                        adapterContext.setEndpointUri(new URI(adapterData.getEndpoint()));
                     }
                     break;
 
                     // ...else just set to null
                     default: {
-                        adapter.setEndpointURI(null);
+                        adapterContext.setEndpointUri(null);
                     }
 
                 }
-            } else if (this.adapterTypeLogic.adapterTypeRequiresEndpoint(
-                adapterData.getAdapterType())) {
-                adapter.setEndpointURI(new URI(adapterData.getEndpoint()));
+            } else if (this.adapterTypeLogic.adapterTypeRequiresEndpoint(adapterData.getAdapterType())) {
+
+                adapterContext.setEndpointUri(new URI(adapterData.getEndpoint()));
             }
         }
     }

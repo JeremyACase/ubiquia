@@ -33,7 +33,7 @@ public class AdapterContext {
 
     private String graphName;
     private String adapterId;
-    private Boolean isTemplateTransform;
+    private Boolean isTemplateAgent;
     private PollSettings pollSettings;
     private List<RequestMappingInfo> registeredMappingInfos = new ArrayList<>();
     private List<KeyValuePair> tags = new ArrayList<>();
@@ -129,12 +129,12 @@ public class AdapterContext {
         this.adapterId = adapterId;
     }
 
-    public Boolean getTemplateTransform() {
-        return isTemplateTransform;
+    public Boolean getTemplateAgent() {
+        return isTemplateAgent;
     }
 
-    public void setTemplateTransform(Boolean templateTransform) {
-        isTemplateTransform = templateTransform;
+    public void setTemplateAgent(Boolean templateTransform) {
+        isTemplateAgent = templateTransform;
     }
 
     public PollSettings getPollSettings() {

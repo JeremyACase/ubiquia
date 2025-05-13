@@ -13,7 +13,7 @@ import org.ubiquia.core.flow.model.entity.AbstractEntity;
  * @param <F> The entity class we're mapping from.
  * @param <T> The DTO class we're mapping to.
  */
-public interface IEntityToDTOMapper<F extends AbstractEntity, T extends AbstractEntityDto> {
+public interface InterfaceEntityToDtoMapper<F extends AbstractEntity, T extends AbstractEntityDto> {
 
     /**
      * Map an Amigos Event entity to a DTO.

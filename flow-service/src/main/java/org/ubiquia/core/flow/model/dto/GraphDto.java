@@ -23,8 +23,8 @@ public class GraphDto extends AbstractEntityDto {
     @JsonProperty("capabilities")
     private List<String> capabilities;
 
-    @JsonProperty("domainOntology")
-    private NameAndVersionPair domainOntology;
+    @JsonProperty("agentCommunicationLanguage")
+    private NameAndVersionPair agentCommunicationLanguage;
 
     @JsonProperty("edges")
     private List<GraphEdgeDto> edges;
@@ -35,11 +35,11 @@ public class GraphDto extends AbstractEntityDto {
     @JsonProperty("adapters")
     private List<AdapterDto> adapters;
 
-    @JsonProperty("dataTransformlessAdapters")
-    private List<AdapterDto> dataTransformlessAdapters;
+    @JsonProperty("agentlessAdapters")
+    private List<AdapterDto> agentlessAdapters;
 
-    @JsonProperty("dataTransforms")
-    private List<AgentDto> dataTransforms;
+    @JsonProperty("agents")
+    private List<AgentDto> agents;
 
     @Override
     public String getModelType() {
@@ -90,12 +90,12 @@ public class GraphDto extends AbstractEntityDto {
         this.adapters = adapters;
     }
 
-    public List<AgentDto> getDataTransforms() {
-        return dataTransforms;
+    public List<AgentDto> getAgents() {
+        return agents;
     }
 
-    public void setDataTransforms(List<AgentDto> dataTransforms) {
-        this.dataTransforms = dataTransforms;
+    public void setAgents(List<AgentDto> agents) {
+        this.agents = agents;
     }
 
     public List<String> getCapabilities() {
@@ -114,21 +114,21 @@ public class GraphDto extends AbstractEntityDto {
         this.edges = edges;
     }
 
-    public List<AdapterDto> getDataTransformlessAdapters() {
-        return dataTransformlessAdapters;
+    public List<AdapterDto> getAgentlessAdapters() {
+        return agentlessAdapters;
     }
 
-    public void setDataTransformlessAdapters(List<AdapterDto> dataTransformlessAdapters) {
-        this.dataTransformlessAdapters = dataTransformlessAdapters;
+    public void setAgentlessAdapters(List<AdapterDto> agentlessAdapters) {
+        this.agentlessAdapters = agentlessAdapters;
     }
 
     @NotNull
-    public NameAndVersionPair getDomainOntology() {
-        return domainOntology;
+    public NameAndVersionPair getAgentCommunicationLanguage() {
+        return agentCommunicationLanguage;
     }
 
-    public void setDomainOntology(NameAndVersionPair domainOntology) {
-        this.domainOntology = domainOntology;
+    public void setAgentCommunicationLanguage(NameAndVersionPair agentCommunicationLanguage) {
+        this.agentCommunicationLanguage = agentCommunicationLanguage;
     }
 }
 

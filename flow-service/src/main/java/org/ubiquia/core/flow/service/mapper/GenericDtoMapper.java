@@ -8,17 +8,17 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.interfaces.IEntityToDTOMapper;
+import org.ubiquia.core.flow.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.core.flow.model.dto.AbstractEntityDto;
 import org.ubiquia.core.flow.model.entity.AbstractEntity;
 
 /**
  * A class dedicated to mapping from entities from the database to Data Transfer
- * Objects (DTO's.)
+ * Objects (DTO's).
  */
 @Service
 public abstract class GenericDtoMapper<F extends AbstractEntity, T extends AbstractEntityDto>
-    implements IEntityToDTOMapper<F, T> {
+    implements InterfaceEntityToDtoMapper<F, T> {
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -39,7 +39,7 @@ public abstract class GenericDtoMapper<F extends AbstractEntity, T extends Abstr
      * @param from The entity model to map from.
      * @param to   The DTO to map to.
      */
-    protected void setAEntityFields(F from, T to) {
+    protected void setAbstractEntityFields(final F from, T to) {
 
         if (Objects.nonNull(from) && Objects.nonNull(to)) {
             to.setCreatedAt(from.getCreatedAt());

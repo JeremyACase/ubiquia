@@ -1,14 +1,13 @@
 package org.ubiquia.core.flow.model.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import java.time.OffsetDateTime;
 import java.util.Set;
 import org.springframework.validation.annotation.Validated;
+import org.ubiquia.core.flow.model.embeddable.FlowEventTimes;
 import org.ubiquia.core.flow.model.embeddable.KeyValuePair;
 
 @Validated
@@ -29,32 +28,7 @@ public class FlowEvent extends AbstractEntity {
 
     private Integer httpResponseCode;
 
-    @JsonProperty("payloadReceivedTime")
-    private OffsetDateTime payloadReceivedTime;
-
-    @JsonProperty("payloadSentToTransformTime")
-    private OffsetDateTime payloadSentToTransformTime;
-
-    @JsonProperty("eventStartTime")
-    private OffsetDateTime eventStartTime;
-
-    @JsonProperty("eventCompleteTime")
-    private OffsetDateTime eventCompleteTime;
-
-    @JsonProperty("egressResponseReceivedTime")
-    private OffsetDateTime egressResponseReceivedTime;
-
-    @JsonProperty("dataTransformResponseTime")
-    private OffsetDateTime dataTransformResponseTime;
-
-    @JsonProperty("payloadSentToOutboxTime")
-    private OffsetDateTime sentToOutboxTime;
-
-    @JsonProperty("payloadEgressedTime")
-    private OffsetDateTime payloadEgressedTime;
-
-    @JsonProperty("pollStartedTime")
-    private OffsetDateTime pollStartedTime;
+    private FlowEventTimes flowEventTimes;
 
     @OneToMany(mappedBy = "amigosEvent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private Set<FlowMessage> flowMessages;
@@ -127,11 +101,11 @@ public class FlowEvent extends AbstractEntity {
         this.httpResponseCode = httpResponseCode;
     }
 
-    public Set<FlowMessage> getAmigosMessages() {
+    public Set<FlowMessage> getFlowMessages() {
         return flowMessages;
     }
 
-    public void setAmigosMessages(Set<FlowMessage> flowMessages) {
+    public void setFlowMessages(Set<FlowMessage> flowMessages) {
         this.flowMessages = flowMessages;
     }
 
@@ -151,75 +125,11 @@ public class FlowEvent extends AbstractEntity {
         this.outputPayloadStamps = outputPayloadStamps;
     }
 
-    public OffsetDateTime getPayloadReceivedTime() {
-        return payloadReceivedTime;
+    public FlowEventTimes getFlowEventTimes() {
+        return flowEventTimes;
     }
 
-    public void setPayloadReceivedTime(OffsetDateTime payloadReceivedTime) {
-        this.payloadReceivedTime = payloadReceivedTime;
-    }
-
-    public OffsetDateTime getPayloadSentToTransformTime() {
-        return payloadSentToTransformTime;
-    }
-
-    public void setPayloadSentToTransformTime(OffsetDateTime payloadSentToTransformTime) {
-        this.payloadSentToTransformTime = payloadSentToTransformTime;
-    }
-
-    public OffsetDateTime getEgressResponseReceivedTime() {
-        return egressResponseReceivedTime;
-    }
-
-    public void setEgressResponseReceivedTime(OffsetDateTime egressResponseReceivedTime) {
-        this.egressResponseReceivedTime = egressResponseReceivedTime;
-    }
-
-    public OffsetDateTime getDataTransformResponseTime() {
-        return dataTransformResponseTime;
-    }
-
-    public void setDataTransformResponseTime(OffsetDateTime dataTransformResponseTime) {
-        this.dataTransformResponseTime = dataTransformResponseTime;
-    }
-
-    public OffsetDateTime getSentToOutboxTime() {
-        return sentToOutboxTime;
-    }
-
-    public void setSentToOutboxTime(OffsetDateTime sentToOutboxTime) {
-        this.sentToOutboxTime = sentToOutboxTime;
-    }
-
-    public OffsetDateTime getPayloadEgressedTime() {
-        return payloadEgressedTime;
-    }
-
-    public void setPayloadEgressedTime(OffsetDateTime payloadEgressedTime) {
-        this.payloadEgressedTime = payloadEgressedTime;
-    }
-
-    public OffsetDateTime getPollStartedTime() {
-        return pollStartedTime;
-    }
-
-    public void setPollStartedTime(OffsetDateTime pollStartedTime) {
-        this.pollStartedTime = pollStartedTime;
-    }
-
-    public OffsetDateTime getEventStartTime() {
-        return eventStartTime;
-    }
-
-    public void setEventStartTime(OffsetDateTime eventStartTime) {
-        this.eventStartTime = eventStartTime;
-    }
-
-    public OffsetDateTime getEventCompleteTime() {
-        return eventCompleteTime;
-    }
-
-    public void setEventCompleteTime(OffsetDateTime eventCompleteTime) {
-        this.eventCompleteTime = eventCompleteTime;
+    public void setFlowEventTimes(FlowEventTimes flowEventTimes) {
+        this.flowEventTimes = flowEventTimes;
     }
 }

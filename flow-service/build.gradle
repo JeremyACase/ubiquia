@@ -20,8 +20,8 @@ dependencies {
     implementation "org.reflections:reflections:${REFLECTIONS_VERSION}"
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${SPRING_DOC_VERSION}"
     implementation "org.springframework.kafka:spring-kafka:${SPRING_BOOT_KAFKA_VERSION}"
-    // implementation "net.jimblackler.jsonschemafriend:core:${JSON_SCHEMA_FRIEND_VERSION}"
-    // implementation "net.jimblackler:jsongenerator:0.4.7"
+    implementation "net.jimblackler.jsonschemafriend:core:${JSON_SCHEMA_FRIEND_VERSION}"
+    implementation "net.jimblackler:jsongenerator:0.4.7"
 
     runtimeOnly "com.h2database:h2:${H2_VERSION}"
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${MICROMETER_VERSION}"

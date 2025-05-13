@@ -28,14 +28,14 @@ public class AdapterDtoMapper extends GenericDtoMapper<
         AdapterDto to = null;
         if (Objects.nonNull(from)) {
             to = new AdapterDto();
-            super.setAEntityFields(from, to);
+            super.setAbstractEntityFields(from, to);
 
             to.setAdapterName(from.getAdapterName());
             to.setAdapterSettings(from.getAdapterSettings());
             to.setAdapterType(from.getAdapterType());
             to.setFlowEvents(new ArrayList<>());
             to.setBrokerSettings(from.getBrokerSettings());
-            to.setAgent(this.agentDtoMapper.map(from.getDataTransform()));
+            to.setAgent(this.agentDtoMapper.map(from.getAgent()));
             to.setDownstreamAdapters(this.mapUpstreamOrDownstreamAdapters(
                 from.getDownstreamAdapters()));
             to.setDescription(from.getDescription());
@@ -75,10 +75,10 @@ public class AdapterDtoMapper extends GenericDtoMapper<
 
         for (var from : froms) {
             var to = new AdapterDto();
-            super.setAEntityFields(from, to);
+            super.setAbstractEntityFields(from, to);
             to.setAdapterName(from.getAdapterName());
             to.setAdapterType(from.getAdapterType());
-            to.setAgent(this.agentDtoMapper.map(from.getDataTransform()));
+            to.setAgent(this.agentDtoMapper.map(from.getAgent()));
             to.setDescription(from.getDescription());
             to.setEgressSettings(from.getEgressSettings());
             to.setEndpoint(from.getEndpoint());

@@ -3,24 +3,20 @@ package org.ubiquia.core.flow.service.builder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import io.kubernetes.client.custom.IntOrString;
+import io.kubernetes.client.openapi.models.*;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
-
 import org.apache.logging.log4j.util.Strings;
-import org.machina.core.amigos.model.dto.DataTransformDTO;
-import org.machina.core.amigos.model.embeddable.Volume;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-
-import io.kubernetes.client.custom.IntOrString;
-import io.kubernetes.client.openapi.models.*;
 import org.ubiquia.core.flow.model.dto.AgentDto;
+import org.ubiquia.core.flow.model.embeddable.Volume;
 
 @ConditionalOnProperty(
     value = "amigos.kubernetes.enabled",
@@ -54,7 +50,8 @@ public class AgentDeploymentBuilder {
 
         if (Objects.nonNull(agent.getConfig())) {
             configMap = new V1ConfigMap();
-            var typeRef = new TypeReference<HashMap<String, String>>() {};
+            var typeRef = new TypeReference<HashMap<String, String>>() {
+            };
             var map = this.objectMapper.convertValue(
                 agent.getConfig().getConfigMap(),
                 typeRef);
@@ -118,39 +115,39 @@ public class AgentDeploymentBuilder {
     /**
      * Attempt to build a Kubernetes deployment for the data transform.
      *
-     * @param dataTransform The data transform to build a deployment for.
+     * @param agent The data transform to build a deployment for.
      * @return A Kubernetes deployment.
      */
     @Transactional
-    public V1Deployment buildDeploymentFrom(final DataTransformDTO dataTransform) {
+    public V1Deployment buildDeploymentFrom(final AgentDto agent) {
         var deployment = new V1Deployment();
         deployment.setApiVersion("apps/v1");
         deployment.setKind("Deployment");
-        deployment.setMetadata(this.getMetadataFrom(dataTransform));
-        deployment.setSpec(this.getDeploymentSpecFrom(dataTransform));
+        deployment.setMetadata(this.getMetadataFrom(agent));
+        deployment.setSpec(this.getDeploymentSpecFrom(agent));
         return deployment;
     }
 
     /**
-     * Attempt to build a Kubernetes metadata for the data transform.
+     * Attempt to build a Kubernetes metadata for the agent.
      *
-     * @param dataTransform The data transform to build a metadata for.
+     * @param agent The agent to build a metadata for.
      * @return A Kubernetes metadata.
      */
     @Transactional
-    private V1ObjectMeta getMetadataFrom(final DataTransformDTO dataTransform) {
+    private V1ObjectMeta getMetadataFrom(final AgentDto agent) {
         var metadata = new V1ObjectMeta();
-        metadata.setName(dataTransform.getDataTransformName().toLowerCase());
+        metadata.setName(agent.getAgentName().toLowerCase());
 
         metadata.setLabels(new HashMap<>());
         metadata.getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
         metadata.getLabels().remove("component");
         metadata.getLabels().remove("app.kubernetes.io/managed-by");
-        metadata.getLabels().put("component", dataTransform.getDataTransformName().toLowerCase());
+        metadata.getLabels().put("component", agent.getAgentName().toLowerCase());
         metadata.getLabels().put("app.kubernetes.io/managed-by", "amigos");
         metadata.getLabels().put(
             "amigos-graph",
-            dataTransform.getGraph().getGraphName().toLowerCase());
+            agent.getGraph().getGraphName().toLowerCase());
 
         metadata.setAnnotations(new HashMap<>());
         metadata.getAnnotations().putAll(this.ubiquiaDeployment.getMetadata().getAnnotations());
@@ -159,36 +156,36 @@ public class AgentDeploymentBuilder {
     }
 
     /**
-     * Attempt to build a Kubernetes deployment spec for the data transform.
+     * Attempt to build a Kubernetes deployment spec for the agent.
      *
-     * @param dataTransform The data transform to build a deployment spec for.
+     * @param agent The agent to build a deployment spec for.
      * @return A Kubernetes deployment spec.
      */
     @Transactional
-    private V1DeploymentSpec getDeploymentSpecFrom(final DataTransformDTO dataTransform) {
+    private V1DeploymentSpec getDeploymentSpecFrom(final AgentDto agent) {
         var spec = new V1DeploymentSpec();
-        spec.setReplicas(dataTransform.getScaleSettings().getMinReplicas());
+        spec.setReplicas(agent.getScaleSettings().getMinReplicas());
         spec.setSelector(this.ubiquiaDeployment.getSpec().getSelector());
         spec.getSelector().getMatchLabels().put(
             "component",
-            dataTransform.getDataTransformName().toLowerCase());
+            agent.getAgentName().toLowerCase());
         spec.getSelector().getMatchLabels().put(
             "amigos-graph",
-            dataTransform.getGraph().getGraphName().toLowerCase());
+            agent.getGraph().getGraphName().toLowerCase());
 
-        spec.setTemplate(this.getPodTemplateSpec(dataTransform));
+        spec.setTemplate(this.getPodTemplateSpec(agent));
 
         return spec;
     }
 
     /**
-     * Attempt to build a Kubernetes template spec for the data transform.
+     * Attempt to build a Kubernetes template spec for the agent.
      *
-     * @param dataTransform The data transform to build a template spec for.
+     * @param agent The agent to build a template spec for.
      * @return A Kubernetes template spec.
      */
     @Transactional
-    private V1PodTemplateSpec getPodTemplateSpec(final DataTransformDTO dataTransform) {
+    private V1PodTemplateSpec getPodTemplateSpec(final AgentDto agent) {
 
         var template = new V1PodTemplateSpec();
         template.setMetadata(new V1ObjectMeta());
@@ -196,17 +193,17 @@ public class AgentDeploymentBuilder {
         template.getMetadata().getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
         template.getMetadata().getLabels().put(
             "component",
-            dataTransform.getDataTransformName().toLowerCase());
+            agent.getAgentName().toLowerCase());
         template.getMetadata().getLabels().put(
-            "amigos-graph",
-            dataTransform.getGraph().getGraphName().toLowerCase());
+            "ubiquia-graph",
+            agent.getGraph().getGraphName().toLowerCase());
         template.getMetadata().getLabels().remove("app.kubernetes.io/managed-by");
-        template.getMetadata().getLabels().put("app.kubernetes.io/managed-by", "amigos");
+        template.getMetadata().getLabels().put("app.kubernetes.io/managed-by", "ubiquia");
 
         template.setSpec(new V1PodSpec());
         template.setSpec(this.ubiquiaDeployment.getSpec().getTemplate().getSpec());
         template.getSpec().setContainers(new ArrayList<>());
-        template.getSpec().getContainers().add(this.getContainer(dataTransform));
+        template.getSpec().getContainers().add(this.getContainer(agent));
         template.getSpec().setImagePullSecrets(
             this.ubiquiaDeployment
                 .getSpec()
@@ -215,25 +212,25 @@ public class AgentDeploymentBuilder {
                 .getImagePullSecrets());
 
         template.getSpec().setVolumes(new ArrayList<>());
-        if (Objects.nonNull(dataTransform.getConfig())) {
+        if (Objects.nonNull(agent.getConfig())) {
             var volume = new V1Volume();
-            volume.setName(dataTransform.getDataTransformName().toLowerCase()
+            volume.setName(agent.getAgentName().toLowerCase()
                 + "-config");
             volume.setConfigMap(new V1ConfigMapVolumeSource());
             volume.getConfigMap().setName(
-                dataTransform.getDataTransformName().toLowerCase()
+                agent.getAgentName().toLowerCase()
                     + "-config");
 
             template.getSpec().getVolumes().add(volume);
         }
 
-        for (var volume : dataTransform.getVolumes()) {
+        for (var volume : agent.getVolumes()) {
             var volumeResource = this.tryGetVolume(volume);
             template.getSpec().addVolumesItem(volumeResource);
         }
 
         template.getSpec().setInitContainers(new ArrayList<>());
-        var initContainer = this.tryGetInitContainer(dataTransform);
+        var initContainer = this.tryGetInitContainer(agent);
         if (Objects.nonNull(initContainer)) {
             template.getSpec().getInitContainers().add(initContainer);
         }
@@ -244,60 +241,60 @@ public class AgentDeploymentBuilder {
     /**
      * Attempt to build a Kubernetes container for the data transform.
      *
-     * @param dataTransform The data transform to build a container for.
+     * @param agent The data transform to build a container for.
      * @return A Kubernetes container.
      */
     @Transactional
-    private V1Container getContainer(final DataTransformDTO dataTransform) {
+    private V1Container getContainer(final AgentDto agent) {
         var container = new V1Container();
-        container.setName(dataTransform.getDataTransformName().toLowerCase());
+        container.setName(agent.getAgentName().toLowerCase());
         container.setImagePullPolicy("IfNotPresent");
 
         var image = "";
 
-        if (!Strings.isEmpty(dataTransform.getImage().getRegistry())) {
-            image += dataTransform.getImage().getRegistry();
+        if (!Strings.isEmpty(agent.getImage().getRegistry())) {
+            image += agent.getImage().getRegistry();
             image += "/";
         }
 
         image = image
-            + dataTransform.getImage().getRepository()
+            + agent.getImage().getRepository()
             + ":"
-            + dataTransform.getImage().getTag();
+            + agent.getImage().getTag();
 
         container.setImage(image);
 
         container.setPorts(new ArrayList<>());
         var port = new V1ContainerPort();
-        port.setContainerPort(dataTransform.getPort());
+        port.setContainerPort(agent.getPort());
         port.setName("http");
         port.setProtocol("TCP");
         port.setHostIP("http");
         container.getPorts().add(port);
 
-        if (Objects.nonNull(dataTransform.getConfig())) {
+        if (Objects.nonNull(agent.getConfig())) {
             var envFrom = new V1EnvFromSource();
             envFrom.setConfigMapRef(new V1ConfigMapEnvSource());
-            envFrom.getConfigMapRef().setName(dataTransform.getDataTransformName().toLowerCase()
+            envFrom.getConfigMapRef().setName(agent.getAgentName().toLowerCase()
                 + "-config");
 
             container.setEnvFrom(new ArrayList<>());
             container.getEnvFrom().add(envFrom);
         }
 
-        if (Objects.nonNull(dataTransform.getLivenessProbe())) {
-            var probe = this.tryGetLivenessProbe(dataTransform);
+        if (Objects.nonNull(agent.getLivenessProbe())) {
+            var probe = this.tryGetLivenessProbe(agent);
             container.setLivenessProbe(probe);
         }
 
         container.setVolumeMounts(new ArrayList<>());
-        for (var volume : dataTransform.getVolumes()) {
+        for (var volume : agent.getVolumes()) {
             var mount = this.tryGetVolumeMount(volume);
             container.getVolumeMounts().add(mount);
         }
 
         container.setEnv(new ArrayList<>());
-        for (var envVar : dataTransform.getEnvironmentVariables()) {
+        for (var envVar : agent.getEnvironmentVariables()) {
             var environmentVariable = new V1EnvVar();
             environmentVariable.setName(envVar.getName());
             environmentVariable.setValue(envVar.getValue());
@@ -308,42 +305,42 @@ public class AgentDeploymentBuilder {
     }
 
     /**
-     * Attempt to build a liveness probe for the data transform.
+     * Attempt to build a liveness probe for the agent.
      *
-     * @param dataTransform The data transform to build a volume mount for.
-     * @return A livess probe.
+     * @param agent The agent to build a volume mount for.
+     * @return A liveness probe.
      */
-    private V1Probe tryGetLivenessProbe(final DataTransformDTO dataTransform) {
+    private V1Probe tryGetLivenessProbe(final AgentDto agent) {
         V1Probe probe = null;
-        if (Objects.nonNull(dataTransform.getLivenessProbe())) {
+        if (Objects.nonNull(agent.getLivenessProbe())) {
             probe = new V1Probe();
-            probe.setInitialDelaySeconds(dataTransform.getLivenessProbe()
+            probe.setInitialDelaySeconds(agent.getLivenessProbe()
                 .getInitialDelaySeconds());
             var httpGet = new V1HTTPGetAction();
-            httpGet.setPath(dataTransform.getLivenessProbe().getHttpGetPath());
-            httpGet.setPort(new IntOrString(dataTransform.getPort()));
+            httpGet.setPath(agent.getLivenessProbe().getHttpGetPath());
+            httpGet.setPort(new IntOrString(agent.getPort()));
             probe.setHttpGet(httpGet);
         }
         return probe;
     }
 
     /**
-     * Attempt to build a Kubernetes init container for the data transform.
+     * Attempt to build a Kubernetes init container for the agent.
      *
-     * @param dataTransform The data transform to build an init container for.
+     * @param agent The agent to build an init container for.
      * @return An init container.
      */
-    private V1Container tryGetInitContainer(final DataTransformDTO dataTransform) {
+    private V1Container tryGetInitContainer(final AgentDto agent) {
         V1Container initContainer = null;
-        if (Objects.nonNull(dataTransform.getInitContainer())) {
+        if (Objects.nonNull(agent.getInitContainer())) {
             initContainer = new V1Container();
-            initContainer.setName(dataTransform.getDataTransformName().toLowerCase()
+            initContainer.setName(agent.getAgentName().toLowerCase()
                 + "-init-container");
             initContainer.setImagePullPolicy("IfNotPresent");
 
-            initContainer.setCommand(dataTransform.getInitContainer().getCommand());
-            initContainer.setArgs(dataTransform.getInitContainer().getArgs());
-            initContainer.setImage(dataTransform.getInitContainer().getImage());
+            initContainer.setCommand(agent.getInitContainer().getCommand());
+            initContainer.setArgs(agent.getInitContainer().getArgs());
+            initContainer.setImage(agent.getInitContainer().getImage());
         }
         return initContainer;
     }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.component.adapter.AAdapter;
+import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.model.embeddable.KeyValuePair;
 
 @Service
@@ -17,7 +17,7 @@ public class AdapterTagBuilder {
      * @param adapter The adapter to build tags for.
      * @return The list of tags.
      */
-    public List<KeyValuePair> buildAdapterTags(final AAdapter adapter) {
+    public List<KeyValuePair> buildAdapterTags(final AbstractAdapter adapter) {
 
         var tags = new ArrayList<KeyValuePair>();
 

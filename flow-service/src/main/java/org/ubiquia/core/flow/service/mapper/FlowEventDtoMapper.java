@@ -25,7 +25,7 @@ public class FlowEventDtoMapper extends GenericDtoMapper<FlowEvent, FlowEventDto
         if (Objects.nonNull(from)) {
 
             to = new FlowEventDto();
-            super.setAEntityFields(from, to);
+            super.setAbstractEntityFields(from, to);
             to.setBatchId(from.getBatchId());
 
             this.setFlowEventTimes(from, to);

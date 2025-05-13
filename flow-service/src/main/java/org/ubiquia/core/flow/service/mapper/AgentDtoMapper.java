@@ -22,7 +22,7 @@ public class AgentDtoMapper extends GenericDtoMapper<
         AgentDto to = null;
         if (Objects.nonNull(from)) {
             to = new AgentDto();
-            super.setAEntityFields(from, to);
+            super.setAbstractEntityFields(from, to);
 
             if (Objects.nonNull(from.getConfig())) {
                 var config = new ConfigDTO();
@@ -34,7 +34,7 @@ public class AgentDtoMapper extends GenericDtoMapper<
                 to.setConfig(config);
             }
 
-            to.setAgentName(from.getDataTransformName());
+            to.setAgentName(from.getAgentName());
             to.setDescription(from.getDescription());
             to.setImage(from.getImage());
             to.setLivenessProbe(from.getLivenessProbe());

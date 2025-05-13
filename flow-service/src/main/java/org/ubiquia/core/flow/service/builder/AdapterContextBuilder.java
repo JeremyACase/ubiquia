@@ -1,13 +1,11 @@
 package org.ubiquia.core.flow.service.builder;
 
 
-import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.component.adapter.AAdapter;
 import org.ubiquia.core.flow.model.adapter.AdapterContext;
 import org.ubiquia.core.flow.model.dto.AdapterDto;
 import org.ubiquia.core.flow.model.embeddable.GraphDeployment;
@@ -49,9 +47,9 @@ public class AdapterContextBuilder {
 
         if (Objects.nonNull(adapterData.getAgent())
             && adapterData.getAgent().getDataTransformType().equals(AgentType.TEMPLATE)) {
-            context.setTemplateTransform(true);
+            context.setTemplateAgent(true);
         } else {
-            context.setTemplateTransform(false);
+            context.setTemplateAgent(false);
         }
 
         return context;

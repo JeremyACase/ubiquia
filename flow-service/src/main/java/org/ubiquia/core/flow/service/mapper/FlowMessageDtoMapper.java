@@ -10,14 +10,14 @@ import org.ubiquia.core.flow.model.entity.FlowMessage;
 public class FlowMessageDtoMapper extends GenericDtoMapper<FlowMessage, FlowMessageDto> {
 
     @Autowired
-    private FlowEventDtoMapper flowEventDTOMapper;
+    private FlowEventDtoMapper flowEventDtoMapper;
 
     @Override
     public FlowMessageDto map(final FlowMessage from) throws JsonProcessingException {
 
         var to = new FlowMessageDto();
-        super.setAEntityFields(from, to);
-        to.setFlowEvent(this.flowEventDTOMapper.map(from.getAmigosEvent()));
+        super.setAbstractEntityFields(from, to);
+        to.setFlowEvent(this.flowEventDtoMapper.map(from.getAmigosEvent()));
         to.setPayload(from.getPayload());
         return to;
     }

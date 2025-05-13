@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.component.adapter.AAdapter;
+import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.component.adapter.PollAdapter;
 import org.ubiquia.core.flow.model.embeddable.GraphDeployment;
 import org.ubiquia.core.flow.model.entity.Adapter;
@@ -23,8 +23,7 @@ import org.ubiquia.core.flow.service.builder.AdapterBuilder;
 @Configuration
 public class AdapterFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(org.ubiquia.core.flow.service.factory.AdapterBuilder.class);
-
+    private static final Logger logger = LoggerFactory.getLogger(AdapterFactory.class);
 
     @Autowired
     private AdapterBuilder adapterBuilder;
@@ -40,7 +39,7 @@ public class AdapterFactory {
      * @return An adapter.
      * @throws Exception Exception from trying to build the adapter.
      */
-    public AAdapter makeAdapterFor(
+    public AbstractAdapter makeAdapterFor(
         final Adapter adapterEntity,
         final Graph graphEntity,
         final GraphDeployment graphDeployment)
@@ -62,19 +61,19 @@ public class AdapterFactory {
     /**
      * Make an adapter for an agent.
      *
-     * @param agentEntity The agent to make an adapter for.
-     * @param graphDeployment     The graph deployment requesting the adapter.
+     * @param agentEntity     The agent to make an adapter for.
+     * @param graphDeployment The graph deployment requesting the adapter.
      * @return An adapter.
      * @throws Exception Exceptions from building the adapter.
      */
-    public AAdapter makeAdapterFor(
+    public AbstractAdapter makeAdapterFor(
         final Agent agentEntity,
         final GraphDeployment graphDeployment)
         throws Exception {
 
         logger.info("...building an adapter for graph {} and data transform {}...",
             agentEntity.getGraph().getGraphName(),
-            agentEntity.getDataTransformName());
+            agentEntity.getAgentName());
 
         if (Objects.isNull(agentEntity.getAdapter())) {
             throw new Exception("ERROR: Cannot build an adapter from a transform with "
@@ -91,7 +90,7 @@ public class AdapterFactory {
 
         logger.info("...completed building adapter for graph {} and data transform named {}...",
             agentEntity.getGraph().getGraphName(),
-            agentEntity.getDataTransformName());
+            agentEntity.getAgentName());
 
         return adapter;
     }
@@ -103,9 +102,9 @@ public class AdapterFactory {
      * @return A built adapter.
      * @throws Exception Exceptions from building the new adapter.
      */
-    private AAdapter makeAdapterByType(final AdapterType adapterType)
+    private AbstractAdapter makeAdapterByType(final AdapterType adapterType)
         throws Exception {
-        AAdapter adapter = null;
+        AbstractAdapter adapter = null;
         switch (adapterType) {
 
             case POLL: {

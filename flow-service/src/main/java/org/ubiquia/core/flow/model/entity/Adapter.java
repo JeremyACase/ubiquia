@@ -62,11 +62,11 @@ public class Adapter extends AbstractEntity {
     @OneToMany(mappedBy = "targetAdapter", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private List<FlowMessage> outboxMessages;
 
-    public Agent getDataTransform() {
+    public Agent getAgent() {
         return agent;
     }
 
-    public void setDataTransform(Agent agent) {
+    public void setAgent(Agent agent) {
         this.agent = agent;
     }
 

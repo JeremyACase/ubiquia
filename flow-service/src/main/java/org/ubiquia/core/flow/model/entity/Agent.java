@@ -16,7 +16,7 @@ public class Agent extends AbstractEntity {
 
     private Config config;
 
-    private String dataTransformName;
+    private String agentName;
 
     private String description;
 
@@ -64,12 +64,12 @@ public class Agent extends AbstractEntity {
     }
 
     @NotNull
-    public String getDataTransformName() {
-        return dataTransformName;
+    public String getAgentName() {
+        return agentName;
     }
 
-    public void setDataTransformName(String dataTransformName) {
-        this.dataTransformName = dataTransformName;
+    public void setAgentName(String agentName) {
+        this.agentName = agentName;
     }
 
     @NotNull
@@ -83,7 +83,7 @@ public class Agent extends AbstractEntity {
 
     @Override
     public String getModelType() {
-        return "DataTransform";
+        return "Agent";
     }
 
     public Adapter getAdapter() {
