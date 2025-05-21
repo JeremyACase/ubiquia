@@ -1,0 +1,434 @@
+{
+  "domain": "pets",
+  "version": {
+    "major": 1,
+    "minor": 2,
+    "patch": 3
+  },
+  "modelType": "AgentCommunicationLanguage",
+  "jsonSchema": {
+    "type": "object",
+    "definitions": {
+      "ColorType": {
+        "type": "string",
+        "enum": [
+          "BLUE",
+          "GREEN",
+          "BROWN",
+          "BLACK",
+          "WHITE",
+          "GRAY"
+        ]
+      },
+      "ModelType": {
+        "type": "string",
+        "enum": [
+          "NONE",
+          "ANIMAL",
+          "ADOPTION_TRANSACTION",
+          "VACCINATION_TRANSACTION",
+          "PERSON",
+          "DOG",
+          "CAT",
+          "POODLE",
+          "DACHSHUND",
+          "SHARK"
+        ]
+      },
+      "VaccinationType": {
+        "type": "string",
+        "enum": [
+          "RABIES",
+          "INFLUENZA"
+        ]
+      },
+      "Name": {
+        "description": "A model with some name infomration.",
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "firstName"
+        ]
+      },
+      "KeyValuePair": {
+        "description": "A model defining a key-value-pair that can be persisted in the MACHINA database where the value is a string.",
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "BaseModel": {
+        "description": "A base model.",
+        "type": "object",
+        "discriminator": {
+          "propertyName": "modelType"
+        },
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}",
+            "readOnly": true
+          },
+          "createdAt": {
+            "description": "Time the model was created.",
+            "example": "2018-01-01T16:00:00.123Z",
+            "format": "date-time",
+            "pattern": "^(?:19|20)\\d{2}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$",
+            "readOnly": true,
+            "type": "string"
+          },
+          "updatedAt": {
+            "description": "Time the model was last updated.",
+            "example": "2018-01-01T16:00:00.123Z",
+            "pattern": "^(?:19|20)\\d{2}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$",
+            "format": "date-time",
+            "readOnly": true,
+            "type": "string"
+          },
+          "tags": {
+            "description": "A list of tags for this model",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/KeyValuePair"
+            },
+            "default": [],
+            "uniqueItems": true
+          },
+          "modelType": {
+            "$ref": "#/definitions/ModelType",
+            "default": "NONE",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "modelType"
+        ]
+      },
+      "AdoptionTransaction": {
+        "description": "A transaction of an adoption.",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/definitions/BaseModel"
+          }
+        ],
+        "properties": {
+          "owner": {
+            "$ref": "#/definitions/Person"
+          },
+          "pet": {
+            "$ref": "#/definitions/Animal"
+          },
+          "modelType": {
+            "$ref": "#/definitions/ModelType",
+            "default": "ADOPTION_TRANSACTION",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "modelType"
+        ]
+      },
+      "MergeTransaction": {
+        "description": "An example of merged data.",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/definitions/VaccinationTransaction"
+          },
+          {
+            "$ref": "#/definitions/Person"
+          }
+        ],
+        "required": [
+          "modelType"
+        ]
+      },
+      "VaccinationTransaction": {
+        "description": "A transaction of a vaccination.",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/definitions/BaseModel"
+          }
+        ],
+        "properties": {
+          "animal": {
+            "$ref": "#/definitions/Animal"
+          },
+          "modelType": {
+            "$ref": "#/definitions/ModelType",
+            "default": "VACCINATION_TRANSACTION",
+            "readOnly": true
+          },
+          "vaccinationType": {
+            "$ref": "#/definitions/VaccinationType"
+          }
+        },
+        "required": [
+          "modelType"
+        ]
+      },
+      "Person": {
+        "description": "A model of a person.",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/definitions/BaseModel"
+          }
+        ],
+        "properties": {
+          "hairColor": {
+            "$ref": "#/definitions/ColorType"
+          },
+          "name": {
+            "$ref": "#/definitions/Name"
+          },
+          "pets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Person"
+            }
+          },
+          "modelType": {
+            "$ref": "#/definitions/ModelType",
+            "default": "PERSON",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "modelType",
+          "name"
+        ]
+      },
+      "Animal": {
+        "description": "The model of an animal.",
+        "allOf": [
+          {
+            "$ref": "#/definitions/BaseModel"
+          }
+        ],
+        "properties": {
+          "color": {
+            "$ref": "#/definitions/ColorType"
+          },
+          "owner": {
+            "$ref": "#/definitions/Person"
+          },
+          "name": {
+            "$ref": "#/definitions/Name"
+          },
+          "height": {
+            "type": "number",
+            "format": "float",
+            "example": 1.2,
+            "minimum": 0
+          },
+          "weight": {
+            "type": "number",
+            "format": "float",
+            "example": 1.2,
+            "minimum": 0
+          },
+          "modelType": {
+            "$ref": "#/definitions/ModelType",
+            "default": "ANIMAL",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "modelType",
+          "color"
+        ]
+      },
+      "Dog": {
+        "description": "The model of a dog.",
+        "allOf": [
+          {
+            "$ref": "#/definitions/Animal"
+          }
+        ],
+        "properties": {
+          "barkDecibels": {
+            "type": "number",
+            "format": "float",
+            "example": 1.2,
+            "minimum": 0
+          },
+          "modelType": {
+            "$ref": "#/definitions/ModelType",
+            "default": "DOG",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "modelType"
+        ]
+      },
+      "Dachschund": {
+        "description": "The model of a wiener dog.",
+        "allOf": [
+          {
+            "$ref": "#/definitions/Dog"
+          }
+        ],
+        "properties": {
+          "apexPredator": {
+            "type": "boolean",
+            "default": true
+          },
+          "modelType": {
+            "$ref": "#/definitions/ModelType",
+            "default": "DACHSCHUND",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "modelType",
+          "apexPredator"
+        ]
+      },
+      "Poodle": {
+        "description": "The model of a poodle.",
+        "allOf": [
+          {
+            "$ref": "#/definitions/Dog"
+          }
+        ],
+        "properties": {
+          "dogShowsWon": {
+            "type": "number",
+            "format": "int64",
+            "default": 0,
+            "minimum": 0
+          },
+          "modelType": {
+            "$ref": "#/definitions/ModelType",
+            "default": "POODLE",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "modelType"
+        ]
+      },
+      "Cat": {
+        "description": "The model of a cat.",
+        "allOf": [
+          {
+            "$ref": "#/definitions/Animal"
+          }
+        ],
+        "properties": {
+          "meowDecibels": {
+            "type": "number",
+            "format": "float",
+            "example": 1.2,
+            "minimum": 0
+          },
+          "modelType": {
+            "$ref": "#/definitions/ModelType",
+            "default": "CAT",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "modelType"
+        ]
+      },
+      "Shark": {
+        "description": "The model of a shark.",
+        "allOf": [
+          {
+            "$ref": "#/definitions/Animal"
+          }
+        ],
+        "properties": {
+          "peopleBitten": {
+            "type": "number",
+            "format": "int64",
+            "default": 0,
+            "minimum": 0
+          },
+          "friendly": {
+            "type": "boolean",
+            "default": true
+          },
+          "modelType": {
+            "$ref": "#/definitions/ModelType",
+            "default": "SHARK",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "modelType"
+        ]
+      }
+    },
+    "properties": {
+      "ColorType": {
+        "$ref": "#/definitions/ColorType"
+      },
+      "ModelType": {
+        "$ref": "#/definitions/ModelType"
+      },
+      "VaccinationType": {
+        "$ref": "#/definitions/VaccinationType"
+      },
+      "Name": {
+        "$ref": "#/definitions/Name"
+      },
+      "KeyValuePair": {
+        "$ref": "#/definitions/KeyValuePair"
+      },
+      "BaseModel": {
+        "$ref": "#/definitions/BaseModel"
+      },
+      "AdoptionTransaction": {
+        "$ref": "#/definitions/AdoptionTransaction"
+      },
+      "MergeTransaction": {
+        "$ref": "#/definitions/MergeTransaction"
+      },
+      "VaccinationTransaction": {
+        "$ref": "#/definitions/VaccinationTransaction"
+      },
+      "Person": {
+        "$ref": "#/definitions/Person"
+      },
+      "Animal": {
+        "$ref": "#/definitions/Animal"
+      },
+      "Dog": {
+        "$ref": "#/definitions/Dog"
+      },
+      "Dachschund": {
+        "$ref": "#/definitions/Dachschund"
+      },
+      "Poodle": {
+        "$ref": "#/definitions/Poodle"
+      },
+      "Cat": {
+        "$ref": "#/definitions/Cat"
+      },
+      "Shark": {
+        "$ref": "#/definitions/Shark"
+      }
+    }
+  }
+}
