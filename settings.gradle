@@ -1,3 +1,5 @@
 rootProject.name = 'ubiquia'
 
+include 'common:models:common-models'
+include 'core:service:communication-service'
 include 'core:service:flow-service'

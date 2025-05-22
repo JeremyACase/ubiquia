@@ -3,7 +3,7 @@ package org.ubiquia.core.flow.repository;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.ubiquia.core.flow.model.entity.FlowMessage;
+import org.ubiquia.common.models.entity.FlowMessage;
 
 public interface FlowMessageRepository extends AbstractEntityRepository<FlowMessage> {
 

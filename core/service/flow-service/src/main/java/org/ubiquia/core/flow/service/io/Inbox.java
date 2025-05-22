@@ -13,7 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.component.adapter.QueueAdapter;
-import org.ubiquia.core.flow.model.dto.FlowMessageDto;
+import org.ubiquia.common.models.dto.FlowMessageDto;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.calculator.AdapterConcurrencyCalculator;

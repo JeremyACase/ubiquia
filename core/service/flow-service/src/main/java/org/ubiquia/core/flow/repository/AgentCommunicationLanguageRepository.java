@@ -1,7 +1,7 @@
 package org.ubiquia.core.flow.repository;
 
 import java.util.Optional;
-import org.ubiquia.core.flow.model.entity.AgentCommunicationLanguage;
+import org.ubiquia.common.models.entity.AgentCommunicationLanguage;
 
 
 public interface AgentCommunicationLanguageRepository

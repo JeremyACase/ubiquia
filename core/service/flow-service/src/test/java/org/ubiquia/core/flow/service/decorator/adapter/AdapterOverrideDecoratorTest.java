@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.ubiquia.core.flow.TestHelper;
-import org.ubiquia.core.flow.model.dto.AdapterDto;
-import org.ubiquia.core.flow.model.embeddable.AdapterSettings;
-import org.ubiquia.core.flow.model.embeddable.GraphDeployment;
-import org.ubiquia.core.flow.model.embeddable.GraphSettings;
-import org.ubiquia.core.flow.model.embeddable.OverrideSettingsStringified;
+import org.ubiquia.common.models.dto.AdapterDto;
+import org.ubiquia.common.models.embeddable.AdapterSettings;
+import org.ubiquia.common.models.embeddable.GraphDeployment;
+import org.ubiquia.common.models.embeddable.GraphSettings;
+import org.ubiquia.common.models.embeddable.OverrideSettingsStringified;
 import org.ubiquia.core.flow.service.decorator.adapter.override.AdapterOverrideDecorator;
 
 

@@ -1,6 +1,6 @@
 package org.ubiquia.core.flow.repository;
 
-import org.ubiquia.core.flow.model.entity.FlowEvent;
+import org.ubiquia.common.models.entity.FlowEvent;
 
 public interface FlowEventRepository extends AbstractEntityRepository<FlowEvent> {
 

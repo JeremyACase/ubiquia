@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.model.dto.AgentCommunicationLanguageDto;
-import org.ubiquia.core.flow.model.entity.AgentCommunicationLanguage;
+import org.ubiquia.common.models.dto.AgentCommunicationLanguageDto;
+import org.ubiquia.common.models.entity.AgentCommunicationLanguage;
 
 @Service
 public class AgentCommunicationLanguageDtoMapper extends GenericDtoMapper<

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,13 +24,13 @@ import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 import org.ubiquia.core.flow.mock.MockRegistrar;
-import org.ubiquia.core.flow.model.dto.GraphEdgeDto;
-import org.ubiquia.core.flow.model.embeddable.AdapterSettings;
-import org.ubiquia.core.flow.model.embeddable.EgressSettings;
-import org.ubiquia.core.flow.model.embeddable.GraphDeployment;
-import org.ubiquia.core.flow.model.enums.AdapterType;
-import org.ubiquia.core.flow.model.enums.AgentType;
-import org.ubiquia.core.flow.model.enums.HttpOutputType;
+import org.ubiquia.common.models.dto.GraphEdgeDto;
+import org.ubiquia.common.models.embeddable.AdapterSettings;
+import org.ubiquia.common.models.embeddable.EgressSettings;
+import org.ubiquia.common.models.embeddable.GraphDeployment;
+import org.ubiquia.common.models.enums.AdapterType;
+import org.ubiquia.common.models.enums.AgentType;
+import org.ubiquia.common.models.enums.HttpOutputType;
 
 
 @SpringBootTest

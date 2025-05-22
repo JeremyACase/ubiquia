@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.controller.AgentCommunicationLanguageController;
 import org.ubiquia.core.flow.controller.GraphController;
-import org.ubiquia.core.flow.model.dto.AgentCommunicationLanguageDto;
-import org.ubiquia.core.flow.model.embeddable.SemanticVersion;
-import org.ubiquia.core.flow.model.entity.AgentCommunicationLanguage;
+import org.ubiquia.common.models.dto.AgentCommunicationLanguageDto;
+import org.ubiquia.common.models.embeddable.SemanticVersion;
+import org.ubiquia.common.models.entity.AgentCommunicationLanguage;
 import org.ubiquia.core.flow.repository.AgentCommunicationLanguageRepository;
 
 

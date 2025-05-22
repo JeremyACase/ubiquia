@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.model.dto.AdapterDto;
-import org.ubiquia.core.flow.model.entity.Adapter;
+import org.ubiquia.common.models.dto.AdapterDto;
+import org.ubiquia.common.models.entity.Adapter;
 
 
 @Service

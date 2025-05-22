@@ -2,9 +2,9 @@ package org.ubiquia.core.flow.controller;
 
 import java.lang.reflect.ParameterizedType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.ubiquia.common.models.dto.AbstractEntityDto;
+import org.ubiquia.common.models.entity.AbstractEntity;
 import org.ubiquia.core.flow.interfaces.InterfaceLogger;
-import org.ubiquia.core.flow.model.dto.AbstractEntityDto;
-import org.ubiquia.core.flow.model.entity.AbstractEntity;
 import org.ubiquia.core.flow.service.builder.IngressResponseBuilder;
 
 public abstract class GenericEntityController<

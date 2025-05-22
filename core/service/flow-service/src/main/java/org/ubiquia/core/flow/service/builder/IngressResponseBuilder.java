@@ -2,8 +2,8 @@ package org.ubiquia.core.flow.service.builder;
 
 
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.model.IngressResponse;
-import org.ubiquia.core.flow.model.entity.AbstractEntity;
+import org.ubiquia.common.models.IngressResponse;
+import org.ubiquia.common.models.entity.AbstractEntity;
 
 @Service
 public class IngressResponseBuilder {

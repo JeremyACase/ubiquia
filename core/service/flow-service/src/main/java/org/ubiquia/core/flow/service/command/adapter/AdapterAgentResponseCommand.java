@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
-import org.ubiquia.core.flow.model.entity.FlowEvent;
+import org.ubiquia.common.models.entity.FlowEvent;
 import org.ubiquia.core.flow.service.io.Outbox;
 import org.ubiquia.core.flow.service.visitor.StamperVisitor;
 import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;

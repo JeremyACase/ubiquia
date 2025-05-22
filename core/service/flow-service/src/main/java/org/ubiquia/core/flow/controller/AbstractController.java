@@ -1,8 +1,6 @@
 package org.ubiquia.core.flow.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.NotImplementedException;
@@ -62,40 +60,5 @@ public abstract class AbstractController {
             throw new IllegalArgumentException("Page request size is larger than maximum limit of: "
                 + this.getMaxPageSize());
         }
-    }
-
-    /**
-     * Helper method to parse a servlet request into predicates.
-     *
-     * @param request The servlet request to parse.
-     * @return A map of parameters to build predicates from.
-     */
-    protected HashMap<String, String[]> getMapFromServletRequest(HttpServletRequest request) {
-        var map = new HashMap<String, String[]>();
-        for (var key : request.getParameterMap().keySet()) {
-            var camelCase = this.camelcaseRegex.matcher(key)
-                .replaceAll(x -> x.group(1).toUpperCase());
-            map.put(camelCase, request.getParameterMap().get(key));
-        }
-        this.removePageKeysHelper(map);
-        return map;
-    }
-
-    /**
-     * Remove any superfluous keys from our map of parameters to query for.
-     *
-     * @param map The map to remove keys from.
-     */
-    protected void removePageKeysHelper(HashMap<String, String[]> map) {
-        map.remove("page");
-        map.remove("size");
-        map.remove("sortDescending");
-        map.remove("sortByFields");
-        map.remove("multiselectFields");
-        map.remove("ignoreTokens");
-        map.remove("hydrationDepth");
-        map.remove("egressDepth");
-
-        this.getLogger().debug("Map now contains the following: {}", map.keySet());
     }
 }

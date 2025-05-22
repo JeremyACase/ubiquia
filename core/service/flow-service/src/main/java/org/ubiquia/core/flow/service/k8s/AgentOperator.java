@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.model.dto.AgentDto;
+import org.ubiquia.common.models.dto.AgentDto;
 import org.ubiquia.core.flow.service.builder.AgentDeploymentBuilder;
 
 /**

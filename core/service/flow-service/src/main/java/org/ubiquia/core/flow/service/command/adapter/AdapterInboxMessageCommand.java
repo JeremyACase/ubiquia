@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.component.adapter.EgressAdapter;
-import org.ubiquia.core.flow.model.dto.FlowMessageDto;
+import org.ubiquia.common.models.dto.FlowMessageDto;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.orchestrator.AdapterPayloadOrchestrator;

@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.ubiquia.core.flow.model.dto.FlowEventDto;
-import org.ubiquia.core.flow.model.entity.FlowEvent;
+import org.ubiquia.common.models.dto.FlowEventDto;
+import org.ubiquia.common.models.entity.FlowEvent;
 
 @RestController
 @RequestMapping("/ubiquia/event")

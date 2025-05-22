@@ -1,0 +1,51 @@
+apply plugin: 'application'
+
+application {
+    mainClass.set('org.ubiquia.core.communication.Application')
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${SPRING_BOOT_VERSION}"
+    }
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    implementation project(':common:models')
+
+    implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
+    implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
+    implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${SPRING_DOC_VERSION}"
+
+    runtimeOnly "io.micrometer:micrometer-registry-prometheus:${MICROMETER_VERSION}"
+
+    testImplementation "org.instancio:instancio-junit:${INSTANCIO_VERSION}"
+    testImplementation "org.testcontainers:testcontainers:1.19.0"
+    testImplementation "org.testcontainers:k3s:1.19.0"
+    testImplementation "org.testcontainers:junit-jupiter:1.19.0"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+}
+
+
+/**
+* Instruct our code coverage tool where to place the report.
+*/
+jacocoTestReport {
+    reports {
+        xml.required=true
+        csv.required=false
+        xml.destination file("./build/reports/jacoco.xml")
+        html.destination file("./build/reports/jacocoHtml")
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+build.dependsOn jacocoTestReport

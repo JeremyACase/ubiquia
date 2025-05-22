@@ -17,8 +17,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  * @author <a href="jeremycase@odysseyconsult.com">Jeremy Case</a>
  */
 @SpringBootApplication
-@ComponentScan(basePackages = {"org.ubiquia.core", "org.ubiquia.core"})
-@EntityScan(basePackages = {"org.ubiquia.core"})
+@ComponentScan(basePackages = {"org.ubiquia.core", "org.ubiquia.common"})
+@EntityScan(basePackages = {"org.ubiquia.core", "org.ubiquia.common"})
 public class Application {
 
     @Autowired

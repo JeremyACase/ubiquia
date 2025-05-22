@@ -9,15 +9,15 @@ import org.instancio.Instancio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.mock.MockRegistrar;
-import org.ubiquia.core.flow.model.dto.AbstractEntityDto;
-import org.ubiquia.core.flow.model.dto.AdapterDto;
-import org.ubiquia.core.flow.model.dto.AgentDto;
-import org.ubiquia.core.flow.model.dto.GraphDto;
-import org.ubiquia.core.flow.model.embeddable.AdapterSettings;
-import org.ubiquia.core.flow.model.embeddable.NameAndVersionPair;
-import org.ubiquia.core.flow.model.embeddable.SemanticVersion;
-import org.ubiquia.core.flow.model.embeddable.SubSchema;
-import org.ubiquia.core.flow.model.enums.AgentType;
+import org.ubiquia.common.models.dto.AbstractEntityDto;
+import org.ubiquia.common.models.dto.AdapterDto;
+import org.ubiquia.common.models.dto.AgentDto;
+import org.ubiquia.common.models.dto.GraphDto;
+import org.ubiquia.common.models.embeddable.AdapterSettings;
+import org.ubiquia.common.models.embeddable.NameAndVersionPair;
+import org.ubiquia.common.models.embeddable.SemanticVersion;
+import org.ubiquia.common.models.embeddable.SubSchema;
+import org.ubiquia.common.models.enums.AgentType;
 
 
 @Service

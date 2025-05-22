@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
-import org.ubiquia.core.flow.model.dto.FlowMessageDto;
+import org.ubiquia.common.models.dto.FlowMessageDto;
 import org.ubiquia.core.flow.service.io.Inbox;
 import org.ubiquia.core.flow.service.telemetry.MicroMeterHelper;
 

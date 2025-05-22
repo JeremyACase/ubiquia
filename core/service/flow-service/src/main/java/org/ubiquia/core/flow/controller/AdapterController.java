@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.ubiquia.core.flow.model.dto.AdapterDto;
-import org.ubiquia.core.flow.model.entity.Adapter;
+import org.ubiquia.common.models.dto.AdapterDto;
+import org.ubiquia.common.models.entity.Adapter;
 
 /**
  * A controller that exposes a RESTful interface for adapter.

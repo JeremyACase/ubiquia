@@ -9,8 +9,8 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.interfaces.InterfaceEntityToDtoMapper;
-import org.ubiquia.core.flow.model.dto.AbstractEntityDto;
-import org.ubiquia.core.flow.model.entity.AbstractEntity;
+import org.ubiquia.common.models.dto.AbstractEntityDto;
+import org.ubiquia.common.models.entity.AbstractEntity;
 
 /**
  * A class dedicated to mapping from entities from the database to Data Transfer

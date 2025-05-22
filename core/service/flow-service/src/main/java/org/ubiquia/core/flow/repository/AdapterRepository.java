@@ -1,7 +1,7 @@
 package org.ubiquia.core.flow.repository;
 
 import java.util.Optional;
-import org.ubiquia.core.flow.model.entity.Adapter;
+import org.ubiquia.common.models.entity.Adapter;
 
 public interface AdapterRepository extends AbstractEntityRepository<Adapter> {
 

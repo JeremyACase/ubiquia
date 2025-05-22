@@ -10,10 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.model.embeddable.SubSchema;
-import org.ubiquia.core.flow.model.entity.Adapter;
-import org.ubiquia.core.flow.model.enums.EgressType;
-import org.ubiquia.core.flow.model.enums.HttpOutputType;
+import org.ubiquia.common.models.embeddable.SubSchema;
+import org.ubiquia.common.models.entity.Adapter;
+import org.ubiquia.common.models.enums.EgressType;
+import org.ubiquia.common.models.enums.HttpOutputType;
 
 /**
  * A service dedicated to validating adapters.

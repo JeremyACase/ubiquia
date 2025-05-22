@@ -6,17 +6,12 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
@@ -24,13 +19,12 @@ import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 import org.ubiquia.core.flow.mock.MockRegistrar;
-import org.ubiquia.core.flow.model.dto.GraphEdgeDto;
-import org.ubiquia.core.flow.model.embeddable.EgressSettings;
-import org.ubiquia.core.flow.model.embeddable.GraphDeployment;
-import org.ubiquia.core.flow.model.entity.FlowMessage;
-import org.ubiquia.core.flow.model.enums.AdapterType;
-import org.ubiquia.core.flow.model.enums.AgentType;
-import org.ubiquia.core.flow.model.enums.HttpOutputType;
+import org.ubiquia.common.models.dto.GraphEdgeDto;
+import org.ubiquia.common.models.embeddable.EgressSettings;
+import org.ubiquia.common.models.embeddable.GraphDeployment;
+import org.ubiquia.common.models.enums.AdapterType;
+import org.ubiquia.common.models.enums.AgentType;
+import org.ubiquia.common.models.enums.HttpOutputType;
 import org.ubiquia.core.flow.service.command.adapter.MergeAdapterCommand;
 import org.ubiquia.core.flow.service.mapper.FlowMessageDtoMapper;
 

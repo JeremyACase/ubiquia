@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.component.adapter.*;
-import org.ubiquia.core.flow.model.embeddable.GraphDeployment;
-import org.ubiquia.core.flow.model.entity.Adapter;
-import org.ubiquia.core.flow.model.entity.Agent;
-import org.ubiquia.core.flow.model.entity.Graph;
-import org.ubiquia.core.flow.model.enums.AdapterType;
+import org.ubiquia.common.models.embeddable.GraphDeployment;
+import org.ubiquia.common.models.entity.Adapter;
+import org.ubiquia.common.models.entity.Agent;
+import org.ubiquia.common.models.entity.Graph;
+import org.ubiquia.common.models.enums.AdapterType;
 import org.ubiquia.core.flow.service.builder.adapter.AdapterBuilder;
 
 /**

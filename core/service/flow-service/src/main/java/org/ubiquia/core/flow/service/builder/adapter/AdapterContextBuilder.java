@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.model.adapter.AdapterContext;
-import org.ubiquia.core.flow.model.dto.AdapterDto;
-import org.ubiquia.core.flow.model.embeddable.GraphDeployment;
-import org.ubiquia.core.flow.model.entity.Graph;
-import org.ubiquia.core.flow.model.enums.AgentType;
+import org.ubiquia.common.models.dto.AdapterDto;
+import org.ubiquia.common.models.embeddable.GraphDeployment;
+import org.ubiquia.common.models.entity.Graph;
+import org.ubiquia.common.models.enums.AgentType;
 import org.ubiquia.core.flow.service.logic.adapter.AdapterTypeLogic;
 
 @Service

@@ -8,7 +8,13 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/flow-service" />
+            <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/common/models" />
+            <option value="$PROJECT_DIR$/common/models/common-models" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/core/service" />
+            <option value="$PROJECT_DIR$/core/service/communication-service" />
+            <option value="$PROJECT_DIR$/core/service/flow-service" />
           </set>
         </option>
       </GradleProjectSettings>

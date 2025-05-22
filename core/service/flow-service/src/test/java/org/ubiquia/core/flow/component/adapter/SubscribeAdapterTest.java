@@ -12,11 +12,11 @@ import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 import org.ubiquia.core.flow.mock.MockRegistrar;
-import org.ubiquia.core.flow.model.embeddable.BrokerSettings;
-import org.ubiquia.core.flow.model.embeddable.GraphDeployment;
-import org.ubiquia.core.flow.model.enums.AdapterType;
-import org.ubiquia.core.flow.model.enums.AgentType;
-import org.ubiquia.core.flow.model.enums.BrokerType;
+import org.ubiquia.common.models.embeddable.BrokerSettings;
+import org.ubiquia.common.models.embeddable.GraphDeployment;
+import org.ubiquia.common.models.enums.AdapterType;
+import org.ubiquia.common.models.enums.AgentType;
+import org.ubiquia.common.models.enums.BrokerType;
 
 @SpringBootTest
 @AutoConfigureMockMvc

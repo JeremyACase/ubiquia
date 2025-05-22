@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.ubiquia.core.flow.model.dto.AgentDto;
-import org.ubiquia.core.flow.model.entity.Agent;
+import org.ubiquia.common.models.dto.AgentDto;
+import org.ubiquia.common.models.entity.Agent;
 
 /**
  * A controller that exposes a RESTful interface for agents.

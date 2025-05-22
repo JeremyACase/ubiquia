@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
-import org.ubiquia.core.flow.model.enums.AdapterType;
+import org.ubiquia.common.models.enums.AdapterType;
 
 
 @SpringBootTest

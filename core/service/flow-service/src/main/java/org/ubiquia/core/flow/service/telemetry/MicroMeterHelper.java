@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.model.embeddable.KeyValuePair;
+import org.ubiquia.common.models.embeddable.KeyValuePair;
 
 @ConditionalOnProperty(
     value = "management.endpoint.prometheus.enabled",

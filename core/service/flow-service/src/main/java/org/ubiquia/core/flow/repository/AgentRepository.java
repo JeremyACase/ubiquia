@@ -1,7 +1,7 @@
 package org.ubiquia.core.flow.repository;
 
 import java.util.Optional;
-import org.ubiquia.core.flow.model.entity.Agent;
+import org.ubiquia.common.models.entity.Agent;
 
 public interface AgentRepository extends AbstractEntityRepository<Agent> {
 

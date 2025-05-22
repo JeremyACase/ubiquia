@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.interfaces.InterfaceLogger;
-import org.ubiquia.core.flow.model.entity.FlowEvent;
+import org.ubiquia.common.models.entity.FlowEvent;
 import org.ubiquia.core.flow.service.command.adapter.AdapterPostToAgentCommand;
 import org.ubiquia.core.flow.service.command.adapter.AdapterPutToAgentCommand;
 import org.ubiquia.core.flow.service.io.Outbox;

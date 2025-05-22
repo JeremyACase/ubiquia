@@ -3,8 +3,8 @@ package org.ubiquia.core.flow.interfaces;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
-import org.ubiquia.core.flow.model.dto.AbstractEntityDto;
-import org.ubiquia.core.flow.model.entity.AbstractEntity;
+import org.ubiquia.common.models.dto.AbstractEntityDto;
+import org.ubiquia.common.models.entity.AbstractEntity;
 
 /**
  * An interface that can be used to map from database entities to their Data Transfer Object

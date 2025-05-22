@@ -18,6 +18,8 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-webflux"
 
+    implementation project(':common:models')
+
     implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${JACKSON_DATA_FORMAT_VERSION}"
     implementation "com.github.java-json-tools:json-schema-core:${JAVA_JSON_TOOLS}"

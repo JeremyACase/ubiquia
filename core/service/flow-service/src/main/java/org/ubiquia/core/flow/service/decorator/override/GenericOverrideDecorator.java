@@ -9,14 +9,12 @@ import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.interfaces.InterfaceLogger;
-import org.ubiquia.core.flow.model.embeddable.GraphDeployment;
-import org.ubiquia.core.flow.model.embeddable.OverrideSettingsStringified;
+import org.ubiquia.common.models.embeddable.GraphDeployment;
+import org.ubiquia.common.models.embeddable.OverrideSettingsStringified;
 
 @Service
 public abstract class GenericOverrideDecorator<T> implements InterfaceLogger {

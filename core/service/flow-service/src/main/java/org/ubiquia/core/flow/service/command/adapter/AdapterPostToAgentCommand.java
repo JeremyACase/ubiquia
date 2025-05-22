@@ -15,9 +15,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.interfaces.InterfaceLogger;
-import org.ubiquia.core.flow.model.entity.FlowEvent;
+import org.ubiquia.common.models.entity.FlowEvent;
 import org.ubiquia.core.flow.repository.FlowEventRepository;
-import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.visitor.AdapterOpenMessageVisitor;
 import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
 
