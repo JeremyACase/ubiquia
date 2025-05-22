@@ -30,16 +30,25 @@ jobs:
       - name: Build
         run: ./gradlew clean build
 
+      - name: Upload subproject jars
+        uses: actions/upload-artifact@v4
+        with:
+          name: jars
+          path: |
+            core/service/communication-service/build/libs/*.jar
+            core/service/flow-service/build/libs/*.jar
+
   containerize-and-publish:
     needs: [build]  
     runs-on: ubuntu-latest
 
     steps:
 
-      - name: Download build artifacts
+      - name: Download JAR artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-artifacts
+          name: jars
+          path: .
 
       - name: Determine image tag
         id: image_tag
