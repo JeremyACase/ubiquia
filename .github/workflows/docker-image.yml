@@ -8,6 +8,8 @@ on:
       - 'v*'  # Trigger on tag push (e.g., v1.0.0)
 
 env:
+  DOCKER_REGISTRY: docker.io
+  DOCKER_REPO: ubiquia
   SUBPROJECTS: "core/service/communication-service core/service/flow-service"
 
 jobs:
