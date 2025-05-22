@@ -8,7 +8,7 @@ on:
       - 'v*'  # Trigger on tag push (e.g., v1.0.0)
 
 env:
-  IMAGE_NAME: ubiquia/pet-store-data-transform 
+  SUBPROJECTS: "core/service/communication-service core/service/flow-service"
 
 jobs:
 
@@ -28,4 +28,45 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build
-        run: ./gradlew build
+        run: ./gradlew clean build
+
+  containerize-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
+      - name: Determine image tag
+        id: image_tag
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "IMAGE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          else
+            echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+          fi
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker images for each subproject
+        run: |
+          for dir in $SUBPROJECTS; do
+            project_name=core-$(basename $dir)
+            IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
+            echo "Building image for $dir -> $IMAGE_NAME:${IMAGE_TAG}"
+            docker build -t $IMAGE_NAME:${IMAGE_TAG} ./$dir
+            docker push $IMAGE_NAME:${IMAGE_TAG}
+
+            # Optionally tag as latest if it's a versioned tag
+            if [[ "${IMAGE_TAG}" != "latest" ]]; then
+              docker tag $IMAGE_NAME:${IMAGE_TAG} $IMAGE_NAME:latest
+              docker push $IMAGE_NAME:latest
+            fi
+          done
