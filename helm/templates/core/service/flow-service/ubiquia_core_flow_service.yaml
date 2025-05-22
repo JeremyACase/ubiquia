@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubiquia-core-flow-service
+  labels:
+    {{- include "ubiquia.labels" . | nindent 4 }}
+    component: ubiquia-core-flow-service
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: {{ .Values.convenience.variables.spring.port }}
+      targetPort: http
+      protocol: TCP
+  selector:
+    {{- include "ubiquia.selectorLabels" . | nindent 4 }}
+    component: ubiquia-core-flow-service
