@@ -62,6 +62,7 @@ jobs:
             jar=$(find . -name "*${base}*.jar" | head -n 1)
             if [[ -f "$jar" ]]; then
               echo "Copying $jar to $dir"
+              mkdir -p "$dir/build/libs"
               cp "$jar" "$dir/build/libs"
             else
               echo "No JAR found for $base"
