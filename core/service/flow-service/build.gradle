@@ -14,9 +14,9 @@ dependencyManagement {
     }
 }
 
-jar {
-    archiveFileName = 'ubiquia-core-flow-service.jar'
-}
+// jar {
+//     enabled = false  // 🚫 Disable the plain JAR completely
+// }
 
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
