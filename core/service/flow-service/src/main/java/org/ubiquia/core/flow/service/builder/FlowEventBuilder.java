@@ -102,8 +102,8 @@ public class FlowEventBuilder {
     private FlowEvent getEventHelper(final AbstractAdapter adapter) {
 
         var adapterContext = adapter.getAdapterContext();
-        logger.debug("Creating a new event for adapter with ID: {}",
-            adapterContext.getAdapterId());
+        logger.debug("Creating a new event for adapter: {}",
+            adapterContext.getAdapterName());
 
         var adapterRecord = this.adapterRepository.findById(adapterContext.getAdapterId());
 

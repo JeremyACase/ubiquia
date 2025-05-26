@@ -1,3 +1,7 @@
+logging:
+  level:
+    org.ubiquia: DEBUG
+
 ubiquia:
   bootstrap:
     enabled: false
@@ -20,7 +24,7 @@ ubiquia:
   outbox:
 
     enabled: true
-    frequency-milliseconds: 1000
+    frequency-milliseconds: 300
 
     # Current supported values are: DEFAULT
     mode: DEFAULT

@@ -86,8 +86,8 @@ public class TemplateAgentProxy {
             schemaStore,
             new Random());
         var fuzzyData = generator.generate(jsonSchema, 10);
-
         var stringifiedPayload = this.objectMapper.writeValueAsString(fuzzyData);
+        logger.debug("Generated dummy data: {}", stringifiedPayload);
         eventTimes.setAgentResponseTime(OffsetDateTime.now());
         this.stamperVisitor.tryStampOutputs(flowEvent, stringifiedPayload);
         if (flowEvent.getAdapter().getAdapterSettings().getIsPersistOutputPayload()) {

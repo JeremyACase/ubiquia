@@ -103,8 +103,8 @@ public abstract class AbstractAdapter implements InterfaceLogger {
 
         this.getLogger().debug("Adapter {} of graph {} is polling "
                 + "to calculate backpressure...",
-            adapterContext.getGraphName(),
-            adapterContext.getAdapterName());
+            adapterContext.getAdapterName(),
+            adapterContext.getGraphName());
 
         var count = this
             .flowMessageRepository
