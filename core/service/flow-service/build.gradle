@@ -1,10 +1,6 @@
 plugins {
     id 'org.springframework.boot' version "${SPRING_BOOT_VERSION}"
-    id 'application'
-}
-
-application {
-    mainClass.set('org.ubiquia.core.flow.Application')
+    id 'java'
 }
 
 bootJar {
