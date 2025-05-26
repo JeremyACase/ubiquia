@@ -1,0 +1,8 @@
+ubiquia:
+  cluster:
+  instance:
+    database: 
+      h2:
+        enabled: true
+      yugabyte:
+        enabled: false

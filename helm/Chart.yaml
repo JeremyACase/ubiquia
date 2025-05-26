@@ -6,7 +6,7 @@ dependencies:
 - name: yugabyte
   version:  2024.1.3
   repository:  https://charts.yugabyte.com
-  condition: config.machina.database.yugabyte.enabled
+  condition: ubiquia.instance.database.yugabyte.enabled
 
 
 # A chart can be either an 'application' or a 'library' chart.

@@ -56,23 +56,13 @@ Pod labels
 {{- define "ubiquia.podLabels" -}}
 {{- range $key, $val := .Values.config.podLabels -}}
 {{ $key }}: {{ $val | quote }}
-{{ end -}}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "ubiquia.adminServiceAccountName" -}}
-{{- if .Values.config.k8s.adminServiceAccount.create }}
-{{- default (printf "%s-admin" (include "ubiquia.fullname" .) ) .Values.config.k8s.adminServiceAccount.name }}
-{{- else }}
-{{- default "default" .Values.adminServiceAccount.name }}
 {{- end }}
 {{- end }}
 
-{{- define "ubiquia.core.commService.image" -}}
-{{ .Values.components.core.commService.image.registry }}/{{ .Values.components.core.commService.image.repository }}:{{ .Values.components.core.commService.image.tag }}
+{{- define "ubiquia.core.communicationService.image" -}}
+{{ .Values.ubiquia.components.core.communicationService.image.registry }}/{{ .Values.ubiquia.components.core.communicationService.image.repository }}:{{ .Values.ubiquia.components.core.communicationService.image.tag }}
 {{- end }}
 
 {{- define "ubiquia.core.flowService.image" -}}
-{{ .Values.components.core.flowService.image.registry }}/{{ .Values.components.core.flowService.image.repository }}:{{ .Values.components.core.flowService.image.tag }}
+{{ .Values.ubiquia.components.core.flowService.image.registry }}/{{ .Values.ubiquia.components.core.flowService.image.repository }}:{{ .Values.ubiquia.components.core.flowService.image.tag }}
 {{- end }}

@@ -34,7 +34,7 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: ubiquia-core-flow-service-config
+          name: ubiquia-core-flow-config
       containers:
       - name: flow-service
         volumeMounts:
@@ -50,5 +50,4 @@ spec:
         ports:
           - name: http
             containerPort: {{ .Values.convenience.variables.spring.port }}
-            targetPort: http
             protocol: TCP

@@ -6,15 +6,20 @@ convenience:
     tls:
       enabled: &tlsEnabled false
 
+config:
+  podLabels: 
+
 ubiquia:
-  cluster:
   instance:
     database: 
       ddlAutoSetting: create
+      h2:
+        enabled: false
       yugabyte:
         enabled: true
       # ANSI Database Level Isolation (https://en.wikipedia.org/wiki/Isolation_(database_systems))
-      transactionIsolation: TRANSACTION_READ_COMMITTED # values are: TRANSACTION_READ_UNCOMMITTED (0), TRANSACTION_READ_COMMITTED (1), TRANSACTION_REPEATABLE_READ (2), TRANSACTION_SERIALIZABLE (3)
+      # values are: TRANSACTION_READ_UNCOMMITTED (0), TRANSACTION_READ_COMMITTED (1), TRANSACTION_REPEATABLE_READ (2), TRANSACTION_SERIALIZABLE (3)
+      transactionIsolation: TRANSACTION_READ_COMMITTED 
     flowService:
       bootstrap:
         enabled: true
@@ -24,17 +29,16 @@ ubiquia:
         maxRAMPercentage: 25
   components:
     core:
-      commService:
+      communicationService:
         image:
-          registry: *prodRegistry
-          repository: amigos
-          tag: 0.1.0
+          registry: ubiquia
+          repository: core-communication-service
+          tag: latest
       flowService:
-        graph:
-          image:
-            registry: *prodRegistry
-            repository: amigos
-            tag: 0.1.0
+        image:
+          registry: ubiquia
+          repository: core-flow-service
+          tag: latest
 
 k8s:
   autoscaling:
