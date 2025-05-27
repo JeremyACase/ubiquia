@@ -9,7 +9,6 @@ import org.ubiquia.common.models.embeddable.KeyValuePair;
 import org.ubiquia.common.models.embeddable.SemanticVersion;
 
 
-@Validated
 @Entity
 public class Graph extends AbstractEntity {
 

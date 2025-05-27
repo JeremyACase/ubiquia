@@ -6,11 +6,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
-import org.springframework.validation.annotation.Validated;
 import org.ubiquia.common.models.embeddable.*;
 import org.ubiquia.common.models.enums.AdapterType;
 
-@Validated
 @Entity
 public class Adapter extends AbstractEntity {
 

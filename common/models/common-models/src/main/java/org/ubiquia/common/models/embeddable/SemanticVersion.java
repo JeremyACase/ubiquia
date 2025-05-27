@@ -1,25 +1,16 @@
 package org.ubiquia.common.models.embeddable;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
-import org.springframework.validation.annotation.Validated;
 
-@ApiModel(
-    description = "A model defining a key-value-pair that can be persisted in the database.")
-@Validated
 @Embeddable
 public class SemanticVersion {
 
-    @JsonProperty("major")
     private Integer major;
 
-    @JsonProperty("minor")
     private Integer minor;
 
-    @JsonProperty("patch")
     private Integer patch;
 
     @NotNull

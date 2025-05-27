@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Embeddable;
 import org.springframework.validation.annotation.Validated;
 
-@Validated
 @Embeddable
 public class SubSchema {
 

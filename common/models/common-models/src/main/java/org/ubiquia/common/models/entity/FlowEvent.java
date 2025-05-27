@@ -1,7 +1,6 @@
 package org.ubiquia.common.models.entity;
 
 
-import io.swagger.annotations.ApiModelProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -55,9 +54,6 @@ public class FlowEvent extends AbstractEntity {
     })
     private Set<KeyValuePair> outputPayloadStamps;
 
-    @Schema(
-        readOnly = true,
-        value = "")
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
     @NotNull
     public String getBatchId() {

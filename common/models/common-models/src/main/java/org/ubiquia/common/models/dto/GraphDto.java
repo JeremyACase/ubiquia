@@ -7,7 +7,6 @@ import org.springframework.validation.annotation.Validated;
 import org.ubiquia.common.models.embeddable.NameAndVersionPair;
 import org.ubiquia.common.models.embeddable.SemanticVersion;
 
-@Validated
 public class GraphDto extends AbstractEntityDto {
 
     private String graphName;

@@ -1,19 +1,15 @@
 package org.ubiquia.common.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.data.annotation.ReadOnlyProperty;
 
 public class IngressResponse {
 
-    @JsonProperty("id")
     private String id = null;
 
-    @JsonProperty("modelType")
     private String modelType = "IngressResponse";
 
-    @JsonProperty("payloadModelType")
     private String payloadModelType = "IngressResponse";
 
     public IngressResponse id(String id) {

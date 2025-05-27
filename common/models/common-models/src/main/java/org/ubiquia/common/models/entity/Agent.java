@@ -1,14 +1,11 @@
 package org.ubiquia.common.models.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.Set;
-import org.springframework.validation.annotation.Validated;
 import org.ubiquia.common.models.embeddable.*;
 import org.ubiquia.common.models.enums.AgentType;
 
-@Validated
 @Entity
 public class Agent extends AbstractEntity {
 
@@ -51,7 +48,6 @@ public class Agent extends AbstractEntity {
     @JoinColumn(name = "graph_agent_join_id", nullable = false)
     private Graph graph;
 
-    @JsonProperty("volumes")
     @ElementCollection
     private Set<Volume> volumes;
 

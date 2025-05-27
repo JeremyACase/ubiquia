@@ -2,28 +2,17 @@ package org.ubiquia.common.models.embeddable;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
-import org.springframework.validation.annotation.Validated;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
-@ApiModel(
-    description = "A model defining a key-value-pair that can be persisted in the database.")
-@Validated
 @Embeddable
 public class KeyValuePair {
 
-    @JsonProperty("key")
     @Column(name = "pair_key")
     private String key = null;
 
-    @JsonProperty("value")
     @Column(name = "pair_value")
     private String value = null;
 
@@ -45,7 +34,6 @@ public class KeyValuePair {
         this.value = value;
     }
 
-    @Schema(required = true, value = "key")
     @NotNull
     public String getKey() {
         return key;
@@ -55,7 +43,6 @@ public class KeyValuePair {
         this.key = key;
     }
 
-    @Schema(value = "value")
     public String getValue() {
         return value;
     }

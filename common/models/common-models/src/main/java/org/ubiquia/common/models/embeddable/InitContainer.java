@@ -8,7 +8,6 @@ import java.util.List;
 import org.springframework.validation.annotation.Validated;
 
 
-@Validated
 @Embeddable
 public class InitContainer {
 

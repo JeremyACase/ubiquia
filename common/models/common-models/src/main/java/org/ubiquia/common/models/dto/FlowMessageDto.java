@@ -4,7 +4,6 @@ package org.ubiquia.common.models.dto;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 
-@Validated
 public class FlowMessageDto extends AbstractEntityDto {
 
     private FlowEventDto flowEvent;

@@ -1,34 +1,26 @@
 package org.ubiquia.common.models.embeddable;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Embeddable;
 import java.time.OffsetDateTime;
 
 @Embeddable
 public class FlowEventTimes {
-    @JsonProperty("agentResponseTime")
+
     private OffsetDateTime agentResponseTime;
 
-    @JsonProperty("payloadSentToAgentTime")
     private OffsetDateTime payloadSentToAgentTime;
 
-    @JsonProperty("eventStartTime")
     private OffsetDateTime eventStartTime;
 
-    @JsonProperty("eventCompleteTime")
     private OffsetDateTime eventCompleteTime;
 
-    @JsonProperty("egressResponseReceivedTime")
     private OffsetDateTime egressResponseReceivedTime;
 
-    @JsonProperty("payloadSentToOutboxTime")
     private OffsetDateTime sentToOutboxTime;
 
-    @JsonProperty("payloadEgressedTime")
     private OffsetDateTime payloadEgressedTime;
 
-    @JsonProperty("pollStartedTime")
     private OffsetDateTime pollStartedTime;
 
     public OffsetDateTime getPayloadSentToAgentTime() {

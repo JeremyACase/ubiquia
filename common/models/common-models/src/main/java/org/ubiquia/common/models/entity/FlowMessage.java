@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 
-@Validated
 @Entity
 public class FlowMessage extends AbstractEntity {
 

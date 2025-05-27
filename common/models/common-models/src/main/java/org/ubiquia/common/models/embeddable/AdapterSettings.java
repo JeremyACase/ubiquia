@@ -1,41 +1,29 @@
 package org.ubiquia.common.models.embeddable;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Embeddable;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.validation.annotation.Validated;
 
-@Validated
 @Embeddable
 public class AdapterSettings {
 
-    @JsonProperty("isValidateInputPayload")
     private Boolean isValidateInputPayload = false;
 
-    @JsonProperty("isValidateOutputPayload")
     private Boolean isValidateOutputPayload = false;
 
-    @JsonProperty("isPersistInputPayload")
     private Boolean isPersistInputPayload = false;
 
-    @JsonProperty("isPersistOutputPayload")
     private Boolean isPersistOutputPayload = false;
 
-    @JsonProperty("inboxPollFrequencyMilliseconds")
     private Long inboxPollFrequencyMilliseconds = 1000L;
 
-    @JsonProperty("backpressurePollFrequencyMilliseconds")
     private Long backpressurePollFrequencyMilliseconds = 5000L;
 
-    @JsonProperty("inputStampKeychains")
     private List<String> inputStampKeychains = new ArrayList<>();
 
-    @JsonProperty("outputStampKeychains")
     private List<String> outputStampKeychains = new ArrayList<>();
 
-    @JsonProperty("isPassthrough")
     private Boolean isPassthrough = false;
 
     public Boolean getIsPersistInputPayload() {

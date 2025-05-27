@@ -4,9 +4,7 @@ package org.ubiquia.common.models.embeddable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.validation.annotation.Validated;
 
-@Validated
 @Embeddable
 public class OverrideSettingsStringified {
 

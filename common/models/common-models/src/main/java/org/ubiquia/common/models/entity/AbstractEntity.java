@@ -10,10 +10,8 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.validation.annotation.Validated;
 import org.ubiquia.common.models.embeddable.KeyValuePair;
 
-@Validated
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractEntity {

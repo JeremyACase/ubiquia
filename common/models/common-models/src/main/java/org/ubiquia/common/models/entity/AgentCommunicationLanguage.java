@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.validation.annotation.Validated;
 import org.ubiquia.common.models.embeddable.SemanticVersion;
 
-@Validated
 @Entity
 public class AgentCommunicationLanguage extends AbstractEntity {
 

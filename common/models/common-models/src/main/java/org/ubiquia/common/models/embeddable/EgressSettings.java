@@ -8,7 +8,6 @@ import org.springframework.validation.annotation.Validated;
 import org.ubiquia.common.models.enums.EgressType;
 import org.ubiquia.common.models.enums.HttpOutputType;
 
-@Validated
 @Embeddable
 public class EgressSettings {
 

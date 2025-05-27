@@ -4,7 +4,6 @@ package org.ubiquia.common.models.embeddable;
 import jakarta.persistence.Embeddable;
 import org.springframework.validation.annotation.Validated;
 
-@Validated
 @Embeddable
 public class EnvironmentVariable {
 

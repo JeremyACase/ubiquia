@@ -1,7 +1,6 @@
 package org.ubiquia.common.models.embeddable;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
@@ -11,10 +10,8 @@ import org.ubiquia.common.models.enums.BrokerType;
 @Embeddable
 public class BrokerSettings {
 
-    @JsonProperty("type")
     private BrokerType type;
 
-    @JsonProperty("topic")
     private String topic;
 
     @NotNull

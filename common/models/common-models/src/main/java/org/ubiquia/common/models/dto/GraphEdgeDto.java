@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
 
-@Validated
 public class GraphEdgeDto {
 
     private String leftAdapterName;
