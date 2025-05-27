@@ -2,7 +2,7 @@ convenience:
   variables:
     spring:
       port: 8080
-      swaggerDocs: /swagger-ui.html
+      swaggerDocs: /swagger-ui/index.html
     tls:
       enabled: &tlsEnabled false
 

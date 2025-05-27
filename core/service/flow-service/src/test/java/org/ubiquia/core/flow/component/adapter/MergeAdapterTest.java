@@ -146,7 +146,7 @@ public class MergeAdapterTest {
             .andExpect(method(HttpMethod.POST))
             .andRespond(withSuccess());
 
-        Thread.sleep(8000);
+        Thread.sleep(12000);
         mockServer.verify();
     }
 }

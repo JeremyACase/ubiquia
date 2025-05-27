@@ -11,10 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.component.adapter.MergeAdapter;
-import org.ubiquia.core.flow.interfaces.InterfaceLogger;
 import org.ubiquia.common.models.dto.FlowMessageDto;
 import org.ubiquia.common.models.entity.FlowMessage;
+import org.ubiquia.core.flow.component.adapter.MergeAdapter;
+import org.ubiquia.core.flow.interfaces.InterfaceLogger;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
@@ -25,7 +25,6 @@ import org.ubiquia.core.flow.service.telemetry.MicroMeterHelper;
  * A service that exposes adapter type logic.
  */
 @Service
-@Transactional
 public class MergeAdapterCommand implements InterfaceLogger {
 
     private static final Logger logger = LoggerFactory.getLogger(MergeAdapterCommand.class);
@@ -53,6 +52,7 @@ public class MergeAdapterCommand implements InterfaceLogger {
         return logger;
     }
 
+    @Transactional
     public void tryProcessMessageFor(final FlowMessageDto message, final MergeAdapter adapter) {
 
         Timer.Sample sample = null;
@@ -70,14 +70,15 @@ public class MergeAdapterCommand implements InterfaceLogger {
 
             if (!messages.isEmpty()) {
 
-                var targetAdapterRecord = this.adapterRepository.findById(
-                    adapterContext.getAdapterId());
+                var targetAdapterRecord = this
+                    .adapterRepository
+                    .findById(adapterContext.getAdapterId());
                 var targetAdapter = targetAdapterRecord.get();
 
                 var upstreamAdapters = targetAdapter.getUpstreamAdapters();
                 if (messages.size() == upstreamAdapters.size()) {
 
-                    this.getLogger().info(" {} has all {} upstream messages "
+                    this.getLogger().info("{} has all {} upstream messages "
                             + "with batch id {}; processing...",
                         adapterContext.getAdapterName(),
                         messages.size(),
@@ -100,6 +101,8 @@ public class MergeAdapterCommand implements InterfaceLogger {
                         messages.size(),
                         message.getFlowEvent().getBatchId());
                 }
+            } else {
+                throw new RuntimeException("ERROR: Somehow, the messages list is empty!");
             }
         } catch (Exception e) {
             this.getLogger().error("ERROR: Could not process inbox message: {}",
@@ -125,6 +128,5 @@ public class MergeAdapterCommand implements InterfaceLogger {
 
         var mergedString = this.objectMapper.writeValueAsString(mergedMap);
         return mergedString;
-
     }
 }

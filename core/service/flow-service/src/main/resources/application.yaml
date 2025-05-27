@@ -1,0 +1,81 @@
+logging:
+  level:
+    org.springdoc: DEBUG
+    org.ubiquia: DEBUG
+
+management:
+  endpoint:
+    info:
+      enabled: true
+      java:
+        enabled: true
+      build:
+        enabled: true
+      health:
+        probes:
+          enabled: true
+        show-components: always
+        show-details: always
+      prometheus:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: info, prometheus, health, mappings
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+spring:
+  server:
+  port: 8080
+
+  application:
+    name: flow-service
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
+    username: sa
+    password: sa
+    hikari:
+      transaction-isolation: TRANSACTION_READ_COMMITTED
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jackson:
+    date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+    deserialization:
+      fail-on-unknown-properties: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        generate_statistics: false
+        format_sql: true
+
+springdoc:
+  swagger-ui:
+    enabled: true
+
+ubiquia:
+  kubernetes:
+    enabled: false
+    namespace: ubiquia
+  outbox:
+    enabled: true
+    frequency-milliseconds: 1000
+    # Current supported values are: DEFAULT
+    mode: DEFAULT
+  page:
+    max-size: 100
+  bootstrap:
+    enabled: false
+    acls:
+      filepath: /app/etc/acls/
+    graph:
+      directory:
+        enabled: false
+        path: /app/etc/graphs/
+      deployments:

@@ -96,7 +96,9 @@ public class Inbox {
             var flowMessages = this.flowMessageDtoMapper.map(flowMessageEntity);
             messages.add(flowMessages);
         }
-        logger.debug("...queried {} inbox records...", query.getTotalElements());
+        logger.debug("...queried first {} records of {} total inbox records...",
+            messages.size(),
+            query.getTotalElements());
         return messages;
     }
 }

@@ -5,9 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.models.dto.FlowMessageDto;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.component.adapter.EgressAdapter;
-import org.ubiquia.common.models.dto.FlowMessageDto;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.orchestrator.AdapterPayloadOrchestrator;
@@ -17,6 +17,7 @@ import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
  * A service that exposes various methods common to all adapters.
  */
 @Service
+@Transactional
 public class AdapterInboxMessageCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(AdapterInboxMessageCommand.class);
@@ -38,7 +39,6 @@ public class AdapterInboxMessageCommand {
         return logger;
     }
 
-    @Transactional
     public void tryProcessInboxMessageFor(
         final FlowMessageDto message,
         final AbstractAdapter adapter) {
@@ -64,7 +64,6 @@ public class AdapterInboxMessageCommand {
         }
     }
 
-    @Transactional
     public void tryProcessInboxMessageFor(
         final FlowMessageDto message,
         final EgressAdapter adapter) {
@@ -89,5 +88,4 @@ public class AdapterInboxMessageCommand {
             this.getLogger().error("ERROR: Could not process inbox message: {}", e.getMessage());
         }
     }
-
 }
