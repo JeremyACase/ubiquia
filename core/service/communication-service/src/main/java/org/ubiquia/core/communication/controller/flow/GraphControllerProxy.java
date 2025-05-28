@@ -17,6 +17,9 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/ubiquia/flow")
 public class GraphControllerProxy {
 
+    @Value("${ubiquia.flow.service.url:http://ubiquia-core-flow-service:}")
+    private String flowServiceUrl;
+
     @Value("${ubiquia.flow.service.port}")
     private Integer flowServicePort;
 
@@ -29,7 +32,10 @@ public class GraphControllerProxy {
     }
 
     private Mono<ResponseEntity<IngressResponse>> proxyToFlowService(String path, ServerHttpRequest originalRequest, Mono<String> body) {
-        var uri = UriComponentsBuilder.fromHttpUrl("http://flow-service/graph" + path)
+
+        var url = this.getUrlHelper();
+        
+        var uri = UriComponentsBuilder.fromHttpUrl(url + path)
             .queryParams(originalRequest.getQueryParams())
             .build(true)
             .toUri();
@@ -44,5 +50,12 @@ public class GraphControllerProxy {
             .toEntity(IngressResponse.class);
 
         return response;
+    }
+
+    private String getUrlHelper() {
+        var url = this.flowServiceUrl
+            + this.flowServicePort.toString()
+            + "ubiquia/flow-service";
+        return url;
     }
 }

@@ -12,7 +12,7 @@ spec:
   selector:
     matchLabels:
       {{- include "ubiquia.selectorLabels" . | nindent 6 }}
-      component: ubiquia-core-flow-service
+      component: ubiquia-core-communication-service
 
   template:
     metadata:
@@ -24,7 +24,7 @@ spec:
       labels:
         {{- include "ubiquia.selectorLabels" . | nindent 8 }}
         {{- include "ubiquia.podLabels" . | nindent 8 }}
-        component: ubiquia-core-flow-service
+        component: ubiquia-core-communication-service
 
     spec:
       {{- with .Values.infrastructure.image.pullSecrets }}
@@ -45,7 +45,7 @@ spec:
             path: /actuator/health
             port: {{ .Values.convenience.variables.spring.port }}
           initialDelaySeconds: 60  
-        image: {{ include "ubiquia.core.flowService.image" . }}
+        image: {{ include "ubiquia.core.communicationService.image" . }}
         imagePullPolicy: {{ .Values.infrastructure.image.pullPolicy }}
         ports:
           - name: http

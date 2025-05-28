@@ -40,3 +40,8 @@ data:
       swagger-ui:
         path: {{ .Values.convenience.variables.spring.swaggerDocs }}
         enabled: true
+
+    ubiquia:
+      flow:
+        service:
+          port: 8080
