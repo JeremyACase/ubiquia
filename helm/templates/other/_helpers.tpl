@@ -59,6 +59,17 @@ Pod labels
 {{- end }}
 {{- end }}
 
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "ubiquia.serviceAccountName" -}}
+{{- if .Values.k8s.serviceAccount.create }}
+{{- default (include "ubiquia.fullname" .) .Values.k8s.serviceAccount.name }}
+{{- else }}
+{{- default "ubiquia" }}
+{{- end }}
+{{- end }}
+
 {{- define "ubiquia.core.communicationService.image" -}}
 {{ .Values.ubiquia.components.core.communicationService.image.registry }}/{{ .Values.ubiquia.components.core.communicationService.image.repository }}:{{ .Values.ubiquia.components.core.communicationService.image.tag }}
 {{- end }}

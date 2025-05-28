@@ -41,6 +41,9 @@ ubiquia:
           tag: latest
 
 k8s:
+  serviceAccount:
+    create: true
+    name: ubiquia
   autoscaling:
     enabled: false
 
