@@ -34,7 +34,7 @@ public class GraphControllerProxy {
     private Mono<ResponseEntity<IngressResponse>> proxyToFlowService(String path, ServerHttpRequest originalRequest, Mono<String> body) {
 
         var url = this.getUrlHelper();
-        
+
         var uri = UriComponentsBuilder.fromHttpUrl(url + path)
             .queryParams(originalRequest.getQueryParams())
             .build(true)
@@ -55,7 +55,7 @@ public class GraphControllerProxy {
     private String getUrlHelper() {
         var url = this.flowServiceUrl
             + this.flowServicePort.toString()
-            + "ubiquia/flow-service";
+            + "/ubiquia/flow-service";
         return url;
     }
 }
