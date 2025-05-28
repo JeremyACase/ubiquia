@@ -55,7 +55,7 @@ public class GraphControllerProxy {
     private String getUrlHelper() {
         var url = this.flowServiceUrl
             + this.flowServicePort.toString()
-            + "/ubiquia/flow-service";
+            + "/ubiquia/flow-service/graph";
         return url;
     }
 }
