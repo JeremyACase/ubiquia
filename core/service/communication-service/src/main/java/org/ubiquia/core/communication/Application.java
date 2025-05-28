@@ -4,19 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 @ComponentScan(basePackages = {"org.ubiquia.core", "org.ubiquia.common"})
 public class Application {
-
-    @Autowired
-    private RequestMappingHandlerAdapter handlerAdapter;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -30,25 +23,4 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-
-    /**
-     * Something - some library - is overwriting our object mapping config;
-     * force our configuration on a context refresh.
-     * Without this method, the controllers will return nanosecond representation
-     * of timestamps when queried; with the method, they will return properly-formatted
-     * timestamps.
-     *
-     * @param event The guilty offender.
-     */
-    @EventListener
-    public void handleContextRefresh(ContextRefreshedEvent event) {
-        handlerAdapter
-            .getMessageConverters()
-            .stream()
-            .forEach(x -> {
-                if (x instanceof MappingJackson2HttpMessageConverter jsonMessageConverter) {
-                    jsonMessageConverter.setObjectMapper(this.objectMapper);
-                }
-            });
-    }
 }

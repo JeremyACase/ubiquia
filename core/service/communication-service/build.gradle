@@ -1,7 +1,11 @@
-apply plugin: 'application'
+plugins {
+    id 'org.springframework.boot' version "${SPRING_BOOT_VERSION}"
+    id 'java'
+}
 
-application {
-    mainClass.set('org.ubiquia.core.communication.Application')
+bootJar {
+    mainClass = 'org.ubiquia.core.communication.Application'
+    archiveFileName = 'ubiquia-core-communication-service.jar'
 }
 
 dependencyManagement {
@@ -11,27 +15,24 @@ dependencyManagement {
 }
 
 jar {
-    archiveFileName = 'ubiquia-core-communication-service.jar'
+    enabled = false  
 }
 
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-validation"
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation "org.springframework.boot:spring-boot-starter-webflux"
 
     implementation project(':common:models:common-models')
 
     implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
     implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
     implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"
-    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${SPRING_DOC_VERSION}"
+    implementation "org.springdoc:springdoc-openapi-starter-webflux-ui:${SPRING_DOC_VERSION}"
 
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${MICROMETER_VERSION}"
 
     testImplementation "org.instancio:instancio-junit:${INSTANCIO_VERSION}"
-    testImplementation "org.testcontainers:testcontainers:1.19.0"
-    testImplementation "org.testcontainers:k3s:1.19.0"
-    testImplementation "org.testcontainers:junit-jupiter:1.19.0"
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
 

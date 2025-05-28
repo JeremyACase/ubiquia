@@ -13,7 +13,7 @@
         ]
       },
       "Name": {
-        "description": "A model with some name infomration.",
+        "description": "A model with some name information.",
         "type": "object",
         "properties": {
           "firstName": {

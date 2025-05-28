@@ -3,6 +3,8 @@ package org.ubiquia.core.communication;
 import io.micrometer.core.aop.TimedAspect;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 import jakarta.annotation.PostConstruct;
 import java.util.TimeZone;
 import org.slf4j.Logger;
@@ -11,14 +13,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@EnableWebMvc
-public class Config implements WebMvcConfigurer {
+public class Config {
 
     protected static final Logger logger = LoggerFactory.getLogger(Config.class);
 
@@ -29,24 +27,12 @@ public class Config implements WebMvcConfigurer {
             .build();
     }
 
-    /**
-     * Rest template bean.
-     *
-     * @return our REST template.
-     */
     @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
-    /**
-     * Web client bean.
-     *
-     * @return Our web client.
-     */
-    @Bean
-    public WebClient webClient() {
-        return WebClient.builder().build();
+    public OpenAPI baseOpenAPI() {
+        return new OpenAPI().info(new Info()
+            .title("UBIQUIA Communication Service")
+            .version("1.0.0")
+            .description("Generated OpenAPI docs for UBIQUIA"));
     }
 
     @PostConstruct

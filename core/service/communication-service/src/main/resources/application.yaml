@@ -1,0 +1,44 @@
+logging:
+  level:
+    org.springdoc: DEBUG
+    org.ubiquia: DEBUG
+
+management:
+  endpoint:
+    info:
+      enabled: true
+      java:
+        enabled: true
+      build:
+        enabled: true
+      health:
+        probes:
+          enabled: true
+        show-components: always
+        show-details: always
+      prometheus:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: info, prometheus, health, mappings
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+spring:
+  server:
+  port: 8080
+
+  application:
+    name: communication-service
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui/index.html
+
+ubiquia:
+  flow:
+    service:
+      port: 8080

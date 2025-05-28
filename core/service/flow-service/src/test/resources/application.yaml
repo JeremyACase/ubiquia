@@ -118,8 +118,5 @@ spring:
 
 springdoc:
   swagger-ui:
-    path: /api-doc/swagger-ui.html
+    path: /swagger-ui/index.html
     enabled: true
-  api-docs:
-    path: /api-doc/service-api-docs
-

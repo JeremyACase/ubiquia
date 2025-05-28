@@ -25,10 +25,10 @@ public class GraphControllerProxy {
 
     @PostMapping("/register/post")
     public Mono<ResponseEntity<IngressResponse>> proxyGraphTrigger(@RequestBody Mono<String> body, ServerHttpRequest request) {
-        return proxyToAmigos("/register/post", request, body);
+        return proxyToFlowService("/register/post", request, body);
     }
 
-    private Mono<ResponseEntity<IngressResponse>> proxyToAmigos(String path, ServerHttpRequest originalRequest, Mono<String> body) {
+    private Mono<ResponseEntity<IngressResponse>> proxyToFlowService(String path, ServerHttpRequest originalRequest, Mono<String> body) {
         var uri = UriComponentsBuilder.fromHttpUrl("http://flow-service/graph" + path)
             .queryParams(originalRequest.getQueryParams())
             .build(true)
