@@ -35,7 +35,7 @@ public class BootstrapGraphDeployer {
     private ObjectMapper objectMapper;
 
     /**
-     * Boostrap this Ubiquia instance.
+     * Bootstrap this Ubiquia instance.
      */
     public void tryDeployBootstrappedGraphs() throws Exception {
         logger.info("Deploying graphs after bootstrapping...");
@@ -45,7 +45,7 @@ public class BootstrapGraphDeployer {
                 logger.info("...deploying graph {} with version: {}",
                     deployment.getName(),
                     deployment.getVersion());
-                //this.graphController.tryDeployGraph(deployment);
+                this.graphController.tryDeployGraph(deployment);
             }
         }
         logger.info("...completed deployment of graphs.");

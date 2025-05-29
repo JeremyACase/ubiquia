@@ -85,8 +85,10 @@ data:
       bootstrap:
         enabled: {{ .Values.ubiquia.instance.flowService.bootstrap.enabled }}          
         acls:
-          filepath: /app/etc/acls/
-        graph:
+          directory: 
+            enabled: true
+            path: /app/etc/acls/
+        graphs:
           directory: 
             enabled: true
             path: /app/etc/graphs/

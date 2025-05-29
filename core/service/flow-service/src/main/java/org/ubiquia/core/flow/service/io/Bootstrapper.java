@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +31,16 @@ import org.ubiquia.core.flow.service.registrar.GraphRegistrar;
 public class Bootstrapper {
 
     private static final Logger logger = LoggerFactory.getLogger(Bootstrapper.class);
-    @Value("${flow.bootstrap.graph.directory.path}")
+    @Value("${flow.bootstrap.graphs.directory.path}")
     private String boostrapGraphsDirectory;
-    @Value("${flow.bootstrap.graph.directory.enabled}")
-    private Boolean isBootstrapGraphsFromDirectory;
-    @Value("${flow.bootstrap.ontology.filepath}")
-    private String boostrapOntologiesFilepath;
+    @Value("${flow.bootstrap.graphs.enabled}")
+    private Boolean isBootstrapGraphs;
+    @Value("${flow.bootstrap.acls.enabled}")
+    private Boolean isBootstrapAcls;
+    @Value("${flow.bootstrap.acls.directory.path}")
+    private String bootstrapAclsDirectory;
     @Autowired
-    private AgentCommunicationLanguageRegistrar domainOntologyRegistrar;
+    private AgentCommunicationLanguageRegistrar aclRegistrar;
     @Autowired(required = false)
     private BootstrapGraphDeployer bootstrapGraphDeployer;
     @Autowired
@@ -51,9 +54,11 @@ public class Bootstrapper {
     public void init() {
         logger.info("Bootstrapping...");
         try {
-            this.bootstrapOntologies();
-            this.bootstrapGraphsFromDirectory();
-            this.bootstrapGraphDeployer.tryDeployBootstrappedGraphs();
+            this.bootstrapAcls();
+            this.bootstrapGraphs();
+            if (Objects.nonNull(this.bootstrapGraphDeployer)) {
+                this.bootstrapGraphDeployer.tryDeployBootstrappedGraphs();
+            }
         } catch (Exception e) {
             logger.error("ERROR bootstrapping: {}", e.getMessage());
         }
@@ -61,53 +66,48 @@ public class Bootstrapper {
     }
 
     /**
-     * Bootstrap.
-     */
-    private void bootstrapOntologies() {
-        this.bootstrapOntologiesFromFilepath();
-    }
-
-    /**
      * Bootstrap any domain ontologies found in the configured directory by this service.
      */
-    private void bootstrapOntologiesFromFilepath() {
-        logger.info("...bootstrapping ontologies from filepath...");
-        var bootstrapPath = Paths.get(this.boostrapOntologiesFilepath);
+    private void bootstrapAcls() throws IOException {
 
-        if (Files.isDirectory(bootstrapPath)) {
-            logger.warn("WARNING: Could not bootstrap ontologies from path {}; it is a directory",
-                this.boostrapOntologiesFilepath);
-        } else {
-            var file = bootstrapPath.toFile();
-            try {
-                logger.info("...bootstrapping file: {}",
-                    file.getName());
-                var ontology = this.objectMapper.readValue(
-                    file,
-                    AgentCommunicationLanguageDto.class);
-                this.domainOntologyRegistrar.tryRegister(ontology);
-            } catch (Exception e) {
-                logger.error("Could not not bootstrap file at filepath {}: {}",
-                    file.getPath(),
-                    e.getMessage());
-            }
-        }
-        logger.info("...completed bootstrapping ontologies from directory...");
-    }
-
-    /**
-     * Bootstrap any graphs found by this service.
-     */
-    private void bootstrapGraphsFromDirectory() throws IOException {
-        if (this.isBootstrapGraphsFromDirectory) {
-            logger.info("...bootstrapping graphs from directory...");
-            var bootstrapPath = Paths.get(this.boostrapGraphsDirectory);
+        if (this.isBootstrapGraphs) {
+            logger.info("...bootstrapping agent communication languages from {}...",
+                this.bootstrapAclsDirectory);
+            var bootstrapPath = Paths.get(this.bootstrapAclsDirectory);
 
             var filePaths = Files.list(bootstrapPath).toList();
             for (var filePath : filePaths) {
                 try {
                     logger.info("...bootstrapping file: {}", filePath.getFileName());
-                    var yamlMapper = new ObjectMapper(new YAMLFactory());
+                    var acl = this.objectMapper.readValue(
+                        filePath.toFile(),
+                        AgentCommunicationLanguageDto.class);
+                    this.aclRegistrar.tryRegister(acl);
+                } catch (Exception e) {
+                    logger.error("Could not not bootstrap file at filepath {}: {}",
+                        bootstrapPath,
+                        e.getMessage());
+                }
+            }
+            logger.info("...completed bootstrapping agent communication languages from "
+                + "directory...");
+        }
+
+    }
+
+    /**
+     * Bootstrap any graphs found by this service.
+     */
+    private void bootstrapGraphs() throws IOException {
+        if (this.isBootstrapGraphs) {
+            logger.info("...bootstrapping graphs from {}...", this.boostrapGraphsDirectory);
+            var bootstrapPath = Paths.get(this.boostrapGraphsDirectory);
+
+            var filePaths = Files.list(bootstrapPath).toList();
+            var yamlMapper = new ObjectMapper(new YAMLFactory());
+            for (var filePath : filePaths) {
+                try {
+                    logger.info("...bootstrapping file: {}", filePath.getFileName());
                     var graph = yamlMapper.readValue(filePath.toFile(), GraphDto.class);
                     this.graphRegistrar.tryRegister(graph);
                 } catch (Exception e) {

@@ -1,16 +1,17 @@
 package org.ubiquia.core.communication.controller.flow;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.models.IngressResponse;
@@ -36,12 +37,22 @@ public class GraphControllerProxy {
         return proxyToFlowService("/register/post", request, body);
     }
 
-    @PostMapping("/register/upload")
+
+    @PostMapping(value = "/register/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseEntity<IngressResponse>> proxyGraphUpload(
-        @RequestBody Mono<MultiValueMap<String, Part>> multipartBody,
+        @Parameter(
+            name = "file",
+            description = "Our graph to upload",
+            required = true,
+            content = @Content(
+                mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                schema = @Schema(type = "string", format = "binary")
+            )
+        )
+        @RequestPart("file") Mono<Part> file,
         ServerHttpRequest request) {
 
-        return proxyToFlowServiceMultipart("/register/upload", request, multipartBody);
+        return proxyToFlowServiceMultipart("/register/upload", request, file);
     }
 
     private Mono<ResponseEntity<IngressResponse>> proxyToFlowService(
@@ -68,10 +79,10 @@ public class GraphControllerProxy {
         return response;
     }
 
-    public Mono<ResponseEntity<IngressResponse>> proxyToFlowServiceMultipart(
+    private Mono<ResponseEntity<IngressResponse>> proxyToFlowServiceMultipart(
         String path,
         ServerHttpRequest originalRequest,
-        Mono<MultiValueMap<String, Part>> multipartBody) {
+        Mono<Part> fileMono) {
 
         var url = this.getUrlHelper();
 
@@ -80,24 +91,23 @@ public class GraphControllerProxy {
             .build(true)
             .toUri();
 
-        var response = this.webClient
-            .method(originalRequest.getMethod()) // Should be POST
-            .uri(uri)
-            .headers(headers -> {
-                headers.addAll(originalRequest.getHeaders());
-                // Remove Transfer-Encoding: chunked, which can confuse some servers
-                headers.remove("Transfer-Encoding");
-                // Remove Content-Length if present (WebClient calculates it automatically for multipart)
-                headers.remove("Content-Length");
-                // Set the content type to multipart/form-data
-                headers.setContentType(null); // Let WebClient derive it from BodyInserter
-            })
-            .body(multipartBody, new ParameterizedTypeReference<>() {
-            })
-            .retrieve()
-            .toEntity(IngressResponse.class);
+        return fileMono.flatMap(file -> {
+            MultiValueMap<String, Part> multipartBody = new LinkedMultiValueMap<>();
+            multipartBody.add("file", file);
 
-        return response;
+            return this.webClient
+                .method(originalRequest.getMethod()) // Should be POST
+                .uri(uri)
+                .headers(headers -> {
+                    headers.addAll(originalRequest.getHeaders());
+                    headers.remove("Content-Length");
+                    headers.remove("Transfer-Encoding");
+                    // Do not set Content-Type here – WebClient will handle it
+                })
+                .bodyValue(multipartBody)
+                .retrieve()
+                .toEntity(IngressResponse.class);
+        });
     }
 
     private String getUrlHelper() {
