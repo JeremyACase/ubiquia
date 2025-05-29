@@ -1,8 +1,10 @@
 package org.ubiquia.core.communication.controller.flow;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.SchemaProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -37,15 +39,13 @@ public class GraphControllerProxy {
         return proxyToFlowService("/register/post", request, body);
     }
 
-
+    @Operation(summary = "Upload a graph file")
     @PostMapping(value = "/register/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseEntity<IngressResponse>> proxyGraphUpload(
         @Parameter(
-            name = "file",
-            description = "Our graph to upload",
-            required = true,
+            description = "Graph file to upload",
             content = @Content(
-                mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
                 schema = @Schema(type = "string", format = "binary")
             )
         )
