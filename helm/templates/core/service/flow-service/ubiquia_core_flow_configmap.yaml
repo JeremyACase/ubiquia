@@ -81,30 +81,31 @@ data:
         mode: DEFAULT
       page:
         max-size: 100
-      bootstrap:
-        enabled: {{ .Values.ubiquia.instance.flowService.bootstrap.enabled }}          
-        acls:
-          directory: 
-            enabled: true
-            path: /app/etc/acls/
-          embedded:
+      flow:
+        bootstrap:
+          enabled: {{ .Values.ubiquia.instance.flowService.bootstrap.enabled }}          
+          acls:
+            directory: 
+              enabled: true
+              path: /app/etc/acls/
+            embedded:
 {{ (.Files.Glob "bootstrap/acls/*.json").AsConfig | indent 12 }}
-        graphs:
-          directory: 
-            enabled: true
-            path: /app/etc/graphs/
-          deployments:
-            {{- range $v := .Values.ubiquia.instance.flowService.graph.deployments }}
-            - name: {{ $v.name }}
-              version: 
-                major: {{ $v.version.major }}
-                minor: {{ $v.version.minor }}
-                patch: {{ $v.version.patch }}
-              {{- if $v.graphSettings }}
-              graphSettings:
-                flag: {{ $v.graphSettings.flag }}
-              {{- end -}}
-            {{- end }}
-          embedded:
+          graphs:
+            directory: 
+              enabled: true
+              path: /app/etc/graphs/
+            deployments:
+              {{- range $v := .Values.ubiquia.instance.flowService.graph.deployments }}
+              - name: {{ $v.name }}
+                version: 
+                  major: {{ $v.version.major }}
+                  minor: {{ $v.version.minor }}
+                  patch: {{ $v.version.patch }}
+                {{- if $v.graphSettings }}
+                graphSettings:
+                  flag: {{ $v.graphSettings.flag }}
+                {{- end -}}
+              {{- end }}
+            embedded:
 {{ (.Files.Glob "bootstrap/graphs/*.yaml").AsConfig | indent 12 }}
 
