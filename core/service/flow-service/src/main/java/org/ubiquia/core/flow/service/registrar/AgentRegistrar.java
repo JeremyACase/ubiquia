@@ -100,6 +100,10 @@ public class AgentRegistrar {
         if (Objects.isNull(agentEntity.getEnvironmentVariables())) {
             agentEntity.setEnvironmentVariables(new HashSet<>());
         }
+
+        if (Objects.isNull(agentEntity.getExposeService())) {
+            agentEntity.setExposeService(false);
+        }
     }
 
     /**
@@ -184,11 +188,12 @@ public class AgentRegistrar {
         if (Objects.nonNull(agentRegistration.getTags())) {
             agentEntity.getTags().addAll(agentRegistration.getTags());
         }
-        agentEntity.setType(agentRegistration.getAgentType());
-        agentEntity.setPort(agentRegistration.getPort());
+        agentEntity.setExposeService(agentRegistration.getExposeService());
         agentEntity.setInitContainer(agentRegistration.getInitContainer());
         agentEntity.setLivenessProbe(agentRegistration.getLivenessProbe());
+        agentEntity.setPort(agentRegistration.getPort());
         agentEntity.setScaleSettings(agentRegistration.getScaleSettings());
+        agentEntity.setType(agentRegistration.getAgentType());
 
         agentEntity.setOverrideSettings(new HashSet<>());
         if (Objects.nonNull(agentRegistration.getOverrideSettings())) {

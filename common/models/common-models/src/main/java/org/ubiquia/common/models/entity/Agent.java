@@ -17,6 +17,8 @@ public class Agent extends AbstractEntity {
 
     private String description;
 
+    private Boolean exposeService;
+
     private ScaleSettings scaleSettings;
 
     @ElementCollection
@@ -168,5 +170,14 @@ public class Agent extends AbstractEntity {
 
     public void setScaleSettings(ScaleSettings scaleSettings) {
         this.scaleSettings = scaleSettings;
+    }
+
+    @NotNull
+    public Boolean getExposeService() {
+        return exposeService;
+    }
+
+    public void setExposeService(Boolean exposeService) {
+        this.exposeService = exposeService;
     }
 }

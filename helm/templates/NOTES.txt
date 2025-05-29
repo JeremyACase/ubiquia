@@ -1,1 +1,10 @@
 SUCCESS! Ubiquia is installed!
+
+
+**************************************************
+Ubiquia Commmunications Service:
+
+The best way to use Ubiquia is by accessing the Ubiquia Communications Service. Locally, it can be accessed by by port-forwarding it as follows:
+
+1. $ kubectl port-forward svc/ubiquia-core-communication-service -n {{ .Release.Namespace }} {{ .Values.convenience.variables.spring.port }}:{{ .Values.convenience.variables.spring.port }}
+2. Navigate to "http://localhost:{{ .Values.convenience.variables.spring.port }}{{ .Values.convenience.variables.spring.swaggerDocs }}"

@@ -15,6 +15,8 @@ public class AgentDto extends AbstractEntityDto {
 
     private String description;
 
+    private Boolean exposeService = false;
+
     private List<EnvironmentVariable> environmentVariables;
 
     private List<OverrideSettings> overrideSettings;
@@ -82,6 +84,7 @@ public class AgentDto extends AbstractEntityDto {
         this.description = description;
     }
 
+    @NotNull
     public Image getImage() {
         return image;
     }
@@ -153,5 +156,13 @@ public class AgentDto extends AbstractEntityDto {
 
     public void setScaleSettings(ScaleSettings scaleSettings) {
         this.scaleSettings = scaleSettings;
+    }
+
+    public Boolean getExposeService() {
+        return exposeService;
+    }
+
+    public void setExposeService(Boolean exposeService) {
+        this.exposeService = exposeService;
     }
 }
