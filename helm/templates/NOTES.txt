@@ -8,3 +8,29 @@ The best way to use Ubiquia is by accessing the Ubiquia Communications Service. 
 
 1. $ kubectl port-forward svc/ubiquia-core-communication-service -n {{ .Release.Namespace }} {{ .Values.convenience.variables.spring.port }}:{{ .Values.convenience.variables.spring.port }}
 2. Navigate to "http://localhost:{{ .Values.convenience.variables.spring.port }}{{ .Values.convenience.variables.spring.swaggerDocs }}"
+
+{{ if .Values.ubiquia.instance.database.h2.enabled }}
+**************************************************
+Ubiquia Flow Service:
+
+Ubiquia is currently configured to run with an in-memory databases. After port-forwarding the Flow Service, its database console can be viewed directly as follows:
+
+1. $ kubectl port-forward svc/ubiquia-core-flow-service -n {{ .Release.Namespace }} {{ .Values.convenience.variables.spring.port }}:{{ .Values.convenience.variables.spring.port }}
+2. Navigate to "http://localhost:{{ .Values.convenience.variables.spring.port }}/h2-console"
+3. Replace the connection URL with "jdbc:h2:mem:myDb" 
+4. Input "sa" for both username and password.
+5. Select "connect."
+{{ else if .Values.ubiquia.instance.database.yugabyte.enabled }}
+**************************************************
+YugabyteDB:
+
+Ubiquia is currently running with a Yugabyte database. 
+
+The Yugabyte user console can be viewed directly as follows:
+1. $ kubectl port-forward svc/yb-tservers -n {{ .Release.Namespace }} 15433:15433
+2. Navigate to "http://localhost:15433"
+
+The Yugabyte master console can be viewed directly as follows:
+1. $ kubectl port-forward svc/yb-masters -n {{ .Release.Namespace }} 7000:7000
+2. Navigate to "http://localhost:7000"
+{{ end }}
