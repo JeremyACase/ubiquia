@@ -85,14 +85,12 @@ data:
         bootstrap:
           enabled: {{ .Values.ubiquia.instance.flowService.bootstrap.enabled }}          
           acls:
+            enabled: true
             directory: 
-              enabled: true
               path: /app/etc/acls/
-            embedded:
-{{ (.Files.Glob "bootstrap/acls/*.json").AsConfig | indent 12 }}
           graphs:
+            enabled: true
             directory: 
-              enabled: true
               path: /app/etc/graphs/
             deployments:
               {{- range $v := .Values.ubiquia.instance.flowService.graph.deployments }}
@@ -106,6 +104,3 @@ data:
                   flag: {{ $v.graphSettings.flag }}
                 {{- end -}}
               {{- end }}
-            embedded:
-{{ (.Files.Glob "bootstrap/graphs/*.yaml").AsConfig | indent 12 }}
-

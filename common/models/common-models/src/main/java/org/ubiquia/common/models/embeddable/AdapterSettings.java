@@ -8,13 +8,13 @@ import java.util.List;
 @Embeddable
 public class AdapterSettings {
 
-    private Boolean isValidateInputPayload = false;
+    private Boolean validateInputPayload = false;
 
-    private Boolean isValidateOutputPayload = false;
+    private Boolean validateOutputPayload = false;
 
-    private Boolean isPersistInputPayload = false;
+    private Boolean persistInputPayload = false;
 
-    private Boolean isPersistOutputPayload = false;
+    private Boolean persistOutputPayload = false;
 
     private Long inboxPollFrequencyMilliseconds = 1000L;
 
@@ -26,20 +26,20 @@ public class AdapterSettings {
 
     private Boolean isPassthrough = false;
 
-    public Boolean getIsPersistInputPayload() {
-        return isPersistInputPayload;
+    public Boolean getPersistInputPayload() {
+        return persistInputPayload;
     }
 
-    public void setIsPersistInputPayload(Boolean persistInputPayload) {
-        isPersistInputPayload = persistInputPayload;
+    public void setPersistInputPayload(Boolean persistInputPayload) {
+        this.persistInputPayload = persistInputPayload;
     }
 
-    public Boolean getIsPersistOutputPayload() {
-        return isPersistOutputPayload;
+    public Boolean getPersistOutputPayload() {
+        return persistOutputPayload;
     }
 
-    public void setIsPersistOutputPayload(Boolean persistOutputPayload) {
-        isPersistOutputPayload = persistOutputPayload;
+    public void setPersistOutputPayload(Boolean persistOutputPayload) {
+        this.persistOutputPayload = persistOutputPayload;
     }
 
     public Long getInboxPollFrequencyMilliseconds() {
@@ -75,19 +75,19 @@ public class AdapterSettings {
     }
 
     public Boolean getValidateInputPayload() {
-        return isValidateInputPayload;
+        return validateInputPayload;
     }
 
     public void setValidateInputPayload(Boolean validateInputPayload) {
-        isValidateInputPayload = validateInputPayload;
+        this.validateInputPayload = validateInputPayload;
     }
 
     public Boolean getValidateOutputPayload() {
-        return isValidateOutputPayload;
+        return validateOutputPayload;
     }
 
     public void setValidateOutputPayload(Boolean validateOutputPayload) {
-        isValidateOutputPayload = validateOutputPayload;
+        this.validateOutputPayload = validateOutputPayload;
     }
 
     public Boolean getIsPassthrough() {

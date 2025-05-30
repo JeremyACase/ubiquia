@@ -2,7 +2,6 @@ package org.ubiquia.core.flow.component.adapter;
 
 
 import io.micrometer.core.instrument.Timer;
-import java.time.OffsetDateTime;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +72,7 @@ public class PollAdapter extends AbstractAdapter {
             super.payloadModelValidator.tryValidateInputPayloadFor(stringifiedPayload, this);
             super.stamper.tryStampInputs(flowEvent, stringifiedPayload);
 
-            if (adapterContext.getAdapterSettings().getIsPersistInputPayload()) {
+            if (adapterContext.getAdapterSettings().getPersistInputPayload()) {
                 flowEvent.setInputPayload(stringifiedPayload);
             }
 

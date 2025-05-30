@@ -43,10 +43,10 @@ public class AdapterOverrideDecoratorTest {
         var adapter = new AdapterDto();
 
         adapter.setAdapterSettings(new AdapterSettings());
-        adapter.getAdapterSettings().setIsPersistInputPayload(false);
+        adapter.getAdapterSettings().setPersistInputPayload(false);
 
         var overriddenAdapterSettings = new AdapterSettings();
-        overriddenAdapterSettings.setIsPersistInputPayload(true);
+        overriddenAdapterSettings.setPersistInputPayload(true);
 
         var overrideSettings = new OverrideSettingsStringified();
         overrideSettings.setFlag("test");
@@ -65,7 +65,7 @@ public class AdapterOverrideDecoratorTest {
             overrideSettingsList,
             deployment);
 
-        Assertions.assertTrue(adapter.getAdapterSettings().getIsPersistInputPayload());
+        Assertions.assertTrue(adapter.getAdapterSettings().getPersistInputPayload());
     }
 
     @Test
@@ -75,10 +75,10 @@ public class AdapterOverrideDecoratorTest {
         var adapter = new AdapterDto();
 
         adapter.setAdapterSettings(new AdapterSettings());
-        adapter.getAdapterSettings().setIsPersistInputPayload(false);
+        adapter.getAdapterSettings().setPersistInputPayload(false);
 
         var overriddenAdapterSettings = new AdapterSettings();
-        overriddenAdapterSettings.setIsPersistInputPayload(true);
+        overriddenAdapterSettings.setPersistInputPayload(true);
 
         var overrideSettings = new OverrideSettingsStringified();
         overrideSettings.setFlag("test");
@@ -97,7 +97,7 @@ public class AdapterOverrideDecoratorTest {
             overrideSettingsList,
             deployment);
 
-        Assertions.assertFalse(adapter.getAdapterSettings().getIsPersistInputPayload());
+        Assertions.assertFalse(adapter.getAdapterSettings().getPersistInputPayload());
     }
 
     @Test
@@ -106,10 +106,10 @@ public class AdapterOverrideDecoratorTest {
         var adapter = new AdapterDto();
 
         adapter.setAdapterSettings(new AdapterSettings());
-        adapter.getAdapterSettings().setIsPersistInputPayload(false);
+        adapter.getAdapterSettings().setPersistInputPayload(false);
 
         var overriddenAdapterSettings = new AdapterSettings();
-        overriddenAdapterSettings.setIsPersistInputPayload(true);
+        overriddenAdapterSettings.setPersistInputPayload(true);
 
         var overrideSettings = new OverrideSettingsStringified();
         overrideSettings.setFlag("test");

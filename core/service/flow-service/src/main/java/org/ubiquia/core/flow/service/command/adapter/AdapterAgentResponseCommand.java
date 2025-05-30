@@ -42,7 +42,7 @@ public class AdapterAgentResponseCommand {
         this.payloadModelValidator.tryValidateOutputPayloadFor(stringifiedPayload, adapter);
         this.stamperVisitor.tryStampOutputs(flowEvent, stringifiedPayload);
 
-        if (adapter.getAdapterContext().getAdapterSettings().getIsPersistOutputPayload()) {
+        if (adapter.getAdapterContext().getAdapterSettings().getPersistOutputPayload()) {
             flowEvent.setOutputPayload(stringifiedPayload);
         }
         flowEvent.getFlowEventTimes().setEventCompleteTime(OffsetDateTime.now());

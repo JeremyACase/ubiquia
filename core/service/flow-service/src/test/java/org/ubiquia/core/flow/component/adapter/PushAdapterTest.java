@@ -138,7 +138,7 @@ public class PushAdapterTest {
         var ingressAdapter = this.dummyFactory.generateAdapter();
         ingressAdapter.setAdapterType(AdapterType.PUSH);
         ingressAdapter.setAdapterSettings(new AdapterSettings());
-        ingressAdapter.getAdapterSettings().setIsPersistInputPayload(true);
+        ingressAdapter.getAdapterSettings().setPersistInputPayload(true);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressAdapter.getInputSubSchemas().add(subSchema);
         ingressAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));

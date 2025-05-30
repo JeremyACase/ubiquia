@@ -70,6 +70,9 @@ public class AgentCommunicationLanguageRegistrar {
         }
 
         entity = this.agentCommunicationLanguageRepository.save(entity);
+        logger.info("...registered ACL with domain {} and version {} to database...",
+            entity.getDomain(),
+            entity.getVersion());
         return entity;
     }
 }

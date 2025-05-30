@@ -33,12 +33,22 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
       volumes:
+      - name: ubiquia-flow-bootstrap-acls
+        configMap:
+          name: ubiquia-flow-bootstrap-acls
+      - name: ubiquia-flow-bootstrap-graphs
+        configMap:
+          name: ubiquia-flow-bootstrap-graphs
       - name: config
         configMap:
           name: ubiquia-core-flow-config
       containers:
       - name: flow-service
         volumeMounts:
+        - name: ubiquia-flow-bootstrap-acls
+          mountPath: /app/etc/acls
+        - name: ubiquia-flow-bootstrap-graphs
+          mountPath: /app/etc/graphs
         - name: config
           mountPath: /app/etc
         livenessProbe: 

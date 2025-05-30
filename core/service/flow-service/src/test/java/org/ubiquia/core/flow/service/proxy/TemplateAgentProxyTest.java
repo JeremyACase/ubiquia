@@ -78,7 +78,7 @@ public class TemplateAgentProxyTest {
         hiddenAdapter.getEgressSettings().setHttpOutputType(HttpOutputType.PUT);
         hiddenAdapter.setAdapterSettings(new AdapterSettings());
         hiddenAdapter.getAdapterSettings().setValidateInputPayload(true);
-        hiddenAdapter.getAdapterSettings().setIsPersistOutputPayload(true);
+        hiddenAdapter.getAdapterSettings().setPersistOutputPayload(true);
         hiddenAdapter.setEndpoint("http://localhost:8080/test");
         hiddenAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
         hiddenAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Cat"));

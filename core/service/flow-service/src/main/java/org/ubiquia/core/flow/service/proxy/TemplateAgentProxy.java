@@ -90,7 +90,7 @@ public class TemplateAgentProxy {
         logger.debug("Generated dummy data: {}", stringifiedPayload);
         eventTimes.setAgentResponseTime(OffsetDateTime.now());
         this.stamperVisitor.tryStampOutputs(flowEvent, stringifiedPayload);
-        if (flowEvent.getAdapter().getAdapterSettings().getIsPersistOutputPayload()) {
+        if (flowEvent.getAdapter().getAdapterSettings().getPersistOutputPayload()) {
             flowEvent.setOutputPayload(stringifiedPayload);
         }
         this.outbox.tryQueueAgentResponse(flowEvent, stringifiedPayload);

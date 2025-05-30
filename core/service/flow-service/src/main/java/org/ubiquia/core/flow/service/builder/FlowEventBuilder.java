@@ -62,7 +62,7 @@ public class FlowEventBuilder {
         flowEvent.setBatchId(UUID.randomUUID().toString());
 
         var adapterContext = adapter.getAdapterContext();
-        if (adapterContext.getAdapterSettings().getIsPersistInputPayload()) {
+        if (adapterContext.getAdapterSettings().getPersistInputPayload()) {
             flowEvent.setInputPayload(inputPayload);
         }
 
@@ -83,7 +83,7 @@ public class FlowEventBuilder {
         flowEvent.setBatchId(batchId);
 
         var adapterContext = adapter.getAdapterContext();
-        if (adapterContext.getAdapterSettings().getIsPersistInputPayload()) {
+        if (adapterContext.getAdapterSettings().getPersistInputPayload()) {
             flowEvent.setInputPayload(inputPayload);
         }
 

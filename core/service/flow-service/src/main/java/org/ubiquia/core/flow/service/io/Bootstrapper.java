@@ -31,14 +31,14 @@ import org.ubiquia.core.flow.service.registrar.GraphRegistrar;
 public class Bootstrapper {
 
     private static final Logger logger = LoggerFactory.getLogger(Bootstrapper.class);
-    @Value("${ubiquia.flow.bootstrap.graphs.directory.path}")
-    private String boostrapGraphsDirectory;
-    @Value("${ubiquia.flow.bootstrap.graphs.enabled}")
-    private Boolean isBootstrapGraphs;
     @Value("${ubiquia.flow.bootstrap.acls.enabled}")
     private Boolean isBootstrapAcls;
     @Value("${ubiquia.flow.bootstrap.acls.directory.path}")
     private String bootstrapAclsDirectory;
+    @Value("${ubiquia.flow.bootstrap.graphs.directory.path}")
+    private String boostrapGraphsDirectory;
+    @Value("${ubiquia.flow.bootstrap.graphs.enabled}")
+    private Boolean isBootstrapGraphs;
     @Autowired
     private AgentCommunicationLanguageRegistrar aclRegistrar;
     @Autowired(required = false)
@@ -70,8 +70,8 @@ public class Bootstrapper {
      */
     private void bootstrapAcls() throws IOException {
 
-        if (this.isBootstrapGraphs) {
-            logger.info("...bootstrapping agent communication languages from {}...",
+        if (this.isBootstrapAcls) {
+            logger.info("...bootstrapping agent communication languages (ACL's) from {}...",
                 this.bootstrapAclsDirectory);
             var bootstrapPath = Paths.get(this.bootstrapAclsDirectory);
 
@@ -92,7 +92,6 @@ public class Bootstrapper {
             logger.info("...completed bootstrapping agent communication languages from "
                 + "directory...");
         }
-
     }
 
     /**

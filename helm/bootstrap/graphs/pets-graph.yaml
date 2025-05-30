@@ -1,0 +1,258 @@
+graphName: Pets
+modelType: Graph
+author: Jeremy Case
+description: The "Hello World" of Directed Acyclic Graphs (DAG's) in Ubiquia, but with Pets!
+
+# Graphs require semantic versions
+version:
+  major: 1
+  minor: 2
+  patch: 3
+
+# These are any tags a developer would like attached to their DAG
+tags:
+  - key: testTagKey1
+    value: testTagValue1
+  - key: testTagKey2
+    value: testTagValue2
+  - key: testTagKey3
+    value: testTagValue3
+
+# These are capabilities that the graph implements. These will eventually be used by MACHINA's Executive Service.
+capabilities:
+  - ImACapability!
+
+# This is the "Agent Communication Language" that this graph is associated with.
+agentCommunicationLanguage:
+  name: pets
+  version:
+    major: 1
+    minor: 2
+    patch: 3
+
+# These are a list of agents that comprise this graph.
+agents:
+  - agentName: Pet-Generator-Agent
+
+    # Setting a agent as a template will instruct Ubiquia to not instantiate it as a 
+    # Kubernetes pod, but instead to generate a "proxy" for it which will act on its behalf with 
+    # dummy data.
+    agentType: TEMPLATE
+    modelType: Agent
+    description: This is a an example agent that will generate new Pets given a name.
+
+    # This is the port that will be exposed for this agent when it is deployed.
+    port: 8080
+
+    # Data pertaining to the image so that it can be deployed as pods/containers.
+    image:
+      registry: ubiquia
+      repository: pet-store-data-Agent
+      tag: latest
+
+    # An optional configmap to pass to the agent.
+    config:
+      configMap:
+        application.yml: |
+          config_0:
+            value: true
+          config_1:
+            value: demo-value
+      configMountPath: /example/mountpath
+
+    # An example of configuring our agent to run with a volume which can be provisioned in a K8s cluster
+    volumes:
+      - name: demo-volume
+        persistentVolumeClaimName: example-volume-claim-name
+        mountPath: example/mount/path
+
+    # An example of configuring our agent to run with a volume which can be provisioned in a K8s cluster
+    livenessProbe:
+      httpGetPath: /actuator/health
+      initialDelaySeconds: 30
+
+    # This is a list of settings to use to override the baseline values should the graph be 
+    # deployed with any "flags."
+    overrideSettings:
+
+      # Any example override setting. It will override the baseline image values defined when the 
+      # graph is deployed with a "prod" flag.
+      - flag: prod
+        key: image
+        value:
+          registry: exampleOverrideRegistry
+          repository: exampleOverrideRepository
+          tag: latest
+
+      # Another example override setting. It will override the template agent boolean when the graph
+      # is deployed with the "prod" flag.
+      - flag: prod
+        key: type
+        value: POD
+
+      # Yet another example to show that even nested configuration values can be overridden.
+      - flag: prod
+        key: config
+        value:
+          configMap:
+            application.yml: |
+              config_0:
+                value: false
+              config_99:
+                value: demo-value
+          configMountPath: /example/mountpath
+
+    # This is an "adapter" for the agent; Ubiquia will use this to manage DAG network 
+    # traffic to/from the agent.
+    adapter:
+      modelType: Adapter
+      adapterType: PUSH
+      adapterName: Pet-Generator-Agent-Adapter
+      description: This is an example adapter.
+
+      # This is the endpoint of the agent that the adapter will interact with when it 
+      # receives upstream traffic.
+      endpoint: /agent/endpoint
+
+      # An example input schema that references a model of the domain ontology.
+      inputSubSchemas:
+        - modelName: Name
+
+      # An example input schema that references a model of the domain ontology.
+      outputSubSchema:
+        modelName: Animal
+      
+      # Various configuration for the adapter, such as whether to persist payload traffic in the 
+      # Ubiquia database for later diagnostics/analysis.
+      adapterSettings:
+        persistInputPayload: true
+        persistOutputPayload: true
+        validateOutputPayload: false
+        validateInputPayload: false
+
+      # Like agents, Adapters can have overridesettings.
+      overrideSettings:
+        - flag: prod
+          key: adapterSettings
+          value:
+            persistInputPayload: false
+            persistOutputPayload: false
+            validateOutputPayload: true
+
+  - agentName: Person-Generator-Agent
+    agentType: TEMPLATE
+    modelType: Agent
+    description: This is a an example agent that will generate new Pets given a name.
+    port: 1234
+    image:
+      registry: some-registry
+      repository: my-repository
+      tag: 1.2.3
+    livenessProbe:
+      httpGetPath: /actuator/health
+      initialDelaySeconds: 123
+    adapter:
+      modelType: Adapter
+      adapterType: HIDDEN
+      adapterName: Person-Generator-Agent-Adapter
+      description: This is an example adapter.
+      endpoint: /data-Agent/endpoint
+
+      inputSubSchemas:
+        - modelName: Animal
+      outputSubSchema:
+        modelName: Person
+      adapterSettings:
+        persistInputPayload: true
+        persistOutputPayload: true
+        validateOutputPayload: false
+        validateInputPayload: false
+
+  - agentName: Vaccine-Generator-Agent
+    agentType: TEMPLATE
+    modelType: Agent
+    description: This is a an example agent that will vaccinate pets.
+    port: 1234
+    image:
+      registry: some-registry
+      repository: my-repository
+      tag: 1.2.3
+    livenessProbe:
+      httpGetPath: /actuator/health
+      initialDelaySeconds: 123
+    adapter:
+      modelType: Adapter
+      adapterType: HIDDEN
+      adapterName: Vaccine-Generator-Agent-Adapter
+      description: This is an example adapter.
+      endpoint: /data-Agent/endpoint
+      inputSubSchemas:
+        - modelName: Animal
+      outputSubSchema:
+        modelName: VaccinationTransaction
+      adapterSettings:
+        persistInputPayload: true
+        persistOutputPayload: true
+        validateOutputPayload: false
+        validateInputPayload: false
+
+  - agentName: Adoption-Agent
+    agentType: TEMPLATE
+    modelType: Agent
+    description: This is a an example agent that will adopt pets.
+    port: 1234
+    image:
+      registry: some-registry
+      repository: my-repository
+      tag: 1.2.3
+    livenessProbe:
+      httpGetPath: /actuator/health
+      initialDelaySeconds: 123
+    adapter:
+      modelType: Adapter
+      adapterType: MERGE
+      adapterName: Adoption-Agent-Adapter
+      description: This is an example adapter.
+      endpoint: /data-Agent/endpoint
+      inputSubSchemas:
+        - modelName: VaccinationTransaction
+        - modelName: Person
+      outputSubSchema:
+        modelName: AdoptionTransaction
+      adapterSettings:
+        persistInputPayload: true
+        persistOutputPayload: true
+        validateOutputPayload: false
+        validateInputPayload: false
+
+# This is a list of adapters that should be deployed with the graph that are not to be associated
+# with agents. These are typically useful as ingress/egress components to a DAG.
+agentlessAdapters:
+  - modelType: Adapter
+    adapterName: Queue-Adapter
+    adapterType: QUEUE
+    description: This is an example adapter that is not attached to a agent.
+    inputSubSchemas:
+      - modelName: AdoptionTransaction
+    adapterSettings:
+      persistInputPayload: true
+      validateInputPayload: false
+
+# This is how Ubiquia knows how to connect adapters together into a Directed Acyclic Graph. Conceptually, 
+# data flows from left-to-right. As adapters receive payloads, they will send them to their respective 
+# agents (if they have them), package up the agent response (if applicable), and send
+# the payload "downstream" (i.e., to any adapters "immediately on the right.")
+edges:
+  - leftAdapterName: Pet-Generator-Agent-Adapter
+    rightAdapterNames:
+      - Person-Generator-Agent-Adapter
+      - Vaccine-Generator-Agent-Adapter
+  - leftAdapterName: Person-Generator-Agent-Adapter
+    rightAdapterNames:
+      - Adoption-Agent-Adapter
+  - leftAdapterName: Vaccine-Generator-Agent-Adapter
+    rightAdapterNames:
+      - Adoption-Agent-Adapter
+  - leftAdapterName: Adoption-Agent-Adapter
+    rightAdapterNames:
+      - Queue-Adapter

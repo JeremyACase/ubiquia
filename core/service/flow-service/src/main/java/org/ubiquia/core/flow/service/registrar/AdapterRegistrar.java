@@ -124,14 +124,14 @@ public class AdapterRegistrar {
                     registrationSettings.getInboxPollFrequencyMilliseconds());
             }
 
-            if (Objects.nonNull(registrationSettings.getIsPersistOutputPayload())) {
-                entitySettings.setIsPersistOutputPayload(registrationSettings
-                    .getIsPersistOutputPayload());
+            if (Objects.nonNull(registrationSettings.getPersistOutputPayload())) {
+                entitySettings.setPersistOutputPayload(registrationSettings
+                    .getPersistOutputPayload());
             }
 
-            if (Objects.nonNull(registrationSettings.getIsPersistInputPayload())) {
-                entitySettings.setIsPersistInputPayload(registrationSettings
-                    .getIsPersistInputPayload());
+            if (Objects.nonNull(registrationSettings.getPersistInputPayload())) {
+                entitySettings.setPersistInputPayload(registrationSettings
+                    .getPersistInputPayload());
             }
 
             if (Objects.nonNull(registrationSettings.getValidateInputPayload())) {
