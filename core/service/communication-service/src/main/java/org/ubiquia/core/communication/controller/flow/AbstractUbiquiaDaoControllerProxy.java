@@ -7,6 +7,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -25,10 +26,10 @@ public abstract class AbstractUbiquiaDaoControllerProxy<T extends AbstractEntity
 
     @GetMapping("/query/params")
     public Mono<ResponseEntity<GenericPageImplementation<T>>> proxyToQueryParams(
-        final Integer page,
-        final Integer size,
-        final Boolean sortDescending,
-        final List<String> sortByFields,
+        @RequestParam("page") final Integer page,
+        @RequestParam("size") final Integer size,
+        @RequestParam(value = "sort-descending", required = false, defaultValue = "true") final Boolean sortDescending,
+        @RequestParam(value = "sort-by-fields", required = false, defaultValue = "") final List<String> sortByFields,
         HttpServletRequest httpServletRequest) {
 
         var url = this.getUrlHelper();
