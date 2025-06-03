@@ -15,22 +15,26 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.ubiquia.common.models.IngressResponse;
-import org.ubiquia.common.models.dto.GraphDto;
-import org.ubiquia.common.models.embeddable.GraphDeployment;
-import org.ubiquia.common.models.embeddable.SemanticVersion;
-import org.ubiquia.common.models.entity.Graph;
+import org.ubiquia.common.library.api.controller.GenericUbiquiaDaoController;
+import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
+import org.ubiquia.common.library.dao.component.EntityDao;
+import org.ubiquia.common.model.ubiquia.IngressResponse;
+import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
+import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
+import org.ubiquia.common.model.ubiquia.entity.Graph;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.AgentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.service.k8s.AgentOperator;
 import org.ubiquia.core.flow.service.manager.AdapterManager;
 import org.ubiquia.core.flow.service.manager.AgentManager;
+import org.ubiquia.core.flow.service.mapper.GraphDtoMapper;
 import org.ubiquia.core.flow.service.registrar.GraphRegistrar;
 
 @RestController
 @RequestMapping("/ubiquia/flow-service/graph")
-public class GraphController extends GenericEntityController<Graph, GraphDto> {
+public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto> {
 
     private static final Logger logger = LoggerFactory.getLogger(GraphController.class);
 
@@ -55,9 +59,25 @@ public class GraphController extends GenericEntityController<Graph, GraphDto> {
     @Autowired
     private GraphRepository graphRepository;
 
+    @Autowired
+    private GraphDtoMapper dtoMapper;
+
+    @Autowired
+    private EntityDao<Graph> entityDao;
+
     @Override
     public Logger getLogger() {
         return logger;
+    }
+
+    @Override
+    public EntityDao<Graph> getDataAccessObject() {
+        return this.entityDao;
+    }
+
+    @Override
+    public InterfaceEntityToDtoMapper<Graph, GraphDto> getDataTransferObjectMapper() {
+        return this.dtoMapper;
     }
 
     /**
@@ -69,7 +89,7 @@ public class GraphController extends GenericEntityController<Graph, GraphDto> {
     @DeleteMapping("/delete/{id}")
     @Transactional
     public ResponseEntity<String> delete(@PathVariable("id") final String id) {
-        logger.info("Received request to delete: ID {}", id);
+        this.getLogger().info("Received request to delete: ID {}", id);
         ResponseEntity<String> response = null;
         var record = this.graphRepository.findById(id);
         if (record.isEmpty()) {
@@ -87,7 +107,7 @@ public class GraphController extends GenericEntityController<Graph, GraphDto> {
     @Transactional
     public IngressResponse register(@RequestBody @Valid final GraphDto graphRegistration)
         throws Exception {
-        logger.info("Received a registration request: {}", graphRegistration);
+        this.getLogger().info("Received a registration request: {}", graphRegistration);
         var graphEntity = this.graphRegistrar.tryRegister(graphRegistration);
         var response = super.ingressResponseBuilder.buildIngressResponseFrom(graphEntity);
         return response;
@@ -95,7 +115,7 @@ public class GraphController extends GenericEntityController<Graph, GraphDto> {
 
     @PostMapping(value = "/register/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public IngressResponse upload(@RequestParam("file") MultipartFile file) {
-        logger.info("Received uploaded graph; processing...");
+        this.getLogger().info("Received uploaded graph; processing...");
 
         IngressResponse response = null;
 
@@ -124,21 +144,21 @@ public class GraphController extends GenericEntityController<Graph, GraphDto> {
     public void tryDeployGraph(@RequestBody @Valid GraphDeployment deployment)
         throws Exception {
 
-        logger.info("Received a request to deploy graph {} with version {}...",
+        this.getLogger().info("Received a request to deploy graph {} with version {}...",
             deployment.getName(),
             deployment.getVersion());
 
         this.agentManager.tryDeployAgentsFor(deployment);
         this.adapterManager.tryDeployAdaptersFor(deployment);
     }
-    
+
     @PostMapping("/teardown")
     @Transactional
     public void tryTeardownGraph(
         @RequestParam(value = "graph-name") String graphName,
         @RequestBody @Valid SemanticVersion version) {
 
-        logger.info("Received a request to teardown graph {} with version {}...",
+        this.getLogger().info("Received a request to teardown graph {} with version {}...",
             graphName,
             version);
 
@@ -151,7 +171,7 @@ public class GraphController extends GenericEntityController<Graph, GraphDto> {
                 version.getPatch());
 
         if (graphRecord.isEmpty()) {
-            logger.error("ERROR: Could not find a graph registered with name {} and version {}...",
+            this.getLogger().error("ERROR: Could not find a graph registered with name {} and version {}...",
                 graphName,
                 version);
             throw new IllegalArgumentException("ERROR: Could not find a graph registered with name "
@@ -162,12 +182,11 @@ public class GraphController extends GenericEntityController<Graph, GraphDto> {
             this.adapterManager.tearDownAdaptersFor(graphName, version);
 
             if (Objects.nonNull(this.agentOperator)) {
-                logger.info("...running in kubernetes; attempting to tear down any of the graph's "
+                this.getLogger().info("...running in kubernetes; attempting to tear down any of the graph's "
                     + " resources deployed in Kubernetes...");
                 this.agentOperator.deleteGraphResources(graphName);
             }
         }
-        logger.info("...finished tearing down the graph...");
+        this.getLogger().info("...finished tearing down the graph...");
     }
-
 }

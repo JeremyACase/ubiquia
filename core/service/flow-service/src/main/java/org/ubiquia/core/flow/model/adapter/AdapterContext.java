@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
-import org.ubiquia.common.models.embeddable.*;
-import org.ubiquia.common.models.enums.AdapterType;
+import org.ubiquia.common.model.ubiquia.embeddable.*;
+import org.ubiquia.common.model.ubiquia.enums.AdapterType;
 
 /**
  * A class that maintains several data points for adapters.

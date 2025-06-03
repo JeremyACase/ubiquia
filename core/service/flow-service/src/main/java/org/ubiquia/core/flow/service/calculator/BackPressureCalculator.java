@@ -2,11 +2,11 @@ package org.ubiquia.core.flow.service.calculator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.model.ubiquia.adapter.backpressure.BackPressure;
+import org.ubiquia.common.model.ubiquia.adapter.backpressure.Egress;
+import org.ubiquia.common.model.ubiquia.adapter.backpressure.Ingress;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.model.adapter.AdapterContext;
-import org.ubiquia.common.models.adapter.backpressure.BackPressure;
-import org.ubiquia.common.models.adapter.backpressure.Egress;
-import org.ubiquia.common.models.adapter.backpressure.Ingress;
 import org.ubiquia.core.flow.service.logic.adapter.AdapterTypeLogic;
 
 /**

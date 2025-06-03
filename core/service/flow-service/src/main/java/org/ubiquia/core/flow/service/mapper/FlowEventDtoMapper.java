@@ -6,11 +6,12 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.dto.AdapterDto;
-import org.ubiquia.common.models.dto.FlowEventDto;
-import org.ubiquia.common.models.dto.KeyValuePairDto;
-import org.ubiquia.common.models.embeddable.FlowEventTimes;
-import org.ubiquia.common.models.entity.FlowEvent;
+import org.ubiquia.common.library.api.service.mapper.GenericDtoMapper;
+import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
+import org.ubiquia.common.model.ubiquia.dto.FlowEventDto;
+import org.ubiquia.common.model.ubiquia.dto.KeyValuePairDto;
+import org.ubiquia.common.model.ubiquia.embeddable.FlowEventTimes;
+import org.ubiquia.common.model.ubiquia.entity.FlowEvent;
 
 
 @Service

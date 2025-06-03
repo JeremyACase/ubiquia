@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.dto.GraphDto;
-import org.ubiquia.common.models.entity.Graph;
+import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.entity.Graph;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 
 /**

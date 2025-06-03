@@ -12,14 +12,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.RestTemplate;
+import org.ubiquia.common.model.ubiquia.adapter.QueueAdapterEgress;
+import org.ubiquia.common.model.ubiquia.dto.GraphEdgeDto;
+import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
+import org.ubiquia.common.model.ubiquia.enums.AdapterType;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 import org.ubiquia.core.flow.mock.MockRegistrar;
-import org.ubiquia.common.models.adapter.QueueAdapterEgress;
-import org.ubiquia.common.models.dto.GraphEdgeDto;
-import org.ubiquia.common.models.embeddable.GraphDeployment;
-import org.ubiquia.common.models.enums.AdapterType;
 
 
 @SpringBootTest

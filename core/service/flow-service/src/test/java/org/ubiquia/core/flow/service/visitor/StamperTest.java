@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.ubiquia.common.models.embeddable.AdapterSettings;
-import org.ubiquia.common.models.embeddable.KeyValuePair;
-import org.ubiquia.common.models.entity.Adapter;
-import org.ubiquia.common.models.entity.FlowEvent;
+import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
+import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
+import org.ubiquia.common.model.ubiquia.entity.Adapter;
+import org.ubiquia.common.model.ubiquia.entity.FlowEvent;
 
 
 @SpringBootTest

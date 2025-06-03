@@ -3,7 +3,7 @@ package org.ubiquia.core.flow.service.decorator.adapter.override;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.dto.AdapterDto;
+import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
 import org.ubiquia.core.flow.service.decorator.override.GenericOverrideDecorator;
 
 @Service

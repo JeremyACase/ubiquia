@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
-import org.ubiquia.common.models.embeddable.KeyValuePair;
 
 @Service
 public class AdapterTagBuilder {

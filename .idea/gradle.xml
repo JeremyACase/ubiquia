@@ -9,8 +9,13 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/common" />
-            <option value="$PROJECT_DIR$/common/models" />
-            <option value="$PROJECT_DIR$/common/models/common-models" />
+            <option value="$PROJECT_DIR$/common/library" />
+            <option value="$PROJECT_DIR$/common/library/advice" />
+            <option value="$PROJECT_DIR$/common/library/api" />
+            <option value="$PROJECT_DIR$/common/library/dao" />
+            <option value="$PROJECT_DIR$/common/model" />
+            <option value="$PROJECT_DIR$/common/model/acl" />
+            <option value="$PROJECT_DIR$/common/model/ubiquia" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/core/service" />
             <option value="$PROJECT_DIR$/core/service/communication-service" />

@@ -1,5 +1,7 @@
 package org.ubiquia.core.flow.service.decorator.adapter.broker;
 
+import static org.ubiquia.common.model.ubiquia.enums.BrokerType.KAFKA;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

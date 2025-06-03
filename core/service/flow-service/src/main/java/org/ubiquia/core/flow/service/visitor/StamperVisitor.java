@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.embeddable.KeyValuePair;
-import org.ubiquia.common.models.entity.FlowEvent;
+import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
+import org.ubiquia.common.model.ubiquia.entity.FlowEvent;
 
 /**
  * This is a service that can "stamp" payloads from adapters per their configuration. Stamps

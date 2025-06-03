@@ -4,7 +4,7 @@ import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-import org.ubiquia.common.models.embeddable.GraphDeployment;
+import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 
 /**
  * Configuration component that maintains what graphs we're configured to deploy

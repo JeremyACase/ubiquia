@@ -1,7 +1,7 @@
 package org.ubiquia.core.flow.service.logic.adapter;
 
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.enums.AdapterType;
+import org.ubiquia.common.model.ubiquia.enums.AdapterType;
 
 /**
  * A service that exposes adapter type logic.

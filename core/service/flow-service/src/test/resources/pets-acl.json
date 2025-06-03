@@ -36,7 +36,7 @@
         ]
       },
       "KeyValuePair": {
-        "description": "A model defining a key-value-pair that can be persisted in the MACHINA database where the value is a string.",
+        "description": "A model defining a key-value-pair that can be persisted in the Ubiquia database where the value is a string.",
         "type": "object",
         "required": [
           "key"

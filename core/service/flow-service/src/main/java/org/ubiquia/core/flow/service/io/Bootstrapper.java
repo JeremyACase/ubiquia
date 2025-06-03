@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.dto.AgentCommunicationLanguageDto;
-import org.ubiquia.common.models.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
+import org.ubiquia.common.model.ubiquia.dto.GraphDto;
 import org.ubiquia.core.flow.service.registrar.AgentCommunicationLanguageRegistrar;
 import org.ubiquia.core.flow.service.registrar.GraphRegistrar;
 

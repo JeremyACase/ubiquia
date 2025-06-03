@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.dto.FlowMessageDto;
+import org.ubiquia.common.model.ubiquia.dto.FlowMessageDto;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.component.adapter.EgressAdapter;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;

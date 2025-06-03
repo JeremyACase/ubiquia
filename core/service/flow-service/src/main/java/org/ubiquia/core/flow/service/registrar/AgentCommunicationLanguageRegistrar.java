@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.dto.AgentCommunicationLanguageDto;
-import org.ubiquia.common.models.entity.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
+import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguage;
 import org.ubiquia.core.flow.repository.AgentCommunicationLanguageRepository;
 import org.ubiquia.core.flow.service.visitor.validator.JsonSchemaValidator;
 

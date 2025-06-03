@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.dto.AgentDto;
-import org.ubiquia.common.models.embeddable.Volume;
+import org.ubiquia.common.model.ubiquia.dto.AgentDto;
+import org.ubiquia.common.model.ubiquia.embeddable.Volume;
 
 @ConditionalOnProperty(
     value = "ubiquia.kubernetes.enabled",

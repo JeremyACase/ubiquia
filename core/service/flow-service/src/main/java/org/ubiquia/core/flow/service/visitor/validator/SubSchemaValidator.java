@@ -4,7 +4,7 @@ package org.ubiquia.core.flow.service.visitor.validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.embeddable.SubSchema;
+import org.ubiquia.common.model.ubiquia.embeddable.SubSchema;
 
 /**
  * A service dedicated to validating "Sub Schemas." In the future, this should be revamped

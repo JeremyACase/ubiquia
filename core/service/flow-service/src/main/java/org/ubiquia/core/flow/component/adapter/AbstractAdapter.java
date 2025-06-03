@@ -9,11 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
-import org.ubiquia.core.flow.interfaces.InterfaceLogger;
+import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
+import org.ubiquia.common.model.ubiquia.adapter.backpressure.BackPressure;
+import org.ubiquia.common.model.ubiquia.dto.FlowEventDto;
+import org.ubiquia.common.model.ubiquia.dto.FlowMessageDto;
 import org.ubiquia.core.flow.model.adapter.AdapterContext;
-import org.ubiquia.common.models.adapter.backpressure.BackPressure;
-import org.ubiquia.common.models.dto.FlowEventDto;
-import org.ubiquia.common.models.dto.FlowMessageDto;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.calculator.BackPressureCalculator;
@@ -37,49 +37,35 @@ import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
  */
 public abstract class AbstractAdapter implements InterfaceLogger {
 
-    private AdapterContext adapterContext;
-
     @Autowired
     protected AdapterDecorator adapterDecorator;
-
     @Autowired
     protected AdapterPayloadOrchestrator adapterPayloadOrchestrator;
-
     @Autowired
     protected AdapterInboxMessageCommand adapterInboxMessageCommand;
-
     @Autowired
     protected AdapterInboxPollCommand adapterInboxPollCommand;
-
     @Autowired
     protected AdapterInboxPollingLogic adapterInboxPollingLogic;
-
     @Autowired
     protected BackPressureCalculator backPressureCalculator;
-
     @Autowired
     protected FlowEventBuilder flowEventBuilder;
-
     @Autowired
     protected FlowEventDtoMapper flowEventDtoMapper;
-
     @Autowired
     protected FlowMessageRepository flowMessageRepository;
-
-    @Autowired (required = false)
+    @Autowired(required = false)
     protected MicroMeterHelper microMeterHelper;
-
     @Autowired
     protected ObjectMapper objectMapper;
-
     @Autowired
     protected PayloadModelValidator payloadModelValidator;
-
     @Autowired
     protected RestTemplate restTemplate;
-
     @Autowired
     protected StamperVisitor stamper;
+    private AdapterContext adapterContext;
 
     public AdapterContext getAdapterContext() {
         return adapterContext;

@@ -8,16 +8,16 @@ import java.util.ArrayList;
 import org.instancio.Instancio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.model.ubiquia.dto.AbstractEntityDto;
+import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
+import org.ubiquia.common.model.ubiquia.dto.AgentDto;
+import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
+import org.ubiquia.common.model.ubiquia.embeddable.NameAndVersionPair;
+import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
+import org.ubiquia.common.model.ubiquia.embeddable.SubSchema;
+import org.ubiquia.common.model.ubiquia.enums.AgentType;
 import org.ubiquia.core.flow.mock.MockRegistrar;
-import org.ubiquia.common.models.dto.AbstractEntityDto;
-import org.ubiquia.common.models.dto.AdapterDto;
-import org.ubiquia.common.models.dto.AgentDto;
-import org.ubiquia.common.models.dto.GraphDto;
-import org.ubiquia.common.models.embeddable.AdapterSettings;
-import org.ubiquia.common.models.embeddable.NameAndVersionPair;
-import org.ubiquia.common.models.embeddable.SemanticVersion;
-import org.ubiquia.common.models.embeddable.SubSchema;
-import org.ubiquia.common.models.enums.AgentType;
 
 
 @Service
@@ -96,11 +96,11 @@ public class DummyFactory {
     @Transactional
     public GraphDto generateGraph() throws IOException {
 
-        var domainOntology = this.mockRegistrar.tryRegisterAcl();
+        var acl = this.mockRegistrar.tryRegisterAcl();
 
         var nameAndVersionPair = new NameAndVersionPair();
-        nameAndVersionPair.setName(domainOntology.getDomain());
-        nameAndVersionPair.setVersion(domainOntology.getVersion());
+        nameAndVersionPair.setName(acl.getDomain());
+        nameAndVersionPair.setVersion(acl.getVersion());
 
         var graph = Instancio
             .of(GraphDto.class)

@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.embeddable.OverrideSettings;
-import org.ubiquia.common.models.embeddable.OverrideSettingsStringified;
+import org.ubiquia.common.model.ubiquia.embeddable.OverrideSettings;
+import org.ubiquia.common.model.ubiquia.embeddable.OverrideSettingsStringified;
 
 
 /**

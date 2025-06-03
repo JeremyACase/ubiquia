@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.ubiquia.common.model.ubiquia.dto.AgentDto;
+import org.ubiquia.common.model.ubiquia.dto.ConfigDto;
+import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
+import org.ubiquia.common.model.ubiquia.embeddable.GraphSettings;
+import org.ubiquia.common.model.ubiquia.embeddable.OverrideSettingsStringified;
 import org.ubiquia.core.flow.TestHelper;
-import org.ubiquia.common.models.dto.AgentDto;
-import org.ubiquia.common.models.dto.ConfigDto;
-import org.ubiquia.common.models.embeddable.GraphDeployment;
-import org.ubiquia.common.models.embeddable.GraphSettings;
-import org.ubiquia.common.models.embeddable.OverrideSettingsStringified;
 
 
 @SpringBootTest

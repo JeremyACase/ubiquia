@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.ubiquia.common.models.adapter.QueueAdapterEgress;
+import org.ubiquia.common.model.ubiquia.adapter.QueueAdapterEgress;
 import org.ubiquia.core.flow.service.command.adapter.QueueAdapterCommand;
 
 @Component

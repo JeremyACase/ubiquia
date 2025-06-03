@@ -26,7 +26,10 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-webflux"
 
-    implementation project(':common:models:common-models')
+    implementation project(':common:model:ubiquia')
+    implementation project(':common:library:advice')
+    implementation project(':common:library:api')
+    implementation project(':common:library:dao')
 
     implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${JACKSON_DATA_FORMAT_VERSION}"

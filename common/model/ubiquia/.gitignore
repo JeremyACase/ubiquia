@@ -1,0 +1,22 @@
+# Ignore Gradle project-specific cache directory
+.gradle
+.project
+**.iml
+
+# Ignore Gradle build stuff
+.classpath
+build
+build.reports
+
+# Ignore build stuff
+bin
+
+# VS Code stuff
+.vscode
+.settings
+
+# Intellij stuff
+.idea
+
+jacocohtml/
+jacoco.xml

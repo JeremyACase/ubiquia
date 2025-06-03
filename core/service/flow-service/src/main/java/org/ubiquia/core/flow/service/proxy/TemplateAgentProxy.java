@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.entity.FlowEvent;
+import org.ubiquia.common.model.ubiquia.entity.FlowEvent;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.service.io.Outbox;
 import org.ubiquia.core.flow.service.visitor.StamperVisitor;

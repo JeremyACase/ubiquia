@@ -12,13 +12,18 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.ubiquia.common.models.IngressResponse;
-import org.ubiquia.common.models.dto.AgentCommunicationLanguageDto;
-import org.ubiquia.common.models.entity.AgentCommunicationLanguage;
+import org.ubiquia.common.library.api.controller.GenericUbiquiaDaoController;
+import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
+import org.ubiquia.common.library.dao.component.EntityDao;
+import org.ubiquia.common.model.ubiquia.IngressResponse;
+import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
+import org.ubiquia.common.model.ubiquia.entity.Adapter;
+import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguage;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.AgentCommunicationLanguageRepository;
 import org.ubiquia.core.flow.repository.AgentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
+import org.ubiquia.core.flow.service.mapper.AgentCommunicationLanguageDtoMapper;
 import org.ubiquia.core.flow.service.registrar.AgentCommunicationLanguageRegistrar;
 
 /**
@@ -26,12 +31,18 @@ import org.ubiquia.core.flow.service.registrar.AgentCommunicationLanguageRegistr
  */
 @RestController
 @RequestMapping("/ubiquia/agent-communication-language")
-public class AgentCommunicationLanguageController extends GenericEntityController<
+public class AgentCommunicationLanguageController extends GenericUbiquiaDaoController<
     AgentCommunicationLanguage,
     AgentCommunicationLanguageDto> {
 
     private static final Logger logger = LoggerFactory.getLogger(
         AgentCommunicationLanguageController.class);
+
+    @Autowired
+    private EntityDao<AgentCommunicationLanguage> entityDao;
+
+    @Autowired
+    private AgentCommunicationLanguageDtoMapper dtoMapper;
 
     @Autowired
     private AdapterRepository adapterRepository;
@@ -51,6 +62,18 @@ public class AgentCommunicationLanguageController extends GenericEntityControlle
     @Override
     public Logger getLogger() {
         return logger;
+    }
+
+    @Override
+    public EntityDao<AgentCommunicationLanguage> getDataAccessObject() {
+        return this.entityDao;
+    }
+
+    @Override
+    public InterfaceEntityToDtoMapper<
+        AgentCommunicationLanguage,
+        AgentCommunicationLanguageDto> getDataTransferObjectMapper() {
+        return this.dtoMapper;
     }
 
     /**

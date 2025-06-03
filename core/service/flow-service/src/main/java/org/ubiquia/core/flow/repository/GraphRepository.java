@@ -1,7 +1,8 @@
 package org.ubiquia.core.flow.repository;
 
+
 import java.util.Optional;
-import org.ubiquia.common.models.entity.Graph;
+import org.ubiquia.common.model.ubiquia.entity.Graph;
 
 public interface GraphRepository
     extends AbstractEntityRepository<Graph> {

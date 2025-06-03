@@ -5,9 +5,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.dto.GraphDto;
-import org.ubiquia.common.models.embeddable.NameAndVersionPair;
-import org.ubiquia.common.models.entity.Graph;
+import org.ubiquia.common.library.api.service.mapper.GenericDtoMapper;
+import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.embeddable.NameAndVersionPair;
+import org.ubiquia.common.model.ubiquia.entity.Graph;
 
 @Service
 public class GraphDtoMapper extends GenericDtoMapper<Graph, GraphDto> {

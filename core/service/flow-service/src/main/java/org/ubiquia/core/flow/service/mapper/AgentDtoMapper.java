@@ -5,10 +5,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.ArrayList;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.dto.AgentDto;
-import org.ubiquia.common.models.dto.ConfigDto;
-import org.ubiquia.common.models.embeddable.OverrideSettings;
-import org.ubiquia.common.models.entity.Agent;
+import org.ubiquia.common.library.api.service.mapper.GenericDtoMapper;
+import org.ubiquia.common.model.ubiquia.dto.AgentDto;
+import org.ubiquia.common.model.ubiquia.dto.ConfigDto;
+import org.ubiquia.common.model.ubiquia.embeddable.OverrideSettings;
+import org.ubiquia.common.model.ubiquia.entity.Agent;
 
 
 @Service

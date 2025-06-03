@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.models.dto.AdapterDto;
-import org.ubiquia.common.models.entity.Adapter;
+import org.ubiquia.common.library.api.service.mapper.GenericDtoMapper;
+import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
+import org.ubiquia.common.model.ubiquia.entity.Adapter;
 
 
 @Service

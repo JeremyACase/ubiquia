@@ -6,12 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
+import org.ubiquia.common.model.ubiquia.entity.Adapter;
+import org.ubiquia.common.model.ubiquia.entity.Agent;
+import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.common.model.ubiquia.enums.AdapterType;
 import org.ubiquia.core.flow.component.adapter.*;
-import org.ubiquia.common.models.embeddable.GraphDeployment;
-import org.ubiquia.common.models.entity.Adapter;
-import org.ubiquia.common.models.entity.Agent;
-import org.ubiquia.common.models.entity.Graph;
-import org.ubiquia.common.models.enums.AdapterType;
 import org.ubiquia.core.flow.service.builder.adapter.AdapterBuilder;
 
 /**

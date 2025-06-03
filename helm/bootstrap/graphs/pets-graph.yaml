@@ -18,7 +18,7 @@ tags:
   - key: testTagKey3
     value: testTagValue3
 
-# These are capabilities that the graph implements. These will eventually be used by MACHINA's Executive Service.
+# These are capabilities that the graph implements. These will eventually be used by Ubiquia's Executive Service.
 capabilities:
   - ImACapability!
 

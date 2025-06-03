@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
-import org.ubiquia.core.flow.interfaces.InterfaceLogger;
 
 @Service
 public class AdapterManagerCommand implements InterfaceLogger {
