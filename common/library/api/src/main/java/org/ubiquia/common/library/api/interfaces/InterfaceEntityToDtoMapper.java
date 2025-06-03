@@ -13,10 +13,12 @@ import org.ubiquia.common.model.ubiquia.entity.AbstractEntity;
  * @param <F> The entity class we're mapping from.
  * @param <T> The DTO class we're mapping to.
  */
-public interface InterfaceEntityToDtoMapper<F extends AbstractEntity, T extends AbstractEntityDto> {
+public interface InterfaceEntityToDtoMapper<
+    F extends AbstractEntity,
+    T extends AbstractEntityDto> {
 
     /**
-     * Map a Ubiquia Event entity to a DTO.
+     * Map a Ubiquia entity to a DTO.
      *
      * @param from The entity to map from.
      * @return A DTO mapped from the entity.

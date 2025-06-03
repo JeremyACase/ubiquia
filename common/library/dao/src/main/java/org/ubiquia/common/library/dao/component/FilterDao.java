@@ -200,7 +200,7 @@ public class FilterDao<T> {
                     split,
                     clazz));
 
-                // Otherwise, process it is as a single query.
+            // Otherwise, process it is as a single query.
             } else {
                 predicates.add(this.getPredicateForParameter(
                     criteriaBuilder,
