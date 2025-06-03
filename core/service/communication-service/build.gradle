@@ -24,7 +24,6 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-webflux"
     implementation "org.springframework.boot:spring-boot-starter-web"
 
-    implementation project(':common:library:dao')
     implementation project(':common:model:ubiquia')
 
     implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"

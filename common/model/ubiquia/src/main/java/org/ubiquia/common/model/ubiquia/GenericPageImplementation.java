@@ -1,4 +1,4 @@
-package org.ubiquia.common.library.dao.model;
+package org.ubiquia.common.model.ubiquia;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

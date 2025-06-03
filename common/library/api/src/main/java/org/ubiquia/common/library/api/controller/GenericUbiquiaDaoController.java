@@ -16,7 +16,7 @@ import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.api.interfaces.InterfaceUbiquiaDaoController;
 import org.ubiquia.common.library.api.service.builder.IngressResponseBuilder;
 import org.ubiquia.common.library.api.service.visitor.PageValidator;
-import org.ubiquia.common.library.dao.model.GenericPageImplementation;
+import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.AbstractEntityDto;
 import org.ubiquia.common.model.ubiquia.entity.AbstractEntity;
 

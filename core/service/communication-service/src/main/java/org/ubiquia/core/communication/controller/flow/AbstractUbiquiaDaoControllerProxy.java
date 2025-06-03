@@ -1,6 +1,5 @@
 package org.ubiquia.core.communication.controller.flow;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,11 +7,10 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.ubiquia.common.library.dao.model.GenericPageImplementation;
+import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 import org.ubiquia.common.model.ubiquia.dto.AbstractEntityDto;
 import org.ubiquia.core.communication.interfaces.InterfaceUbiquiaDaoControllerProxy;

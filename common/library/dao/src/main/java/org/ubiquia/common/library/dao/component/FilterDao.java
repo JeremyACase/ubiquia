@@ -15,7 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import org.ubiquia.common.library.dao.model.GenericPageImplementation;
+import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.library.dao.service.ClassDeriver;
 import org.ubiquia.common.library.dao.service.NestedPredicateBuilder;
 import org.ubiquia.common.library.dao.service.NonNestedPredicateBuilder;
