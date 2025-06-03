@@ -9,7 +9,7 @@ import org.ubiquia.common.model.ubiquia.dto.GraphDto;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/ubiquia/flow")
+@RequestMapping("/ubiquia/flow-service/graph")
 public class GraphControllerProxy
     extends AbstractUbiquiaDaoControllerProxy<GraphDto> {
 

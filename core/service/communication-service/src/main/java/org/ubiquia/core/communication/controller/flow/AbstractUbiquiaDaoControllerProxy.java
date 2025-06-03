@@ -34,25 +34,24 @@ public abstract class AbstractUbiquiaDaoControllerProxy<T extends AbstractEntity
 
         var url = this.getUrlHelper();
 
-        // Build the target URI with query params
-        var targetUri = UriComponentsBuilder
-            .fromHttpUrl(url + "/query/params")
-            .queryParam("page", page)
-            .queryParam("size", size)
-            .queryParam("sort-descending", sortDescending)
-            .queryParam("sort-by-fields", String.join(",", sortByFields))
-            .build()
-            .toUriString();
+        // Create UriComponentsBuilder for the target endpoint
+        var targetUriBuilder = UriComponentsBuilder.fromHttpUrl(url + "/query/params");
+
+        // Copy all query parameters from the original request
+        httpServletRequest.getParameterMap().forEach((key, values) -> {
+            for (var value : values) {
+                targetUriBuilder.queryParam(key, value);
+            }
+        });
+
+        var targetUri = targetUriBuilder.build().toUriString();
 
         return this.webClient
             .get()
             .uri(targetUri)
             .retrieve()
             .toEntity(new ParameterizedTypeReference<GenericPageImplementation<T>>() {})
-            .onErrorResume(e -> {
-                // Map error to a 502 Bad Gateway if the downstream service fails
-                return Mono.just(ResponseEntity.status(502).body(null));
-            });
+            .onErrorResume(e -> Mono.just(ResponseEntity.status(502).body(null)));
     }
 
     public Mono<ResponseEntity<IngressResponse>> proxyToPostEndpoint(
