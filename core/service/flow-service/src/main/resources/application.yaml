@@ -70,13 +70,14 @@ ubiquia:
     mode: DEFAULT
   page:
     max-size: 100
-  flow:
-    bootstrap:
-      enabled: false
-      acls:
-        directory:
-          path: /app/etc/graphs/
-      graph:
-        directory:
-          path: /app/etc/graphs/
-        deployments:
+  agent:
+    flowService:
+      bootstrap:
+        enabled: false
+        acls:
+          directory:
+            path: /app/etc/graphs/
+        graph:
+          directory:
+            path: /app/etc/graphs/
+          deployments:

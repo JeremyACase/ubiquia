@@ -33,26 +33,26 @@ data:
 
       application:
         name: flow-service
-{{ if .Values.ubiquia.instance.database.h2.enabled }}
+{{ if .Values.ubiquia.agent.database.h2.enabled }}
       datasource:
         driverClassName: org.h2.Driver
         url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
         username: sa
         password: sa
         hikari:
-          transaction-isolation: {{ .Values.ubiquia.instance.database.transactionIsolation }}
+          transaction-isolation: {{ .Values.ubiquia.agent.database.transactionIsolation }}
       h2:
         console:
           enabled: true
           path: /h2-console
-{{ else if .Values.ubiquia.instance.database.yugabyte.enabled }}
+{{ else if .Values.ubiquia.agent.database.yugabyte.enabled }}
       datasource:
         driverClassName: com.yugabyte.Driver
         url: jdbc:yugabytedb://yb-tservers:5433/yugabyte?autoReconnect=true
         username: yugabyte
         password: yugabyte
         hikari:
-          transaction-isolation: {{ .Values.ubiquia.instance.database.transactionIsolation }}
+          transaction-isolation: {{ .Values.ubiquia.agent.database.transactionIsolation }}
 {{ end }}
       jackson:
         date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
@@ -60,7 +60,7 @@ data:
           fail-on-unknown-properties: true
       jpa:
         hibernate:
-          ddl-auto: {{ .Values.ubiquia.instance.database.ddlAutoSetting }}
+          ddl-auto: {{ .Values.ubiquia.agent.database.ddlAutoSetting }}
         properties:
           hibernate:
             generate_statistics: false
@@ -83,7 +83,7 @@ data:
         max-size: 100
       flow:
         bootstrap:
-          enabled: {{ .Values.ubiquia.instance.flowService.bootstrap.enabled }}          
+          enabled: {{ .Values.ubiquia.agent.flowService.bootstrap.enabled }}          
           acls:
             enabled: true
             directory: 
@@ -93,7 +93,7 @@ data:
             directory: 
               path: /app/etc/graphs/
             deployments:
-              {{- range $v := .Values.ubiquia.instance.flowService.graph.deployments }}
+              {{- range $v := .Values.ubiquia.agent.flowService.graph.deployments }}
               - name: {{ $v.name }}
                 version: 
                   major: {{ $v.version.major }}

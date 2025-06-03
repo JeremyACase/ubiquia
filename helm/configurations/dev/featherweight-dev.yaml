@@ -1,6 +1,6 @@
 ubiquia:
   cluster:
-  instance:
+  agent:
     database: 
       h2:
         enabled: true

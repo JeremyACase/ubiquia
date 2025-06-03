@@ -1,3 +1,6 @@
+**************************************************
+
+
 SUCCESS! Ubiquia is installed!
 
 
@@ -34,3 +37,37 @@ The Yugabyte master console can be viewed directly as follows:
 1. $ kubectl port-forward svc/yb-masters -n {{ .Release.Namespace }} 7000:7000
 2. Navigate to "http://localhost:7000"
 {{ end }}
+{{- $jsonFiles := .Files.Glob "bootstrap/acls/*.json" }}
+{{- if $jsonFiles }}
+**************************************************
+Attempting to register Agent Communication Language (ACL) with Flow Service:
+{{- range $path, $_ := $jsonFiles }}
+- {{ $path | base }}
+{{- end }}
+**************************************************
+{{- end }}
+{{- $yamlFiles := .Files.Glob "bootstrap/graphs/*.yaml" }}
+{{- if $yamlFiles }}
+**************************************************
+Attempting to register Directed Acyclic Graph (DAG) with Flow Service:
+{{- range $path, $_ := $yamlFiles }}
+- {{ $path | base }}
+{{- end }}
+**************************************************
+{{- end }}
+{{- if .Values.ubiquia.agent.flowService.graph.deployments }}
+**************************************************
+Attempting to deploy Directed Acyclic Graphs (DAG's):
+
+{{- range $i, $v := .Values.ubiquia.agent.flowService.graph.deployments }}
+- Name: {{ $v.name }}
+  Version: {{ $v.version.major }}.{{ $v.version.minor }}.{{ $v.version.patch }}
+  {{- if $v.graphSettings }}
+  Graph Settings:
+    Flag: {{ $v.graphSettings.flag }}
+  {{- end }}
+{{- end }}
+**************************************************
+{{- else }}
+No Graph Deployments defined.
+{{- end }}

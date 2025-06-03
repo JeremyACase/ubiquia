@@ -3,14 +3,16 @@ logging:
     org.ubiquia: DEBUG
 
 ubiquia:
-  bootstrap:
-    enabled: false
-    graphs:
-      directory:
-        enabled: true
-        path: src/test/resources/boostrap/graphs/
-    acls:
-      filepath: src/test/resources/boostrap/ontologies/pets-acl.json
+  agent:
+    flowService:
+      bootstrap:
+        enabled: false
+        graphs:
+          directory:
+            enabled: true
+            path: src/test/resources/boostrap/graphs/
+        acls:
+          filepath: src/test/resources/boostrap/ontologies/pets-acl.json
 
   broker:
     kafka:

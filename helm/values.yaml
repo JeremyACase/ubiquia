@@ -10,7 +10,7 @@ config:
   podLabels: 
 
 ubiquia:
-  instance:
+  agent:
     database: 
       ddlAutoSetting: create
       h2:

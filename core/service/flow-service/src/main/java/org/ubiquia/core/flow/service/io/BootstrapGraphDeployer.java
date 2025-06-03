@@ -16,7 +16,7 @@ import org.ubiquia.core.flow.controller.GraphController;
  * languages from file.
  */
 @ConditionalOnProperty(
-    value = "ubiquia.instance.bootstrap.enabled",
+    value = "ubiquia.agent.flowService.bootstrap.enabled",
     havingValue = "true",
     matchIfMissing = false
 )

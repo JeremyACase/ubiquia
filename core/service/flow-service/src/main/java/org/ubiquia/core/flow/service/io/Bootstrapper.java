@@ -23,7 +23,7 @@ import org.ubiquia.core.flow.service.registrar.GraphRegistrar;
  * languages from file.
  */
 @ConditionalOnProperty(
-    value = "ubiquia.flow.bootstrap.enabled",
+    value = "ubiquia.agent.flowService.bootstrap.enabled",
     havingValue = "true",
     matchIfMissing = false
 )
@@ -31,13 +31,13 @@ import org.ubiquia.core.flow.service.registrar.GraphRegistrar;
 public class Bootstrapper {
 
     private static final Logger logger = LoggerFactory.getLogger(Bootstrapper.class);
-    @Value("${ubiquia.flow.bootstrap.acls.enabled}")
+    @Value("${ubiquia.agent.flowService.bootstrap.acls.enabled}")
     private Boolean isBootstrapAcls;
-    @Value("${ubiquia.flow.bootstrap.acls.directory.path}")
+    @Value("${ubiquia.agent.flowService.bootstrap.acls.directory.path}")
     private String bootstrapAclsDirectory;
-    @Value("${ubiquia.flow.bootstrap.graphs.directory.path}")
+    @Value("${ubiquia.agent.flowService.bootstrap.graphs.directory.path}")
     private String boostrapGraphsDirectory;
-    @Value("${ubiquia.flow.bootstrap.graphs.enabled}")
+    @Value("${ubiquia.agent.flowService.bootstrap.graphs.enabled}")
     private Boolean isBootstrapGraphs;
     @Autowired
     private AgentCommunicationLanguageRegistrar aclRegistrar;
