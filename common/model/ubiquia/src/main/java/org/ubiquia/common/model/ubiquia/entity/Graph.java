@@ -23,8 +23,6 @@ public class Graph extends AbstractEntity {
     @JoinColumn(name = "acl_graph_join_id", nullable = false)
     private AgentCommunicationLanguage agentCommunicationLanguage;
 
-    private List<KeyValuePair> tags;
-
     private SemanticVersion version;
 
     @OneToMany(mappedBy = "graph", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
@@ -32,6 +30,9 @@ public class Graph extends AbstractEntity {
 
     @OneToMany(mappedBy = "graph", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private List<Agent> agents;
+
+    @ManyToMany(mappedBy = "deployedGraphs", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<UbiquiaAgent> ubiquiaAgentsDeployingGraph;
 
     @Override
     public String getModelType() {
@@ -107,6 +108,14 @@ public class Graph extends AbstractEntity {
 
     public void setCapabilities(List<String> capabilities) {
         this.capabilities = capabilities;
+    }
+
+    public List<UbiquiaAgent> getUbiquiaAgentsDeployingGraph() {
+        return ubiquiaAgentsDeployingGraph;
+    }
+
+    public void setUbiquiaAgentsDeployingGraph(List<UbiquiaAgent> ubiquiaAgentsDeployingGraph) {
+        this.ubiquiaAgentsDeployingGraph = ubiquiaAgentsDeployingGraph;
     }
 }
 

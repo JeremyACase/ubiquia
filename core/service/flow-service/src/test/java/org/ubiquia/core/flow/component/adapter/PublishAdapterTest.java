@@ -53,7 +53,7 @@ public class PublishAdapterTest {
 
     @BeforeEach
     public void setup() {
-        this.testHelper.clearAllState();
+        this.testHelper.setupAgentState();
     }
 
     @KafkaListener(topics = "topic.test")

@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.service.io.Bootstrapper;
 import org.ubiquia.core.flow.service.k8s.AgentOperator;
+import org.ubiquia.core.flow.service.logic.ubiquia.UbiquiaAgentLogic;
 
 
 /**
@@ -25,6 +26,9 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
     @Autowired(required = false)
     private AgentOperator agentOperator;
 
+    @Autowired
+    private UbiquiaAgentLogic ubiquiaAgentLogic;
+
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         logger.info("Initializing Flow instance...");
@@ -40,6 +44,8 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
         if (Objects.nonNull(this.bootstrapper)) {
             this.bootstrapper.init();
         }
+
+        this.ubiquiaAgentLogic.tryInitializeAgentInDatabase();
 
         logger.info("...completed initialization.");
     }

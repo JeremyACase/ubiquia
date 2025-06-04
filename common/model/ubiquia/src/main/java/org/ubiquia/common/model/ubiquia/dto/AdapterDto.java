@@ -20,6 +20,8 @@ public class AdapterDto extends AbstractEntityDto {
 
     private AgentDto agent;
 
+    private CommServiceSettings commServiceSettings;
+
     private String description;
 
     private String endpoint;
@@ -173,5 +175,13 @@ public class AdapterDto extends AbstractEntityDto {
 
     public void setOutputSubSchema(SubSchema outputSubSchema) {
         this.outputSubSchema = outputSubSchema;
+    }
+
+    public CommServiceSettings getCommServiceSettings() {
+        return commServiceSettings;
+    }
+
+    public void setCommServiceSettings(CommServiceSettings commServiceSettings) {
+        this.commServiceSettings = commServiceSettings;
     }
 }

@@ -163,6 +163,7 @@ public class GraphRegistrar {
         graphEntity.setVersion(graphRegistration.getVersion());
         graphEntity.setAgents(new ArrayList<>());
         graphEntity.setAdapters(new ArrayList<>());
+        graphEntity.setUbiquiaAgentsDeployingGraph(new ArrayList<>());
 
         graphEntity.setTags(new HashSet<>());
         if (Objects.nonNull(graphRegistration.getTags())) {

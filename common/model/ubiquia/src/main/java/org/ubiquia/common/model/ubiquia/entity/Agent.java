@@ -11,6 +11,8 @@ public class Agent extends AbstractEntity {
 
     private AgentType type;
 
+    private CommServiceSettings commServiceSettings;
+
     private Config config;
 
     private String agentName;
@@ -179,5 +181,14 @@ public class Agent extends AbstractEntity {
 
     public void setExposeService(Boolean exposeService) {
         this.exposeService = exposeService;
+    }
+
+    @NotNull
+    public CommServiceSettings getCommServiceSettings() {
+        return commServiceSettings;
+    }
+
+    public void setCommServiceSettings(CommServiceSettings commServiceSettings) {
+        this.commServiceSettings = commServiceSettings;
     }
 }

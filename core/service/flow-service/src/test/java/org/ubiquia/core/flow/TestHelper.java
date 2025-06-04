@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.repository.*;
+import org.ubiquia.core.flow.service.logic.ubiquia.UbiquiaAgentLogic;
 import org.ubiquia.core.flow.service.manager.AdapterManager;
 
 @Service
@@ -34,9 +35,16 @@ public class TestHelper {
     @Autowired
     private GraphRepository graphRepository;
 
-    public void clearAllState() {
+    @Autowired
+    private UbiquiaAgentLogic ubiquiaAgentLogic;
+
+    @Autowired
+    private UbiquiaAgentRepository ubiquiaAgentRepository;
+
+    public void setupAgentState() {
         this.clearDatabase();
         this.adapterManager.teardownAllAdapters();
+        this.ubiquiaAgentLogic.tryInitializeAgentInDatabase();
     }
 
     /**

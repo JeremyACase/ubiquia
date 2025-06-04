@@ -23,9 +23,11 @@ import org.ubiquia.common.model.ubiquia.dto.GraphDto;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.core.flow.config.UbiquiaAgentConfig;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.AgentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
+import org.ubiquia.core.flow.repository.UbiquiaAgentRepository;
 import org.ubiquia.core.flow.service.k8s.AgentOperator;
 import org.ubiquia.core.flow.service.manager.AdapterManager;
 import org.ubiquia.core.flow.service.manager.AgentManager;
@@ -43,6 +45,7 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
 
     @Autowired(required = false)
     private AgentOperator agentOperator;
+
 
     @Autowired
     private AdapterRepository adapterRepository;
@@ -64,6 +67,12 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
 
     @Autowired
     private EntityDao<Graph> entityDao;
+
+    @Autowired
+    private UbiquiaAgentConfig ubiquiaAgentConfig;
+
+    @Autowired
+    private UbiquiaAgentRepository ubiquiaAgentRepository;
 
     @Override
     public Logger getLogger() {
@@ -148,6 +157,44 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
             deployment.getName(),
             deployment.getVersion());
 
+        var version = deployment.getVersion();
+        var record = this.graphRepository
+            .findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatchAndUbiquiaAgentsDeployingGraphId(
+                deployment.getName(),
+                version.getMajor(),
+                version.getMinor(),
+                version.getPatch(),
+                this.ubiquiaAgentConfig.getId());
+
+        if (record.isPresent()) {
+            var json = this.objectMapper.writeValueAsString(deployment);
+            throw new IllegalArgumentException("ERROR: Graph for Ubiquia Agent Id "
+                + this.ubiquiaAgentConfig.getId()
+                + " is already deployed: "
+                + json);
+        }
+
+        var ubiquiaAgentRecord = this.ubiquiaAgentRepository.findById(this.ubiquiaAgentConfig.getId());
+        if (ubiquiaAgentRecord.isEmpty()) {
+            throw new RuntimeException("ERROR: Could not find Ubiquia Agent with id "
+                + this.ubiquiaAgentConfig.getId()
+                + "...");
+        }
+        var ubiquiaAgentEntity = ubiquiaAgentRecord.get();
+        var graphRecord = this.graphRepository.findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatch(
+            deployment.getName(),
+            version.getMajor(),
+            version.getMinor(),
+            version.getPatch());
+        if (graphRecord.isEmpty()) {
+            throw new RuntimeException("ERROR: Could not find Graph:  "
+                + this.objectMapper.writeValueAsString(deployment)
+                + "...");
+        }
+
+        ubiquiaAgentEntity.getDeployedGraphs().add(graphRecord.get());
+        this.ubiquiaAgentRepository.save(ubiquiaAgentEntity);
+
         this.agentManager.tryDeployAgentsFor(deployment);
         this.adapterManager.tryDeployAdaptersFor(deployment);
     }
@@ -162,18 +209,15 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
             graphName,
             version);
 
-        var graphRecord = this
-            .graphRepository
-            .findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatch(
+        var record = this.graphRepository
+            .findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatchAndUbiquiaAgentsDeployingGraphId(
                 graphName,
                 version.getMajor(),
                 version.getMinor(),
-                version.getPatch());
+                version.getPatch(),
+                this.ubiquiaAgentConfig.getId());
 
-        if (graphRecord.isEmpty()) {
-            this.getLogger().error("ERROR: Could not find a graph registered with name {} and version {}...",
-                graphName,
-                version);
+        if (record.isEmpty()) {
             throw new IllegalArgumentException("ERROR: Could not find a graph registered with name "
                 + graphName
                 + " and semantic version "
@@ -186,6 +230,32 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
                     + " resources deployed in Kubernetes...");
                 this.agentOperator.deleteGraphResources(graphName);
             }
+
+            var ubiquiaAgentRecord = this
+                .ubiquiaAgentRepository
+                .findByDeployedGraphsGraphNameAndDeployedGraphsVersionMajorAndDeployedGraphsVersionMinorAndDeployedGraphsVersionPatchAndId(
+                    graphName,
+                    version.getMajor(),
+                    version.getMinor(),
+                    version.getPatch(),
+                    this.ubiquiaAgentConfig.getId());
+
+            if (ubiquiaAgentRecord.isEmpty()) {
+                throw new RuntimeException("ERROR: Could not find a Ubiquia Agent for "
+                    + graphName
+                    + " and semantic version "
+                    + version
+                    + " and id "
+                    + this.ubiquiaAgentConfig.getId());
+            }
+
+            var graphEntity = record.get();
+            var ubiquiaAgentEntity = ubiquiaAgentRecord.get();
+            ubiquiaAgentEntity.getDeployedGraphs().remove(graphEntity);
+            logger.info("...removing graph deployment from Ubiquia agent {}...",
+                ubiquiaAgentEntity.getId());
+            this.ubiquiaAgentRepository.save(ubiquiaAgentEntity);
+
         }
         this.getLogger().info("...finished tearing down the graph...");
     }

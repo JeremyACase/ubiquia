@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
 import org.ubiquia.common.model.ubiquia.dto.GraphDto;
 import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
+import org.ubiquia.common.model.ubiquia.embeddable.CommServiceSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
 import org.ubiquia.common.model.ubiquia.entity.Adapter;
 import org.ubiquia.common.model.ubiquia.entity.Graph;
@@ -238,6 +239,7 @@ public class AdapterRegistrar {
 
         var adapterEntity = new Adapter();
         adapterEntity.setGraph(graphEntity);
+        adapterEntity.setCommServiceSettings(adapterRegistration.getCommServiceSettings());
         adapterEntity.setAdapterType(adapterRegistration.getAdapterType());
         adapterEntity.setAdapterName(adapterRegistration.getAdapterName());
         adapterEntity.setAdapterSettings(adapterRegistration.getAdapterSettings());
@@ -262,6 +264,10 @@ public class AdapterRegistrar {
             for (var schema : adapterRegistration.getInputSubSchemas()) {
                 adapterEntity.getInputSubSchemas().add(schema);
             }
+        }
+
+        if (Objects.isNull(adapterEntity.getCommServiceSettings())) {
+            adapterEntity.setCommServiceSettings(new CommServiceSettings());
         }
 
         adapterEntity.setOutputSubSchema(adapterRegistration.getOutputSubSchema());

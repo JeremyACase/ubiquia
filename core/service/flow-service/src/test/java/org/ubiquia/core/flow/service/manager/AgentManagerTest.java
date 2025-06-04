@@ -37,7 +37,7 @@ public class AgentManagerTest {
 
     @BeforeEach
     public void setup() {
-        this.testHelper.clearAllState();
+        this.testHelper.setupAgentState();
     }
 
     @Test

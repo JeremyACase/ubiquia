@@ -13,6 +13,7 @@ ubiquia:
             path: src/test/resources/boostrap/graphs/
         acls:
           filepath: src/test/resources/boostrap/ontologies/pets-acl.json
+    id: 0328ca73-4d50-409f-85a8-7168ce80bd96
 
   broker:
     kafka:

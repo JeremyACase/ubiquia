@@ -59,7 +59,7 @@ public class HiddenAdapterTest {
 
     @BeforeEach
     public void setup() {
-        this.testHelper.clearAllState();
+        this.testHelper.setupAgentState();
     }
 
     @Test

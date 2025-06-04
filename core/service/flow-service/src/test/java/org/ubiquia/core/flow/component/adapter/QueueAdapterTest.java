@@ -49,7 +49,7 @@ public class QueueAdapterTest {
 
     @BeforeEach
     public void setup() {
-        this.testHelper.clearAllState();
+        this.testHelper.setupAgentState();
     }
 
     @Test

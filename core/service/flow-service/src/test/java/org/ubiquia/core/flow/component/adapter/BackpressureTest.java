@@ -31,7 +31,7 @@ public class BackpressureTest {
 
     @BeforeEach
     public void setup() {
-        this.testHelper.clearAllState();
+        this.testHelper.setupAgentState();
     }
 
     @Test

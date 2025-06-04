@@ -77,3 +77,15 @@ Create the name of the service account to use
 {{- define "ubiquia.core.flowService.image" -}}
 {{ .Values.ubiquia.components.core.flowService.image.registry }}/{{ .Values.ubiquia.components.core.flowService.image.repository }}:{{ .Values.ubiquia.components.core.flowService.image.tag }}
 {{- end }}
+
+{{/*
+A pseudo-UUID-generator
+*/}}
+{{- define "ubiquia.generate.uuid" -}}
+{{- $part1 := randAlphaNum 8 | lower -}}
+{{- $part2 := randAlphaNum 4 | lower -}}
+{{- $part3 := randAlphaNum 4 | lower -}}
+{{- $part4 := randAlphaNum 4 | lower -}}
+{{- $part5 := randAlphaNum 12 | lower -}}
+{{- printf "%s-%s-%s-%s-%s" $part1 $part2 $part3 $part4 $part5 -}}
+{{- end }}

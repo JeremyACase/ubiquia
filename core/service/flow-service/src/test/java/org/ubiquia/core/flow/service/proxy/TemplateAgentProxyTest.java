@@ -51,7 +51,7 @@ public class TemplateAgentProxyTest {
 
     @BeforeEach
     public void setup() {
-        this.testHelper.clearAllState();
+        this.testHelper.setupAgentState();
     }
 
     @Test

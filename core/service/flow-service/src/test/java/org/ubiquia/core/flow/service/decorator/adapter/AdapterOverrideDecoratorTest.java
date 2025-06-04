@@ -33,7 +33,7 @@ public class AdapterOverrideDecoratorTest {
 
     @BeforeEach
     public void setup() {
-        this.testHelper.clearAllState();
+        this.testHelper.setupAgentState();
     }
 
     @Test

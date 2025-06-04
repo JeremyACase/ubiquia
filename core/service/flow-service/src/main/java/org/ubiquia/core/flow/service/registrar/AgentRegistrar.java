@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import org.hibernate.type.descriptor.java.ObjectJavaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.AgentDto;
 import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.embeddable.CommServiceSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.Config;
 import org.ubiquia.common.model.ubiquia.embeddable.ScaleSettings;
 import org.ubiquia.common.model.ubiquia.entity.Agent;
@@ -104,6 +106,10 @@ public class AgentRegistrar {
         if (Objects.isNull(agentEntity.getExposeService())) {
             agentEntity.setExposeService(false);
         }
+
+        if (Objects.isNull(agentEntity.getCommServiceSettings())) {
+            agentEntity.setCommServiceSettings(new CommServiceSettings());
+        }
     }
 
     /**
@@ -188,6 +194,7 @@ public class AgentRegistrar {
         if (Objects.nonNull(agentRegistration.getTags())) {
             agentEntity.getTags().addAll(agentRegistration.getTags());
         }
+        agentEntity.setCommServiceSettings(agentRegistration.getCommServiceSettings());
         agentEntity.setExposeService(agentRegistration.getExposeService());
         agentEntity.setInitContainer(agentRegistration.getInitContainer());
         agentEntity.setLivenessProbe(agentRegistration.getLivenessProbe());

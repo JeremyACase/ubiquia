@@ -42,3 +42,4 @@ ubiquia:
   flow:
     service:
       port: 8080
+      url: http://ubiquia-core-flow-service

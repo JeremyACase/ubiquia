@@ -49,7 +49,7 @@ spring:
       fail-on-unknown-properties: true
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         generate_statistics: false
@@ -81,3 +81,5 @@ ubiquia:
           directory:
             path: /app/etc/graphs/
           deployments:
+    # This is a default UUID for development purposes
+    id: 0328ca73-4d50-409f-85a8-7168ce80bd96

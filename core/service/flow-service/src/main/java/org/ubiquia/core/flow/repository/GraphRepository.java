@@ -12,4 +12,11 @@ public interface GraphRepository
         final Integer major,
         final Integer minor,
         final Integer patch);
+
+    Optional<Graph> findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatchAndUbiquiaAgentsDeployingGraphId(
+        final String graphName,
+        final Integer major,
+        final Integer minor,
+        final Integer patch,
+        final String id);
 }

@@ -49,7 +49,7 @@ public class AdapterInboxPollingLogicTest {
 
     @BeforeEach
     public void setup() {
-        this.testHelper.clearAllState();
+        this.testHelper.setupAgentState();
     }
 
     @Test
