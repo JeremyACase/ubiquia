@@ -19,19 +19,18 @@ Welcome to Ubiquia — a domain-agnostic, production-grade Multi-Agent Orchestra
 ## Ubiquia Overview
 
 ### About
-
 Ubiquia is a production-grade multi-agent system (MAS) orchestration tool that brings the power of dynamic, runtime agent coordination to real-world deployments. Key features include:
 
-- 🛠️ **Production-Ready MAS Orchestration**: A carefully architected orchestration engine designed to handle dynamic, real-time data flows and resilient agent networks.
-- ☕ **Spring Boot Foundation**: Leverages the battle-tested Spring Boot ecosystem for robust microservice capabilities, including dependency injection, lifecycle management, and secure configuration.
-- 🔧 **Sophisticated DTO Mapping**: Uses advanced DTO mapping techniques for clean, modular code and seamless data transformation between agents and orchestration layers.
-- 🔍 **Runtime Schema Validation**: Employs JSON Schema validation to ensure that all data exchanged between agents and the orchestration layer adheres to well-defined, dynamically loaded schemas.
-- 🌐 **Distributed Belief State with YugabyteDB**: Built on YugabyteDB, a resilient, distributed SQL database that underpins Ubiquia’s shared global belief state, ensuring eventual consistency and high availability.
-- 🚀 **Kubernetes-Native Deployment**: Ubiquia is designed to run seamlessly in containerized environments orchestrated by Kubernetes, making it easy to deploy, scale, and maintain in real-world production clusters.
-- 🔄 **Resilience to Network Partitions**: Engineered to gracefully handle transient network partitions, ensuring that agents can rejoin the system and maintain a consistent belief state.
+- 🛠️ **Production-Ready MAS Orchestration:** A carefully architected orchestration engine designed to handle dynamic, real-time data flows and resilient agent networks.
+- 🌐 **Distributed Belief State with YugabyteDB:** Built on YugabyteDB, a resilient, distributed SQL database that underpins Ubiquia’s shared global belief state, ensuring eventual consistency and high availability.
+- 🔄 **Dynamic Domain Ontology Realization:** Ubiquia can derive bidirectional, relational database schemas--domain ontologies--directly from JSON schemas at runtime, enabling rapid modeling that adapts to evolving requirements.
+- 🔍 **Runtime Schema Validation:** Employs JSON Schema validation to ensure that all data exchanged between agents and the orchestration layer adheres to well-defined, dynamically loaded schemas.
+- 🌐 **Automatic RESTful API Generation:** Automatically creates a RESTful server that exposes these domain ontologies as APIs, providing seamless CRUD operations for runtime-managed data.
+- 🚀 **Kubernetes-Native Deployment:** Ubiquia is designed to run seamlessly in containerized environments orchestrated by Kubernetes, making it easy to deploy, scale, and maintain in real-world production clusters.
+- 🔄 **Resilience to Network Partitions:** Engineered to gracefully handle transient network partitions, ensuring that agents can rejoin the system and maintain a consistent belief state.
+- ☕ **Spring Boot Foundation:** Leverages the battle-tested Spring Boot ecosystem for robust microservice capabilities, including dependency injection, lifecycle management, and secure configuration.
 
 Together, these features make Ubiquia a production-ready, highly reliable MAS orchestration tool that is both developer-friendly and operationally robust.
-
 
 ## Quickstart
 The quickest way to get up and running with Ubiquia is to follow this section.

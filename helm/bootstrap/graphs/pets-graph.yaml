@@ -33,7 +33,7 @@ agentCommunicationLanguage:
 # These are a list of agents that comprise this graph.
 agents:
 
-  - agentName: Pet-Classifier-Agent
+  - agentName: Pet-Store-Image-Classifier-Agent
 
     # Setting a agent as a template will instruct Ubiquia to not instantiate it as a 
     # Kubernetes pod, but instead to generate a "proxy" for it which will act on its behalf with 
@@ -82,8 +82,8 @@ agents:
 
       # Another example override setting. It will override the template agent boolean when the graph
       # is deployed with the "prod" flag.
-      - flag: prod
-        key: type
+      - flag: demo
+        key: agentType
         value: POD
 
       # Yet another example to show that even nested configuration values can be overridden.
@@ -103,7 +103,7 @@ agents:
     adapter:
       modelType: Adapter
       adapterType: PUSH
-      adapterName: pet-store-image-classifier-adapter
+      adapterName: Pet-Store-Image-Classifier-Adapter
       description: This is an example adapter.
 
       # This is the endpoint of the agent that the adapter will interact with when it 
@@ -128,13 +128,12 @@ agents:
 
       # Like agents, Adapters can have overridesettings.
       overrideSettings:
-        - flag: prod
+        - flag: demo
           key: adapterSettings
           value:
             persistInputPayload: false
             persistOutputPayload: false
             validateOutputPayload: true
-
 
   - agentName: Pet-Generator-Agent
 
@@ -148,19 +147,19 @@ agents:
       tag: latest
 
     # An example of configuring our agent to run with a volume which can be provisioned in a K8s cluster
-    livenessProbe:
-      httpGetPath: /actuator/health
-      initialDelaySeconds: 30
+    # livenessProbe:
+    #   httpGetPath: /actuator/health
+    #   initialDelaySeconds: 30
 
     overrideSettings:
-      - flag: prod
-        key: type
+      - flag: demo
+        key: agentType
         value: POD
 
     adapter:
       modelType: Adapter
       adapterType: HIDDEN
-      adapterName: Pet-Generator-Agent-Adapter
+      adapterName: Pet-Generator-Adapter
       description: This is an example adapter.
 
       endpoint: /pet/store/create-pet
@@ -177,7 +176,7 @@ agents:
         validateInputPayload: false
 
       overrideSettings:
-        - flag: prod
+        - flag: demo
           key: adapterSettings
           value:
             persistInputPayload: true
@@ -194,6 +193,6 @@ agentlessAdapters:
 # agents (if they have them), package up the agent response (if applicable), and send
 # the payload "downstream" (i.e., to any adapters "immediately on the right.")
 edges:
-  - leftAdapterName: Pet-Classifier-Agent-Adapter
+  - leftAdapterName: Pet-Store-Image-Classifier-Adapter
     rightAdapterNames:
-      - Pet-Generator-Agent-Adapter
+      - Pet-Generator-Adapter
