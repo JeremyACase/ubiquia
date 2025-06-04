@@ -12,11 +12,11 @@ import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
  */
 @Component
 @ConditionalOnProperty(
-    value = "ubiquia.agent.flowService.bootstrap.enabled",
+    value = "ubiquia.agent.flow-service.bootstrap.enabled",
     havingValue = "true",
     matchIfMissing = false
 )
-@ConfigurationProperties("ubiquia.agent.flowService.bootstrap.graphs")
+@ConfigurationProperties("ubiquia.agent.flow-service.bootstrap.graphs")
 public class GraphDeployments {
 
     private List<GraphDeployment> deployments;
