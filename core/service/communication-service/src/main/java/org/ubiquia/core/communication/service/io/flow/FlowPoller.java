@@ -1,4 +1,4 @@
-package org.ubiquia.core.communication.service;
+package org.ubiquia.core.communication.service.io.flow;
 
 import org.springframework.stereotype.Service;
 

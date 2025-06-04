@@ -3,7 +3,6 @@ package org.ubiquia.common.model.ubiquia.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
@@ -36,7 +35,7 @@ public class UbiquiaAgent {
     )
     private List<Graph> deployedGraphs;
 
-    @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
+    @NotNull
     public String getId() {
         return id;
     }
