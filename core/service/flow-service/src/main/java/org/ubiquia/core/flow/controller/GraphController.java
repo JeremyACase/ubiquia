@@ -28,6 +28,8 @@ import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.AgentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.repository.UbiquiaAgentRepository;
+import org.ubiquia.core.flow.service.finder.GraphFinder;
+import org.ubiquia.core.flow.service.finder.UbiquiaAgentFinder;
 import org.ubiquia.core.flow.service.k8s.AgentOperator;
 import org.ubiquia.core.flow.service.manager.AdapterManager;
 import org.ubiquia.core.flow.service.manager.AgentManager;
@@ -46,7 +48,6 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
     @Autowired(required = false)
     private AgentOperator agentOperator;
 
-
     @Autowired
     private AdapterRepository adapterRepository;
 
@@ -55,6 +56,12 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
 
     @Autowired
     private AgentRepository agentRepository;
+
+    @Autowired
+    private EntityDao<Graph> entityDao;
+
+    @Autowired
+    private GraphFinder graphFinder;
 
     @Autowired
     private GraphRegistrar graphRegistrar;
@@ -66,10 +73,10 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
     private GraphDtoMapper dtoMapper;
 
     @Autowired
-    private EntityDao<Graph> entityDao;
+    private UbiquiaAgentConfig ubiquiaAgentConfig;
 
     @Autowired
-    private UbiquiaAgentConfig ubiquiaAgentConfig;
+    private UbiquiaAgentFinder ubiquiaAgentFinder;
 
     @Autowired
     private UbiquiaAgentRepository ubiquiaAgentRepository;
@@ -180,17 +187,15 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
                 + this.ubiquiaAgentConfig.getId()
                 + "...");
         }
-        var ubiquiaAgentEntity = ubiquiaAgentRecord.get();
-        var graphRecord = this.graphRepository.findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatch(
-            deployment.getName(),
-            version.getMajor(),
-            version.getMinor(),
-            version.getPatch());
+
+        var graphRecord = this.graphFinder.findGraphFor(deployment.getName(), version);
         if (graphRecord.isEmpty()) {
             throw new RuntimeException("ERROR: Could not find Graph:  "
                 + this.objectMapper.writeValueAsString(deployment)
                 + "...");
         }
+
+        var ubiquiaAgentEntity = ubiquiaAgentRecord.get();
 
         ubiquiaAgentEntity.getDeployedGraphs().add(graphRecord.get());
         this.ubiquiaAgentRepository.save(ubiquiaAgentEntity);
@@ -209,14 +214,7 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
             graphName,
             version);
 
-        var record = this.graphRepository
-            .findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatchAndUbiquiaAgentsDeployingGraphId(
-                graphName,
-                version.getMajor(),
-                version.getMinor(),
-                version.getPatch(),
-                this.ubiquiaAgentConfig.getId());
-
+        var record = this.graphFinder.findGraphFor(graphName, version);
         if (record.isEmpty()) {
             throw new IllegalArgumentException("ERROR: Could not find a graph registered with name "
                 + graphName
@@ -231,14 +229,7 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
                 this.agentOperator.deleteGraphResources(graphName);
             }
 
-            var ubiquiaAgentRecord = this
-                .ubiquiaAgentRepository
-                .findByDeployedGraphsGraphNameAndDeployedGraphsVersionMajorAndDeployedGraphsVersionMinorAndDeployedGraphsVersionPatchAndId(
-                    graphName,
-                    version.getMajor(),
-                    version.getMinor(),
-                    version.getPatch(),
-                    this.ubiquiaAgentConfig.getId());
+            var ubiquiaAgentRecord = this.ubiquiaAgentFinder.findAgentFor(graphName, version);
 
             if (ubiquiaAgentRecord.isEmpty()) {
                 throw new RuntimeException("ERROR: Could not find a Ubiquia Agent for "
