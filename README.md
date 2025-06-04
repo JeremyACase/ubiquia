@@ -5,6 +5,7 @@ Welcome to Ubiquia — a domain-agnostic, production-grade Multi-Agent Orchestra
 ## Table of Contents
 
 * [Ubiquia Overview](#ubiquia-overview)
+    * [About](#about)
 * [Quickstart](#quickstart)
     * [Quickstart: Requirements](#quick-start-requirements)
     * [Quickstart: Scripts](#quick-start-scripts)
@@ -13,28 +14,24 @@ Welcome to Ubiquia — a domain-agnostic, production-grade Multi-Agent Orchestra
     * [Getting Started: Requirements](#getting-started-requirements)
     * [Getting Started: Helm Repo](#getting-started-helm-repo)
     * [Getting Started: Installation](#getting-started-installation)
+* [Contributors](#contributors)
 
 ## Ubiquia Overview
 
-### Ubiquia Overview: About
+### About
 
-Ubiquia is a production-grade, multi-agent system (MAS) orchestration tool designed to bring the power of dynamic, runtime agent coordination to real-world deployments. At its core, Ubiquia provides:
+Ubiquia is a production-grade multi-agent system (MAS) orchestration tool that brings the power of dynamic, runtime agent coordination to real-world deployments. Key features include:
 
-🛠️ Production-Ready MAS Orchestration: A carefully architected orchestration engine built from the ground up to handle dynamic, real-time data flows and resilient agent networks.
+- 🛠️ **Production-Ready MAS Orchestration**: A carefully architected orchestration engine designed to handle dynamic, real-time data flows and resilient agent networks.
+- ☕ **Spring Boot Foundation**: Leverages the battle-tested Spring Boot ecosystem for robust microservice capabilities, including dependency injection, lifecycle management, and secure configuration.
+- 🔧 **Sophisticated DTO Mapping**: Uses advanced DTO mapping techniques for clean, modular code and seamless data transformation between agents and orchestration layers.
+- 🔍 **Runtime Schema Validation**: Employs JSON Schema validation to ensure that all data exchanged between agents and the orchestration layer adheres to well-defined, dynamically loaded schemas.
+- 🌐 **Distributed Belief State with YugabyteDB**: Built on YugabyteDB, a resilient, distributed SQL database that underpins Ubiquia’s shared global belief state, ensuring eventual consistency and high availability.
+- 🚀 **Kubernetes-Native Deployment**: Ubiquia is designed to run seamlessly in containerized environments orchestrated by Kubernetes, making it easy to deploy, scale, and maintain in real-world production clusters.
+- 🔄 **Resilience to Network Partitions**: Engineered to gracefully handle transient network partitions, ensuring that agents can rejoin the system and maintain a consistent belief state.
 
-☕ Spring Boot Foundation: Leverages the battle-tested Spring Boot ecosystem for robust microservice capabilities, including dependency injection, lifecycle management, and secure configuration.
+Together, these features make Ubiquia a production-ready, highly reliable MAS orchestration tool that is both developer-friendly and operationally robust.
 
-🔧 Sophisticated DTO Mapping: Uses cutting-edge DTO mapping techniques for clean, modular code and seamless data transformation between agents and orchestration layers.
-
-🔍 Runtime Schema Validation: Employs JSON Schema validation to ensure all data exchanged between agents and the orchestration layer adheres to well-defined, dynamically loaded schemas—enabling safe and consistent runtime behavior.
-
-🌐 Distributed Belief State with YugabyteDB: Built on YugabyteDB, a resilient, distributed SQL database that underpins Ubiquia’s shared global belief state, ensuring eventual consistency and high availability.
-
-🚀 Kubernetes-Native Deployment: Ubiquia is designed to run seamlessly in containerized environments orchestrated by Kubernetes, making it easy to deploy, scale, and maintain in real-world production clusters.
-
-🔄 Resilience to Network Partitions: The system is engineered to handle transient network partitions gracefully, ensuring that agents can rejoin the system and maintain a consistent belief state.
-
-Together, these features make Ubiquia a production-worthy, highly reliable MAS orchestration tool that is both developer-friendly and operationally robust. 
 
 ## Quickstart
 The quickest way to get up and running with Ubiquia is to follow this section.
@@ -46,12 +43,9 @@ Before running Ubiquia, there are a few requirements that must be met.
 - [KIND](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-with-go-install) has been installed
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/) has been installed
 - [Docker](https://docs.docker.com/engine/install/) has been installed (required by KIND)
-  - On Linux systems, add one's username to the `docker` group: `sudo usermod -aG docker <username>`
 
 ### Quickstart: Scripts
-Some convenience scripts are provided to users in this repo to get users up and running.
-
-***The scripts must be executed in the root Ubiquia directory.***
+Some convenience scripts are provided to users in this repo to get users up and running. ***The scripts must be executed in the root Ubiquia directory.***
 
 ### Quickstart: Scripts - One-Time Setup
 These scripts should only ever need to be run once.
