@@ -77,7 +77,7 @@ agents:
 
       # Any example override setting. It will override the baseline image values defined when the 
       # graph is deployed with a "prod" flag.
-      - flag: prod
+      - flag: exampleOverride
         key: image
         value:
           registry: exampleOverrideRegistry
@@ -91,7 +91,7 @@ agents:
         value: POD
 
       # Yet another example to show that even nested configuration values can be overridden.
-      - flag: prod
+      - flag: exampleOverride
         key: config
         value:
           configMap:
@@ -112,7 +112,7 @@ agents:
 
       # This is the endpoint of the agent that the adapter will interact with when it 
       # receives upstream traffic.
-      endpoint: /agent/endpoint
+      endpoint: /pet/store/create-pet
 
       # An example input schema that references a model of the domain ontology.
       inputSubSchemas:

@@ -10,6 +10,8 @@ public class UbiquiaAgentDto {
 
     private String id = null;
 
+    private String modelType = "UbiquiaAgent";
+
     private OffsetDateTime createdAt = null;
 
     private OffsetDateTime updatedAt = null;
@@ -48,5 +50,9 @@ public class UbiquiaAgentDto {
 
     public void setDeployedGraphs(List<GraphDto> deployedGraphs) {
         this.deployedGraphs = deployedGraphs;
+    }
+
+    public String getModelType() {
+        return modelType;
     }
 }

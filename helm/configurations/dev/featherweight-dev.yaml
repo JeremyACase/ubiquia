@@ -17,4 +17,4 @@ ubiquia:
               minor: 2
               patch: 3
             graphSettings:
-              flag: prod
+              flag: demo

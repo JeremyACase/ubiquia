@@ -20,6 +20,9 @@ public class UbiquiaAgent {
     @Id
     private String id = null;
 
+    @Transient
+    private String modelType = "UbiquiaAgent";
+
     @CreationTimestamp
     @Column(updatable = false)
     private OffsetDateTime createdAt = null;
@@ -67,5 +70,9 @@ public class UbiquiaAgent {
 
     public void setDeployedGraphs(List<Graph> deployedGraphs) {
         this.deployedGraphs = deployedGraphs;
+    }
+
+    public String getModelType() {
+        return modelType;
     }
 }
