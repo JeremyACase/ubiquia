@@ -27,7 +27,7 @@ public class UbiquiaAgentLogic {
 
     @Transactional
     public void tryInitializeAgentInDatabase() {
-        logger.info("Attempting to initialize Ubiquia agent id: {}...",
+        logger.info("...attempting to initialize Ubiquia agent id: {}...",
             this.ubiquiaAgentConfig.getId());
 
         var record = this.ubiquiaAgentRepository.findById(this.ubiquiaAgentConfig.getId());

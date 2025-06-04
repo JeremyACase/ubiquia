@@ -47,7 +47,7 @@ agents:
     # Data pertaining to the image so that it can be deployed as pods/containers.
     image:
       registry: ubiquia
-      repository: pet-store-data-Agent
+      repository: pet-store-data-transform
       tag: latest
 
     # An optional configmap to pass to the agent.

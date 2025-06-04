@@ -45,7 +45,7 @@ public class UbiquiaAgentControllerProxy implements InterfaceUbiquiaDaoControlle
         var url = this.flowServiceConfig.getUrl()
             + ":"
             + this.flowServiceConfig.getPort().toString()
-            + "/ubiquia-agent";
+            + "/ubiquia/ubiquia-agent";
         return url;
     }
 }

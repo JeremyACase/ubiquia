@@ -44,4 +44,6 @@ data:
     ubiquia:
       flow:
         service:
+          pollFrequencyMilliseconds: 5000
           port: 8080
+          url: http://ubiquia-core-flow-service
