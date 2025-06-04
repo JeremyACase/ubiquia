@@ -11,6 +11,8 @@ public class FlowServiceConfig {
 
     private Integer port;
 
+    private Long pollFrequencyMilliseconds;
+
     public String getUrl() {
         return url;
     }
@@ -25,5 +27,13 @@ public class FlowServiceConfig {
 
     public void setPort(Integer port) {
         this.port = port;
+    }
+
+    public Long getPollFrequencyMilliseconds() {
+        return pollFrequencyMilliseconds;
+    }
+
+    public void setPollFrequencyMilliseconds(Long pollFrequencyMilliseconds) {
+        this.pollFrequencyMilliseconds = pollFrequencyMilliseconds;
     }
 }

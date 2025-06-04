@@ -33,6 +33,8 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
     public void onApplicationEvent(ApplicationReadyEvent event) {
         logger.info("Initializing Flow instance...");
 
+        this.ubiquiaAgentLogic.tryInitializeAgentInDatabase();
+
         if (Objects.nonNull(this.agentOperator)) {
             try {
                 this.agentOperator.init();
@@ -44,8 +46,6 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
         if (Objects.nonNull(this.bootstrapper)) {
             this.bootstrapper.init();
         }
-
-        this.ubiquiaAgentLogic.tryInitializeAgentInDatabase();
 
         logger.info("...completed initialization.");
     }
