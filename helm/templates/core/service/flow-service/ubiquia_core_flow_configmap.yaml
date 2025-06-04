@@ -71,8 +71,19 @@ data:
         path: {{ .Values.convenience.variables.spring.swaggerDocs }}
         enabled: true
 
+
+{{- $uuidCM := lookup "v1" "ConfigMap" .Release.Namespace (printf "%s-uuid" .Release.Name) -}}
+{{- $uuid := "" -}}
+{{- if $uuidCM -}}
+  {{- $uuid = index $uuidCM.data "uuid" -}}
+{{- else -}}
+  {{- $uuid = include "ubiquia.generate.uuid" . -}}
+{{- end }}
+
+
     ubiquia:
       agent:
+        id: {{ $uuid }}
         flowService:
           bootstrap:
             enabled: {{ .Values.ubiquia.agent.flowService.bootstrap.enabled }}          
@@ -96,15 +107,6 @@ data:
                     flag: {{ $v.graphSettings.flag }}
                   {{- end -}}
                 {{- end }}
-                {{- $uuidCM := lookup "v1" "ConfigMap" .Release.Namespace (printf "%s-uuid" .Release.Name) -}}
-                {{- $uuid := "" -}}
-                {{- if $uuidCM -}}
-                  {{- $uuid = index $uuidCM.data "uuid" -}}
-                {{- else -}}
-                  {{- $uuid = include "mychart.generateUUID" . -}}
-                {{- end -}}
-        uuid: {{ $uuid }}
-        id: {{ $uuid }}
       kubernetes:
         enabled: true
         namespace: {{ .Release.Namespace }}
