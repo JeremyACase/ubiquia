@@ -57,9 +57,11 @@ public class DeployedGraphPoller {
         try {
             boolean hasNextPage;
             do {
-                var pageOfGraphIds = fetchGraphIdsPage(page, size);
+                var pageOfGraphIds = this.fetchGraphIdsPage(page, size);
                 if (Objects.nonNull(pageOfGraphIds) && !pageOfGraphIds.getContent().isEmpty()) {
-                    logger.debug("...polled Graph IDs from page {}: {}", page, pageOfGraphIds.getContent());
+                    logger.debug("...polled Graph IDs from page {}: {}",
+                        page,
+                        pageOfGraphIds.getContent());
                     currentlyDeployedGraphIds.addAll(pageOfGraphIds.getContent());
                     hasNextPage = pageOfGraphIds.hasNext();
                     page++;
@@ -78,8 +80,7 @@ public class DeployedGraphPoller {
     /**
      * Process the currently deployed graph IDs: identify new deployments and torn-down graphs.
      */
-    private void processDeployedGraphIds(final List<String> currentlyDeployedGraphIds)
-        throws URISyntaxException {
+    private void processDeployedGraphIds(final List<String> currentlyDeployedGraphIds)  {
         var newlyDeployedGraphIds = this.identifyNewlyDeployedGraphIds(currentlyDeployedGraphIds);
         var newlyTornDownGraphIds = this.identifyNewlyTornDownGraphIds(currentlyDeployedGraphIds);
 

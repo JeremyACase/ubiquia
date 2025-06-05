@@ -41,7 +41,18 @@ data:
         path: {{ .Values.convenience.variables.spring.swaggerDocs }}
         enabled: true
 
+{{- $uuidCM := lookup "v1" "ConfigMap" .Release.Namespace (printf "%s-uuid" .Release.Name) -}}
+{{- $uuid := "" -}}
+{{- if $uuidCM -}}
+  {{- $uuid = index $uuidCM.data "uuid" -}}
+{{- else -}}
+  {{- $uuid = include "ubiquia.generate.uuid" . -}}
+{{- end }}
+
+
     ubiquia:
+      agent:
+        id: {{ $uuid }}
       flow:
         service:
           pollFrequencyMilliseconds: 5000
