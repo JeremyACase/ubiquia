@@ -31,6 +31,7 @@ dependencies {
     implementation project(':common:library:api')
     implementation project(':common:library:config')
     implementation project(':common:library:dao')
+    implementation project(':common:library:logic')
 
     implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${JACKSON_DATA_FORMAT_VERSION}"

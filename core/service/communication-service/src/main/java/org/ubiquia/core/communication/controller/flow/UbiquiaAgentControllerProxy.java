@@ -13,7 +13,7 @@ import org.ubiquia.core.communication.interfaces.InterfaceUbiquiaDaoControllerPr
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/ubiquia/flow-service/ubiquia-agent")
+@RequestMapping("/ubiquia/communication-service/flow/ubiquia-agent")
 public class UbiquiaAgentControllerProxy implements InterfaceUbiquiaDaoControllerProxy {
 
     @Autowired

@@ -11,7 +11,7 @@ import org.ubiquia.core.communication.config.FlowServiceConfig;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/ubiquia/flow-service/graph")
+@RequestMapping("/ubiquia/communication-service/flow/graph")
 public class GraphControllerProxy
     extends AbstractUbiquiaDaoControllerProxy<GraphDto> {
 

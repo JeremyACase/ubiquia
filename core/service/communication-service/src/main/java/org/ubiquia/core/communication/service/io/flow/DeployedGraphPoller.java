@@ -1,5 +1,6 @@
 package org.ubiquia.core.communication.service.io.flow;
 
+import java.net.URISyntaxException;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +78,8 @@ public class DeployedGraphPoller {
     /**
      * Process the currently deployed graph IDs: identify new deployments and torn-down graphs.
      */
-    private void processDeployedGraphIds(final List<String> currentlyDeployedGraphIds) {
+    private void processDeployedGraphIds(final List<String> currentlyDeployedGraphIds)
+        throws URISyntaxException {
         var newlyDeployedGraphIds = this.identifyNewlyDeployedGraphIds(currentlyDeployedGraphIds);
         var newlyTornDownGraphIds = this.identifyNewlyTornDownGraphIds(currentlyDeployedGraphIds);
 

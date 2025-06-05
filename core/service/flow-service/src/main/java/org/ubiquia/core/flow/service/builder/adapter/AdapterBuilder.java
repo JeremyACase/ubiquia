@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.library.logic.service.builder.AdapterUriBuilder;
 import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.entity.Adapter;
@@ -30,6 +31,8 @@ public class AdapterBuilder {
     private AdapterOverrideDecorator adapterOverrideDecorator;
     @Autowired
     private AdapterTagBuilder adapterTagBuilder;
+    @Autowired
+    private AdapterUriBuilder adapterUriBuilder;
     @Autowired
     private AdapterTypeLogic adapterTypeLogic;
 
@@ -74,32 +77,12 @@ public class AdapterBuilder {
             adapterEntity.getOverrideSettings().stream().toList(),
             graphDeployment);
 
+        this.trySetAdapterEndpoint(adapter, adapterData);
         adapter.initializeBehavior();
 
         logger.info("...built adapter...");
     }
 
-    /**
-     * Get the adapter's agent's URI.
-     *
-     * @param adapter The adapter to get a URI endpoint from.
-     * @return The URI of the endpoint.
-     * @throws URISyntaxException Exception from creating a URI.
-     */
-    private URI getAgentUriFrom(final AdapterDto adapter)
-        throws URISyntaxException {
-
-        var uri = new URI("http",
-            null,
-            adapter.getAgent().getAgentName(),
-            adapter.getAgent().getPort(),
-            adapter.getEndpoint(),
-            null,
-            null
-        );
-
-        return uri;
-    }
 
     /**
      * Attempt to set an adapter's endpoint.
@@ -122,7 +105,8 @@ public class AdapterBuilder {
 
                     // If we have a Kubernetes service to use...
                     case POD: {
-                        adapterContext.setEndpointUri(this.getAgentUriFrom(adapterData));
+                        adapterContext.setEndpointUri(
+                            this.adapterUriBuilder.getAgentUriFrom(adapterData));
                     }
                     break;
 

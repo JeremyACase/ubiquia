@@ -28,6 +28,7 @@ dependencies {
     implementation project(':common:model:ubiquia')
     implementation project(':common:library:advice')
     implementation project(':common:library:config')
+    implementation project(':common:library:logic')
 
     implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
     implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
