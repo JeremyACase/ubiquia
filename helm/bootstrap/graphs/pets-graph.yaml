@@ -42,13 +42,17 @@ agents:
     modelType: Agent
     description: This is a an example agent that will classify an animal from an image.
 
+    communicationServiceSettings:
+      # Ensure the Communication Service exposes this agent's endpoints  
+      exposeViaCommService: true
+
     # This is the port that will be exposed for this agent when it is deployed.
     port: 5000
 
     # Data pertaining to the image so that it can be deployed as pods/containers.
     image:
       registry: ubiquia
-      repository: pet-store-image-classifier
+      repository: pet-store-image-classiffier
       tag: latest
 
     # An optional configmap to pass to the agent.
@@ -60,12 +64,6 @@ agents:
           config_1:
             value: demo-value
       configMountPath: /example/mountpath
-
-    # An example of configuring our agent to run with a volume which can be provisioned in a K8s cluster
-    volumes:
-      - name: demo-volume
-        persistentVolumeClaimName: example-volume-claim-name
-        mountPath: example/mount/path
 
     # This is a list of settings to use to override the baseline values should the graph be 
     # deployed with any "flags."
@@ -105,6 +103,10 @@ agents:
       adapterType: PUSH
       adapterName: Pet-Store-Image-Classifier-Adapter
       description: This is an example adapter.
+
+      communicationServiceSettings:
+        # Ensure the Communication Service exposes this adapter's endpoints  
+        exposeViaCommService: true
 
       # This is the endpoint of the agent that the adapter will interact with when it 
       # receives upstream traffic.

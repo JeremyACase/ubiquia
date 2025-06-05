@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
@@ -27,11 +28,21 @@ public class Config {
             .build();
     }
 
+    /**
+     * Rest template bean.
+     *
+     * @return our REST template.
+     */
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
     @Bean
     public OpenAPI baseOpenAPI() {
         return new OpenAPI().info(new Info()
-            .title("UBIQUIA Communication Service")
-            .version("1.0.0")
+            .title("Ubiquia Communication Service")
+            .version("0.1.0")
             .description("Generated OpenAPI docs for UBIQUIA"));
     }
 

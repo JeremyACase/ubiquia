@@ -25,7 +25,7 @@ done
 helm dependency update helm/
 helm dependency build helm/
 
-kind create cluster -n ubiquia-instance-0
+kind create cluster -n ubiquia-agent-0
 
 kubectl create namespace ubiquia
 

@@ -20,7 +20,7 @@ public class AdapterDto extends AbstractEntityDto {
 
     private AgentDto agent;
 
-    private CommServiceSettings commServiceSettings;
+    private CommunicationServiceSettings communicationServiceSettings;
 
     private String description;
 
@@ -177,11 +177,11 @@ public class AdapterDto extends AbstractEntityDto {
         this.outputSubSchema = outputSubSchema;
     }
 
-    public CommServiceSettings getCommServiceSettings() {
-        return commServiceSettings;
+    public CommunicationServiceSettings getCommunicationServiceSettings() {
+        return communicationServiceSettings;
     }
 
-    public void setCommServiceSettings(CommServiceSettings commServiceSettings) {
-        this.commServiceSettings = commServiceSettings;
+    public void setCommunicationServiceSettings(CommunicationServiceSettings communicationServiceSettings) {
+        this.communicationServiceSettings = communicationServiceSettings;
     }
 }

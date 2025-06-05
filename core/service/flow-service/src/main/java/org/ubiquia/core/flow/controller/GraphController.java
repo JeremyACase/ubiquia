@@ -23,7 +23,7 @@ import org.ubiquia.common.model.ubiquia.dto.GraphDto;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.model.ubiquia.entity.Graph;
-import org.ubiquia.core.flow.config.UbiquiaAgentConfig;
+import org.ubiquia.common.library.config.UbiquiaAgentConfig;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.AgentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;

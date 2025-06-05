@@ -2,26 +2,18 @@ package org.ubiquia.core.flow.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.ubiquia.common.library.api.controller.GenericUbiquiaDaoController;
-import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.dao.component.EntityDao;
-import org.ubiquia.common.model.ubiquia.IngressResponse;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
-import org.ubiquia.common.model.ubiquia.dto.AgentDto;
 import org.ubiquia.common.model.ubiquia.dto.UbiquiaAgentDto;
-import org.ubiquia.common.model.ubiquia.entity.Agent;
 import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgent;
-import org.ubiquia.core.flow.config.UbiquiaAgentConfig;
+import org.ubiquia.common.library.config.UbiquiaAgentConfig;
 import org.ubiquia.core.flow.repository.UbiquiaAgentRepository;
-import org.ubiquia.core.flow.service.mapper.AgentDtoMapper;
 import org.ubiquia.core.flow.service.mapper.UbiquiaAgentDtoMapper;
 
 /**
@@ -53,13 +45,26 @@ public class UbiquiaAgentController implements InterfaceLogger {
     @GetMapping(value = "/instance/get")
     @Transactional
     public UbiquiaAgentDto getInstance() throws JsonProcessingException {
-        logger.info("Received request for Ubiquia instance...");
+        logger.debug("Received request for Ubiquia instance...");
         var id = this.ubiquiaAgentConfig.getId();
         var record = this.ubiquiaAgentRepository.findById(id);
         if (record.isEmpty()) {
             throw new RuntimeException("ERROR: Could not find instance id in database: "
-            + id);
+                + id);
         }
         return this.dtoMapper.map(record.get());
     }
+
+    @GetMapping("/{id}/get-deployed-graph-ids")
+    public Page<String> getDeployedGraphIdsByUbiquiaAgent(
+        @PathVariable("id") final String agentId,
+        @RequestParam(value = "page", defaultValue = "0") final Integer page,
+        @RequestParam(value = "size", defaultValue = "10") final Integer size) {
+
+        logger.debug("Received request to return deployed graphs for agent ID: {}...",
+            agentId);
+        var pageable = PageRequest.of(page, size);
+        return this.ubiquiaAgentRepository.findDeployedGraphIdsByAgentId(agentId, pageable);
+    }
 }
+

@@ -4,11 +4,10 @@ package org.ubiquia.common.model.ubiquia.embeddable;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
-import org.ubiquia.common.model.ubiquia.enums.BrokerType;
 
 @Validated
 @Embeddable
-public class CommServiceSettings {
+public class CommunicationServiceSettings {
 
     private Boolean exposeViaCommService = false;
 

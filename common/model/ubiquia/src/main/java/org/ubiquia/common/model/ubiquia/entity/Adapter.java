@@ -16,7 +16,7 @@ public class Adapter extends AbstractEntity {
 
     private AdapterSettings adapterSettings;
 
-    private CommServiceSettings commServiceSettings;
+    private CommunicationServiceSettings communicationServiceSettings;
 
     @OneToMany(mappedBy = "adapter", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private List<FlowEvent> flowEvents;
@@ -203,11 +203,11 @@ public class Adapter extends AbstractEntity {
     }
 
     @NotNull
-    public CommServiceSettings getCommServiceSettings() {
-        return commServiceSettings;
+    public CommunicationServiceSettings getCommunicationServiceSettings() {
+        return communicationServiceSettings;
     }
 
-    public void setCommServiceSettings(CommServiceSettings commServiceSettings) {
-        this.commServiceSettings = commServiceSettings;
+    public void setCommunicationServiceSettings(CommunicationServiceSettings communicationServiceSettings) {
+        this.communicationServiceSettings = communicationServiceSettings;
     }
 }

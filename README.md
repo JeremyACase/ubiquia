@@ -61,6 +61,15 @@ $ ./scripts/devs/install-ubiquia-into-kind.sh
 
 After invoking the script and a successful installation, Helm will output to console how to interface with the newly-installed Ubiquia agent.
 
+### Quickstart: Deleting Ubiquia Cluster
+If you ran the above script to install Ubiquia into KIND and want a completely fresh start, you can delete the KIND Kubernetes cluster
+
+```bash
+$ kind delete clusters ubiquia-agent-0
+```
+
+Now you can re-run the installation script with a fresh Kubernetes cluster!
+
 
 ## Getting Started
 

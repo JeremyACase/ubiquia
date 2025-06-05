@@ -13,7 +13,7 @@ public class AgentDto extends AbstractEntityDto {
 
     private String agentName;
 
-    private CommServiceSettings commServiceSettings;
+    private CommunicationServiceSettings communicationServiceSettings;
 
     private String description;
 
@@ -168,11 +168,11 @@ public class AgentDto extends AbstractEntityDto {
         this.exposeService = exposeService;
     }
 
-    public CommServiceSettings getCommServiceSettings() {
-        return commServiceSettings;
+    public CommunicationServiceSettings getCommunicationServiceSettings() {
+        return communicationServiceSettings;
     }
 
-    public void setCommServiceSettings(CommServiceSettings commServiceSettings) {
-        this.commServiceSettings = commServiceSettings;
+    public void setCommunicationServiceSettings(CommunicationServiceSettings communicationServiceSettings) {
+        this.communicationServiceSettings = communicationServiceSettings;
     }
 }

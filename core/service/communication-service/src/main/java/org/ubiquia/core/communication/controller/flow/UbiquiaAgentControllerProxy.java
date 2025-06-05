@@ -1,10 +1,10 @@
 package org.ubiquia.core.communication.controller.flow;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.model.ubiquia.dto.UbiquiaAgentDto;
@@ -39,6 +39,29 @@ public class UbiquiaAgentControllerProxy implements InterfaceUbiquiaDaoControlle
                 // Handle downstream service error by returning 502
                 return Mono.just(ResponseEntity.status(502).body(null));
             });
+    }
+
+
+    @GetMapping("/{id}/get-deployed-graph-ids")
+    public Mono<ResponseEntity<Page<String>>> proxyGetDeployedGraphIds(
+        @PathVariable("id") String agentId,
+        @RequestParam(value = "page", defaultValue = "0") Integer page,
+        @RequestParam(value = "size", defaultValue = "10") Integer size) {
+
+        var targetUri = UriComponentsBuilder
+            .fromHttpUrl(this.getUrlHelper() + "/" + agentId + "/get-deployed-graph-ids")
+            .queryParam("page", page)
+            .queryParam("size", size)
+            .build()
+            .toUriString();
+
+        return this.webClient
+            .get()
+            .uri(targetUri)
+            .retrieve()
+            .toEntity(new ParameterizedTypeReference<Page<String>>() {
+            })
+            .onErrorResume(e -> Mono.just(ResponseEntity.status(502).body(Page.empty())));
     }
 
     public String getUrlHelper() {

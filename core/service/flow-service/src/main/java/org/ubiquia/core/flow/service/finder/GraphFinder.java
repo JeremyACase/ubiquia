@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.model.ubiquia.entity.Graph;
-import org.ubiquia.core.flow.config.UbiquiaAgentConfig;
+import org.ubiquia.common.library.config.UbiquiaAgentConfig;
 import org.ubiquia.core.flow.repository.GraphRepository;
 
 @Service

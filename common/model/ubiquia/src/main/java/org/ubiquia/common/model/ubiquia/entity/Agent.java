@@ -11,7 +11,7 @@ public class Agent extends AbstractEntity {
 
     private AgentType type;
 
-    private CommServiceSettings commServiceSettings;
+    private CommunicationServiceSettings communicationServiceSettings;
 
     private Config config;
 
@@ -184,11 +184,11 @@ public class Agent extends AbstractEntity {
     }
 
     @NotNull
-    public CommServiceSettings getCommServiceSettings() {
-        return commServiceSettings;
+    public CommunicationServiceSettings getCommunicationServiceSettings() {
+        return communicationServiceSettings;
     }
 
-    public void setCommServiceSettings(CommServiceSettings commServiceSettings) {
-        this.commServiceSettings = commServiceSettings;
+    public void setCommunicationServiceSettings(CommunicationServiceSettings communicationServiceSettings) {
+        this.communicationServiceSettings = communicationServiceSettings;
     }
 }

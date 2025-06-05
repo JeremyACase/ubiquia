@@ -29,6 +29,7 @@ dependencies {
     implementation project(':common:model:ubiquia')
     implementation project(':common:library:advice')
     implementation project(':common:library:api')
+    implementation project(':common:library:config')
     implementation project(':common:library:dao')
 
     implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"

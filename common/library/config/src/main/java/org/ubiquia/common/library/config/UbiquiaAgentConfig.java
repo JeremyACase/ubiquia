@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.config;
+package org.ubiquia.common.library.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
