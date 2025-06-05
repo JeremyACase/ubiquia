@@ -57,7 +57,7 @@ public class DeployedGraphPoller {
             boolean hasNextPage;
             do {
                 var pageOfGraphIds = fetchGraphIdsPage(page, size);
-                if (pageOfGraphIds != null && !pageOfGraphIds.getContent().isEmpty()) {
+                if (Objects.nonNull(pageOfGraphIds) && !pageOfGraphIds.getContent().isEmpty()) {
                     logger.debug("...polled Graph IDs from page {}: {}", page, pageOfGraphIds.getContent());
                     currentlyDeployedGraphIds.addAll(pageOfGraphIds.getContent());
                     hasNextPage = pageOfGraphIds.hasNext();
@@ -203,7 +203,8 @@ public class DeployedGraphPoller {
             }
         );
 
-        if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null) {
+        if (responseEntity.getStatusCode().is2xxSuccessful()
+            && Objects.nonNull(responseEntity.getBody())) {
             return responseEntity.getBody();
         } else {
             logger.warn("No data retrieved from page {}. Status: {}", pageNumber, responseEntity.getStatusCode());

@@ -20,7 +20,7 @@ public interface UbiquiaAgentRepository extends PagingAndSortingRepository<Ubiqu
         final String id);
 
     @Query("SELECT g.id FROM UbiquiaAgent a JOIN a.deployedGraphs g WHERE a.id = :agentId")
-    Page<String> findDeployedGraphIdsByAgentId(
+    Page<String> findDeployedGraphIdsById(
         final String agentId,
         final Pageable pageable);
 

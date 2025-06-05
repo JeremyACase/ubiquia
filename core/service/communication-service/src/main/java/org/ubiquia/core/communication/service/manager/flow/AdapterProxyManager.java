@@ -16,9 +16,6 @@ public class AdapterProxyManager {
 
     private static final Logger logger = LoggerFactory.getLogger(AdapterProxyManager.class);
 
-    @Autowired
-    private RestTemplate restTemplate;
-
     public void tryProcessNewlyDeployedGraph(final GraphDto graph) {
 
     }

@@ -64,7 +64,7 @@ public class UbiquiaAgentController implements InterfaceLogger {
         logger.debug("Received request to return deployed graphs for agent ID: {}...",
             agentId);
         var pageable = PageRequest.of(page, size);
-        return this.ubiquiaAgentRepository.findDeployedGraphIdsByAgentId(agentId, pageable);
+        return this.ubiquiaAgentRepository.findDeployedGraphIdsById(agentId, pageable);
     }
 }
 
