@@ -9,17 +9,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.library.logic.service.builder.AdapterEndpointRecordBuilder;
+import org.ubiquia.core.flow.model.adapter.AdapterContext;
 import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.entity.Graph;
 import org.ubiquia.common.model.ubiquia.enums.AgentType;
-import org.ubiquia.core.flow.model.adapter.AdapterContext;
 import org.ubiquia.core.flow.service.logic.adapter.AdapterTypeLogic;
 
 @Service
 public class AdapterContextBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(AdapterContextBuilder.class);
+
+    @Autowired
+    private AdapterEndpointRecordBuilder adapterEndpointRecordBuilder;
 
     @Autowired
     private AdapterTypeLogic adapterTypeLogic;
@@ -68,21 +72,6 @@ public class AdapterContextBuilder {
         return x / y;
     }
 
-    private URI getAgentUriFrom(final AdapterDto adapter)
-        throws URISyntaxException {
-
-        var uri = new URI("http",
-            null,
-            adapter.getAgent().getAgentName(),
-            adapter.getAgent().getPort(),
-            adapter.getEndpoint(),
-            null,
-            null
-        );
-
-        return uri;
-    }
-
     private void trySetAdapterContextEndpoint(
         AdapterContext adapterContext,
         final AdapterDto adapterData)
@@ -98,15 +87,17 @@ public class AdapterContextBuilder {
 
                     // If we have a Kubernetes service to use...
                     case POD: {
-                        var uri = this.getAgentUriFrom(adapterData);
+                        var uri = this.adapterEndpointRecordBuilder.getAgentUriFrom(adapterData);
                         adapterContext.setEndpointUri(uri);
-                    } break;
+                    }
+                    break;
 
                     // ...use full endpoint for NONE type...
                     case NONE: {
                         var uri = new URI(adapterData.getEndpoint());
                         adapterContext.setEndpointUri(uri);
-                    } break;
+                    }
+                    break;
 
                     // ...else just set to null
                     default: {

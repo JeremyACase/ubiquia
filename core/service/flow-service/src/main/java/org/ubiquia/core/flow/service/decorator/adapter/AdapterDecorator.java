@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.ubiquia.common.library.logic.service.builder.AdapterEndpointRecordBuilder;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.component.adapter.PollAdapter;
 import org.ubiquia.core.flow.component.adapter.QueueAdapter;
@@ -34,6 +34,8 @@ public class AdapterDecorator {
     private static final Logger logger = LoggerFactory.getLogger(AdapterDecorator.class);
     @Autowired
     private AdapterBrokerDecorator adapterBrokerDecorator;
+    @Autowired
+    private AdapterEndpointRecordBuilder adapterEndpointRecordBuilder;
     @Autowired
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
@@ -127,12 +129,13 @@ public class AdapterDecorator {
 
         var adapterContext = adapter.getAdapterContext();
 
-        // Build an endpoint using the agent's name as part of the path.
-        var path = this.getBackpressurePathFor(adapter);
-        logger.info("...building endpoint: {}", path);
+        var endpointRecord = this.adapterEndpointRecordBuilder.getBackpressureEndpointFor(
+            adapterContext.getGraphName(),
+            adapterContext.getAdapterName());
+        logger.info("...building endpoint: {}", endpointRecord.path());
         var mappingInfo = RequestMappingInfo
-            .paths(path)
-            .methods(RequestMethod.GET)
+            .paths(endpointRecord.path())
+            .methods(endpointRecord.method())
             .produces(MediaType.APPLICATION_JSON_VALUE)
             .build();
         var method = this.getMethodFrom(adapter, "tryGetBackPressure");
@@ -150,11 +153,13 @@ public class AdapterDecorator {
 
         var adapterContext = adapter.getAdapterContext();
 
-        var path = this.getPeekPathFor(adapter);
-        logger.info("...generating endpoint: {}", path);
+        var endpointRecord = this.adapterEndpointRecordBuilder.getPeekEndpointFor(
+            adapterContext.getGraphName(),
+            adapterContext.getAdapterName());
+        logger.info("...generating endpoint: {}", endpointRecord.path());
         var mappingInfo = RequestMappingInfo
-            .paths(path)
-            .methods(RequestMethod.GET)
+            .paths(endpointRecord.path())
+            .methods(endpointRecord.method())
             .produces(MediaType.APPLICATION_JSON_VALUE)
             .build();
         var method = this.getMethodFrom(adapter, "peek");
@@ -168,15 +173,17 @@ public class AdapterDecorator {
      * @param adapter The adapter to create an endpoint for.
      * @throws RuntimeException Exceptions from creating the endpoints.
      */
-    public void registerPopEndpointFor(QueueAdapter adapter) throws RuntimeException {
+    public void registerPopEndpointFor(final QueueAdapter adapter) throws RuntimeException {
 
         var adapterContext = adapter.getAdapterContext();
 
-        var path = this.getPopPathFor(adapter);
-        logger.info("...generating endpoint: {}", path);
+        var endpointRecord = this.adapterEndpointRecordBuilder.getPopEndpointFor(
+            adapterContext.getGraphName(),
+            adapterContext.getAdapterName());
+        logger.info("...generating endpoint: {}", endpointRecord.path());
         var mappingInfo = RequestMappingInfo
-            .paths(path)
-            .methods(RequestMethod.GET)
+            .paths(endpointRecord.path())
+            .methods(endpointRecord.method())
             .produces(MediaType.APPLICATION_JSON_VALUE)
             .build();
         var method = this.getMethodFrom(adapter, "pop");
@@ -194,11 +201,13 @@ public class AdapterDecorator {
 
         var adapterContext = adapter.getAdapterContext();
 
-        var path = this.getPushPathFor(adapter);
-        logger.info("...generating endpoint: {}", path);
+        var endpointRecord = this.adapterEndpointRecordBuilder.getPushEndpointFor(
+            adapterContext.getGraphName(),
+            adapterContext.getAdapterName());
+        logger.info("...generating endpoint: {}", endpointRecord.path());
         var mappingInfo = RequestMappingInfo
-            .paths(path)
-            .methods(RequestMethod.GET)
+            .paths(endpointRecord.path())
+            .methods(endpointRecord.method())
             .consumes(MediaType.APPLICATION_JSON_VALUE)
             .produces(MediaType.APPLICATION_JSON_VALUE)
             .build();
@@ -227,100 +236,5 @@ public class AdapterDecorator {
         }
         return match.get();
     }
-
-    /**
-     * Helper method to build back pressure paths.
-     *
-     * @param adapter The adapter to build an path for.
-     * @return The path.
-     */
-    private String getBackpressurePathFor(final AbstractAdapter adapter) {
-        var path = this.getPathHelper(adapter) + "/back-pressure";
-        return path;
-    }
-
-    /**
-     * Helper method to build back pressure paths.
-     *
-     * @param adapter The adapter to build a path for.
-     * @return The path.
-     */
-    private String getPushPathFor(final AbstractAdapter adapter) {
-        var path = this.getPathHelper(adapter) + "/push";
-        return path;
-    }
-
-    /**
-     * Helper method to build back pressure paths.
-     *
-     * @param adapter The adapter to build a path for.
-     * @return The path.
-     */
-    private String getPushListPathFor(final AbstractAdapter adapter) {
-        var path = this.getPathHelper(adapter) + "/push/list";
-        return path;
-    }
-
-    /**
-     * Helper method to build peek paths.
-     *
-     * @param adapter The adapter to build a path for.
-     * @return The path.
-     */
-    private String getPeekPathFor(final AbstractAdapter adapter) {
-        var path = this.getPathHelper(adapter) + "/queue/peek";
-        return path;
-    }
-
-    /**
-     * Helper method to build pop paths.
-     *
-     * @param adapter The adapter to build a path for.
-     * @return The path.
-     */
-    private String getPopPathFor(final AbstractAdapter adapter) {
-        var path = this.getPathHelper(adapter) + "/queue/pop";
-        return path;
-    }
-
-    /**
-     * Helper method to build paths.
-     *
-     * @param adapter The adapter to build n path for.
-     * @return The path.
-     */
-    private String getPathHelper(final AbstractAdapter adapter) {
-
-        var adapterContext = adapter.getAdapterContext();
-
-        var path = "ubiquia/graph/"
-            + adapterContext.getGraphName().toLowerCase()
-            + "/adapter/";
-
-        path += adapterContext.getAdapterName().toLowerCase();
-
-        return path;
-    }
-
-    /**
-     * Helper method to build an upload path.
-     *
-     * @param adapter The adapter to build a path for.
-     * @return The path.
-     */
-    private String getUploadPathFor(final AbstractAdapter adapter) {
-        var path = this.getPathHelper(adapter) + "/upload/file";
-        return path;
-    }
-
-    /**
-     * Helper method to build a multiple file upload path.
-     *
-     * @param adapter The adapter to build a path for.
-     * @return The path.
-     */
-    private String getUploadsPathFor(final AbstractAdapter adapter) {
-        var path = this.getPathHelper(adapter) + "/upload/files";
-        return path;
-    }
 }
+

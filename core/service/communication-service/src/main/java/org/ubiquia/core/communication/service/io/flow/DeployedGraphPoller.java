@@ -163,7 +163,7 @@ public class DeployedGraphPoller {
         for (var id : newlyDeployedGraphIds) {
             var graph = this.currentGraphs.get(id);
             this.adapterProxyManager.tryProcessNewlyDeployedGraph(graph);
-            this.agentProxyManager.tryProcessNewlyDeployedGraph(graph);
+            //this.agentProxyManager.tryProcessNewlyDeployedGraph(graph);
         }
     }
 
@@ -174,7 +174,7 @@ public class DeployedGraphPoller {
         for (var id : newlyTornDownGraphIds) {
             var graph = this.currentGraphs.get(id);
             this.adapterProxyManager.tryProcessNewlyTornDownGraph(graph);
-            this.agentProxyManager.tryProcessNewlyTornDownGraph(graph);
+            //this.agentProxyManager.tryProcessNewlyTornDownGraph(graph);
             this.currentGraphs.remove(id);
         }
     }

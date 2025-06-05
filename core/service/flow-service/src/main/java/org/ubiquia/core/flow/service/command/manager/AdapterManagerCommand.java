@@ -42,10 +42,10 @@ public class AdapterManagerCommand implements InterfaceLogger {
         adapterContext.getTasks().clear();
 
         for (var mappingInfo : adapterContext.getRegisteredMappingInfos()) {
-            logger.info("...removing endpoint: {}...", mappingInfo);
+            logger.debug("...unregistering mapping info: {}...", mappingInfo);
             this.requestMappingHandlerMapping.unregisterMapping(mappingInfo);
         }
+
         adapterContext.getRegisteredMappingInfos().clear();
     }
-
 }
