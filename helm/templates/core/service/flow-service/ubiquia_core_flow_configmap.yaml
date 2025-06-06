@@ -65,7 +65,6 @@ data:
           hibernate:
             generate_statistics: false
             format_sql: true
-            show_sql: true
 
     springdoc:
       swagger-ui:

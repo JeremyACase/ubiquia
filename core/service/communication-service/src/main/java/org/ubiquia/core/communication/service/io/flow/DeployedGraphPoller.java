@@ -1,12 +1,10 @@
 package org.ubiquia.core.communication.service.io.flow;
 
-import java.net.URISyntaxException;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.library.config.UbiquiaAgentConfig;
+import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.GraphDto;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
 import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
@@ -80,7 +79,7 @@ public class DeployedGraphPoller {
     /**
      * Process the currently deployed graph IDs: identify new deployments and torn-down graphs.
      */
-    private void processDeployedGraphIds(final List<String> currentlyDeployedGraphIds)  {
+    private void processDeployedGraphIds(final List<String> currentlyDeployedGraphIds) {
         var newlyDeployedGraphIds = this.identifyNewlyDeployedGraphIds(currentlyDeployedGraphIds);
         var newlyTornDownGraphIds = this.identifyNewlyTornDownGraphIds(currentlyDeployedGraphIds);
 
@@ -142,7 +141,7 @@ public class DeployedGraphPoller {
                 targetUri,
                 HttpMethod.GET,
                 requestEntity,
-                new ParameterizedTypeReference<PageImpl<GraphDto>>() {
+                new ParameterizedTypeReference<GenericPageImplementation<GraphDto>>() {
                 }
             );
 
@@ -183,7 +182,7 @@ public class DeployedGraphPoller {
     /**
      * Helper method to fetch a single page of Graph IDs for the UbiquiaAgent.
      */
-    private PageImpl<String> fetchGraphIdsPage(int pageNumber, int pageSize) {
+    private GenericPageImplementation<String> fetchGraphIdsPage(int pageNumber, int pageSize) {
         var targetUri = UriComponentsBuilder
             .fromHttpUrl(this.flowServiceConfig.getUrl()
                 + ":"
@@ -202,7 +201,7 @@ public class DeployedGraphPoller {
             targetUri,
             HttpMethod.GET,
             requestEntity,
-            new ParameterizedTypeReference<PageImpl<String>>() {
+            new ParameterizedTypeReference<GenericPageImplementation<String>>() {
             }
         );
 
