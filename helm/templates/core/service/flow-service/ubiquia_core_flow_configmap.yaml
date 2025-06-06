@@ -4,6 +4,20 @@ metadata:
   name: ubiquia-core-flow-config
 data:
   application.yaml: |
+
+    # Just some fancy way to generate a UUID and stuff it in a configmap should this agent not be assigned an ID yet
+    {{- $uuidCM := lookup "v1" "ConfigMap" .Release.Namespace (printf "%s-uuid" .Release.Name) -}}
+    {{- $uuid := "" -}}
+    {{- if $uuidCM -}}
+      {{- $uuid = index $uuidCM.data "uuid" -}}
+    {{- else -}}
+      {{- $uuid = include "ubiquia.generate.uuid" . -}}
+    {{- end }}
+
+    logging:
+      level:
+        org.ubiquia: {{ .Values.logging.ubiquia }}
+
     management:
       endpoint:
         info:
@@ -70,16 +84,6 @@ data:
       swagger-ui:
         path: {{ .Values.convenience.variables.spring.swaggerDocs }}
         enabled: true
-
-
-{{- $uuidCM := lookup "v1" "ConfigMap" .Release.Namespace (printf "%s-uuid" .Release.Name) -}}
-{{- $uuid := "" -}}
-{{- if $uuidCM -}}
-  {{- $uuid = index $uuidCM.data "uuid" -}}
-{{- else -}}
-  {{- $uuid = include "ubiquia.generate.uuid" . -}}
-{{- end }}
-
 
     ubiquia:
       agent:

@@ -2,11 +2,11 @@ package org.ubiquia.core.communication.controller.flow;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.UbiquiaAgentDto;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
 import org.ubiquia.core.communication.interfaces.InterfaceUbiquiaDaoControllerProxy;
@@ -43,7 +43,7 @@ public class UbiquiaAgentControllerProxy implements InterfaceUbiquiaDaoControlle
 
 
     @GetMapping("/{id}/get-deployed-graph-ids")
-    public Mono<ResponseEntity<Page<String>>> proxyGetDeployedGraphIds(
+    public Mono<ResponseEntity<GenericPageImplementation<String>>> proxyGetDeployedGraphIds(
         @PathVariable("id") String agentId,
         @RequestParam(value = "page", defaultValue = "0") Integer page,
         @RequestParam(value = "size", defaultValue = "10") Integer size) {
@@ -59,9 +59,10 @@ public class UbiquiaAgentControllerProxy implements InterfaceUbiquiaDaoControlle
             .get()
             .uri(targetUri)
             .retrieve()
-            .toEntity(new ParameterizedTypeReference<Page<String>>() {
+            .toEntity(new ParameterizedTypeReference<GenericPageImplementation<String>>() {
             })
-            .onErrorResume(e -> Mono.just(ResponseEntity.status(502).body(Page.empty())));
+            .onErrorResume(e -> Mono.just(ResponseEntity.status(502).body(
+                new GenericPageImplementation())));
     }
 
     public String getUrlHelper() {

@@ -207,6 +207,7 @@ public class DeployedGraphPoller {
 
         if (responseEntity.getStatusCode().is2xxSuccessful()
             && Objects.nonNull(responseEntity.getBody())) {
+            logger.debug("Received response: {}", responseEntity.getStatusCode());
             return responseEntity.getBody();
         } else {
             logger.warn("No data retrieved from page {}. Status: {}", pageNumber, responseEntity.getStatusCode());
