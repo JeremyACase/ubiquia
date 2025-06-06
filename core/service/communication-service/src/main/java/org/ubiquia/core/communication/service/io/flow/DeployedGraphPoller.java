@@ -70,7 +70,7 @@ public class DeployedGraphPoller {
                 }
             } while (hasNextPage);
 
-            processDeployedGraphIds(currentlyDeployedGraphIds);
+            this.tryProcessDeployedGraphIds(currentlyDeployedGraphIds);
         } catch (Exception e) {
             logger.error("Error during polling: {}", e.getMessage(), e);
         }
@@ -79,7 +79,7 @@ public class DeployedGraphPoller {
     /**
      * Process the currently deployed graph IDs: identify new deployments and torn-down graphs.
      */
-    private void processDeployedGraphIds(final List<String> currentlyDeployedGraphIds) {
+    private void tryProcessDeployedGraphIds(final List<String> currentlyDeployedGraphIds) {
         var newlyDeployedGraphIds = this.identifyNewlyDeployedGraphIds(currentlyDeployedGraphIds);
         var newlyTornDownGraphIds = this.identifyNewlyTornDownGraphIds(currentlyDeployedGraphIds);
 
@@ -182,7 +182,10 @@ public class DeployedGraphPoller {
     /**
      * Helper method to fetch a single page of Graph IDs for the UbiquiaAgent.
      */
-    private GenericPageImplementation<String> fetchGraphIdsPage(int pageNumber, int pageSize) {
+    private GenericPageImplementation<String> fetchGraphIdsPage(
+        final Integer pageNumber,
+        final Integer pageSize) {
+
         var targetUri = UriComponentsBuilder
             .fromHttpUrl(this.flowServiceConfig.getUrl()
                 + ":"

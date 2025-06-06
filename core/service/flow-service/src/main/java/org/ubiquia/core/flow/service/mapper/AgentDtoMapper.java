@@ -45,6 +45,7 @@ public class AgentDtoMapper extends GenericDtoMapper<
             to.setPort(from.getPort());
             to.setScaleSettings(from.getScaleSettings());
             to.setAgentType(from.getType());
+            to.setCommunicationServiceSettings(from.getCommunicationServiceSettings());
 
             if (Objects.nonNull(from.getOverrideSettings())) {
                 var overrideSettings = new ArrayList<OverrideSettings>();

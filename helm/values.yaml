@@ -15,6 +15,8 @@ logging:
 
 ubiquia:
   agent:
+    # This is a default UUID for development purposes
+    id: 0328ca73-4d50-409f-85a8-7168ce80bd96
     database: 
       ddlAutoSetting: create
       h2:

@@ -5,15 +5,6 @@ metadata:
 data:
   application.yaml: |
 
-    # Just some fancy way to generate a UUID and stuff it in a configmap should this agent not be assigned an ID yet
-    {{- $uuidCM := lookup "v1" "ConfigMap" .Release.Namespace (printf "%s-uuid" .Release.Name) -}}
-    {{- $uuid := "" -}}
-    {{- if $uuidCM -}}
-      {{- $uuid = index $uuidCM.data "uuid" -}}
-    {{- else -}}
-      {{- $uuid = include "ubiquia.generate.uuid" . -}}
-    {{- end }}
-
     logging:
       level:
         org.ubiquia: {{ .Values.logging.ubiquia }}
@@ -87,7 +78,7 @@ data:
 
     ubiquia:
       agent:
-        id: {{ $uuid }}
+        id: {{ .Values.ubiquia.agent.id }}
         flowService:
           bootstrap:
             enabled: {{ .Values.ubiquia.agent.flowService.bootstrap.enabled }}          

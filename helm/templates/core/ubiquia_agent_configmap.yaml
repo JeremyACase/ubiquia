@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ubiquia-agent-id
-data:
-  uuid: {{ include "ubiquia.generate.uuid" . }}

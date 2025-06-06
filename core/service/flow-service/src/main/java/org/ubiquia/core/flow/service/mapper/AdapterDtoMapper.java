@@ -45,6 +45,7 @@ public class AdapterDtoMapper extends GenericDtoMapper<
             to.setPollSettings(from.getPollSettings());
             to.setUpstreamAdapters(this.mapUpstreamOrDownstreamAdapters(
                 from.getUpstreamAdapters()));
+            to.setCommunicationServiceSettings(from.getCommunicationServiceSettings());
 
             to.setOverrideSettings(new ArrayList<>());
             if (Objects.nonNull(from.getOverrideSettings())) {
