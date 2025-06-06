@@ -21,9 +21,6 @@ public class AdapterDtoMapper extends GenericDtoMapper<
     private AgentDtoMapper agentDtoMapper;
 
     @Autowired
-    private GraphDtoMapper graphDtoMapper;
-
-    @Autowired
     private OverrideSettingsMapper overrideSettingsMapper;
 
     @Override
@@ -49,10 +46,6 @@ public class AdapterDtoMapper extends GenericDtoMapper<
             to.setUpstreamAdapters(this.mapUpstreamOrDownstreamAdapters(
                 from.getUpstreamAdapters()));
             to.setCommunicationServiceSettings(from.getCommunicationServiceSettings());
-
-            to.setGraph(this.graphDtoMapper.map(from.getGraph()));
-            to.getGraph().getAdapters().clear();
-            to.getGraph().getAgents().clear();
 
             to.setOverrideSettings(new ArrayList<>());
             if (Objects.nonNull(from.getOverrideSettings())) {

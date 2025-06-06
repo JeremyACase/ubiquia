@@ -44,9 +44,13 @@ public class AdapterProxyManager {
             .toList();
 
         for (var adapter : adaptersToProxy) {
-            logger.info("...Proxying new endpoints for adapter: {}...", adapter.getAdapterName());
+            logger.info("...Proxying new endpoints for graph {} and adapter: {}...",
+                graph.getGraphName(),
+                adapter.getAdapterName());
             this.proxiedAdapterMap.put(adapter.getId(), new ArrayList<>());
-            var endpointRecords = this.adapterProxiedEndpointFactory.getProxiedEndpointsFrom(adapter);
+            var endpointRecords = this.adapterProxiedEndpointFactory.getProxiedEndpointsFrom(
+                adapter,
+                graph);
 
             for (var endpointRecord : endpointRecords) {
                 try {

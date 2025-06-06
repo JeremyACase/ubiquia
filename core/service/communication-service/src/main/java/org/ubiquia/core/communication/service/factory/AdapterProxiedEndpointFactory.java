@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.logic.service.builder.AdapterEndpointRecordBuilder;
 import org.ubiquia.common.library.logic.service.builder.EndpointRecord;
 import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
+import org.ubiquia.common.model.ubiquia.dto.GraphDto;
 
 @Service
 public class AdapterProxiedEndpointFactory {
@@ -17,10 +18,12 @@ public class AdapterProxiedEndpointFactory {
     @Autowired
     private AdapterEndpointRecordBuilder adapterEndpointRecordBuilder;
 
-    public List<EndpointRecord> getProxiedEndpointsFrom(final AdapterDto adapter) {
+    public List<EndpointRecord> getProxiedEndpointsFrom(
+        final AdapterDto adapter,
+        final GraphDto graph) {
         logger.debug("Building proxied endpoints for adapter type: {}", adapter.getAdapterType());
 
-        var graphName = adapter.getGraph().getGraphName();
+        var graphName = graph.getGraphName();
         var adapterName = adapter.getAdapterName();
 
         // Determine which endpoints to include for each adapter type
