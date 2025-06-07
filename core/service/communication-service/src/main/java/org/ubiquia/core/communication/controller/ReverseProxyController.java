@@ -62,12 +62,25 @@ public class ReverseProxyController {
             IOUtils.copy(request.getInputStream(), connection.getOutputStream());
         }
 
-        // Forward response
+        // Forward response status and headers
         response.setStatus(connection.getResponseCode());
         connection.getHeaderFields().forEach((headerName, headerValues) -> {
             if (headerName != null) {
                 headerValues.forEach(headerValue -> response.addHeader(headerName, headerValue));
             }
         });
+
+        // Forward response body
+        try (var adapterStream = connection.getInputStream();
+             var clientStream = response.getOutputStream()) {
+
+            var buffer = new byte[8192];
+            
+            int bytesRead;
+            while ((bytesRead = adapterStream.read(buffer)) != -1) {
+                clientStream.write(buffer, 0, bytesRead);
+            }
+            clientStream.flush();
+        }
     }
 }

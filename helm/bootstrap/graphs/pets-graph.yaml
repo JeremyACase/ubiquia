@@ -164,6 +164,9 @@ agents:
       adapterName: Pet-Generator-Adapter
       description: This is an example adapter.
 
+      communicationServiceSettings:
+        exposeViaCommService: true
+
       endpoint: /pet/store/create-pet
 
       inputSubSchemas:
