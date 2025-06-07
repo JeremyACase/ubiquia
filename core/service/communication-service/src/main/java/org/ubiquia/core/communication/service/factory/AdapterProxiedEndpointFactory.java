@@ -10,6 +10,7 @@ import org.ubiquia.common.library.logic.service.builder.EndpointRecord;
 import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
 import org.ubiquia.common.model.ubiquia.dto.GraphDto;
 
+
 @Service
 public class AdapterProxiedEndpointFactory {
 
