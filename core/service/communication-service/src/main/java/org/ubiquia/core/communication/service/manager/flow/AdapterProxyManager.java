@@ -104,12 +104,6 @@ public class AdapterProxyManager {
      */
     private Mono<ResponseEntity<String>> proxyEndpoint(URI targetUri, HttpMethod method) {
         var requestSpec = this.webClient.method(method).uri(targetUri);
-
-        // If POST/PUT, send an empty body by default
-        if (method == HttpMethod.POST || method == HttpMethod.PUT) {
-            requestSpec = (WebClient.RequestBodySpec) requestSpec.bodyValue(""); // empty body
-        }
-
         return requestSpec
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
