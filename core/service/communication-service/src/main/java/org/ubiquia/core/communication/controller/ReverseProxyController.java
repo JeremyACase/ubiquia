@@ -52,11 +52,16 @@ public class ReverseProxyController {
         var registeredEndpoint = this.adapterProxyManager.getRegisteredEndpointFor(adapterName);
         if (Objects.nonNull(registeredEndpoint)) {
 
+            var cleanedPath = request.getRequestURI()
+                .replace("/ubiquia/communication-service/reverse-proxy", "")
+                .replace(adapterName, "");
+
             var targetUrl = this.flowServiceConfig.getUrl()
                 + ":"
                 + this.flowServiceConfig.getPort()
                 + "/"
-                + registeredEndpoint;
+                + registeredEndpoint
+                + cleanedPath;
 
             logger.debug("Reverse proxying to URL {}...", targetUrl);
 
