@@ -54,8 +54,10 @@ public class ReverseProxyController {
                 .replace(adapterName, "");
 
             var targetUrl = this.flowServiceConfig.getUrl()
+                + ":"
                 + this.flowServiceConfig.getPort()
                 + cleanedPath;
+            targetUrl = targetUrl.replace("//", "/");
 
             logger.debug("Reverse proxying to URL {}...", targetUrl);
 
