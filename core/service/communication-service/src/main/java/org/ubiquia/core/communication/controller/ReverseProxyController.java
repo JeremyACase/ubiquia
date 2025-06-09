@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +34,9 @@ public class ReverseProxyController {
     private WebClient webClient;
 
     @GetMapping("/get-proxied-adapters")
-    public HashSet<String> getProxiedAdapters() {
+    public List<String> getProxiedAdapters() {
         logger.info("Received request for currently proxied adapters...");
-        return this.adapterProxyManager.getRegisteredAdapters();
+        return this.adapterProxyManager.getRegisteredEndpoints();
     }
 
     @RequestMapping(value = "/{adapterName}/**",
@@ -48,16 +49,14 @@ public class ReverseProxyController {
         HttpServletRequest request,
         HttpServletResponse response) throws IOException {
 
-        if (this.adapterProxyManager.getRegisteredAdapters().contains(adapterName)) {
-            var cleanedPath = request.getRequestURI()
-                .replace("/ubiquia/communication-service/reverse-proxy", "")
-                .replace(adapterName, "");
+        var registeredEndpoint = this.adapterProxyManager.getRegisteredEndpointFor(adapterName);
+        if (Objects.nonNull(registeredEndpoint)) {
 
             var targetUrl = this.flowServiceConfig.getUrl()
                 + ":"
                 + this.flowServiceConfig.getPort()
-                + cleanedPath;
-            targetUrl = targetUrl.replace("//", "/");
+                + "/"
+                + registeredEndpoint;
 
             logger.debug("Reverse proxying to URL {}...", targetUrl);
 

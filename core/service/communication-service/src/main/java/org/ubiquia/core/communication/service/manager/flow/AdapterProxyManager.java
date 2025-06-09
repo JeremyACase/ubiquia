@@ -1,24 +1,25 @@
 package org.ubiquia.core.communication.service.manager.flow;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.ubiquia.common.library.logic.service.builder.AdapterEndpointRecordBuilder;
 import org.ubiquia.common.model.ubiquia.dto.GraphDto;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
-import org.ubiquia.core.communication.service.factory.AdapterProxiedEndpointFactory;
 
 @Service
 public class AdapterProxyManager {
 
     private static final Logger logger = LoggerFactory.getLogger(AdapterProxyManager.class);
 
-    private final HashSet<String> registerAdapters = new HashSet<>();
+    private final HashMap<String, String> proxiedAdapterEndpoints = new HashMap<>();
 
     @Autowired
-    private AdapterProxiedEndpointFactory adapterProxiedEndpointFactory;
+    private AdapterEndpointRecordBuilder adapterEndpointRecordBuilder;
 
     @Autowired
     private FlowServiceConfig flowServiceConfig;
@@ -35,9 +36,13 @@ public class AdapterProxyManager {
 
         for (var adapter : adaptersToProxy) {
 
-            if (!this.registerAdapters.contains(adapter.getAdapterName())) {
+            if (!this.proxiedAdapterEndpoints.containsKey(adapter.getAdapterName())) {
                 logger.info("Registering proxy for adapter: {}", adapter.getAdapterName());
-                this.registerAdapters.add(adapter.getAdapterName().toLowerCase());
+                var endpoint = this.adapterEndpointRecordBuilder.getBasePathFor(
+                    graph.getGraphName(),
+                    adapter.getAdapterName());
+                logger.info("...proxying base url: {}", endpoint);
+                this.proxiedAdapterEndpoints.put(adapter.getAdapterName(), endpoint);
             }
         }
     }
@@ -53,15 +58,23 @@ public class AdapterProxyManager {
 
         for (var adapter : adaptersToUnproxy) {
 
-            if (this.registerAdapters.contains(adapter.getAdapterName())) {
+            if (this.proxiedAdapterEndpoints.containsKey(adapter.getAdapterName())) {
                 logger.info("...unproxying endpoints for adapter {}...",
                     adapter.getAdapterName());
-                this.registerAdapters.remove(adapter.getAdapterName());
+                this.proxiedAdapterEndpoints.remove(adapter.getAdapterName());
             }
         }
     }
 
-    public HashSet<String> getRegisteredAdapters() {
-        return registerAdapters;
+    public List<String> getRegisteredEndpoints() {
+        return this.proxiedAdapterEndpoints.values().stream().toList();
+    }
+
+    public String getRegisteredEndpointFor(final String adapterName) {
+        String endpoint = null;
+        if (this.proxiedAdapterEndpoints.containsKey(adapterName)) {
+            endpoint = this.proxiedAdapterEndpoints.get(adapterName);
+        }
+        return endpoint;
     }
 }
