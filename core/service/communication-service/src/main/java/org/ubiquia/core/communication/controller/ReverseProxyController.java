@@ -62,6 +62,7 @@ public class ReverseProxyController {
                 + this.flowServiceConfig.getPort()
                 + "/"
                 + registeredEndpoint
+                + "/"
                 + cleanedPath;
 
             logger.debug("Reverse proxying to URL {}...", targetUrl);
