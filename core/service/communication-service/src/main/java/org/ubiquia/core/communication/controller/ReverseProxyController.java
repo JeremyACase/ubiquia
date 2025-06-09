@@ -6,14 +6,13 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
 import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
@@ -33,6 +32,12 @@ public class ReverseProxyController {
     @Autowired
     private WebClient webClient;
 
+    @GetMapping("/get-proxied-adapters")
+    public HashSet<String> getProxiedAdapters() {
+        logger.info("Received request for currently proxied adapters...");
+        return this.adapterProxyManager.getRegisteredAdapters();
+    }
+
     @RequestMapping(value = "/{adapterName}/**",
         method = {RequestMethod.GET,
             RequestMethod.POST,
@@ -43,7 +48,7 @@ public class ReverseProxyController {
         HttpServletRequest request,
         HttpServletResponse response) throws IOException {
 
-        if (this.adapterProxyManager.getRegisterAdapters().contains(adapterName)) {
+        if (this.adapterProxyManager.getRegisteredAdapters().contains(adapterName)) {
             var cleanedPath = request.getRequestURI()
                 .replace("/ubiquia/communication-service/reverse-proxy", "")
                 .replace(adapterName, "");

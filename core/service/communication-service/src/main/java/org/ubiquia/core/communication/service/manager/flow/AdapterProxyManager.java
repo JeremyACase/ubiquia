@@ -28,14 +28,16 @@ public class AdapterProxyManager {
 
     public void tryProcessNewlyDeployedGraph(final GraphDto graph) {
         var adaptersToProxy = graph.getAdapters().stream()
-            .filter(adapter -> Boolean.TRUE.equals(adapter.getCommunicationServiceSettings().getExposeViaCommService()))
+            .filter(adapter ->
+                Boolean.TRUE.equals(
+                    adapter.getCommunicationServiceSettings().getExposeViaCommService()))
             .toList();
 
         for (var adapter : adaptersToProxy) {
 
             if (!this.registerAdapters.contains(adapter.getAdapterName())) {
                 logger.info("Registering proxy for adapter: {}", adapter.getAdapterName());
-                this.registerAdapters.add(adapter.getAdapterName());
+                this.registerAdapters.add(adapter.getAdapterName().toLowerCase());
             }
         }
     }
@@ -59,7 +61,7 @@ public class AdapterProxyManager {
         }
     }
 
-    public HashSet<String> getRegisterAdapters() {
+    public HashSet<String> getRegisteredAdapters() {
         return registerAdapters;
     }
 }
