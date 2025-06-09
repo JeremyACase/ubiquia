@@ -54,7 +54,8 @@ public class ReverseProxyController {
 
             var cleanedPath = request.getRequestURI()
                 .replace("/ubiquia/communication-service/reverse-proxy", "")
-                .replace(adapterName, "");
+                .replace(adapterName, "")
+                .replace("/", "");
 
             var targetUrl = this.flowServiceConfig.getUrl()
                 + ":"
