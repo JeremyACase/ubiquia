@@ -15,16 +15,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.ubiquia.core.communication.config.FlowServiceConfig;
 import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
 
 @RestController
-@RequestMapping("/proxy")
+@RequestMapping("/ubiquia/communication-service/reverse-proxy")
 public class ReverseProxyController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReverseProxyController.class);
 
     @Autowired
     private AdapterProxyManager adapterProxyManager;
+
+    @Autowired
+    private FlowServiceConfig flowServiceConfig;
 
     @Autowired
     private WebClient webClient;
@@ -39,48 +43,59 @@ public class ReverseProxyController {
         HttpServletRequest request,
         HttpServletResponse response) throws IOException {
 
-        var targetBaseUrl = adapterProxyManager.getProxiedAdapterMap().get(adapterName).get(0).toString();
-        var path = request.getRequestURI().replaceFirst("/proxy/" + adapterName, "");
-        var targetUrl = targetBaseUrl + path + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
+        if (this.adapterProxyManager.getRegisterAdapters().contains(adapterName)) {
+            var cleanedPath = request.getRequestURI()
+                .replace("/ubiquia/communication-service/reverse-proxy", "")
+                .replace(adapterName, "");
 
-        // Create a connection to the target
-        var url = new URL(targetUrl);
-        var connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod(request.getMethod());
+            var targetUrl = this.flowServiceConfig.getUrl()
+                + this.flowServiceConfig.getPort()
+                + cleanedPath;
 
-        // Copy headers
-        Collections.list(request.getHeaderNames()).forEach(headerName -> {
-            Collections.list(request.getHeaders(headerName)).forEach(headerValue -> {
-                connection.setRequestProperty(headerName, headerValue);
+            logger.debug("Reverse proxying to URL {}...", targetUrl);
+
+            // Create a connection to the target
+            var url = new URL(targetUrl);
+            var connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod(request.getMethod());
+
+            // Copy headers
+            Collections.list(request.getHeaderNames()).forEach(headerName -> {
+                Collections.list(request.getHeaders(headerName)).forEach(headerValue -> {
+                    connection.setRequestProperty(headerName, headerValue);
+                });
             });
-        });
 
-        // Copy body if needed
-        if ("POST".equalsIgnoreCase(request.getMethod())
-            || "PUT".equalsIgnoreCase(request.getMethod())) {
-            connection.setDoOutput(true);
-            IOUtils.copy(request.getInputStream(), connection.getOutputStream());
-        }
-
-        // Forward response status and headers
-        response.setStatus(connection.getResponseCode());
-        connection.getHeaderFields().forEach((headerName, headerValues) -> {
-            if (headerName != null) {
-                headerValues.forEach(headerValue -> response.addHeader(headerName, headerValue));
+            // Copy body if needed
+            if ("POST".equalsIgnoreCase(request.getMethod())
+                || "PUT".equalsIgnoreCase(request.getMethod())) {
+                connection.setDoOutput(true);
+                IOUtils.copy(request.getInputStream(), connection.getOutputStream());
             }
-        });
 
-        // Forward response body
-        try (var adapterStream = connection.getInputStream();
-             var clientStream = response.getOutputStream()) {
+            // Forward response status and headers
+            response.setStatus(connection.getResponseCode());
+            connection.getHeaderFields().forEach((headerName, headerValues) -> {
+                if (headerName != null) {
+                    headerValues.forEach(headerValue -> response.addHeader(headerName, headerValue));
+                }
+            });
 
-            var buffer = new byte[8192];
-            
-            int bytesRead;
-            while ((bytesRead = adapterStream.read(buffer)) != -1) {
-                clientStream.write(buffer, 0, bytesRead);
+            // Forward response body
+            try (var adapterStream = connection.getInputStream();
+                 var clientStream = response.getOutputStream()) {
+
+                var buffer = new byte[8192];
+
+                int bytesRead;
+                while ((bytesRead = adapterStream.read(buffer)) != -1) {
+                    clientStream.write(buffer, 0, bytesRead);
+                }
+                clientStream.flush();
             }
-            clientStream.flush();
+        } else {
+            throw new IllegalArgumentException("ERROR: No adapter registered with name: "
+                + adapterName);
         }
     }
 }

@@ -84,7 +84,7 @@ public class QueueAdapterTest {
         deployment.setVersion(graph.getVersion());
         this.graphController.tryDeployGraph(deployment);
 
-        var targetUrl = "http://localhost:8080/ubiquia/graph/"
+        var targetUrl = "http://localhost:8080/graph/"
             + graph.getGraphName().toLowerCase()
             + "/adapter/"
             + queueAdapter.getAdapterName().toLowerCase()
@@ -146,7 +146,7 @@ public class QueueAdapterTest {
         deployment.setVersion(graph.getVersion());
         this.graphController.tryDeployGraph(deployment);
 
-        var targetUrl = "http://localhost:8080/ubiquia/graph/"
+        var targetUrl = "http://localhost:8080/graph/"
             + graph.getGraphName().toLowerCase()
             + "/adapter/"
             + queueAdapter.getAdapterName().toLowerCase()

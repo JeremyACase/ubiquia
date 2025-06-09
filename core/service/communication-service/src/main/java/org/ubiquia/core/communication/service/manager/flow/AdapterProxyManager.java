@@ -1,9 +1,6 @@
 package org.ubiquia.core.communication.service.manager.flow;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +15,7 @@ public class AdapterProxyManager {
 
     private static final Logger logger = LoggerFactory.getLogger(AdapterProxyManager.class);
 
-    private final HashMap<String, ArrayList<URI>> proxiedAdapterMap = new HashMap<>();
+    private final HashSet<String> registerAdapters = new HashSet<>();
 
     @Autowired
     private AdapterProxiedEndpointFactory adapterProxiedEndpointFactory;
@@ -35,16 +32,11 @@ public class AdapterProxyManager {
             .toList();
 
         for (var adapter : adaptersToProxy) {
-            logger.info("Registering proxy for adapter: {}", adapter.getAdapterName());
-            var targetBaseUrl = this.flowServiceConfig.getUrl()
-                + ":"
-                + this.flowServiceConfig.getPort()
-                + "/";
 
-            // Store mapping: adapter name → target base URL
-            this.proxiedAdapterMap.put(
-                adapter.getAdapterName().toLowerCase(),
-                new ArrayList<>(List.of(URI.create(targetBaseUrl))));
+            if (!this.registerAdapters.contains(adapter.getAdapterName())) {
+                logger.info("Registering proxy for adapter: {}", adapter.getAdapterName());
+                this.registerAdapters.add(adapter.getAdapterName());
+            }
         }
     }
 
@@ -59,15 +51,15 @@ public class AdapterProxyManager {
 
         for (var adapter : adaptersToUnproxy) {
 
-            if (this.proxiedAdapterMap.containsKey(adapter.getAdapterName())) {
+            if (this.registerAdapters.contains(adapter.getAdapterName())) {
                 logger.info("...unproxying endpoints for adapter {}...",
                     adapter.getAdapterName());
-                this.proxiedAdapterMap.remove(adapter.getAdapterName());
+                this.registerAdapters.remove(adapter.getAdapterName());
             }
         }
     }
 
-    public HashMap<String, ArrayList<URI>> getProxiedAdapterMap() {
-        return proxiedAdapterMap;
+    public HashSet<String> getRegisterAdapters() {
+        return registerAdapters;
     }
 }

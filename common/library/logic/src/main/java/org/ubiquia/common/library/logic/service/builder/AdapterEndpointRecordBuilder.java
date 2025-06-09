@@ -24,27 +24,27 @@ public class AdapterEndpointRecordBuilder {
     }
 
     public EndpointRecord getBackpressureEndpointFor(final String graphName, final String adapterName) {
-        var path = this.getPathHelper(graphName, adapterName) + "/back-pressure";
+        var path = this.getBasePathFor(graphName, adapterName) + "/back-pressure";
         return new EndpointRecord(path, RequestMethod.GET);
     }
 
     public EndpointRecord getPushEndpointFor(final String graphName, final String adapterName) {
-        var path = this.getPathHelper(graphName, adapterName) + "/push";
+        var path = this.getBasePathFor(graphName, adapterName) + "/push";
         return new EndpointRecord(path, RequestMethod.POST);
     }
 
     public EndpointRecord getPeekEndpointFor(final String graphName, final String adapterName) {
-        var path = this.getPathHelper(graphName, adapterName) + "/queue/peek";
+        var path = this.getBasePathFor(graphName, adapterName) + "/queue/peek";
         return new EndpointRecord(path, RequestMethod.GET);
     }
 
     public EndpointRecord getPopEndpointFor(final String graphName, final String adapterName) {
-        var path = this.getPathHelper(graphName, adapterName) + "/queue/pop";
+        var path = this.getBasePathFor(graphName, adapterName) + "/queue/pop";
         return new EndpointRecord(path, RequestMethod.GET);
     }
 
-    public String getPathHelper(final String graphName, final String adapterName) {
-        return "ubiquia/graph/"
+    public String getBasePathFor(final String graphName, final String adapterName) {
+        return "graph/"
             + graphName.toLowerCase()
             + "/adapter/"
             + adapterName.toLowerCase();
