@@ -36,13 +36,16 @@ public class AdapterProxyManager {
 
         for (var adapter : adaptersToProxy) {
 
-            if (!this.proxiedAdapterEndpoints.containsKey(adapter.getAdapterName())) {
+            var adapterName = adapter.getAdapterName().toLowerCase();
+            if (!this.proxiedAdapterEndpoints.containsKey(adapterName)) {
                 logger.info("Registering proxy for adapter: {}", adapter.getAdapterName());
                 var endpoint = this.adapterEndpointRecordBuilder.getBasePathFor(
                     graph.getGraphName(),
-                    adapter.getAdapterName());
+                    adapterName);
                 logger.info("...proxying base url: {}", endpoint);
-                this.proxiedAdapterEndpoints.put(adapter.getAdapterName(), endpoint);
+                this.proxiedAdapterEndpoints.put(
+                    adapterName,
+                    endpoint);
             }
         }
     }
