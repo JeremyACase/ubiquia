@@ -4,8 +4,8 @@ plugins {
 }
 
 bootJar {
-    mainClass = 'org.ubiquia.core.communication.Application'
-    archiveFileName = 'ubiquia-core-communication-service.jar'
+    mainClass = 'org.ubiquia.core.belief.state.generator.Application'
+    archiveFileName = 'ubiquia-core-belief-state-generator-service.jar'
 }
 
 dependencyManagement {
@@ -27,12 +27,8 @@ dependencies {
     implementation project(':common:model:ubiquia')
     implementation project(':common:library:advice')
     implementation project(':common:library:config')
-    implementation project(':common:library:logic')
 
     implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
-    implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
-    implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"
-    implementation "org.springdoc:springdoc-openapi-starter-webflux-ui:${SPRING_DOC_VERSION}"
 
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${MICROMETER_VERSION}"
 
