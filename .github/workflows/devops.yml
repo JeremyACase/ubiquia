@@ -10,7 +10,7 @@ on:
 env:
   DOCKER_REGISTRY: docker.io
   DOCKER_REPO: ubiquia
-  SUBPROJECTS: "core/service/communication-service core/service/flow-service"
+  SUBPROJECTS: "core/service/belief-state-generator-service core/service/communication-service core/service/flow-service "
 
 jobs:
 
