@@ -30,7 +30,7 @@ spring:
   port: 8080
 
   application:
-    name: communication-service
+    name: belief-state-generator-service
 
 springdoc:
   swagger-ui:
@@ -41,12 +41,6 @@ ubiquia:
   agent:
     # This is a default UUID for development purposes
     id: 0328ca73-4d50-409f-85a8-7168ce80bd96
-  belief:
-    state:
-      generator:
-        service:
-          port: 8080
-          url: http://ubiquia-core-belief-state-generator-service
   flow:
     service:
       port: 8080

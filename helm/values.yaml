@@ -35,6 +35,11 @@ ubiquia:
         maxRAMPercentage: 25
   components:
     core:
+      beliefStateGeneratorService:
+        image:
+          registry: ubiquia
+          repository: core-belief-state-generator-service
+          tag: latest
       communicationService:
         image:
           registry: ubiquia

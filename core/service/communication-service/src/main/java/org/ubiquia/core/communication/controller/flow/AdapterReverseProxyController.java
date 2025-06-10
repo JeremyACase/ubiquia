@@ -1,4 +1,4 @@
-package org.ubiquia.core.communication.controller;
+package org.ubiquia.core.communication.controller.flow;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.io.IOUtils;
@@ -19,10 +18,10 @@ import org.ubiquia.core.communication.config.FlowServiceConfig;
 import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
 
 @RestController
-@RequestMapping("/ubiquia/communication-service/reverse-proxy")
-public class ReverseProxyController {
+@RequestMapping("/ubiquia/communication-service/adapter-reverse-proxy")
+public class AdapterReverseProxyController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReverseProxyController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdapterReverseProxyController.class);
 
     @Autowired
     private AdapterProxyManager adapterProxyManager;
@@ -33,9 +32,9 @@ public class ReverseProxyController {
     @Autowired
     private WebClient webClient;
 
-    @GetMapping("/get-proxied-adapters")
-    public List<String> getProxiedAdapters() {
-        logger.info("Received request for currently proxied adapters...");
+    @GetMapping("/get-proxied-urls")
+    public List<String> getProxiedUrls() {
+        logger.info("Received request for currently proxied urls...");
         return this.adapterProxyManager.getRegisteredEndpoints();
     }
 
@@ -53,7 +52,7 @@ public class ReverseProxyController {
         if (Objects.nonNull(registeredEndpoint)) {
 
             var cleanedPath = request.getRequestURI()
-                .replace("/ubiquia/communication-service/reverse-proxy", "")
+                .replace("/ubiquia/communication-service/adapter-reverse-proxy", "")
                 .replace(adapterName, "")
                 .replace("/", "");
 

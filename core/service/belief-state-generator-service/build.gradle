@@ -1,0 +1,60 @@
+plugins {
+    id 'org.springframework.boot' version "${SPRING_BOOT_VERSION}"
+    id 'java'
+}
+
+bootJar {
+    mainClass = 'org.ubiquia.core.communication.Application'
+    archiveFileName = 'ubiquia-core-communication-service.jar'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${SPRING_BOOT_VERSION}"
+    }
+}
+
+jar {
+    enabled = false
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+
+    implementation project(':common:model:ubiquia')
+    implementation project(':common:library:advice')
+    implementation project(':common:library:config')
+    implementation project(':common:library:logic')
+
+    implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
+    implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
+    implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"
+    implementation "org.springdoc:springdoc-openapi-starter-webflux-ui:${SPRING_DOC_VERSION}"
+
+    runtimeOnly "io.micrometer:micrometer-registry-prometheus:${MICROMETER_VERSION}"
+
+    testImplementation "org.instancio:instancio-junit:${INSTANCIO_VERSION}"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+}
+
+
+/**
+ * Instruct our code coverage tool where to place the report.
+ */
+jacocoTestReport {
+    reports {
+        xml.required = true
+        csv.required = false
+        xml.destination file("./build/reports/jacoco.xml")
+        html.destination file("./build/reports/jacocoHtml")
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+build.dependsOn jacocoTestReport

@@ -70,6 +70,10 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
+{{- define "ubiquia.core.beliefStateGeneratorService.image" -}}
+{{ .Values.ubiquia.components.core.beliefStateGeneratorService.image.registry }}/{{ .Values.ubiquia.components.core.beliefStateGeneratorService.image.repository }}:{{ .Values.ubiquia.components.core.beliefStateGeneratorService.image.tag }}
+{{- end }}
+
 {{- define "ubiquia.core.communicationService.image" -}}
 {{ .Values.ubiquia.components.core.communicationService.image.registry }}/{{ .Values.ubiquia.components.core.communicationService.image.repository }}:{{ .Values.ubiquia.components.core.communicationService.image.tag }}
 {{- end }}

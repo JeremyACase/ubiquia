@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubiquia-core-belief-state-generator-service
+  labels:
+    {{- include "ubiquia.labels" . | nindent 4 }}
+    component: ubiquia-core-belief-state-generator-service
+spec:
+  {{- if not .Values.k8s.autoscaling.enabled }}
+  replicas: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ubiquia.selectorLabels" . | nindent 6 }}
+      component: ubiquia-core-belief-state-generator-service
+
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: '/actuator/prometheus'
+        prometheus.io/port: "{{ .Values.convenience.variables.spring.port }}"
+
+      labels:
+        {{- include "ubiquia.selectorLabels" . | nindent 8 }}
+        {{- include "ubiquia.podLabels" . | nindent 8 }}
+        component: ubiquia-core-belief-state-generator-service
+
+    spec:
+      {{- with .Values.infrastructure.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: ubiquia-core-belief-state-generator-config
+      containers:
+      - name: flow-service
+        volumeMounts:
+        - name: config
+          mountPath: /app/etc
+        livenessProbe: 
+          httpGet:
+            path: /actuator/health
+            port: {{ .Values.convenience.variables.spring.port }}
+          initialDelaySeconds: 60  
+        image: {{ include "ubiquia.core.beliefStateGeneratorService.image" . }}
+        imagePullPolicy: {{ .Values.infrastructure.image.pullPolicy }}
+        ports:
+          - name: http
+            containerPort: {{ .Values.convenience.variables.spring.port }}
+            protocol: TCP

@@ -1,0 +1,58 @@
+package org.ubiquia.core.communication.controller.belief;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.ubiquia.common.model.ubiquia.IngressResponse;
+import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.embeddable.DomainGeneration;
+import org.ubiquia.core.communication.config.BeliefStateGeneratorServiceConfig;
+import reactor.core.publisher.Mono;
+
+@RestController
+@RequestMapping("/ubiquia/communication-service/belief-state-generator-service")
+public class BeliefStateGeneratorControllerProxy {
+
+    @Autowired
+    private BeliefStateGeneratorServiceConfig beliefStateGeneratorServiceConfig;
+
+    @Autowired
+    private WebClient webClient;
+
+    @PostMapping("/register/post")
+    public Mono<ResponseEntity<DomainGeneration>> proxyGraphPost(
+        @RequestBody Mono<GraphDto> body,
+        ServerHttpRequest originalRequest) {
+
+        var url = this.getUrlHelper();
+        var uri = UriComponentsBuilder.fromHttpUrl(url + "/generate/domain")
+            .queryParams(originalRequest.getQueryParams())
+            .build(true)
+            .toUri();
+
+        var response = this
+            .webClient
+            .method(originalRequest.getMethod())
+            .uri(uri)
+            .headers(headers -> headers.addAll(originalRequest.getHeaders()))
+            .body(body, String.class)
+            .retrieve()
+            .toEntity(DomainGeneration.class);
+
+        return response;
+    }
+
+    public String getUrlHelper() {
+        var url = this.beliefStateGeneratorServiceConfig.getUrl()
+            + ":"
+            + this.beliefStateGeneratorServiceConfig.getPort().toString()
+            + "/ubiquia/belief-state-generator";
+        return url;
+    }
+}
