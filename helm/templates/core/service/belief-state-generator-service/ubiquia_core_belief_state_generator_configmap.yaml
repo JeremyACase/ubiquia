@@ -49,3 +49,7 @@ data:
     ubiquia:
       agent:
         id: {{ .Values.ubiquia.agent.id }}
+      flow:
+        service:
+          port: {{ .Values.convenience.variables.spring.port }}
+          url: http://ubiquia-core-flow-service

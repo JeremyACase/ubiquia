@@ -23,7 +23,7 @@ import org.ubiquia.core.belief.state.generator.service.BeliefStateGeneratorServi
 import org.ubiquia.core.communication.config.FlowServiceConfig;
 
 @RestController
-@RequestMapping("/ubiquia/belief-state-generator")
+@RequestMapping("/belief-state-generator")
 public class BeliefStateGeneratorController {
 
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateGeneratorController.class);
@@ -48,8 +48,13 @@ public class BeliefStateGeneratorController {
         logger.info("Received a domain generation request: {}...",
             this.objectMapper.writeValueAsString(domainGeneration));
 
-        var url = UriComponentsBuilder
-            .fromHttpUrl(this.flowServiceConfig.getUrl() + ":" + this.flowServiceConfig.getPort())
+        var url = this.flowServiceConfig.getUrl()
+            + ":"
+            + this.flowServiceConfig.getPort()
+            + "/agent-communication-language/query/params";
+
+        var uri = UriComponentsBuilder
+            .fromHttpUrl(url)
             .queryParam("page", 0)
             .queryParam("size", 1)
             .queryParam("domain", domainGeneration.getName())
@@ -57,14 +62,14 @@ public class BeliefStateGeneratorController {
             .queryParam("version.minor", domainGeneration.getVersion().getMinor())
             .queryParam("version.patch", domainGeneration.getVersion().getPatch())
             .toUriString();
-        logger.debug("...querying URL: {}...", url);
+        logger.debug("...querying URL: {}...", uri);
 
         var responseType = new ParameterizedTypeReference
             <GenericPageImplementation<AgentCommunicationLanguageDto>>() {
         };
 
         var response =
-            this.restTemplate.exchange(url, HttpMethod.GET, null, responseType);
+            this.restTemplate.exchange(uri, HttpMethod.GET, null, responseType);
 
         if (!response.getStatusCode().is2xxSuccessful() ||
             Objects.requireNonNull(response.getBody()).getNumberOfElements() <= 0) {
