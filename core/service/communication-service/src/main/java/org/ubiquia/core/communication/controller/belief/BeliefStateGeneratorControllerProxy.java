@@ -27,7 +27,7 @@ public class BeliefStateGeneratorControllerProxy {
 
     @PostMapping("/register/post")
     public Mono<ResponseEntity<DomainGeneration>> proxyGraphPost(
-        @RequestBody Mono<GraphDto> body,
+        @RequestBody Mono<DomainGeneration> body,
         ServerHttpRequest originalRequest) {
 
         var url = this.getUrlHelper();
@@ -41,7 +41,7 @@ public class BeliefStateGeneratorControllerProxy {
             .method(originalRequest.getMethod())
             .uri(uri)
             .headers(headers -> headers.addAll(originalRequest.getHeaders()))
-            .body(body, String.class)
+            .body(body, DomainGeneration.class)
             .retrieve()
             .toEntity(DomainGeneration.class);
 
