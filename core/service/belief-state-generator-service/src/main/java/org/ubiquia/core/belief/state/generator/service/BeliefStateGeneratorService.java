@@ -28,6 +28,8 @@ public class BeliefStateGeneratorService {
 
         var yaml = this.jsonSchemaToOpenApiYamlService.translateJsonSchemaToOpenApiYaml(
             this.objectMapper.writeValueAsString(acl.getJsonSchema()));
+
+        logger.debug("Generated YAML: {}", yaml);
     }
 
 }

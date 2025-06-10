@@ -1,18 +1,14 @@
 package org.ubiquia.core.communication.controller.belief;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.http.HttpMethod;
-import org.ubiquia.common.model.ubiquia.IngressResponse;
-import org.ubiquia.common.model.ubiquia.dto.GraphDto;
 import org.ubiquia.common.model.ubiquia.embeddable.DomainGeneration;
 import org.ubiquia.core.communication.config.BeliefStateGeneratorServiceConfig;
 import reactor.core.publisher.Mono;
@@ -51,7 +47,7 @@ public class BeliefStateGeneratorControllerProxy {
         var url = this.beliefStateGeneratorServiceConfig.getUrl()
             + ":"
             + this.beliefStateGeneratorServiceConfig.getPort().toString()
-            + "/ubiquia/belief-state-generator";
+            + "/belief-state-generator";
         return url;
     }
 }
