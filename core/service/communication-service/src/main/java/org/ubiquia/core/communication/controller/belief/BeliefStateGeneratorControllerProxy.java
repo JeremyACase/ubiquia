@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.http.HttpMethod;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 import org.ubiquia.common.model.ubiquia.dto.GraphDto;
 import org.ubiquia.common.model.ubiquia.embeddable.DomainGeneration;
@@ -27,8 +28,7 @@ public class BeliefStateGeneratorControllerProxy {
 
     @PostMapping("/generate/domain")
     public Mono<ResponseEntity<DomainGeneration>> proxyGraphPost(
-        @RequestBody Mono<DomainGeneration> body,
-        ServerHttpRequest originalRequest) {
+        @RequestBody Mono<DomainGeneration> body) {
 
         var url = this.getUrlHelper();
         var uri = UriComponentsBuilder.fromHttpUrl(url + "/generate/domain")
@@ -37,9 +37,8 @@ public class BeliefStateGeneratorControllerProxy {
 
         var response = this
             .webClient
-            .method(originalRequest.getMethod())
+            .method(HttpMethod.POST)
             .uri(uri)
-            .headers(headers -> headers.addAll(originalRequest.getHeaders()))
             .body(body, DomainGeneration.class)
             .retrieve()
             .toEntity(DomainGeneration.class);

@@ -19,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
 import org.ubiquia.common.model.ubiquia.embeddable.DomainGeneration;
+import org.ubiquia.core.belief.state.generator.service.BeliefStateGeneratorService;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
 
 @RestController
@@ -26,6 +27,9 @@ import org.ubiquia.core.communication.config.FlowServiceConfig;
 public class BeliefStateGeneratorController {
 
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateGeneratorController.class);
+
+    @Autowired
+    private BeliefStateGeneratorService beliefStateGeneratorService;
 
     @Autowired
     private FlowServiceConfig flowServiceConfig;
@@ -68,6 +72,9 @@ public class BeliefStateGeneratorController {
             throw new IllegalArgumentException("Could not find a registered Agent Communication "
                 + "Language for: " + this.objectMapper.writeValueAsString(domainGeneration));
         }
+
+        var acl = response.getBody().getContent().get(0);
+        this.beliefStateGeneratorService.generateBeliefStateFrom(acl);
 
         return domainGeneration;
     }
