@@ -25,14 +25,13 @@ public class BeliefStateGeneratorControllerProxy {
     @Autowired
     private WebClient webClient;
 
-    @PostMapping("/register/post")
+    @PostMapping("/generate/domain")
     public Mono<ResponseEntity<DomainGeneration>> proxyGraphPost(
         @RequestBody Mono<DomainGeneration> body,
         ServerHttpRequest originalRequest) {
 
         var url = this.getUrlHelper();
         var uri = UriComponentsBuilder.fromHttpUrl(url + "/generate/domain")
-            .queryParams(originalRequest.getQueryParams())
             .build(true)
             .toUri();
 
