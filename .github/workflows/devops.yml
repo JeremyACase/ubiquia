@@ -37,6 +37,7 @@ jobs:
         with:
           name: jars
           path: |
+            core/service/belief-state-generator-service/build/libs/*.jar
             core/service/communication-service/build/libs/*.jar
             core/service/flow-service/build/libs/*.jar
 
