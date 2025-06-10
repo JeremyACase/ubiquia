@@ -55,7 +55,7 @@ public class JsonSchemaToOpenApiYamlService {
         var map = this.objectMapper.convertValue(openApiNode, Map.class);
         var yamlString = yaml.dump(map);
 
-        logger.debug("Generated OpenAPI YAML: \n{}", yamlString);
+        logger.debug("...generated OpenAPI YAML: \n{}", yamlString);
 
         return yamlString;
     }
