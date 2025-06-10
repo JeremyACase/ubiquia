@@ -1,4 +1,4 @@
-package org.ubiquia.core.belief.generator.controller;
+package org.ubiquia.core.belief.state.generator.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

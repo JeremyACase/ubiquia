@@ -1,4 +1,4 @@
-package org.ubiquia.core.belief.generator;
+package org.ubiquia.core.belief.state.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;

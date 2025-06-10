@@ -1,4 +1,4 @@
-package org.ubiquia.core.belief.generator.controller.advice;
+package org.ubiquia.core.belief.state.generator.controller.advice;
 
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.ubiquia.common.library.advice.exception.AbstractGlobalExceptionHandler;

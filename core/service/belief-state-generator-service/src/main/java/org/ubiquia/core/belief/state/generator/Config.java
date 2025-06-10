@@ -1,4 +1,4 @@
-package org.ubiquia.core.belief.generator;
+package org.ubiquia.core.belief.state.generator;
 
 import io.micrometer.core.aop.TimedAspect;
 import io.micrometer.core.instrument.MeterRegistry;
