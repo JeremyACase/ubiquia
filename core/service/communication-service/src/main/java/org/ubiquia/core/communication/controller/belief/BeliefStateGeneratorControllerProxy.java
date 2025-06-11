@@ -24,7 +24,7 @@ public class BeliefStateGeneratorControllerProxy {
     private WebClient webClient;
 
     @PostMapping("/generate/domain")
-    public Mono<ResponseEntity<DomainGeneration>> proxyGraphPost(
+    public Mono<ResponseEntity<DomainGeneration>> proxyGenerateDomain(
         @RequestBody Mono<DomainGeneration> body) {
 
         var url = this.getUrlHelper();

@@ -10,10 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
@@ -40,7 +37,7 @@ public class BeliefStateGeneratorController {
     @Autowired
     private RestTemplate restTemplate;
 
-    @PutMapping("/generate/domain")
+    @PostMapping("/generate/domain")
     @Transactional
     public DomainGeneration register(@RequestBody @Valid final DomainGeneration domainGeneration)
         throws JsonProcessingException {

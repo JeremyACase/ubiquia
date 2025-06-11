@@ -34,7 +34,7 @@ dependencies {
     implementation project(':common:library:logic')
 
     implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${JACKSON_DATA_FORMAT_VERSION}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${JACKSON_VERSION}"
     implementation "com.github.java-json-tools:json-schema-core:${JAVA_JSON_TOOLS}"
     implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
     implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"

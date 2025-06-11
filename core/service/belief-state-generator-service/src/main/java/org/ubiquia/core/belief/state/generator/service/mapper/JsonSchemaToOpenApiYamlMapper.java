@@ -2,6 +2,7 @@ package org.ubiquia.core.belief.state.generator.service.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,34 +25,46 @@ public class JsonSchemaToOpenApiYamlMapper {
         throws JsonProcessingException {
         logger.debug("Translating schema to OpenAPI yaml: {}...", jsonSchema);
 
-        var jsonNode = this.objectMapper.readTree(jsonSchema);
+        var rewrittenSchema = jsonSchema.replaceAll("#/definitions/", "#/components/schemas/");
 
+        var rootNode = this.objectMapper.readTree(rewrittenSchema);
+
+        // Prepare OpenAPI structure
         var openApiNode = this.objectMapper.createObjectNode();
         openApiNode.put("openapi", "3.0.0");
 
         var infoNode = this.objectMapper.createObjectNode();
         infoNode.put("title", "Generated OpenAPI");
         infoNode.put("version", "1.0.0");
-
         openApiNode.set("info", infoNode);
 
-        var pathsNode = this.objectMapper.createObjectNode();
-        openApiNode.set("paths", pathsNode);
+        openApiNode.set("paths", this.objectMapper.createObjectNode()); // Empty paths
 
         var componentsNode = this.objectMapper.createObjectNode();
         var schemasNode = this.objectMapper.createObjectNode();
-        schemasNode.set("GeneratedSchema", jsonNode);
-        componentsNode.set("schemas", schemasNode);
 
+        ObjectNode mainSchema = (ObjectNode) rootNode;
+        ObjectNode generatedSchema = mainSchema.deepCopy();
+
+        if (mainSchema.has("definitions")) {
+            var definitionsNode = (ObjectNode) mainSchema.get("definitions");
+
+            definitionsNode.fieldNames().forEachRemaining(defName -> {
+                schemasNode.set(defName, definitionsNode.get(defName));
+            });
+
+            generatedSchema.remove("definitions");
+        }
+
+        schemasNode.set("GeneratedSchema", generatedSchema);
+        componentsNode.set("schemas", schemasNode);
         openApiNode.set("components", componentsNode);
 
-        // Convert the final OpenAPI JSON object to YAML
         var options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setPrettyFlow(true);
         var yaml = new Yaml(options);
 
-        // Convert ObjectNode to a Map for SnakeYAML
         var map = this.objectMapper.convertValue(openApiNode, Map.class);
         var yamlString = yaml.dump(map);
 
