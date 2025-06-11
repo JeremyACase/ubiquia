@@ -80,6 +80,35 @@ public class ParameterDaoTest {
     }
 
     @Test
+    public void assertQueriesForNestedEmbeddedData_isValid() throws NoSuchFieldException {
+        var person = this.dummyFactory.generatePersonWithPets();
+
+        var params = new HashMap<String, String[]>();
+        var major = new String[1];
+        var minor = new String[1];
+        var patch = new String[1];
+
+        major[0] = "1";
+        minor[0] = "2";
+        patch[0] = "3";
+
+        params.put("version.major", major);
+        params.put("version.minor", minor);
+        params.put("version.patch", patch);
+
+        var records = this.personDataAccessObject.getPage(
+            params,
+            0,
+            1,
+            false,
+            new ArrayList<>(),
+            Person.class);
+
+        Assertions.assertEquals(1, records.getTotalElements());
+        Assertions.assertEquals(records.getContent().get(0).getId(), person.getId());
+    }
+
+    @Test
     public void assertQueriesForNestedFloatData_isValid() throws NoSuchFieldException {
         var person = this.dummyFactory.generatePersonWithPets();
 

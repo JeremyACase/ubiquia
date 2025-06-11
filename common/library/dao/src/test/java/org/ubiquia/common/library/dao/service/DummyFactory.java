@@ -15,6 +15,7 @@ import org.ubiquia.common.library.dao.model.entity.*;
 import org.ubiquia.common.library.dao.repository.AnimalRepository;
 import org.ubiquia.common.library.dao.repository.PersonRepository;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
+import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 
 @Service
 public class DummyFactory {
@@ -36,6 +37,11 @@ public class DummyFactory {
         pets.add(this.generateWienerDog());
         pets.add(this.generatePoodle());
 
+        var version = new SemanticVersion();
+        version.setMajor(1);
+        version.setMinor(2);
+        version.setPatch(3);
+
         var person = Instancio
             .of(Person.class)
             .withMaxDepth(1)
@@ -43,6 +49,7 @@ public class DummyFactory {
             .ignore(field(Person::getCreatedAt))
             .ignore(field(Person::getUpdatedAt))
             .set(field(Person::getPets), pets)
+            .set(field(Person::getVersion), version)
             .set(field(Person::getNullValue), null)
             .create();
 

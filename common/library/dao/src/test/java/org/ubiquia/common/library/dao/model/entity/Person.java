@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.ubiquia.common.library.dao.model.enums.Color;
+import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 
 @Entity
 public class Person {
@@ -23,6 +24,8 @@ public class Person {
 
     @UpdateTimestamp
     private OffsetDateTime updatedAt = null;
+
+    private SemanticVersion version;
 
     private String name;
 
@@ -117,5 +120,13 @@ public class Person {
 
     public void setNullValue(String nullValue) {
         this.nullValue = nullValue;
+    }
+
+    public SemanticVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(SemanticVersion version) {
+        this.version = version;
     }
 }

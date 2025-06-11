@@ -15,11 +15,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import org.ubiquia.common.library.dao.service.logic.EntityDeriver;
-import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
-import org.ubiquia.common.library.dao.service.logic.ClassDeriver;
 import org.ubiquia.common.library.dao.service.builder.NestedPredicateBuilder;
 import org.ubiquia.common.library.dao.service.builder.NonNestedPredicateBuilder;
+import org.ubiquia.common.library.dao.service.logic.ClassDeriver;
+import org.ubiquia.common.library.dao.service.logic.EmbeddableDeriver;
+import org.ubiquia.common.library.dao.service.logic.EntityDeriver;
+import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dao.QueryFilterParameter;
 import org.ubiquia.common.model.ubiquia.dao.QueryOperatorType;
 
@@ -36,6 +37,8 @@ public class ParameterDao<T> {
     private static final Logger logger = LoggerFactory.getLogger(ParameterDao.class);
     @Autowired
     private ClassDeriver classDeriver;
+    @Autowired
+    private EmbeddableDeriver embeddableDeriver;
     @Autowired
     private EntityDeriver entityDeriver;
     @Autowired
@@ -395,11 +398,12 @@ public class ParameterDao<T> {
 
         // Determine the final class and field type for the last element of the keychain
         var currentClass = rootClass;
+        Class<?> previousClass = null;
         Field finalField = null;
 
         for (int i = 0; i < split.size(); i++) {
-            String fieldName = getStringWithoutOperatorSymbols(split.get(i));
-            Optional<Field> fieldOpt = FieldUtils.getAllFieldsList(currentClass).stream()
+            var fieldName = getStringWithoutOperatorSymbols(split.get(i));
+            var fieldOpt = FieldUtils.getAllFieldsList(currentClass).stream()
                 .filter(f -> f.getName().equalsIgnoreCase(fieldName))
                 .findFirst();
 
@@ -407,7 +411,7 @@ public class ParameterDao<T> {
                 logger.debug("Field '{}' not found in '{}', checking subclasses...",
                     fieldName, currentClass.getSimpleName());
 
-                currentClass = classDeriver.tryGetPredicateClass(currentClass, fieldName);
+                currentClass = this.classDeriver.tryGetPredicateClass(currentClass, fieldName);
 
                 fieldOpt = FieldUtils.getAllFieldsList(currentClass).stream()
                     .filter(f -> f.getName().equalsIgnoreCase(fieldName))
@@ -424,8 +428,10 @@ public class ParameterDao<T> {
             // If it's a collection, resolve the generic type for the next iteration
             if (Collection.class.isAssignableFrom(finalField.getType())) {
                 var collectionType = (ParameterizedType) finalField.getGenericType();
+                previousClass = currentClass;
                 currentClass = (Class<?>) collectionType.getActualTypeArguments()[0];
             } else {
+                previousClass = currentClass;
                 currentClass = finalField.getType();
             }
         }
@@ -433,96 +439,135 @@ public class ParameterDao<T> {
         // Build the subquery using correlated joins
         var subQuery = criteriaQuery.subquery(currentClass);
 
+        var finalFieldName = this.getStringWithoutOperatorSymbols(split.get(split.size() - 1));
+
+        Predicate predicate = null;
         Root<?> subRoot = null;
         if (this.entityDeriver.isEntityClass(currentClass)) {
             subRoot = subQuery.from(currentClass);
+            predicate = this.getPredicatesForNestedParameterEntities(
+                criteriaBuilder,
+                subQuery,
+                queryValue,
+                subRoot,
+                split,
+                finalFieldName,
+                finalField,
+                keychain);
+        } else if (this.embeddableDeriver.isEmbeddedClass(previousClass)) {
+
+            Path<?> path = root;
+            for (var field : split) {
+                path = path.get(field);
+            }
+            predicate = criteriaBuilder.equal(path, queryValue);
         } else {
             subRoot = subQuery.correlate(root);
+            predicate = this.getPredicatesForNestedParameterEntities(
+                criteriaBuilder,
+                subQuery,
+                queryValue,
+                subRoot,
+                split,
+                finalFieldName,
+                finalField,
+                keychain);
         }
+        return predicate;
+    }
 
-        var join = subRoot.join(getStringWithoutOperatorSymbols(split.get(0)));
+    private Predicate getPredicatesForNestedParameterEntities(
+        final CriteriaBuilder criteriaBuilder,
+        final Subquery<?> subQuery,
+        final String queryValue,
+        final Root<?> subRoot,
+        final List<String> split,
+        final String finalFieldName,
+        final Field finalField,
+        final String keychain) throws NoSuchFieldException {
+
+        var join = subRoot.join(this.getStringWithoutOperatorSymbols(split.get(0)));
         for (int i = 1; i < split.size() - 1; i++) {
-            String fieldName = getStringWithoutOperatorSymbols(split.get(i));
+            var fieldName = this.getStringWithoutOperatorSymbols(split.get(i));
             join = join.join(fieldName);
         }
 
-        var finalFieldName = getStringWithoutOperatorSymbols(split.get(split.size() - 1));
         var joinedPath = join.get(finalFieldName);
 
-        if (finalField == null) {
+        if (Objects.isNull(finalField)) {
             throw new NoSuchFieldException("Final field '"
                 + finalFieldName
                 + "' not found in the keychain: "
                 + keychain);
         }
 
-        return getPredicateForNestedParameterHelper(
+        var predicate = getPredicateForNestedParameterHelper(
             criteriaBuilder,
             joinedPath,
             subQuery,
             keychain,
             finalField,
             queryValue);
+        return predicate;
     }
-
 
     /**
      * Private helper method to build a predicate from a filter parameter.
      *
      * @param criteriaBuilder The criteria builder.
      * @param field           The field we're dealing with.
-     * @param root            The root query.
+     * @param path            The root query.
      * @param parameter       The parameter we're using to build a predicate from.
      * @return A predicate.
      */
     private Predicate getPredicateForParameterHelper(
         final CriteriaBuilder criteriaBuilder,
         final Field field,
-        final Root<?> root,
+        final Path<?> path,
         final QueryFilterParameter parameter) {
 
         Predicate predicate = null;
         // Attempt to derive the type from the
         // request using a combination of parsing and reflection.
         if (parameter.getValue().equalsIgnoreCase("null")) {
-            predicate = criteriaBuilder.isNull(root.get(parameter.getKey()));
+            predicate = criteriaBuilder.isNull(path.get(parameter.getKey()));
         } else if (parameter.getValue().equalsIgnoreCase("!null")) {
-            predicate = criteriaBuilder.isNotNull(root.get(parameter.getKey()));
+            predicate = criteriaBuilder.isNotNull(path.get(parameter.getKey()));
         } else {
             if (field.getType().equals(OffsetDateTime.class)) {
                 predicate = this.nonNestedPredicateBuilder.getPredicateHelperDate(
                     criteriaBuilder,
-                    root,
+                    path,
                     parameter);
             } else if (field.getType().equals(String.class)) {
                 predicate = this.nonNestedPredicateBuilder.getPredicateHelperString(
                     criteriaBuilder,
-                    root,
+                    path,
                     parameter);
             } else if (field.getType().equals(Boolean.class)) {
                 predicate = this.nonNestedPredicateBuilder.getPredicateHelperBoolean(
                     criteriaBuilder,
-                    root,
+                    path,
                     parameter);
             } else if (field.getType().equals(Integer.class)) {
                 predicate = this.nonNestedPredicateBuilder.getPredicateHelperInteger(
                     criteriaBuilder,
-                    root,
+                    path,
                     parameter);
             } else if (field.getType().equals(Float.class)) {
                 predicate = this.nonNestedPredicateBuilder.getPredicateHelperFloat(
                     criteriaBuilder,
-                    root,
+                    path,
                     parameter);
             } else if (field.getType().equals(Double.class)) {
                 predicate = this.nonNestedPredicateBuilder.getPredicateHelperDouble(
                     criteriaBuilder,
-                    root,
+                    path,
                     parameter);
             } else if (field.getType().isEnum()) {
                 predicate = this.nonNestedPredicateBuilder.getPredicateHelperEnum(
                     criteriaBuilder,
-                    root,
+                    path,
                     field,
                     parameter);
             }
@@ -647,7 +692,6 @@ public class ParameterDao<T> {
             }
         }
     }
-
 
 
     /**

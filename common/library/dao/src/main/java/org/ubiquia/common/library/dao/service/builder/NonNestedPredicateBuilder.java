@@ -1,6 +1,7 @@
 package org.ubiquia.common.library.dao.service.builder;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.lang.reflect.Field;
@@ -15,13 +16,13 @@ public class NonNestedPredicateBuilder {
      * Because even the help needs help.
      *
      * @param criteriaBuilder The criteria builder.
-     * @param root            The root query.
+     * @param path            The root query.
      * @param parameter       The parameter we're using to build a predicate from.
      * @return A predicate.
      */
     public Predicate getPredicateHelperDate(
         final CriteriaBuilder criteriaBuilder,
-        final Root<?> root,
+        final Path<?> path,
         final QueryFilterParameter parameter) {
 
         Predicate predicate = null;
@@ -30,27 +31,27 @@ public class NonNestedPredicateBuilder {
         switch (parameter.getOperator()) {
 
             case EQUAL: {
-                predicate = criteriaBuilder.equal(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.equal(path.get(parameter.getKey()), value);
             }
             break;
 
             case LESS_THAN: {
-                predicate = criteriaBuilder.lessThan(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.lessThan(path.get(parameter.getKey()), value);
             }
             break;
 
             case LESS_THAN_OR_EQUAL_TO: {
-                predicate = criteriaBuilder.lessThanOrEqualTo(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.lessThanOrEqualTo(path.get(parameter.getKey()), value);
             }
             break;
 
             case GREATER_THAN: {
-                predicate = criteriaBuilder.greaterThan(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.greaterThan(path.get(parameter.getKey()), value);
             }
             break;
 
             case GREATER_THAN_OR_EQUAL_TO: {
-                predicate = criteriaBuilder.greaterThanOrEqualTo(root.get(parameter.getKey()),
+                predicate = criteriaBuilder.greaterThanOrEqualTo(path.get(parameter.getKey()),
                     value);
             }
             break;
@@ -68,13 +69,13 @@ public class NonNestedPredicateBuilder {
      * Because even the help needs help.
      *
      * @param criteriaBuilder The criteria builder.
-     * @param root            The root query.
+     * @param path            The root query.
      * @param parameter       The parameter we're using to build a predicate from.
      * @return A predicate.
      */
     public Predicate getPredicateHelperInteger(
         final CriteriaBuilder criteriaBuilder,
-        final Root<?> root,
+        final Path<?> path,
         final QueryFilterParameter parameter) {
 
         Predicate predicate = null;
@@ -84,27 +85,27 @@ public class NonNestedPredicateBuilder {
         switch (parameter.getOperator()) {
 
             case EQUAL: {
-                predicate = criteriaBuilder.equal(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.equal(path.get(parameter.getKey()), value);
             }
             break;
 
             case LESS_THAN: {
-                predicate = criteriaBuilder.lessThan(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.lessThan(path.get(parameter.getKey()), value);
             }
             break;
 
             case LESS_THAN_OR_EQUAL_TO: {
-                predicate = criteriaBuilder.lessThanOrEqualTo(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.lessThanOrEqualTo(path.get(parameter.getKey()), value);
             }
             break;
 
             case GREATER_THAN: {
-                predicate = criteriaBuilder.greaterThan(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.greaterThan(path.get(parameter.getKey()), value);
             }
             break;
 
             case GREATER_THAN_OR_EQUAL_TO: {
-                predicate = criteriaBuilder.greaterThanOrEqualTo(root.get(parameter.getKey()),
+                predicate = criteriaBuilder.greaterThanOrEqualTo(path.get(parameter.getKey()),
                     value);
             }
             break;
@@ -123,13 +124,13 @@ public class NonNestedPredicateBuilder {
      * Because even the help needs help.
      *
      * @param criteriaBuilder The criteria builder.
-     * @param root            The root query.
+     * @param path            The root query.
      * @param parameter       The parameter we're using to build a predicate from.
      * @return A predicate.
      */
     public Predicate getPredicateHelperFloat(
         final CriteriaBuilder criteriaBuilder,
-        final Root<?> root,
+        final Path<?> path,
         final QueryFilterParameter parameter) {
 
         Predicate predicate = null;
@@ -139,27 +140,27 @@ public class NonNestedPredicateBuilder {
         switch (parameter.getOperator()) {
 
             case EQUAL: {
-                predicate = criteriaBuilder.equal(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.equal(path.get(parameter.getKey()), value);
             }
             break;
 
             case LESS_THAN: {
-                predicate = criteriaBuilder.lessThan(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.lessThan(path.get(parameter.getKey()), value);
             }
             break;
 
             case LESS_THAN_OR_EQUAL_TO: {
-                predicate = criteriaBuilder.lessThanOrEqualTo(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.lessThanOrEqualTo(path.get(parameter.getKey()), value);
             }
             break;
 
             case GREATER_THAN: {
-                predicate = criteriaBuilder.greaterThan(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.greaterThan(path.get(parameter.getKey()), value);
             }
             break;
 
             case GREATER_THAN_OR_EQUAL_TO: {
-                predicate = criteriaBuilder.greaterThanOrEqualTo(root.get(parameter.getKey()),
+                predicate = criteriaBuilder.greaterThanOrEqualTo(path.get(parameter.getKey()),
                     value);
             }
             break;
@@ -177,13 +178,13 @@ public class NonNestedPredicateBuilder {
      * Because even the help needs help.
      *
      * @param criteriaBuilder The criteria builder.
-     * @param root            The root query.
+     * @param path            The root query.
      * @param parameter       The parameter we're using to build a predicate from.
      * @return A predicate.
      */
     public Predicate getPredicateHelperDouble(
         final CriteriaBuilder criteriaBuilder,
-        final Root<?> root,
+        final Path<?> path,
         final QueryFilterParameter parameter) {
 
         Predicate predicate = null;
@@ -193,27 +194,27 @@ public class NonNestedPredicateBuilder {
         switch (parameter.getOperator()) {
 
             case EQUAL: {
-                predicate = criteriaBuilder.equal(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.equal(path.get(parameter.getKey()), value);
             }
             break;
 
             case LESS_THAN: {
-                predicate = criteriaBuilder.lessThan(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.lessThan(path.get(parameter.getKey()), value);
             }
             break;
 
             case LESS_THAN_OR_EQUAL_TO: {
-                predicate = criteriaBuilder.lessThanOrEqualTo(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.lessThanOrEqualTo(path.get(parameter.getKey()), value);
             }
             break;
 
             case GREATER_THAN: {
-                predicate = criteriaBuilder.greaterThan(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.greaterThan(path.get(parameter.getKey()), value);
             }
             break;
 
             case GREATER_THAN_OR_EQUAL_TO: {
-                predicate = criteriaBuilder.greaterThanOrEqualTo(root.get(parameter.getKey()),
+                predicate = criteriaBuilder.greaterThanOrEqualTo(path.get(parameter.getKey()),
                     value);
             }
             break;
@@ -231,14 +232,14 @@ public class NonNestedPredicateBuilder {
      * Because even the help needs help.
      *
      * @param criteriaBuilder The criteria builder.
-     * @param root            The root query.
+     * @param path            The root query.
      * @param field           The field we're casting.
      * @param parameter       The parameter we're using to build a predicate from.
      * @return A predicate.
      */
     public Predicate getPredicateHelperEnum(
         final CriteriaBuilder criteriaBuilder,
-        final Root<?> root,
+        final Path<?> path,
         final Field field,
         final QueryFilterParameter parameter) {
 
@@ -253,7 +254,7 @@ public class NonNestedPredicateBuilder {
 
             case EQUAL: {
                 predicate = criteriaBuilder.equal(
-                    root.get(parameter.getKey()),
+                    path.get(parameter.getKey()),
                     field.getType().cast(value)); // Cast type to generic run-time enum class
             }
             break;
@@ -270,13 +271,13 @@ public class NonNestedPredicateBuilder {
      * Because even the help needs help.
      *
      * @param criteriaBuilder The criteria builder.
-     * @param root            The root query.
+     * @param path            The root query.
      * @param parameter       The parameter we're using to build a predicate from.
      * @return A predicate.
      */
     public Predicate getPredicateHelperBoolean(
         final CriteriaBuilder criteriaBuilder,
-        final Root<?> root,
+        final Path<?> path,
         final QueryFilterParameter parameter) {
 
         Predicate predicate = null;
@@ -286,7 +287,7 @@ public class NonNestedPredicateBuilder {
         switch (parameter.getOperator()) {
 
             case EQUAL: {
-                predicate = criteriaBuilder.equal(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.equal(path.get(parameter.getKey()), value);
             }
             break;
 
@@ -302,13 +303,13 @@ public class NonNestedPredicateBuilder {
      * Because even the help needs help.
      *
      * @param criteriaBuilder The criteria builder.
-     * @param root            The root query.
+     * @param path            The root query.
      * @param parameter       The parameter we're using to build a predicate from.
      * @return A predicate.
      */
     public Predicate getPredicateHelperString(
         final CriteriaBuilder criteriaBuilder,
-        final Root<?> root,
+        final Path<?> path,
         final QueryFilterParameter parameter) {
 
         Predicate predicate = null;
@@ -318,34 +319,34 @@ public class NonNestedPredicateBuilder {
         switch (parameter.getOperator()) {
 
             case EQUAL: {
-                predicate = criteriaBuilder.equal(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.equal(path.get(parameter.getKey()), value);
             }
             break;
 
             case LESS_THAN: {
-                predicate = criteriaBuilder.lessThan(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.lessThan(path.get(parameter.getKey()), value);
             }
             break;
 
             case LESS_THAN_OR_EQUAL_TO: {
-                predicate = criteriaBuilder.lessThanOrEqualTo(root.get(parameter.getKey()),
+                predicate = criteriaBuilder.lessThanOrEqualTo(path.get(parameter.getKey()),
                     value);
             }
             break;
 
             case GREATER_THAN: {
-                predicate = criteriaBuilder.greaterThan(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.greaterThan(path.get(parameter.getKey()), value);
             }
             break;
 
             case GREATER_THAN_OR_EQUAL_TO: {
-                predicate = criteriaBuilder.greaterThanOrEqualTo(root.get(parameter.getKey()),
+                predicate = criteriaBuilder.greaterThanOrEqualTo(path.get(parameter.getKey()),
                     value);
             }
             break;
 
             case LIKE: {
-                predicate = criteriaBuilder.like(root.get(parameter.getKey()), value);
+                predicate = criteriaBuilder.like(path.get(parameter.getKey()), value);
             }
             break;
 
