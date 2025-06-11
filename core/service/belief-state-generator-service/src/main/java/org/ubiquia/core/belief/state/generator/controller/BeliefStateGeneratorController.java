@@ -19,7 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
 import org.ubiquia.common.model.ubiquia.embeddable.DomainGeneration;
-import org.ubiquia.core.belief.state.generator.service.BeliefStateGeneratorService;
+import org.ubiquia.core.belief.state.generator.service.generator.BeliefStateGenerator;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
 
 @RestController
@@ -29,7 +29,7 @@ public class BeliefStateGeneratorController {
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateGeneratorController.class);
 
     @Autowired
-    private BeliefStateGeneratorService beliefStateGeneratorService;
+    private BeliefStateGenerator beliefStateGenerator;
 
     @Autowired
     private FlowServiceConfig flowServiceConfig;
@@ -79,7 +79,7 @@ public class BeliefStateGeneratorController {
         }
 
         var acl = response.getBody().getContent().get(0);
-        this.beliefStateGeneratorService.generateBeliefStateFrom(acl);
+        this.beliefStateGenerator.generateBeliefStateFrom(acl);
 
         return domainGeneration;
     }

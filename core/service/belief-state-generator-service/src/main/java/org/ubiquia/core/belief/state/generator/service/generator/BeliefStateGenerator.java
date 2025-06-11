@@ -1,4 +1,4 @@
-package org.ubiquia.core.belief.state.generator.service;
+package org.ubiquia.core.belief.state.generator.service.generator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,14 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
 import org.ubiquia.core.belief.state.generator.controller.BeliefStateGeneratorController;
+import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiYamlMapper;
 
 @Service
-public class BeliefStateGeneratorService {
+public class BeliefStateGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(BeliefStateGeneratorController.class);
+    private static final Logger logger = LoggerFactory.getLogger(BeliefStateGenerator.class);
 
     @Autowired
-    private JsonSchemaToOpenApiYamlService jsonSchemaToOpenApiYamlService;
+    private JsonSchemaToOpenApiYamlMapper jsonSchemaToOpenApiYamlMapper;
+
+    @Autowired
+    private OpenApiGenerator openApiGenerator;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -26,8 +30,9 @@ public class BeliefStateGeneratorService {
         logger.info("Generating new Belief State from: {}",
             this.objectMapper.writeValueAsString(acl));
 
-        var yaml = this.jsonSchemaToOpenApiYamlService.translateJsonSchemaToOpenApiYaml(
+        var openApiYaml = this.jsonSchemaToOpenApiYamlMapper.translateJsonSchemaToOpenApiYaml(
             this.objectMapper.writeValueAsString(acl.getJsonSchema()));
-    }
 
+        this.openApiGenerator.generateOpenApiModelsFrom(openApiYaml);
+    }
 }

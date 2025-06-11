@@ -29,6 +29,7 @@ dependencies {
     implementation project(':common:library:config')
 
     implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
+    implementation "org.openapitools:openapi-generator:${OPENAPI_GENERATOR_VERSION}"
 
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${MICROMETER_VERSION}"
 

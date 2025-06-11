@@ -396,7 +396,7 @@ public class ParameterDao<T> {
         final String queryValue,
         final Class<?> rootClass) throws NoSuchFieldException {
 
-        // Determine the final class and field type for the last element of the keychain
+        // Determine the final class and field type for the last element of the keychain...
         var currentClass = rootClass;
         Class<?> previousClass = null;
         Field finalField = null;
@@ -425,7 +425,7 @@ public class ParameterDao<T> {
 
             finalField = fieldOpt.get();
 
-            // If it's a collection, resolve the generic type for the next iteration
+            // ...if it's a collection, resolve the generic type for the next iteration...
             if (Collection.class.isAssignableFrom(finalField.getType())) {
                 var collectionType = (ParameterizedType) finalField.getGenericType();
                 previousClass = currentClass;
@@ -436,13 +436,16 @@ public class ParameterDao<T> {
             }
         }
 
-        // Build the subquery using correlated joins
+        // ...build the subquery using correlated joins...
         var subQuery = criteriaQuery.subquery(currentClass);
 
         var finalFieldName = this.getStringWithoutOperatorSymbols(split.get(split.size() - 1));
 
         Predicate predicate = null;
         Root<?> subRoot = null;
+
+        // ...ensure we properly do JOINs (or not) depending on if the class is an entity,
+        // embeddable, or something else...
         if (this.entityDeriver.isEntityClass(currentClass)) {
             subRoot = subQuery.from(currentClass);
             predicate = this.getPredicatesForNestedParameterEntities(
@@ -461,6 +464,7 @@ public class ParameterDao<T> {
                 path = path.get(field);
             }
             predicate = criteriaBuilder.equal(path, queryValue);
+
         } else {
             subRoot = subQuery.correlate(root);
             predicate = this.getPredicatesForNestedParameterEntities(
