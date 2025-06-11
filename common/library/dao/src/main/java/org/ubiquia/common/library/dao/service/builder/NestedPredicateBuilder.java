@@ -1,4 +1,4 @@
-package org.ubiquia.common.library.dao.service;
+package org.ubiquia.common.library.dao.service.builder;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;

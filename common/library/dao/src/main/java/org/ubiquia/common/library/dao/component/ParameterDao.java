@@ -15,10 +15,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.ubiquia.common.library.dao.service.logic.EntityDeriver;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
-import org.ubiquia.common.library.dao.service.ClassDeriver;
-import org.ubiquia.common.library.dao.service.NestedPredicateBuilder;
-import org.ubiquia.common.library.dao.service.NonNestedPredicateBuilder;
+import org.ubiquia.common.library.dao.service.logic.ClassDeriver;
+import org.ubiquia.common.library.dao.service.builder.NestedPredicateBuilder;
+import org.ubiquia.common.library.dao.service.builder.NonNestedPredicateBuilder;
 import org.ubiquia.common.model.ubiquia.dao.QueryFilterParameter;
 import org.ubiquia.common.model.ubiquia.dao.QueryOperatorType;
 
@@ -35,6 +36,8 @@ public class ParameterDao<T> {
     private static final Logger logger = LoggerFactory.getLogger(ParameterDao.class);
     @Autowired
     private ClassDeriver classDeriver;
+    @Autowired
+    private EntityDeriver entityDeriver;
     @Autowired
     private EntityManager entityManager;
     @Autowired
@@ -429,7 +432,13 @@ public class ParameterDao<T> {
 
         // Build the subquery using correlated joins
         var subQuery = criteriaQuery.subquery(currentClass);
-        var subRoot = subQuery.correlate(root);
+
+        Root<?> subRoot = null;
+        if (this.entityDeriver.isEntityClass(currentClass)) {
+            subRoot = subQuery.from(currentClass);
+        } else {
+            subRoot = subQuery.correlate(root);
+        }
 
         var join = subRoot.join(getStringWithoutOperatorSymbols(split.get(0)));
         for (int i = 1; i < split.size() - 1; i++) {
@@ -638,6 +647,8 @@ public class ParameterDao<T> {
             }
         }
     }
+
+
 
     /**
      * Get a page request.

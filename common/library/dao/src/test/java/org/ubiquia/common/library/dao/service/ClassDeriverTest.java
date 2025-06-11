@@ -9,6 +9,7 @@ import org.ubiquia.common.library.dao.model.entity.Animal;
 import org.ubiquia.common.library.dao.model.entity.Cat;
 import org.ubiquia.common.library.dao.model.entity.Dachschund;
 import org.ubiquia.common.library.dao.model.entity.Dog;
+import org.ubiquia.common.library.dao.service.logic.ClassDeriver;
 import org.ubiquia.common.model.ubiquia.dao.QueryFilter;
 import org.ubiquia.common.model.ubiquia.dao.QueryFilterParameter;
 import org.ubiquia.common.model.ubiquia.dao.QueryOperatorType;

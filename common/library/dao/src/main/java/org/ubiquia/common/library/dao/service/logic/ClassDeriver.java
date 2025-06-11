@@ -1,4 +1,4 @@
-package org.ubiquia.common.library.dao.service;
+package org.ubiquia.common.library.dao.service.logic;
 
 import static org.reflections.scanners.Scanners.SubTypes;
 
