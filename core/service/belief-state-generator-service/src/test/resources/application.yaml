@@ -1,0 +1,54 @@
+logging:
+  level:
+    org.ubiquia: DEBUG
+
+management:
+  endpoint:
+    info:
+      enabled: true
+      java:
+        enabled: true
+      build:
+        enabled: true
+      health:
+        probes:
+          enabled: true
+        show-components: always
+        show-details: always
+      prometheus:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: info, prometheus, health, mappings
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+spring:
+  server:
+  port: 8080
+
+  application:
+    name: belief-state-generator-service
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui/index.html
+
+ubiquia:
+  agent:
+    # This is a default UUID for development purposes
+    id: 0328ca73-4d50-409f-85a8-7168ce80bd96
+  flow:
+    service:
+      port: 8080
+      url: http://ubiquia-core-flow-service
+      pollFrequencyMilliseconds: 5000
+  test:
+    acl:
+      openapi:
+        filepath: src/test/resources/pets-openapi.yaml
+      schema:
+        filepath: src/test/resources/pets-acl-json-schema.json

@@ -1,33 +1,29 @@
-package org.ubiquia.common.model.acl.entity;
+package org.ubiquia.common.model.acl.dto;
 
-import jakarta.persistence.*;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Transient;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.time.OffsetDateTime;
 import java.util.Objects;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.UpdateTimestamp;
+import java.util.Set;
+import org.ubiquia.common.model.acl.embeddable.KeyValuePair;
 
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class BaseAclEntity {
+public abstract class AbstractAclEntityDto {
 
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id = null;
 
-    @CreationTimestamp
-    @Column(updatable = false)
     private OffsetDateTime createdAt = null;
 
-    @UpdateTimestamp
     private OffsetDateTime updatedAt = null;
 
     @Transient
     private String modelType;
+
+    @ElementCollection
+    @Valid
+    private Set<KeyValuePair> tags = null;
 
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
     public String getId() {
@@ -56,11 +52,6 @@ public abstract class BaseAclEntity {
         this.updatedAt = updatedAt;
     }
 
-    /**
-     * Type of the Model.
-     *
-     * @return modelType
-     **/
     @NotNull
     public String getModelType() {
         return "BaseDomainEntity";
@@ -81,10 +72,20 @@ public abstract class BaseAclEntity {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BaseAclEntity aentity = (BaseAclEntity) o;
+        AbstractAclEntityDto aentity = (AbstractAclEntityDto) o;
 
         return
             Objects.equals(this.id, aentity.id)
                 && Objects.equals(this.modelType, aentity.modelType);
+    }
+
+
+    @Valid
+    public Set<KeyValuePair> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<KeyValuePair> tags) {
+        this.tags = tags;
     }
 }

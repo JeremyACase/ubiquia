@@ -14,6 +14,9 @@ Welcome to Ubiquia — a domain-agnostic, production-grade Multi-Agent Orchestra
     * [Getting Started: Requirements](#getting-started-requirements)
     * [Getting Started: Helm Repo](#getting-started-helm-repo)
     * [Getting Started: Installation](#getting-started-installation)
+* [For Devs](#for-devs)
+    * [For Devs: Building Ubiquia](#for-devs-building-ubiquia)
+    * [For Devs: Building Subprojects](#for-devs-building-subprojects)
 * [Contributors](#contributors)
 
 ## Ubiquia Overview
@@ -86,6 +89,28 @@ Ubiquia should be able to be installed into any Kubernetes environment using Hel
 Example Ubiquia Installation
 ```bash
 $ helm install ubiquia ubiquia-helm --values helm/configurations/featherwweight.yaml -n ubiquia
+```
+
+## For Devs
+This section will contain a handful of useful commands, topics, concepts, or otherwise for developers using the Ubiquia framework.
+
+### For Devs: Building Ubiquia
+The entire Ubiquia project can be built by invoking Gradle. This will task each subproject to build. 
+```bash
+$ ./gradlew clean build
+```
+
+### For Devs: Building Subprojects
+The subprojects of Ubiquia can be built by invoking specific subprojects via Gradle with a command.
+
+Generic Example:
+```bash
+$ ./gradlew :<folder>:<folder>:<subproject>:<command>
+```
+
+Concrete Example:
+```bash
+$ ./gradlew :core:service:flow-service:build
 ```
 
 ## Contributors

@@ -24,6 +24,10 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-validation"
     implementation "org.springframework.boot:spring-boot-starter-web"
 
+    // Adding these for now to prevent failures occurring when generating OpenAPI files from yaml
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
+
     implementation project(':common:model:ubiquia')
     implementation project(':common:library:advice')
     implementation project(':common:library:config')

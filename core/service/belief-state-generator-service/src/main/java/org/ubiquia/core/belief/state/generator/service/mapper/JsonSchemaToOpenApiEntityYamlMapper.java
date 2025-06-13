@@ -13,7 +13,7 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 @Service
-public class JsonSchemaToOpenApiYamlMapper {
+public class JsonSchemaToOpenApiEntityYamlMapper {
 
 
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateGeneratorController.class);
@@ -44,7 +44,6 @@ public class JsonSchemaToOpenApiYamlMapper {
         var schemasNode = this.objectMapper.createObjectNode();
 
         ObjectNode mainSchema = (ObjectNode) rootNode;
-        ObjectNode generatedSchema = mainSchema.deepCopy();
 
         if (mainSchema.has("definitions")) {
             var definitionsNode = (ObjectNode) mainSchema.get("definitions");
@@ -52,11 +51,8 @@ public class JsonSchemaToOpenApiYamlMapper {
             definitionsNode.fieldNames().forEachRemaining(defName -> {
                 schemasNode.set(defName, definitionsNode.get(defName));
             });
-
-            generatedSchema.remove("definitions");
         }
 
-        schemasNode.set("GeneratedSchema", generatedSchema);
         componentsNode.set("schemas", schemasNode);
         openApiNode.set("components", componentsNode);
 
