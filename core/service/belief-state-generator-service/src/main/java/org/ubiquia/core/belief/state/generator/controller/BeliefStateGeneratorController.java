@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +40,8 @@ public class BeliefStateGeneratorController {
 
     @PostMapping("/generate/domain")
     @Transactional
-    public DomainGeneration register(@RequestBody @Valid final DomainGeneration domainGeneration)
-        throws JsonProcessingException {
+    public DomainGeneration generateDomain(@RequestBody @Valid final DomainGeneration domainGeneration)
+        throws IOException {
 
         logger.info("Received a domain generation request: {}...",
             this.objectMapper.writeValueAsString(domainGeneration));

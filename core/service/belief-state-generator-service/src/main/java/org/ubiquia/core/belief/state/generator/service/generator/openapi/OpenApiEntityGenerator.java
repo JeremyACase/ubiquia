@@ -22,30 +22,27 @@ public class OpenApiEntityGenerator {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public void generateOpenApiEntitiesFrom(final String openApiYaml) {
+    public void generateOpenApiEntitiesFrom(final String openApiYaml) throws IOException {
 
         logger.debug("Generating new Belief State from: {}", openApiYaml);
 
         Path tempPath;
-        try {
-            tempPath = Files.createTempFile("openapi-spec-entity", ".yaml");
-            Files.writeString(tempPath, openApiYaml, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to write OpenAPI spec to temp file", e);
-        }
-        var specFilePath = tempPath.toAbsolutePath().toString();
+        tempPath = Files.createTempFile("openapi-spec-entity", ".yaml");
+        Files.writeString(tempPath, openApiYaml, StandardCharsets.UTF_8);
 
+        var specFilePath = tempPath.toAbsolutePath().toString();
         var templatePath = Paths.get("src/main/resources/template/java/entity")
             .toAbsolutePath()
             .toString();
 
         var configurator = new CodegenConfigurator()
             .setInputSpec(specFilePath)
-            .setGeneratorName("java")
+            .setGeneratorName("java-jpa-relation")
             .setOutputDir("generated/test")
             .setTemplateDir(templatePath)
-            .addAdditionalProperty("useBeanValidation", true)
-            .addAdditionalProperty("modelPackage", "org.ubiquia.acl.generated.entity");
+            .addAdditionalProperty("modelInheritanceSupport", true)
+            .addAdditionalProperty("modelPackage", "org.ubiquia.acl.generated.entity")
+            .addAdditionalProperty("useBeanValidation", true);
 
         configurator.setGlobalProperties(Map.of(
             "models", "",
@@ -56,8 +53,7 @@ public class OpenApiEntityGenerator {
             "apiTests", "false"
         ));
 
-        var clientOptInput = configurator.toClientOptInput();
         var generator = new DefaultGenerator();
-        generator.opts(clientOptInput).generate();
+        generator.opts(configurator.toClientOptInput()).generate();
     }
 }

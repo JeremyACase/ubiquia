@@ -2,6 +2,7 @@ package org.ubiquia.core.belief.state.generator.service.generator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class BeliefStateGenerator {
     private ObjectMapper objectMapper;
 
     public void generateBeliefStateFrom(final AgentCommunicationLanguageDto acl)
-        throws JsonProcessingException {
+        throws IOException {
 
         logger.info("Generating new Belief State from: {}",
             this.objectMapper.writeValueAsString(acl));

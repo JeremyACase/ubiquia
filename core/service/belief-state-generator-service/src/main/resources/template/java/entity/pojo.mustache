@@ -32,10 +32,10 @@
 {{^isEnum}}
 @Entity
 {{/isEnum}}
-public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}}{{^parent}}extends AbstractAclEntity {{/parent}}{{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}}{
+// debug: parent={{parent}} parentModel={{#parentModel}}{{classname}}{{/parentModel}}
+public class {{classname}}{{#parent}} extends {{{.}}}{{/parent}}{{^parent}}{{#vendorExtensions.x-is-base-class}} extends AbstractAclEntity{{/vendorExtensions.x-is-base-class}}{{/parent}}{{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}}{
 {{#serializableModel}}
     private static final long serialVersionUID = 1L;
-
 {{/serializableModel}}
 {{#vars}}
     {{#isEnum}}
@@ -73,17 +73,40 @@ public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}}{{^parent}}exten
         {{{vendorExtensions.x-field-extra-annotation}}}
     {{/vendorExtensions.x-field-extra-annotation}}
     {{^isEnum}}
-        {{^isContainer}}
-            {{#isModel}}
-        @OneToOne
-            {{/isModel}}
-        {{/isContainer}}
-        {{#isContainer}}
-            {{#items.isModel}}
-                // TODO: Identify an owning side for 1:1 and 1:many
-                @OneToMany(mappedBy = "{{classname}}", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-            {{/items.isModel}}
-        {{/isContainer}}
+        {{#vendorExtensions.x-is-one-to-one}}
+            {{#vendorExtensions.x-is-owning-side}}
+                @OneToOne(cascade = CascadeType.ALL)
+                @JoinColumn(name = "{{name}}_id")
+            {{/vendorExtensions.x-is-owning-side}}
+            {{^vendorExtensions.x-is-owning-side}}
+                @OneToOne(mappedBy = "{{vendorExtensions.x-mapped-by}}")
+            {{/vendorExtensions.x-is-owning-side}}
+        {{/vendorExtensions.x-is-one-to-one}}
+
+        {{#vendorExtensions.x-is-many-to-one}}
+            @ManyToOne
+            @JoinColumn(name = "{{name}}_id")
+        {{/vendorExtensions.x-is-many-to-one}}
+
+        {{#vendorExtensions.x-is-one-to-many}}
+            {{#vendorExtensions.x-is-owning-side}}
+                @OneToMany(cascade = CascadeType.ALL)
+                @JoinColumn(name = "{{classname | lower}}_id")
+            {{/vendorExtensions.x-is-owning-side}}
+            {{^vendorExtensions.x-is-owning-side}}
+                @OneToMany(mappedBy = "{{vendorExtensions.x-mapped-by}}", cascade = CascadeType.ALL)
+            {{/vendorExtensions.x-is-owning-side}}
+        {{/vendorExtensions.x-is-one-to-many}}
+
+        {{#vendorExtensions.x-is-many-to-many}}
+            {{#vendorExtensions.x-is-owning-side}}
+                @ManyToMany(cascade = CascadeType.ALL)
+                @JoinTable(name = "{{classname | lower}}_{{vendorExtensions.x-mapped-by}}")
+            {{/vendorExtensions.x-is-owning-side}}
+            {{^vendorExtensions.x-is-owning-side}}
+                @ManyToMany(mappedBy = "{{vendorExtensions.x-mapped-by}}")
+            {{/vendorExtensions.x-is-owning-side}}
+        {{/vendorExtensions.x-is-many-to-many}}
     {{/isEnum}}
     {{#vendorExtensions.x-is-jackson-optional-nullable}}
         {{#isContainer}}
