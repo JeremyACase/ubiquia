@@ -32,8 +32,7 @@
 {{^isEnum}}
 @Entity
 {{/isEnum}}
-// debug: parent={{parent}} parentModel={{#parentModel}}{{classname}}{{/parentModel}}
-public class {{classname}}{{#parent}} extends {{{.}}}{{/parent}}{{^parent}}{{#vendorExtensions.x-is-base-class}} extends AbstractAclEntity{{/vendorExtensions.x-is-base-class}}{{/parent}}{{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}}{
+public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}}{{^parent}}extends AbstractAclEntity {{/parent}}{{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}}{
 {{#serializableModel}}
     private static final long serialVersionUID = 1L;
 {{/serializableModel}}

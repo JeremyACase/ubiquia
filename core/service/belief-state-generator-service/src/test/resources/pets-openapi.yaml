@@ -38,6 +38,8 @@ components:
           type: string
     BaseModel:
       description: A base model.
+      discriminator:
+        propertyName: modelType
       type: object
       properties:
         modelVersion:
@@ -45,6 +47,8 @@ components:
           pattern: ^([0-9]+\.){2}(\*|[0-9]+)(-.*)?
           default: 1.2.3
           readOnly: true
+        modelType:
+          type: string
       required:
         - modelVersion
     AdoptionTransaction:

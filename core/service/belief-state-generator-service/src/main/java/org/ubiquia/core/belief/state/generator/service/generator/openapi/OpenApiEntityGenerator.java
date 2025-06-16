@@ -38,9 +38,11 @@ public class OpenApiEntityGenerator {
         var configurator = new CodegenConfigurator()
             .setInputSpec(specFilePath)
             .setGeneratorName("java-jpa-relation")
-            .setOutputDir("generated/test")
+            .setOutputDir("generated")
             .setTemplateDir(templatePath)
-            .addAdditionalProperty("modelInheritanceSupport", true)
+            .addAdditionalProperty("gson", false)
+            .addAdditionalProperty("jackson", false)
+            .addAdditionalProperty("modelPropertyNaming", "original")
             .addAdditionalProperty("modelPackage", "org.ubiquia.acl.generated.entity")
             .addAdditionalProperty("useBeanValidation", true);
 
