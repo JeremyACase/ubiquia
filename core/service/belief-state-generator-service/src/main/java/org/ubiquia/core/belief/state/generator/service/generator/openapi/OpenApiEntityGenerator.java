@@ -42,6 +42,7 @@ public class OpenApiEntityGenerator {
             .setTemplateDir(templatePath)
             .addAdditionalProperty("gson", false)
             .addAdditionalProperty("jackson", false)
+            .addAdditionalProperty("library", "native")
             .addAdditionalProperty("modelPropertyNaming", "original")
             .addAdditionalProperty("modelPackage", "org.ubiquia.acl.generated.entity")
             .addAdditionalProperty("useBeanValidation", true);

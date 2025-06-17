@@ -47,7 +47,9 @@ public class OpenApiDtoGenerator {
             .addAdditionalProperty("useBeanValidation", true)
             .addAdditionalProperty("gson", false)
             .addAdditionalProperty("jackson", false)
+            .addAdditionalProperty("library", "native")
             .addAdditionalProperty("modelPropertyNaming", "original")
+            .addAdditionalProperty("javaxPackage", "jakarta")
             .addAdditionalProperty("modelPackage", "org.ubiquia.acl.generated.dto");
 
         configurator.setGlobalProperties(Map.of(

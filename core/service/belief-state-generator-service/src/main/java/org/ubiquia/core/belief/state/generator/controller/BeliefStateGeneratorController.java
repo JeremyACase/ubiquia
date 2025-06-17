@@ -41,7 +41,7 @@ public class BeliefStateGeneratorController {
     @PostMapping("/generate/domain")
     @Transactional
     public DomainGeneration generateDomain(@RequestBody @Valid final DomainGeneration domainGeneration)
-        throws IOException {
+        throws Exception {
 
         logger.info("Received a domain generation request: {}...",
             this.objectMapper.writeValueAsString(domainGeneration));
