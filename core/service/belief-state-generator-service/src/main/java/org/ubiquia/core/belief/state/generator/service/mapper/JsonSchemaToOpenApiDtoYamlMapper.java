@@ -53,7 +53,11 @@ public class JsonSchemaToOpenApiDtoYamlMapper {
             // Then rename all schema definitions to Dto
             definitionsNode.fieldNames().forEachRemaining(defName -> {
                 var defNode = definitionsNode.get(defName);
-                schemasNode.set(defName + "Dto", defNode);
+                if (this.isEnumDefinition(defNode)) {
+                    schemasNode.set(defName, defNode); // enums: keep original name
+                } else {
+                    schemasNode.set(defName + "Dto", defNode); // others: add Dto
+                }
             });
         }
 
@@ -85,16 +89,27 @@ public class JsonSchemaToOpenApiDtoYamlMapper {
                     var ref = value.asText();
                     if (ref.startsWith("#/components/schemas/")) {
                         var schemaName = ref.substring("#/components/schemas/".length());
-                        objNode.put("$ref", "#/components/schemas/" + schemaName + "Dto");
+
+                        JsonNode targetDef = definitionsNode.get(schemaName);
+                        if (targetDef != null && this.isEnumDefinition(targetDef)) {
+                            objNode.put("$ref", "#/components/schemas/" + schemaName); // no Dto for enums
+                        } else {
+                            objNode.put("$ref", "#/components/schemas/" + schemaName + "Dto");
+                        }
                     }
                 } else {
-                    replaceRefsWithDto(value, definitionsNode);
+                    this.replaceRefsWithDto(value, definitionsNode);
                 }
             });
         } else if (node.isArray()) {
             for (var item : node) {
-                replaceRefsWithDto(item, definitionsNode);
+                this.replaceRefsWithDto(item, definitionsNode);
             }
         }
+    }
+
+    private boolean isEnumDefinition(JsonNode defNode) {
+        return defNode.has("enum") && defNode.get("enum").isArray()
+            && defNode.has("type") && "string".equals(defNode.get("type").asText());
     }
 }

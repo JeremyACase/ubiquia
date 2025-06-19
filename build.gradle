@@ -38,7 +38,8 @@ allprojects {
     apply plugin: "io.spring.dependency-management"
 
     ext {
-        APACHE_COMMON_VERSION='3.14.0'
+        //APACHE_COMMONS_IO_VERSION='2.19.0'
+        APACHE_COMMONS_VERSION='3.14.0'
         H2_VERSION='2.2.224'
         INSTANCIO_VERSION='4.3.2'
         JACKSON_VERSION='2.19.0'

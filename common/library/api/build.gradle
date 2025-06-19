@@ -13,6 +13,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-validation"
     implementation "org.springframework.boot:spring-boot-starter-web"
 
+    implementation project(':common:model:acl')
     implementation project(':common:model:ubiquia')
     implementation project(':common:library:dao')
 }

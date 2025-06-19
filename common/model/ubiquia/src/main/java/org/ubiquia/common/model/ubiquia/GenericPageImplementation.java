@@ -48,7 +48,8 @@ public class GenericPageImplementation<T> extends PageImpl<T> {
         @JsonProperty("totalPages") int totalPages,
         @JsonProperty("sort") JsonNode sort,
         @JsonProperty("first") boolean first,
-        @JsonProperty("numberOfElements") int numberOfElements) {
+        @JsonProperty("numberOfElements") int numberOfElements,
+        @JsonProperty("empty") boolean empty) {
 
         super(content, PageRequest.of(number, size), totalElements);
         this.totalElements = totalElements;

@@ -6,9 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.time.OffsetDateTime;
 import java.util.Objects;
+import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.ubiquia.common.model.acl.embeddable.KeyValuePair;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -25,6 +27,10 @@ public abstract class AbstractAclEntity {
 
     @UpdateTimestamp
     private OffsetDateTime updatedAt = null;
+
+    @ElementCollection
+    @Valid
+    private Set<KeyValuePair> tags = null;
 
     @Transient
     private String modelType;
@@ -86,5 +92,17 @@ public abstract class AbstractAclEntity {
         return
             Objects.equals(this.id, aentity.id)
                 && Objects.equals(this.modelType, aentity.modelType);
+    }
+
+    public void setModelType(String modelType) {
+        this.modelType = modelType;
+    }
+
+    public Set<KeyValuePair> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<KeyValuePair> tags) {
+        this.tags = tags;
     }
 }

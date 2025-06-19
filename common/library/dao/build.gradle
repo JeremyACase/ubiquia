@@ -13,7 +13,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation "org.springframework.boot:spring-boot-starter-web"
 
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: "${APACHE_COMMON_VERSION}"
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: "${APACHE_COMMONS_VERSION}"
     implementation group: 'org.reflections', name: 'reflections', version: "${REFLECTIONS_VERSION}"
 
     implementation project(':common:model:ubiquia')

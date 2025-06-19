@@ -115,7 +115,8 @@ public abstract class GenericUbiquiaDaoController<
             records.getTotalPages(),
             this.objectMapper.valueToTree(records.getSort()),
             records.isFirst(),
-            records.getNumberOfElements());
+            records.getNumberOfElements(),
+            records.getSort().isEmpty());
 
         return convertedPage;
     }

@@ -54,7 +54,7 @@ public abstract class AbstractAclEntityDto {
 
     @NotNull
     public String getModelType() {
-        return "BaseDomainEntity";
+        return "AbstractAclEntity";
     }
 
     @Override
@@ -87,5 +87,9 @@ public abstract class AbstractAclEntityDto {
 
     public void setTags(Set<KeyValuePair> tags) {
         this.tags = tags;
+    }
+
+    public void setModelType(String modelType) {
+        this.modelType = modelType;
     }
 }
