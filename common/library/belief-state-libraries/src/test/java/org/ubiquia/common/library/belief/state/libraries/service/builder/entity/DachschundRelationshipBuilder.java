@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.acl.generated.entity.Dachschund;
 
 @Service
-public class DachshundRelationshipBuilder extends EntityRelationshipBuilder<Dachschund> {
+public class DachschundRelationshipBuilder extends EntityRelationshipBuilder<Dachschund> {
 
-    protected static final Logger logger = LoggerFactory.getLogger(DachshundRelationshipBuilder.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DachschundRelationshipBuilder.class);
 
     @Override
     public Logger getLogger() {

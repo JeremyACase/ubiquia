@@ -29,15 +29,17 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-// Ensure our test entities are
-sourceSets {
-    test {
-        java {
-            srcDir 'src/test/java/org/ubiquia/generated/acl/entity'
-        }
+jacocoTestReport {
+    reports {
+        xml.required=true
+        csv.required=false
+        xml.destination file("./build/reports/jacoco.xml")
+        html.destination file("./build/reports/jacocoHtml")
     }
 }
 
 test {
     useJUnitPlatform()
 }
+
+build.dependsOn jacocoTestReport

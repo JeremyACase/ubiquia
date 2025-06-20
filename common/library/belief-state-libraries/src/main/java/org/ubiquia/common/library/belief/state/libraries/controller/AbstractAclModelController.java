@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,14 +21,11 @@ import org.ubiquia.common.library.api.service.builder.IngressResponseBuilder;
 import org.ubiquia.common.library.api.service.visitor.PageValidator;
 import org.ubiquia.common.library.belief.state.libraries.interfaces.InterfaceModelController;
 import org.ubiquia.common.library.belief.state.libraries.model.association.Association;
-import org.ubiquia.common.library.belief.state.libraries.model.embed.Embed;
 import org.ubiquia.common.library.belief.state.libraries.service.EntityUpdater;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.io.DtoPageBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.telemetry.MicroMeterTagsBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.command.MicroMeterCommand;
-import org.ubiquia.common.library.belief.state.libraries.service.finder.EgressMapperFinder;
 import org.ubiquia.common.library.belief.state.libraries.service.finder.EntityRepositoryFinder;
-import org.ubiquia.common.library.belief.state.libraries.service.finder.IngressMapperFinder;
 import org.ubiquia.common.library.belief.state.libraries.service.logic.AclControllerLogic;
 import org.ubiquia.common.library.dao.component.EntityDao;
 import org.ubiquia.common.model.acl.dto.AbstractAclEntityDto;
@@ -52,18 +48,14 @@ public abstract class AbstractAclModelController<
     @Autowired
     protected EntityDao<T> entityDao;
     @Autowired
-    protected EgressMapperFinder egressMapperFinder;
-    @Autowired
     protected EntityRepositoryFinder entityRepositoryFinder;
     @Autowired
     protected EntityUpdater entityUpdater;
     @Autowired
-    protected IngressMapperFinder ingressMapperFinder;
-    @Autowired
     protected DtoPageBuilder<T, D> dtoPageBuilder;
     @Autowired
     protected IngressResponseBuilder ingressResponseBuilder;
-    @Autowired (required = false)
+    @Autowired(required = false)
     protected MicroMeterCommand microMeterCommand;
     @Autowired
     protected ObjectMapper objectMapper;
@@ -251,117 +243,6 @@ public abstract class AbstractAclModelController<
         return response;
     }
 
-    @PostMapping(value = "/embed")
-    @Transactional
-    public IngressResponse embed(
-        @RequestBody Embed embed,
-        @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource)
-        throws Exception {
-
-        Timer.Sample sample = null;
-        if (Objects.nonNull(this.microMeterCommand)) {
-            sample = this.microMeterCommand.startSample();
-        }
-
-        this.getLogger().info("Received a model to embed of type: {}...",
-            embed.getToEmbed().getModelType());
-
-        var repository = this.getEntityRepository();
-        var record = repository.findById(embed.getParentId());
-
-        if (record.isEmpty()) {
-            throw new IllegalArgumentException("Cannot find record with id: "
-                + embed.getParentId());
-        }
-
-        var parentEntity = record.get();
-        var dtoFields = Arrays.stream(FieldUtils.getAllFields(this.cachedDtoClass))
-            .toList();
-        var entityFields = Arrays.stream(FieldUtils.getAllFields(this.cachedEntityClass))
-            .toList();
-        var listFields = dtoFields.stream().filter(x -> x.getType().isAssignableFrom(List.class))
-            .toList();
-        var setFields = dtoFields.stream().filter(x -> x.getType().isAssignableFrom(Set.class))
-            .toList();
-
-        Field fieldToSet = null;
-
-        // Refactor me!
-        for (var listField : listFields) {
-            var listType = (ParameterizedType) listField.getGenericType();
-            var elementClass = (Class<?>) listType.getActualTypeArguments()[0];
-            if (elementClass.isAssignableFrom(embed.getToEmbed().getClass())) {
-
-                var equivalentEntityField = entityFields
-                    .stream()
-                    .filter(x -> x.getName().equals(listField.getName()))
-                    .findFirst();
-
-                if (equivalentEntityField.isPresent()) {
-                    var ingressEntityClass = Class.forName("org.ubiquia.acl.generated.dto."
-                        + embed.getToEmbed().getModelType());
-                    var ingressMapper = this.ingressMapperFinder
-                        .findEgressMapperFor(embed.getToEmbed());
-                    var ingressEntity = (AbstractAclEntity) ingressMapper.map(
-                        embed.getToEmbed(),
-                        ingressEntityClass);
-                    fieldToSet = equivalentEntityField.get();
-                    fieldToSet.setAccessible(true);
-                    var list = (List<AbstractAclEntity>) fieldToSet.get(parentEntity);
-                    list.add(ingressEntity);
-                    fieldToSet.set(parentEntity, list);
-                    break;
-                }
-            }
-        }
-
-        for (var setField : setFields) {
-            var listType = (ParameterizedType) setField.getGenericType();
-            var elementClass = (Class<?>) listType.getActualTypeArguments()[0];
-            if (elementClass.isAssignableFrom(embed.getToEmbed().getClass())) {
-
-                var equivalentEntityField = entityFields
-                    .stream()
-                    .filter(x -> x.getName().equals(setField.getName()))
-                    .findFirst();
-
-                if (equivalentEntityField.isPresent()) {
-                    var ingressEntityClass = Class.forName("org.ubiquia.acl.generated.dto."
-                        + embed.getToEmbed().getModelType());
-                    var ingressMapper = this.ingressMapperFinder
-                        .findEgressMapperFor(embed.getToEmbed());
-                    var ingressEntity = (AbstractAclEntity) ingressMapper.map(
-                        embed.getToEmbed(),
-                        ingressEntityClass);
-                    fieldToSet = equivalentEntityField.get();
-                    fieldToSet.setAccessible(true);
-                    var set = (Set<AbstractAclEntity>) fieldToSet.get(parentEntity);
-                    set.add(ingressEntity);
-                    fieldToSet.set(parentEntity, set);
-                    break;
-                }
-            }
-        }
-
-        if (Objects.isNull(fieldToSet)) {
-            throw new IllegalArgumentException("ERROR: Failed to match object of type: "
-                + embed.getToEmbed().getModelType()
-                + " with any field for class "
-                + this.cachedDtoClass);
-        }
-
-        this.getEntityRelationshipBuilder().tryBuildRelationships(parentEntity);
-        parentEntity = repository.save(parentEntity);
-
-        var response = this.ingressResponseBuilder.buildIngressResponseFor(parentEntity);
-
-        if (Objects.nonNull(sample)) {
-            this.microMeterCommand.endSample(sample, "embed", this.tags);
-        }
-
-        return response;
-    }
-
     @PostMapping(value = "/tag/remove/{id}")
     @Transactional
     public IngressResponse removeTag(
@@ -418,8 +299,8 @@ public abstract class AbstractAclModelController<
         return keys;
     }
 
-    @GetMapping("/tags/get/values-by-key")
-    public List<String> getDistinctValuesByKey(@Param("key") String key) {
+    @GetMapping("/tags/get/values-by-key/{key}")
+    public List<String> getDistinctValuesByKey(@PathVariable("key") String key) {
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterCommand)) {
             sample = this.microMeterCommand.startSample();
@@ -678,7 +559,9 @@ public abstract class AbstractAclModelController<
      * @return A child record if one is present in the database.
      */
     @SuppressWarnings("unchecked")
-    private AbstractAclEntity getChildRecord(Field childField, final Association association) {
+    private AbstractAclEntity getChildRecord(
+        final Field childField,
+        final Association association) {
 
         childField.setAccessible(true);
 

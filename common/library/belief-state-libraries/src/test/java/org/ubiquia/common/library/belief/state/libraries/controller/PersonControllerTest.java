@@ -2,13 +2,16 @@ package org.ubiquia.common.library.belief.state.libraries.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,9 +23,11 @@ import org.ubiquia.acl.generated.dto.PersonDto;
 import org.ubiquia.common.library.belief.state.libraries.model.association.Association;
 import org.ubiquia.common.library.belief.state.libraries.model.association.ChildAssociation;
 import org.ubiquia.common.library.belief.state.libraries.model.association.ParentAssociation;
+import org.ubiquia.common.library.belief.state.libraries.model.embed.Embed;
 import org.ubiquia.common.library.belief.state.libraries.service.factory.MockFactory;
 import org.ubiquia.common.model.acl.embeddable.KeyValuePair;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
+import org.ubiquia.common.model.ubiquia.IngressResponse;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -207,5 +212,275 @@ public class PersonControllerTest {
         var tagsList = Arrays.stream(tags).toList();
 
         Assertions.assertTrue(tagsList.contains("uniqueKey"));
+    }
+
+    @Test
+    public void assertGetValuesByKey_isValid() throws Exception {
+
+        var model = this.mockFactory.generatePerson();
+        var ingressResponse = this.personController.add(model, "test");
+
+        var addTagUrl = "http://localhost:8080/ubiquia/belief-state-service/person/tag/add/"
+            + ingressResponse.getId();
+
+        var tag = new KeyValuePair();
+        tag.setKey("uniqueKey");
+        tag.setValue("uniqueValue");
+
+        this.mockMvc.perform(MockMvcRequestBuilders
+                .post(addTagUrl)
+                .content(this.objectMapper.writeValueAsString(tag))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andReturn();
+
+        var getURL = "http://localhost:8080/ubiquia/belief-state-service/person/tags/get/values-by-key/uniqueKey";
+        var result = this.mockMvc.perform(MockMvcRequestBuilders
+                .get(getURL)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andReturn();
+
+        var tagsString = result.getResponse().getContentAsString();
+        var tags = this.objectMapper.readValue(tagsString, String[].class);
+        var tagsList = Arrays.stream(tags).toList();
+
+        Assertions.assertTrue(tagsList.contains("uniqueValue"));
+    }
+
+    @Test
+    public void assertAddTags_isValid() throws Exception {
+
+        var model = this.mockFactory.generatePerson();
+        var ingressResponse = this.personController.add(model, "test");
+
+        var addTagUrl = "http://localhost:8080/ubiquia/belief-state-service/person/tag/add/"
+            + ingressResponse.getId();
+
+        var tag = new KeyValuePair();
+        tag.setKey("testKey");
+        tag.setValue("testValue");
+
+        this.mockMvc.perform(MockMvcRequestBuilders
+                .post(addTagUrl)
+                .content(this.objectMapper.writeValueAsString(tag))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andReturn();
+
+        var getURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/params";
+        var json = this.mockMvc.perform(MockMvcRequestBuilders
+                .get(getURL)
+                .accept(MediaType.APPLICATION_JSON)
+                .queryParam("page", "0")
+                .queryParam("size", "1")
+                .queryParam("id", ingressResponse.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        var result = this.objectMapper.readValue(
+            json,
+            new TypeReference<GenericPageImplementation<PersonDto>>() {
+            });
+
+        var record = result.getContent().get(0);
+        var matchingTag = record.getTags().stream().filter(x -> x
+                .getKey()
+                .equals("testKey"))
+            .findFirst();
+
+        Assertions.assertTrue(matchingTag.isPresent());
+    }
+
+    @Test
+    public void assertRemovesTag_isValid() throws Exception {
+
+        var model = this.mockFactory.generatePerson();
+        var ingressResponse = this.personController.add(model, "test");
+
+        var addTagUrl = "http://localhost:8080/ubiquia/belief-state-service/person/tag/add/"
+            + ingressResponse.getId();
+
+        var tag = new KeyValuePair();
+        tag.setKey("testKey");
+        tag.setValue("testValue");
+
+        this.mockMvc.perform(MockMvcRequestBuilders
+                .post(addTagUrl)
+                .content(this.objectMapper.writeValueAsString(tag))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andReturn();
+
+        var removeTagUrl = "http://localhost:8080/ubiquia/belief-state-service/person/tag/remove/"
+            + ingressResponse.getId();
+
+        this.mockMvc.perform(MockMvcRequestBuilders
+                .post(removeTagUrl)
+                .content(this.objectMapper.writeValueAsString(tag))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andReturn();
+
+        var getURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/params";
+        var json = this.mockMvc.perform(MockMvcRequestBuilders
+                .get(getURL)
+                .accept(MediaType.APPLICATION_JSON)
+                .queryParam("page", "0")
+                .queryParam("size", "1")
+                .queryParam("id", ingressResponse.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        var result = this.objectMapper.readValue(
+            json,
+            new TypeReference<GenericPageImplementation<PersonDto>>() {
+            });
+
+        var record = result.getContent().get(0);
+        var matchingTag = record.getTags().stream().filter(x -> x
+                .getKey()
+                .equals("testKey"))
+            .findFirst();
+
+        Assertions.assertTrue(matchingTag.isEmpty());
+    }
+
+    @Test
+    public void assertAddTagsWithInvalidId_throwsException() throws Exception {
+
+        var addTagUrl = "http://localhost:8080/ubiquia/belief-state-service/person/tag/add/"
+            + UUID.randomUUID();
+
+        var tag = new KeyValuePair();
+        tag.setKey("testKey");
+        tag.setValue("testValue");
+
+        this.mockMvc.perform(MockMvcRequestBuilders
+                .post(addTagUrl)
+                .content(this.objectMapper.writeValueAsString(tag))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+            .andReturn();
+    }
+
+    @Test
+    public void assertEmbedsModel_isValid() throws Exception {
+
+        var ween = this.mockFactory.generateWienerDog();
+        var person = this.mockFactory.generatePerson();
+
+        var personResponse = this
+            .personController
+            .add(person, "test");
+
+        var personRecord = this.personController.queryModelWithId(
+            personResponse.getId());
+
+        ween.setOwner(personRecord.getBody());
+        var weenResponse = this.animalController.add(ween, "test");
+
+        var getURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/params";
+        var json = this.mockMvc.perform(MockMvcRequestBuilders
+                .get(getURL)
+                .accept(MediaType.APPLICATION_JSON)
+                .queryParam("page", "0")
+                .queryParam("size", "1")
+                .queryParam("pets.id", weenResponse.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        var result = this.objectMapper.readValue(
+            json,
+            new TypeReference<GenericPageImplementation<PersonDto>>() {
+            });
+
+        Assertions.assertEquals(result.getContent().get(0).getId(), personResponse.getId());
+    }
+
+    @Test
+    public void assertQueriesCountWithParams_isValid() throws Exception {
+
+        var model = this.mockFactory.generatePerson();
+        var ingressResponse = this.personController.add(model, "test");
+
+        var queryURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/count/params";
+
+        var result = this.mockMvc.perform(MockMvcRequestBuilders
+                .get(queryURL)
+                .queryParam("id", ingressResponse.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andReturn();
+
+        var count = this.objectMapper.readValue(
+            result.getResponse().getContentAsString(),
+            Long.class);
+
+        Assertions.assertEquals(1L, count);
+    }
+
+    @Test
+    public void assertQueriesMultiSelectWithParams_isValid() throws Exception {
+
+        var model = this.mockFactory.generatePerson();
+        var ingressResponse = this.personController.add(model, "test");
+
+        var queryURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/multiselect/params";
+        this.mockMvc.perform(MockMvcRequestBuilders
+                .get(queryURL)
+                .queryParam("id", ingressResponse.getId())
+                .queryParam("page", "0")
+                .queryParam("size", "1")
+                .queryParam("multiselect-fields", "id")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andReturn();
+    }
+
+    @Test
+    public void assertDeletesModel_isValid() throws Exception {
+        var model = this.mockFactory.generatePerson();
+        var addUrl = "http://localhost:8080/ubiquia/belief-state-service/person/add";
+        var result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post(addUrl)
+                .content(this.objectMapper.writeValueAsString(model))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andReturn();
+
+        var ingressResponse = this.objectMapper.readValue(
+            result.getResponse().getContentAsString(),
+            IngressResponse.class);
+
+        var deleteURL = "http://localhost:8080/ubiquia/belief-state-service/person/delete/"
+            + ingressResponse.getId();
+
+        this.mockMvc.perform(MockMvcRequestBuilders
+                .delete(deleteURL)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+
+        var queried = this.personController.queryModelWithId(ingressResponse.getId());
+
+        Assertions.assertEquals(HttpStatus.NO_CONTENT, queried.getStatusCode());
     }
 }

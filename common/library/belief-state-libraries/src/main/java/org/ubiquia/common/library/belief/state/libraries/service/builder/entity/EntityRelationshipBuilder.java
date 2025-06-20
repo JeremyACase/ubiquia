@@ -113,6 +113,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
      * @throws Exception Exceptions.
      */
     @SuppressWarnings("unchecked")
+    @Transactional
     private void setBidirectionalEntityRelationship(T model, Field key, Object value)
         throws Exception {
         if (Objects.nonNull(value)) {
@@ -309,6 +310,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
         }
     }
 
+    @Transactional
     private void setBidirectionalSetRelationship(T parentModel, Field key, Object childModelValue)
         throws Exception {
         if (Objects.nonNull(childModelValue)) {

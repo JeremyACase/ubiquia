@@ -52,11 +52,6 @@ public interface InterfaceModelController<
         @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource)
         throws Exception;
 
-    IngressResponse embed(
-        @RequestBody Embed embed,
-        @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource)
-        throws Exception;
-
     IngressResponse removeTag(
         @PathVariable("id") final String id,
         @RequestBody KeyValuePair tag,

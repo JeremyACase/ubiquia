@@ -2,141 +2,241 @@ package org.ubiquia.common.library.dao.service.logic;
 
 import static org.reflections.scanners.Scanners.SubTypes;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dao.QueryFilter;
-import org.ubiquia.common.model.ubiquia.dao.QueryFilterParameter;
 
 /**
- * Service to derive the most specific class matching a given query filter or keychain.
+ * A service that will derive a class towards building predicates.
  */
 @Service
 public class ClassDeriver {
 
     private static final Logger logger = LoggerFactory.getLogger(ClassDeriver.class);
-    private final Reflections reflections = new Reflections("org.ubiquia");
+    private final Reflections reflections;
+
+    public ClassDeriver() {
+        this.reflections = new Reflections("org.ubiquia");
+    }
 
     /**
-     * Derive the most specific class for the given QueryFilter.
+     * Attempt to build our predicate class from a base class.
      *
-     * @param clazz       the root class
-     * @param queryFilter the query filter containing parameters with keychains
-     * @return the derived class
-     * @throws NoSuchFieldException if no matching field is found
+     * @param clazz       The base class.
+     * @param queryFilter The filter provided by the client.
+     * @return Either the base class or a subclass.
+     * @throws NoSuchFieldException Exception from invalid fields.
      */
     public Class<?> tryGetPredicateClass(Class<?> clazz, QueryFilter queryFilter)
         throws NoSuchFieldException {
-        var keychains = queryFilter.getParameters().stream()
-            .map(QueryFilterParameter::getKey)
-            .collect(Collectors.toList());
-        return tryGetPredicateClass(clazz, keychains);
+
+        Class predicateClass = clazz;
+
+        var candidateClasses = new ArrayList<Class>();
+        var fields = FieldUtils.getAllFieldsList(clazz);
+
+        for (var param : queryFilter.getParameters()) {
+            var split = Arrays.asList(param.getKey().split("\\."));
+            var fieldName = split.get(0);
+
+            var match = fields.stream().filter(x ->
+                x.getName().equalsIgnoreCase(fieldName)).findFirst();
+            if (match.isEmpty()) {
+                logger.debug("Could not match field name {} of class {} to any field;"
+                        + " checking subclasses...",
+                    fieldName,
+                    clazz.getSimpleName());
+
+                var subclasses = this.reflections.get(SubTypes.of(clazz).asClass());
+                for (var sub : subclasses) {
+                    fields = FieldUtils.getAllFieldsList(sub);
+                    var subField = fields.stream().filter(x -> x.getName().equalsIgnoreCase(fieldName))
+                        .findFirst();
+                    if (subField.isPresent()) {
+                        candidateClasses.add(sub);
+                    }
+                }
+
+                if (candidateClasses.size() > 1) {
+                    throw new IllegalArgumentException("ERROR: Found multiple subclasses of "
+                        + " parent class "
+                        + clazz.getSimpleName()
+                        + " with field named "
+                        + fieldName
+                        + "; no way of knowing which class was intended."
+                        + " Candidate classes: "
+                        + candidateClasses
+                    );
+                } else if (candidateClasses.size() == 1) {
+                    logger.debug("Found field name {} in subclass {} of parent class {}; "
+                            + "assuming this class as predicate...",
+                        fieldName,
+                        clazz,
+                        candidateClasses.get(0).getSimpleName());
+                    predicateClass = candidateClasses.get(0);
+                } else {
+                    throw new NoSuchFieldException("ERROR: Could not match key word "
+                        + param.getKey()
+                        + " to any field in "
+                        + clazz.getSimpleName()
+                        + " or sub classes.");
+                }
+            }
+        }
+
+        return predicateClass;
     }
 
     /**
-     * Derive the most specific class for a list of keychains.
+     * Attempt to build our predicate class from a base class.
      *
-     * @param clazz     the root class
-     * @param keychains the list of keychains
-     * @return the derived class
-     * @throws NoSuchFieldException if no matching field is found
+     * @param clazz     The base class.
+     * @param keychains The keychains provided by the client.
+     * @return Either the base class or a subclass.
+     * @throws NoSuchFieldException Exception from invalid fields.
      */
     public Class<?> tryGetPredicateClass(Class<?> clazz, List<String> keychains)
         throws NoSuchFieldException {
+        Class predicateClass = clazz;
 
-        var currentClass = clazz;
-        for (String keychain : keychains) {
-            currentClass = findBestMatchingClass(currentClass, keychain);
+        var candidateClasses = new ArrayList<Class>();
+
+        var fields = FieldUtils.getAllFieldsList(clazz);
+
+        for (var param : keychains) {
+            var split = Arrays.asList(param.split("\\."));
+            var fieldName = this.getStringWithoutOperatorSymbols(split.get(0));
+
+            var match = fields.stream().filter(x ->
+                x.getName().equalsIgnoreCase(fieldName)).findFirst();
+            if (match.isEmpty()) {
+                logger.debug("Could not match field name {} of class {} to any field;"
+                        + " checking subclasses...",
+                    fieldName,
+                    clazz.getSimpleName());
+
+                var subclasses = this.reflections.get(SubTypes.of(clazz).asClass());
+                for (var sub : subclasses) {
+                    fields = FieldUtils.getAllFieldsList(sub);
+                    var subField = fields.stream().filter(x ->
+                            x.getName().equalsIgnoreCase(fieldName))
+                        .findFirst();
+                    if (subField.isPresent()) {
+                        candidateClasses.add(sub);
+                    }
+                }
+
+                if (candidateClasses.size() > 1) {
+                    throw new IllegalArgumentException("ERROR: Found multiple subclasses of "
+                        + " parent class "
+                        + clazz.getSimpleName()
+                        + " with field named "
+                        + fieldName
+                        + "; no way of knowing which class was intended."
+                        + " Candidate classes: "
+                        + candidateClasses
+                    );
+                } else if (candidateClasses.size() == 1) {
+                    logger.debug("Found field name {} in subclass {} of parent class {}; assuming this class"
+                            + "as predicate...",
+                        fieldName,
+                        clazz,
+                        candidateClasses.get(0).getSimpleName());
+                    predicateClass = candidateClasses.get(0);
+                } else {
+                    throw new NoSuchFieldException("ERROR: Could not match key word "
+                        + param
+                        + " to any field in "
+                        + clazz.getSimpleName()
+                        + " or sub classes.");
+                }
+            }
         }
-        return currentClass;
+
+        return predicateClass;
     }
 
     /**
-     * Derive the most specific class for a single keychain.
+     * Attempt to build our predicate class from a base class.
      *
-     * @param clazz    the root class
-     * @param keychain the keychain
-     * @return the derived class
-     * @throws NoSuchFieldException if no matching field is found
+     * @param clazz    The base class.
+     * @param keychain The keychain provided by the client.
+     * @return Either the base class or a subclass.
+     * @throws NoSuchFieldException Exception from invalid fields.
      */
     public Class<?> tryGetPredicateClass(Class<?> clazz, String keychain)
         throws NoSuchFieldException {
-        return this.findBestMatchingClass(clazz, keychain);
-    }
+        Class predicateClass = clazz;
 
-    /**
-     * Given a keychain, find the class (root or subclass) containing the first segment.
-     */
-    private Class<?> findBestMatchingClass(Class<?> clazz, String keychain)
-        throws NoSuchFieldException {
+        var candidateClasses = new ArrayList<Class>();
 
-        var firstSegment = extractFirstSegment(keychain);
+        var fields = FieldUtils.getAllFieldsList(clazz);
 
-        if (hasFieldIgnoreCase(clazz, firstSegment)) {
-            return clazz;
+        var split = Arrays.asList(keychain.split("\\."));
+        var fieldName = this.getStringWithoutOperatorSymbols(split.get(0));
+
+        var match = fields.stream().filter(x ->
+            x.getName().equalsIgnoreCase(fieldName)).findFirst();
+        if (match.isEmpty()) {
+            logger.debug("Could not match field name {} of class {} to any field;"
+                    + " checking subclasses...",
+                fieldName,
+                clazz.getSimpleName());
+
+            var subclasses = this.reflections.get(SubTypes.of(clazz).asClass());
+            for (var sub : subclasses) {
+                fields = FieldUtils.getAllFieldsList(sub);
+                var subField = fields.stream().filter(x ->
+                        x.getName().equalsIgnoreCase(fieldName))
+                    .findFirst();
+                if (subField.isPresent()) {
+                    candidateClasses.add(sub);
+                }
+            }
+
+            if (candidateClasses.size() > 1) {
+                throw new IllegalArgumentException("ERROR: Found multiple subclasses of "
+                    + " parent class "
+                    + clazz.getSimpleName()
+                    + " with field named "
+                    + fieldName
+                    + "; no way of knowing which class was intended."
+                    + " Candidate classes: "
+                    + candidateClasses
+                );
+            } else if (candidateClasses.size() == 1) {
+                logger.debug("Found field name {} in subclass {} of parent class {}; assuming this class"
+                        + "as predicate...",
+                    fieldName,
+                    clazz,
+                    candidateClasses.get(0).getSimpleName());
+                predicateClass = candidateClasses.get(0);
+            } else {
+                throw new NoSuchFieldException("ERROR: Could not match key word "
+                    + keychain
+                    + " to any field in "
+                    + clazz.getSimpleName()
+                    + " or sub classes.");
+            }
         }
 
-        return findSubclassWithFieldOrThrow(clazz, firstSegment, keychain);
+        return predicateClass;
     }
 
     /**
-     * Extract the first segment of a keychain and remove operator symbols.
+     * Given a string, build and return the key without any operator symbols.
+     *
+     * @param key The key we're replacing strings from.
+     * @return A string without the symbols.
      */
-    private String extractFirstSegment(String keychain) {
-        var firstSegment = keychain.split("\\.")[0];
-        return removeOperatorSymbols(firstSegment);
-    }
-
-    /**
-     * Remove operator symbols from a key (e.g., "<", ">", "*").
-     */
-    private String removeOperatorSymbols(String key) {
-        return key.replaceAll("[<>*]", "");
-    }
-
-    /**
-     * Check if a field exists in the class (case-insensitive).
-     */
-    private boolean hasFieldIgnoreCase(Class<?> clazz, String fieldName) {
-        return FieldUtils.getAllFieldsList(clazz).stream()
-            .anyMatch(field -> field.getName().equalsIgnoreCase(fieldName));
-    }
-
-    /**
-     * Search for a subclass of the given class that contains the specified field.
-     * Throws an exception if multiple or no subclasses match.
-     */
-    private Class<?> findSubclassWithFieldOrThrow(Class<?> clazz, String fieldName, String keychain)
-        throws NoSuchFieldException {
-
-        logger.debug("Could not match field '{}' in class '{}'. Checking subclasses...",
-            fieldName, clazz.getSimpleName());
-
-        var subclasses = reflections.get(SubTypes.of(clazz).asClass());
-
-        var matchingSubclasses = subclasses.stream()
-            .filter(sub -> hasFieldIgnoreCase(sub, fieldName))
-            .toList();
-
-        if (matchingSubclasses.isEmpty()) {
-            throw new NoSuchFieldException("No field matching keychain '"
-                + keychain + "' in " + clazz.getSimpleName() + " or its subclasses.");
-        }
-
-        if (matchingSubclasses.size() > 1) {
-            throw new IllegalArgumentException("Multiple subclasses of "
-                + clazz.getSimpleName()
-                + " found with field '" + fieldName + "'. Candidates: "
-                + matchingSubclasses);
-        }
-
-        var subclass = matchingSubclasses.get(0);
-        logger.debug("Field '{}' found in subclass '{}'; using subclass as predicate.",
-            fieldName, subclass.getSimpleName());
-        return subclass;
+    private String getStringWithoutOperatorSymbols(final String key) {
+        var keyWord = key.replaceAll("[<>*]", "");
+        return keyWord;
     }
 }

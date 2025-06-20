@@ -123,22 +123,21 @@ public abstract class AbstractEgressDtoMapper<
 
         if (!Collection.class.isAssignableFrom(field.getType())) {
             isCollectionOfAclEntities = false;
-        }
+        } else {
+            try {
+                var type = (ParameterizedType) field.getGenericType();
+                var arg = type.getActualTypeArguments()[0];
 
-        try {
-            var type = (ParameterizedType) field.getGenericType();
-            var arg = type.getActualTypeArguments()[0];
+                if (arg instanceof Class<?> elementClass) {
+                    isCollectionOfAclEntities = AbstractAclEntity.class.isAssignableFrom(elementClass);
+                }
 
-            if (arg instanceof Class<?> elementClass) {
-                isCollectionOfAclEntities = AbstractAclEntity.class.isAssignableFrom(elementClass);
+            } catch (Exception e) {
+                this.getLogger().warn("Unable to inspect generic type of field: {}",
+                    field.getName(),
+                    e);
             }
-
-        } catch (Exception e) {
-            this.getLogger().warn("Unable to inspect generic type of field: {}",
-                field.getName(),
-                e);
         }
-
         return isCollectionOfAclEntities;
     }
 

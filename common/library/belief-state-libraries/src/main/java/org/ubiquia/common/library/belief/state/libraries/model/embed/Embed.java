@@ -1,5 +1,6 @@
 package org.ubiquia.common.library.belief.state.libraries.model.embed;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
@@ -14,7 +15,7 @@ public class Embed {
 
     private String parentId;
 
-    private AbstractAclEntityDto toEmbed;
+    private JsonNode toEmbed;
 
     @NotNull
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
@@ -27,11 +28,11 @@ public class Embed {
     }
 
     @NotNull
-    public AbstractAclEntityDto getToEmbed() {
+    public JsonNode getToEmbed() {
         return toEmbed;
     }
 
-    public void setToEmbed(AbstractAclEntityDto toEmbed) {
+    public void setToEmbed(JsonNode toEmbed) {
         this.toEmbed = toEmbed;
     }
 }

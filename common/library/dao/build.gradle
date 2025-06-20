@@ -24,6 +24,16 @@ dependencies {
     testImplementation group: 'org.instancio', name: 'instancio-junit', version: "${INSTANCIO_VERSION}"
 }
 
+jacocoTestReport {
+    reports {
+        xml.required=true
+        csv.required=false
+        xml.destination file("./build/reports/jacoco.xml")
+        html.destination file("./build/reports/jacocoHtml")
+    }
+}
+
+
 test {
     useJUnitPlatform()
 }
