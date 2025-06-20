@@ -16,13 +16,13 @@ public class MockFactory {
      *
      * @return A Mock model.
      */
-    public PersonDto generatePerson() {
+    public Person generatePerson() {
         var model = Instancio
-            .of(PersonDto.class)
+            .of(Person.class)
             .ignore(field(AbstractAclEntityDto::getId))
             .ignore(field(AbstractAclEntityDto::getCreatedAt))
             .ignore(field(AbstractAclEntityDto::getUpdatedAt))
-            .set(field(PersonDto::getPets), new ArrayList<>())
+            .set(field(Person::getPets), new ArrayList<>())
             .set(field(AbstractAclEntityDto::getModelType), "Person")
             .create();
         return model;
@@ -33,13 +33,13 @@ public class MockFactory {
      *
      * @return A mock model.
      */
-    public CatDto generateCat() {
+    public Cat generateCat() {
         var model = Instancio
-            .of(CatDto.class)
+            .of(Cat.class)
             .ignore(field(AbstractAclEntityDto::getId))
             .ignore(field(AbstractAclEntityDto::getCreatedAt))
             .ignore(field(AbstractAclEntityDto::getUpdatedAt))
-            .ignore(field(AnimalDto::getOwner))
+            .ignore(field(Animal::getOwner))
             .create();
         return model;
     }
@@ -49,13 +49,13 @@ public class MockFactory {
      *
      * @return A mock model.
      */
-    public SharkDto generateShark() {
+    public Shark generateShark() {
         var model = Instancio
-            .of(SharkDto.class)
+            .of(Shark.class)
             .ignore(field(AbstractAclEntityDto::getId))
             .ignore(field(AbstractAclEntityDto::getCreatedAt))
             .ignore(field(AbstractAclEntityDto::getUpdatedAt))
-            .ignore(field(AnimalDto::getOwner))
+            .ignore(field(Animal::getOwner))
             .create();
         return model;
     }
@@ -65,13 +65,13 @@ public class MockFactory {
      *
      * @return A mock model.
      */
-    public DachschundDto generateWienerDog() {
+    public Dachschund generateWienerDog() {
         var warWeen = Instancio
-            .of(DachschundDto.class)
+            .of(Dachschund.class)
             .ignore(field(AbstractAclEntityDto::getId))
             .ignore(field(AbstractAclEntityDto::getCreatedAt))
             .ignore(field(AbstractAclEntityDto::getUpdatedAt))
-            .ignore(field(AnimalDto::getOwner))
+            .ignore(field(Animal::getOwner))
             .create();
         return warWeen;
     }

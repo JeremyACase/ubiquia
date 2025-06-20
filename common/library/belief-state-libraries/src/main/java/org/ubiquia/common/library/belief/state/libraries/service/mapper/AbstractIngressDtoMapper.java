@@ -70,7 +70,8 @@ public abstract class AbstractIngressDtoMapper<
             var cast = (AbstractAclEntity) to;
 
             var clazz = Class.forName("org.ubiquia.acl.generated.entity."
-                + cast.getModelType());
+                + cast.getModelType()
+                + "Entity");
 
             for (var field : FieldUtils.getAllFields(clazz)) {
                 field.setAccessible(true);
@@ -82,7 +83,7 @@ public abstract class AbstractIngressDtoMapper<
                     if (AbstractAclEntity.class.isAssignableFrom(field.getType())) {
                         this.tryHydrateOneToOneRelationship(to, field);
 
-                        // ...else if we have a list of Ubiquia entities...
+                    // ...else if we have a list of Ubiquia entities...
                     } else if (List.class.isAssignableFrom(field.getType())) {
                         this.tryHydrateOneToManyRelationship(to, field);
                     }

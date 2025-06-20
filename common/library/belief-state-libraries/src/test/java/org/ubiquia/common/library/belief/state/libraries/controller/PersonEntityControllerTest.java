@@ -2,7 +2,6 @@ package org.ubiquia.common.library.belief.state.libraries.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
@@ -18,12 +17,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.client.RestTemplate;
-import org.ubiquia.acl.generated.dto.AnimalDto;
-import org.ubiquia.acl.generated.dto.PersonDto;
+import org.ubiquia.acl.generated.dto.Animal;
+import org.ubiquia.acl.generated.dto.Person;
 import org.ubiquia.common.library.belief.state.libraries.model.association.Association;
 import org.ubiquia.common.library.belief.state.libraries.model.association.ChildAssociation;
 import org.ubiquia.common.library.belief.state.libraries.model.association.ParentAssociation;
-import org.ubiquia.common.library.belief.state.libraries.model.embed.Embed;
 import org.ubiquia.common.library.belief.state.libraries.service.factory.MockFactory;
 import org.ubiquia.common.model.acl.embeddable.KeyValuePair;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
@@ -32,7 +30,7 @@ import org.ubiquia.common.model.ubiquia.IngressResponse;
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class PersonControllerTest {
+public class PersonEntityControllerTest {
 
     @Autowired
     private AnimalController animalController;
@@ -70,7 +68,7 @@ public class PersonControllerTest {
     @Test
     public void assertPOSTsModels_isValid() throws Exception {
 
-        var models = new ArrayList<PersonDto>();
+        var models = new ArrayList<Person>();
         models.add(this.mockFactory.generatePerson());
         models.add(this.mockFactory.generatePerson());
         models.add(this.mockFactory.generatePerson());
@@ -94,7 +92,7 @@ public class PersonControllerTest {
         var weenTwo = this.mockFactory.generateWienerDog();
         var weenThree = this.mockFactory.generateWienerDog();
 
-        var weens = new ArrayList<AnimalDto>();
+        var weens = new ArrayList<Animal>();
         weens.add(weenOne);
         weens.add(weenTwo);
         weens.add(weenThree);
@@ -125,7 +123,7 @@ public class PersonControllerTest {
 
         var result = this.objectMapper.readValue(
             json,
-            new TypeReference<GenericPageImplementation<AnimalDto>>() {
+            new TypeReference<GenericPageImplementation<Animal>>() {
             });
 
         Assertions.assertEquals(weens.size(), result.getTotalElements());
@@ -172,7 +170,7 @@ public class PersonControllerTest {
 
         var result = this.objectMapper.readValue(
             json,
-            new TypeReference<GenericPageImplementation<AnimalDto>>() {
+            new TypeReference<GenericPageImplementation<Animal>>() {
             });
 
         Assertions.assertEquals(result.getContent().get(0).getId(), weenResponse.getId());
@@ -286,7 +284,7 @@ public class PersonControllerTest {
 
         var result = this.objectMapper.readValue(
             json,
-            new TypeReference<GenericPageImplementation<PersonDto>>() {
+            new TypeReference<GenericPageImplementation<Person>>() {
             });
 
         var record = result.getContent().get(0);
@@ -345,7 +343,7 @@ public class PersonControllerTest {
 
         var result = this.objectMapper.readValue(
             json,
-            new TypeReference<GenericPageImplementation<PersonDto>>() {
+            new TypeReference<GenericPageImplementation<Person>>() {
             });
 
         var record = result.getContent().get(0);
@@ -407,7 +405,7 @@ public class PersonControllerTest {
 
         var result = this.objectMapper.readValue(
             json,
-            new TypeReference<GenericPageImplementation<PersonDto>>() {
+            new TypeReference<GenericPageImplementation<Person>>() {
             });
 
         Assertions.assertEquals(result.getContent().get(0).getId(), personResponse.getId());

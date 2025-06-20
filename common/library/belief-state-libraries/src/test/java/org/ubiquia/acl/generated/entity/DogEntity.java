@@ -16,16 +16,14 @@ package org.ubiquia.acl.generated.entity;
 
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.Entity;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
-import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
- * The model of a poodle.
+ * The model of a dog.
  */
 @JsonPropertyOrder({
-    Poodle.JSON_PROPERTY_DOG_SHOWS_WON
+    DogEntity.JSON_PROPERTY_BARK_DECIBELS
 })
 @jakarta.annotation.Generated(value = "org.ubiquia.core.belief.state.generator.service.generator.acl.UbiquiaAclEntityCodegen", date = "2025-06-18T01:59:36.137342500Z[UTC]", comments = "Generator version: 7.13.0")
 @JsonIgnoreProperties(
@@ -33,42 +31,45 @@ import java.util.Objects;
     allowSetters = true // allows the modelType to be set during deserialization
 )
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = DachschundEntity.class, name = "Dachschund"),
+    @JsonSubTypes.Type(value = PoodleEntity.class, name = "Poodle"),
+})
 
 @Entity
-public class Poodle extends Dog {
-    public static final String JSON_PROPERTY_DOG_SHOWS_WON = "dogShowsWon";
+public class DogEntity extends AnimalEntity {
+    public static final String JSON_PROPERTY_BARK_DECIBELS = "barkDecibels";
     @jakarta.annotation.Nullable
 
 
-    private BigDecimal dogShowsWon = new BigDecimal("0");
+    protected Float barkDecibels;
 
-    public Poodle dogShowsWon(@jakarta.annotation.Nullable BigDecimal dogShowsWon) {
+    public DogEntity barkDecibels(@jakarta.annotation.Nullable Float barkDecibels) {
 
-        this.dogShowsWon = dogShowsWon;
+        this.barkDecibels = barkDecibels;
         return this;
     }
 
     /**
-     * Get dogShowsWon
+     * Get barkDecibels
      * minimum: 0
      *
-     * @return dogShowsWon
+     * @return barkDecibels
      */
     @jakarta.annotation.Nullable
-    @Valid
     @DecimalMin("0")
-    @JsonProperty(JSON_PROPERTY_DOG_SHOWS_WON)
+    @JsonProperty(JSON_PROPERTY_BARK_DECIBELS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-    public BigDecimal getDogShowsWon() {
-        return dogShowsWon;
+    public Float getBarkDecibels() {
+        return barkDecibels;
     }
 
 
-    @JsonProperty(JSON_PROPERTY_DOG_SHOWS_WON)
+    @JsonProperty(JSON_PROPERTY_BARK_DECIBELS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setDogShowsWon(@jakarta.annotation.Nullable BigDecimal dogShowsWon) {
-        this.dogShowsWon = dogShowsWon;
+    public void setBarkDecibels(@jakarta.annotation.Nullable Float barkDecibels) {
+        this.barkDecibels = barkDecibels;
     }
 
     @Override
@@ -79,22 +80,22 @@ public class Poodle extends Dog {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Poodle poodle = (Poodle) o;
-        return Objects.equals(this.dogShowsWon, poodle.dogShowsWon) &&
+        DogEntity dogEntity = (DogEntity) o;
+        return Objects.equals(this.barkDecibels, dogEntity.barkDecibels) &&
             super.equals(o);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(dogShowsWon, super.hashCode());
+        return Objects.hash(barkDecibels, super.hashCode());
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("class Poodle {\n");
+        sb.append("class Dog {\n");
         sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-        sb.append("    dogShowsWon: ").append(toIndentedString(dogShowsWon)).append("\n");
+        sb.append("    barkDecibels: ").append(toIndentedString(barkDecibels)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -110,9 +111,10 @@ public class Poodle extends Dog {
         return o.toString().replace("\n", "\n    ");
     }
 
+
     @Override
     public String getModelType() {
-        return "Poodle";
+        return "Dog";
     }
 
 }

@@ -38,20 +38,20 @@ Example: In a document-based database, a developer can easily POST the following
 {
   "id": "a5c2e1f3-9bd4-4f7a-a3e9-2b3e21c4bcb1",
   "modelType": "Sensor",
-  "name": "Example Sensor",
+  "nameEntity": "Example Sensor",
   "status": "ACTIVE",
   "lastCalibrated": "2024-11-15T13:45:00Z",
   "location": {
     "id": "b9175ea2-e7c4-403e-8c87-6c77a06ebf94",
     "modelType": "Location",
-    "name": "Data Center East Wing",
+    "nameEntity": "Data Center East Wing",
     "floor": 2,
     "building": "HQ"
   },
   "linkedSensor": {
     "id": "27adf1fa-73d2-4982-bd9e-50d8c1db6c42",
     "modelType": "Sensor",
-    "name": "Another Example Sensor",
+    "nameEntity": "Another Example Sensor",
     "status": "STANDBY"
   }
 }
@@ -68,7 +68,7 @@ Example: In a relational database, the JSON can be collapsed, assuming **foreign
 {
   "id": "a5c2e1f3-9bd4-4f7a-a3e9-2b3e21c4bcb1",
   "modelType": "Sensor",
-  "name": "Example Sensor",
+  "nameEntity": "Example Sensor",
   "status": "ACTIVE",
   "lastCalibrated": "2024-11-15T13:45:00Z",
   "locationId": "b9175ea2-e7c4-403e-8c87-6c77a06ebf94",
@@ -108,7 +108,7 @@ Database entities have to be related to each other, but we should not egress any
 {
   "id": "a5c2e1f3-9bd4-4f7a-a3e9-2b3e21c4bcb1",
   "modelType": "Sensor",
-  "name": "Example Sensor",
+  "nameEntity": "Example Sensor",
   "status": "ACTIVE",
   "lastCalibrated": "2024-11-15T13:45:00Z",
   "locationId": "b9175ea2-e7c4-403e-8c87-6c77a06ebf94",
@@ -119,7 +119,7 @@ Database entities have to be related to each other, but we should not egress any
 CREATE TABLE sensor (
   id UUID PRIMARY KEY,
   model_type TEXT,
-  name TEXT,
+  nameEntity TEXT,
   status TEXT,
   last_calibrated TIMESTAMP,
   location_id UUID
@@ -130,7 +130,7 @@ CREATE TABLE sensor (
 {
   "id": "b5c2e1f3-9bd4-4f7a-a3e9-2b3e21c4bcb1",
   "modelType": "Observation",
-  "name": "Example Observation",
+  "nameEntity": "Example Observation",
   "sensorId": "a5c2e1f3-9bd4-4f7a-a3e9-2b3e21c4bcb1",
 }
 ```
@@ -139,7 +139,7 @@ CREATE TABLE sensor (
 CREATE TABLE observation (
   id UUID PRIMARY KEY
   sensor_id UUID,
-  name TEXT,
+  nameEntity TEXT,
 )
 ```
 
@@ -157,13 +157,13 @@ You'd get this response:
     {
       "id": "b5c2e1f3-9bd4-4f7a-a3e9-2b3e21c4bcb1",
       "modelType": "Observation",
-      "name": "Example Observation",
+      "nameEntity": "Example Observation",
       "sensorId": "a5c2e1f3-9bd4-4f7a-a3e9-2b3e21c4bcb1",
     },
     {
       "id": "56643fb3-b97b-4289-99c2-c47ec25648fd",
       "modelType": "Observation",
-      "name": "Example Observation",
+      "nameEntity": "Example Observation",
       "sensorId": "a5c2e1f3-9bd4-4f7a-a3e9-2b3e21c4bcb1",
     },
   ],
@@ -198,12 +198,12 @@ You'd get this response:
 ## Implementation
 Implementation should look like the Belief State "implementing" an Agent Communication Language and creating database schemas from it. This should happen at registration-time, and should happen transparently to clients. Implementation will have to make some **rather strong assumptions**. For example, any "list" field becomes either a 1:many or many:many relationship, provided a corresponding bidirectional relationship.
 
-Consider the following example of a person with pets. The Belief State generation process should assume that there is a 1:many relationship between a Person and Pets, and create the normalized relationship in the database. However, the "many" half of the relationship will never be egressed to clients.
+Consider the following example of a personEntity with pets. The Belief State generation process should assume that there is a 1:many relationship between a Person and Pets, and create the normalized relationship in the database. However, the "many" half of the relationship will never be egressed to clients.
 
 ```json
 {
   "Person": {
-    "description": "A model of a person.",
+    "description": "A model of a personEntity.",
     "type": "object",
     "allOf": [
       {
@@ -214,7 +214,7 @@ Consider the following example of a person with pets. The Belief State generatio
       "hairColor": {
         "$ref": "#/definitions/ColorType"
       },
-      "name": {
+      "nameEntity": {
         "$ref": "#/definitions/Name"
       },
       "pets": {
@@ -229,7 +229,7 @@ Consider the following example of a person with pets. The Belief State generatio
     ]
   },
   "Animal": {
-    "description": "The model of an animal.",
+    "description": "The model of an animalEntity.",
     "allOf": [
       {
         "$ref": "#/definitions/BaseModel"

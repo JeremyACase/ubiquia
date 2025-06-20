@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.ubiquia.acl.generated.dto.PersonDto;
-import org.ubiquia.acl.generated.entity.Person;
+import org.ubiquia.acl.generated.dto.Person;
+import org.ubiquia.acl.generated.entity.PersonEntity;
 import org.ubiquia.common.library.belief.state.libraries.repository.PersonRepository;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.PersonRelationshipBuilder;
@@ -14,14 +14,14 @@ import org.ubiquia.common.library.belief.state.libraries.service.mapper.Abstract
 
 @RestController
 @RequestMapping("/ubiquia/belief-state-service/person")
-public class PersonController extends AbstractAclModelController<Person, PersonDto> {
+public class PersonController extends AbstractAclModelController<PersonEntity, Person> {
 
 
     private static final Logger logger = LoggerFactory.getLogger(PersonController.class);
     @Autowired
     protected PersonRelationshipBuilder entityRelationshipBuilder;
     @Autowired
-    private AbstractIngressDtoMapper<PersonDto, Person> ingressMapper;
+    private AbstractIngressDtoMapper<Person, PersonEntity> ingressMapper;
     @Autowired
     private PersonRepository entityRepository;
 
@@ -31,12 +31,12 @@ public class PersonController extends AbstractAclModelController<Person, PersonD
     }
 
     @Override
-    public EntityRelationshipBuilder<Person> getEntityRelationshipBuilder() {
+    public EntityRelationshipBuilder<PersonEntity> getEntityRelationshipBuilder() {
         return this.entityRelationshipBuilder;
     }
 
     @Override
-    public AbstractIngressDtoMapper<PersonDto, Person> getIngressMapper() {
+    public AbstractIngressDtoMapper<Person, PersonEntity> getIngressMapper() {
         return this.ingressMapper;
     }
 

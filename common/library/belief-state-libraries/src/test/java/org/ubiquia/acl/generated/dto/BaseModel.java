@@ -15,8 +15,6 @@ package org.ubiquia.acl.generated.dto;
 
 
 import com.fasterxml.jackson.annotation.*;
-import jakarta.validation.constraints.Pattern;
-import java.util.Objects;
 import org.ubiquia.common.model.acl.dto.AbstractAclEntityDto;
 
 /**
@@ -29,17 +27,17 @@ import org.ubiquia.common.model.acl.dto.AbstractAclEntityDto;
     property = "modelType",
     visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = AdoptionTransactionDto.class, name = "AdoptionTransaction"),
-    @JsonSubTypes.Type(value = AnimalDto.class, name = "Animal"),
-    @JsonSubTypes.Type(value = CatDto.class, name = "Cat"),
-    @JsonSubTypes.Type(value = DachschundDto.class, name = "Dachschund"),
-    @JsonSubTypes.Type(value = DogDto.class, name = "Dog"),
-    @JsonSubTypes.Type(value = PersonDto.class, name = "Person"),
-    @JsonSubTypes.Type(value = PoodleDto.class, name = "Poodle"),
-    @JsonSubTypes.Type(value = SharkDto.class, name = "Shark"),
+    @JsonSubTypes.Type(value = AdoptionTransaction.class, name = "AdoptionTransaction"),
+    @JsonSubTypes.Type(value = Animal.class, name = "Animal"),
+    @JsonSubTypes.Type(value = Cat.class, name = "Cat"),
+    @JsonSubTypes.Type(value = Dachschund.class, name = "Dachschund"),
+    @JsonSubTypes.Type(value = Dog.class, name = "Dog"),
+    @JsonSubTypes.Type(value = Person.class, name = "Person"),
+    @JsonSubTypes.Type(value = Poodle.class, name = "Poodle"),
+    @JsonSubTypes.Type(value = Shark.class, name = "Shark"),
 })
 
-public class BaseModelDto extends AbstractAclEntityDto {
+public class BaseModel extends AbstractAclEntityDto {
 
 
     /**

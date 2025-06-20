@@ -25,8 +25,8 @@ import java.util.Objects;
  * A transaction of a transaction.
  */
 @JsonPropertyOrder({
-    AdoptionTransaction.JSON_PROPERTY_OWNER,
-    AdoptionTransaction.JSON_PROPERTY_PET
+    AdoptionTransactionEntity.JSON_PROPERTY_OWNER,
+    AdoptionTransactionEntity.JSON_PROPERTY_PET
 })
 @jakarta.annotation.Generated(value = "org.ubiquia.core.belief.state.generator.service.generator.acl.UbiquiaAclEntityCodegen", date = "2025-06-18T01:59:36.137342500Z[UTC]", comments = "Generator version: 7.13.0")
 @JsonIgnoreProperties(
@@ -36,7 +36,7 @@ import java.util.Objects;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
 
 @Entity
-public class AdoptionTransaction extends BaseModel {
+public class AdoptionTransactionEntity extends BaseModelEntity {
     public static final String JSON_PROPERTY_OWNER = "owner";
     public static final String JSON_PROPERTY_PET = "pet";
     @jakarta.annotation.Nullable
@@ -44,19 +44,19 @@ public class AdoptionTransaction extends BaseModel {
     @JoinColumn(name = "owner_id")
 
 
-    private Person owner;
+    private PersonEntity owner;
     @jakarta.annotation.Nullable
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "pet_id")
 
 
-    private Animal pet;
+    private AnimalEntity pet;
 
-    public AdoptionTransaction() {
+    public AdoptionTransactionEntity() {
 
     }
 
-    public AdoptionTransaction owner(@jakarta.annotation.Nullable Person owner) {
+    public AdoptionTransactionEntity owner(@jakarta.annotation.Nullable PersonEntity owner) {
 
         this.owner = owner;
         return this;
@@ -73,18 +73,18 @@ public class AdoptionTransaction extends BaseModel {
     @JsonProperty(JSON_PROPERTY_OWNER)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-    public Person getOwner() {
+    public PersonEntity getOwner() {
         return owner;
     }
 
 
     @JsonProperty(JSON_PROPERTY_OWNER)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setOwner(@jakarta.annotation.Nullable Person owner) {
+    public void setOwner(@jakarta.annotation.Nullable PersonEntity owner) {
         this.owner = owner;
     }
 
-    public AdoptionTransaction pet(@jakarta.annotation.Nullable Animal pet) {
+    public AdoptionTransactionEntity pet(@jakarta.annotation.Nullable AnimalEntity pet) {
 
         this.pet = pet;
         return this;
@@ -101,14 +101,14 @@ public class AdoptionTransaction extends BaseModel {
     @JsonProperty(JSON_PROPERTY_PET)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-    public Animal getPet() {
+    public AnimalEntity getPet() {
         return pet;
     }
 
 
     @JsonProperty(JSON_PROPERTY_PET)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setPet(@jakarta.annotation.Nullable Animal pet) {
+    public void setPet(@jakarta.annotation.Nullable AnimalEntity pet) {
         this.pet = pet;
     }
 
@@ -120,9 +120,9 @@ public class AdoptionTransaction extends BaseModel {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AdoptionTransaction adoptionTransaction = (AdoptionTransaction) o;
-        return Objects.equals(this.owner, adoptionTransaction.owner) &&
-            Objects.equals(this.pet, adoptionTransaction.pet) &&
+        AdoptionTransactionEntity adoptionTransactionEntity = (AdoptionTransactionEntity) o;
+        return Objects.equals(this.owner, adoptionTransactionEntity.owner) &&
+            Objects.equals(this.pet, adoptionTransactionEntity.pet) &&
             super.equals(o);
     }
 

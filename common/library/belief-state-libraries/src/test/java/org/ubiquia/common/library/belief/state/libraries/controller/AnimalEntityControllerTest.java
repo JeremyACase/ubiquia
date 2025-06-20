@@ -15,15 +15,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.client.RestTemplate;
-import org.ubiquia.acl.generated.dto.AnimalDto;
-import org.ubiquia.acl.generated.dto.PersonDto;
+import org.ubiquia.acl.generated.dto.Animal;
+import org.ubiquia.acl.generated.dto.Person;
 import org.ubiquia.common.library.belief.state.libraries.service.factory.MockFactory;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class AnimalControllerTest {
+public class AnimalEntityControllerTest {
 
     @Autowired
     private AnimalController animalController;
@@ -48,7 +48,7 @@ public class AnimalControllerTest {
         var weenTwo = this.mockFactory.generateWienerDog();
         var weenThree = this.mockFactory.generateWienerDog();
 
-        var weens = new ArrayList<AnimalDto>();
+        var weens = new ArrayList<Animal>();
         weens.add(weenOne);
         weens.add(weenTwo);
         weens.add(weenThree);
@@ -79,7 +79,7 @@ public class AnimalControllerTest {
 
         var result = this.objectMapper.readValue(
             json,
-            new TypeReference<GenericPageImplementation<AnimalDto>>() {
+            new TypeReference<GenericPageImplementation<Animal>>() {
             });
 
         var anyNull = false;
@@ -101,7 +101,7 @@ public class AnimalControllerTest {
         var weenTwo = this.mockFactory.generateWienerDog();
         var weenThree = this.mockFactory.generateWienerDog();
 
-        var weens = new ArrayList<AnimalDto>();
+        var weens = new ArrayList<Animal>();
         weens.add(weenOne);
         weens.add(weenTwo);
         weens.add(weenThree);
@@ -132,7 +132,7 @@ public class AnimalControllerTest {
 
         var result = this.objectMapper.readValue(
             json,
-            new TypeReference<GenericPageImplementation<PersonDto>>() {
+            new TypeReference<GenericPageImplementation<Person>>() {
             });
 
         var allNull = true;

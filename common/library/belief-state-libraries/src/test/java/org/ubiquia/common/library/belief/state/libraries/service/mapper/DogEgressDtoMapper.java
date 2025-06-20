@@ -3,11 +3,11 @@ package org.ubiquia.common.library.belief.state.libraries.service.mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.ubiquia.acl.generated.dto.DogDto;
-import org.ubiquia.acl.generated.entity.Dog;
+import org.ubiquia.acl.generated.dto.Dog;
+import org.ubiquia.acl.generated.entity.DogEntity;
 
 @Component
-public class DogEgressDtoMapper extends AbstractEgressDtoMapper<Dog, DogDto> {
+public class DogEgressDtoMapper extends AbstractEgressDtoMapper<DogEntity, Dog> {
 
     protected static final Logger logger = LoggerFactory.getLogger(DogEgressDtoMapper.class);
 
@@ -17,8 +17,8 @@ public class DogEgressDtoMapper extends AbstractEgressDtoMapper<Dog, DogDto> {
     }
 
     @Override
-    public DogDto getNewDto() {
-        return new DogDto();
+    public Dog getNewDto() {
+        return new Dog();
     }
 
 

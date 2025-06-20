@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.ubiquia.common.library.belief.state.libraries.model.association.Association;
-import org.ubiquia.common.library.belief.state.libraries.model.embed.Embed;
 import org.ubiquia.common.library.belief.state.libraries.repository.EntityRepository;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractIngressDtoMapper;

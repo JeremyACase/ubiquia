@@ -25,11 +25,11 @@ import org.ubiquia.acl.generated.enums.ColorType;
  * The model of an animal.
  */
 @JsonPropertyOrder({
-    Animal.JSON_PROPERTY_COLOR,
-    Animal.JSON_PROPERTY_OWNER,
-    Animal.JSON_PROPERTY_NAME,
-    Animal.JSON_PROPERTY_HEIGHT,
-    Animal.JSON_PROPERTY_WEIGHT
+    AnimalEntity.JSON_PROPERTY_COLOR,
+    AnimalEntity.JSON_PROPERTY_OWNER,
+    AnimalEntity.JSON_PROPERTY_NAME,
+    AnimalEntity.JSON_PROPERTY_HEIGHT,
+    AnimalEntity.JSON_PROPERTY_WEIGHT
 })
 @jakarta.annotation.Generated(value = "org.ubiquia.core.belief.state.generator.service.generator.acl.UbiquiaAclEntityCodegen", date = "2025-06-18T01:59:36.137342500Z[UTC]", comments = "Generator version: 7.13.0")
 @JsonIgnoreProperties(
@@ -38,15 +38,15 @@ import org.ubiquia.acl.generated.enums.ColorType;
 )
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = Cat.class, name = "Cat"),
-    @JsonSubTypes.Type(value = Dachschund.class, name = "Dachschund"),
-    @JsonSubTypes.Type(value = Dog.class, name = "Dog"),
-    @JsonSubTypes.Type(value = Poodle.class, name = "Poodle"),
-    @JsonSubTypes.Type(value = Shark.class, name = "Shark"),
+    @JsonSubTypes.Type(value = CatEntity.class, name = "Cat"),
+    @JsonSubTypes.Type(value = DachschundEntity.class, name = "Dachschund"),
+    @JsonSubTypes.Type(value = DogEntity.class, name = "Dog"),
+    @JsonSubTypes.Type(value = PoodleEntity.class, name = "Poodle"),
+    @JsonSubTypes.Type(value = SharkEntity.class, name = "Shark"),
 })
 
 @Entity
-public class Animal extends BaseModel {
+public class AnimalEntity extends BaseModelEntity {
     public static final String JSON_PROPERTY_COLOR = "color";
     public static final String JSON_PROPERTY_OWNER = "owner";
     public static final String JSON_PROPERTY_NAME = "name";
@@ -62,13 +62,13 @@ public class Animal extends BaseModel {
     @JoinColumn(name = "owner_id")
 
 
-    protected Person owner;
+    protected PersonEntity owner;
     @jakarta.annotation.Nullable
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "name_id")
 
 
-    protected Name name;
+    protected NameEntity nameEntity;
     @jakarta.annotation.Nullable
 
 
@@ -78,11 +78,11 @@ public class Animal extends BaseModel {
 
     protected Float weight;
 
-    public Animal() {
+    public AnimalEntity() {
 
     }
 
-    public Animal color(@jakarta.annotation.Nullable ColorType color) {
+    public AnimalEntity color(@jakarta.annotation.Nullable ColorType color) {
 
         this.color = color;
         return this;
@@ -110,7 +110,7 @@ public class Animal extends BaseModel {
         this.color = color;
     }
 
-    public Animal owner(@jakarta.annotation.Nullable Person owner) {
+    public AnimalEntity owner(@jakarta.annotation.Nullable PersonEntity owner) {
 
         this.owner = owner;
         return this;
@@ -127,20 +127,20 @@ public class Animal extends BaseModel {
     @JsonProperty(JSON_PROPERTY_OWNER)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-    public Person getOwner() {
+    public PersonEntity getOwner() {
         return owner;
     }
 
 
     @JsonProperty(JSON_PROPERTY_OWNER)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setOwner(@jakarta.annotation.Nullable Person owner) {
+    public void setOwner(@jakarta.annotation.Nullable PersonEntity owner) {
         this.owner = owner;
     }
 
-    public Animal name(@jakarta.annotation.Nullable Name name) {
+    public AnimalEntity name(@jakarta.annotation.Nullable NameEntity nameEntity) {
 
-        this.name = name;
+        this.nameEntity = nameEntity;
         return this;
     }
 
@@ -155,18 +155,18 @@ public class Animal extends BaseModel {
     @JsonProperty(JSON_PROPERTY_NAME)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-    public Name getName() {
-        return name;
+    public NameEntity getName() {
+        return nameEntity;
     }
 
 
     @JsonProperty(JSON_PROPERTY_NAME)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setName(@jakarta.annotation.Nullable Name name) {
-        this.name = name;
+    public void setName(@jakarta.annotation.Nullable NameEntity nameEntity) {
+        this.nameEntity = nameEntity;
     }
 
-    public Animal height(@jakarta.annotation.Nullable Float height) {
+    public AnimalEntity height(@jakarta.annotation.Nullable Float height) {
 
         this.height = height;
         return this;
@@ -194,7 +194,7 @@ public class Animal extends BaseModel {
         this.height = height;
     }
 
-    public Animal weight(@jakarta.annotation.Nullable Float weight) {
+    public AnimalEntity weight(@jakarta.annotation.Nullable Float weight) {
 
         this.weight = weight;
         return this;
@@ -230,18 +230,18 @@ public class Animal extends BaseModel {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Animal animal = (Animal) o;
-        return Objects.equals(this.color, animal.color) &&
-            Objects.equals(this.owner, animal.owner) &&
-            Objects.equals(this.name, animal.name) &&
-            Objects.equals(this.height, animal.height) &&
-            Objects.equals(this.weight, animal.weight) &&
+        AnimalEntity animalEntity = (AnimalEntity) o;
+        return Objects.equals(this.color, animalEntity.color) &&
+            Objects.equals(this.owner, animalEntity.owner) &&
+            Objects.equals(this.nameEntity, animalEntity.nameEntity) &&
+            Objects.equals(this.height, animalEntity.height) &&
+            Objects.equals(this.weight, animalEntity.weight) &&
             super.equals(o);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(color, owner, name, height, weight, super.hashCode());
+        return Objects.hash(color, owner, nameEntity, height, weight, super.hashCode());
     }
 
     @Override
@@ -251,7 +251,7 @@ public class Animal extends BaseModel {
         sb.append("    ").append(toIndentedString(super.toString())).append("\n");
         sb.append("    color: ").append(toIndentedString(color)).append("\n");
         sb.append("    owner: ").append(toIndentedString(owner)).append("\n");
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    name: ").append(toIndentedString(nameEntity)).append("\n");
         sb.append("    height: ").append(toIndentedString(height)).append("\n");
         sb.append("    weight: ").append(toIndentedString(weight)).append("\n");
         sb.append("}");

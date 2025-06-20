@@ -24,23 +24,23 @@ import org.ubiquia.acl.generated.enums.ColorType;
  * The model of an animal.
  */
 @JsonPropertyOrder({
-    AnimalDto.JSON_PROPERTY_COLOR,
-    AnimalDto.JSON_PROPERTY_OWNER,
-    AnimalDto.JSON_PROPERTY_NAME,
-    AnimalDto.JSON_PROPERTY_HEIGHT,
-    AnimalDto.JSON_PROPERTY_WEIGHT
+    Animal.JSON_PROPERTY_COLOR,
+    Animal.JSON_PROPERTY_OWNER,
+    Animal.JSON_PROPERTY_NAME,
+    Animal.JSON_PROPERTY_HEIGHT,
+    Animal.JSON_PROPERTY_WEIGHT
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = CatDto.class, name = "Cat"),
-    @JsonSubTypes.Type(value = DachschundDto.class, name = "Dachschund"),
-    @JsonSubTypes.Type(value = DogDto.class, name = "Dog"),
-    @JsonSubTypes.Type(value = PoodleDto.class, name = "Poodle"),
-    @JsonSubTypes.Type(value = SharkDto.class, name = "Shark"),
+    @JsonSubTypes.Type(value = Cat.class, name = "Cat"),
+    @JsonSubTypes.Type(value = Dachschund.class, name = "Dachschund"),
+    @JsonSubTypes.Type(value = Dog.class, name = "Dog"),
+    @JsonSubTypes.Type(value = Poodle.class, name = "Poodle"),
+    @JsonSubTypes.Type(value = Shark.class, name = "Shark"),
 })
 
-public class AnimalDto extends BaseModelDto {
+public class Animal extends BaseModel {
     public static final String JSON_PROPERTY_COLOR = "color";
     public static final String JSON_PROPERTY_OWNER = "owner";
     public static final String JSON_PROPERTY_NAME = "name";
@@ -49,9 +49,9 @@ public class AnimalDto extends BaseModelDto {
     @jakarta.annotation.Nullable
     protected ColorType color;
     @jakarta.annotation.Nullable
-    protected PersonDto owner;
+    protected Person owner;
     @jakarta.annotation.Nullable
-    protected NameDto name;
+    protected Name name;
     @jakarta.annotation.Nullable
     protected Float height;
     @jakarta.annotation.Nullable
@@ -79,7 +79,7 @@ public class AnimalDto extends BaseModelDto {
         this.color = color;
     }
 
-    public AnimalDto owner(@jakarta.annotation.Nullable PersonDto owner) {
+    public Animal owner(@jakarta.annotation.Nullable Person owner) {
 
         this.owner = owner;
         return this;
@@ -96,18 +96,18 @@ public class AnimalDto extends BaseModelDto {
     @JsonProperty(JSON_PROPERTY_OWNER)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-    public PersonDto getOwner() {
+    public Person getOwner() {
         return owner;
     }
 
 
     @JsonProperty(JSON_PROPERTY_OWNER)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setOwner(@jakarta.annotation.Nullable PersonDto owner) {
+    public void setOwner(@jakarta.annotation.Nullable Person owner) {
         this.owner = owner;
     }
 
-    public AnimalDto name(@jakarta.annotation.Nullable NameDto name) {
+    public Animal name(@jakarta.annotation.Nullable Name name) {
 
         this.name = name;
         return this;
@@ -124,18 +124,18 @@ public class AnimalDto extends BaseModelDto {
     @JsonProperty(JSON_PROPERTY_NAME)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-    public NameDto getName() {
+    public Name getName() {
         return name;
     }
 
 
     @JsonProperty(JSON_PROPERTY_NAME)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setName(@jakarta.annotation.Nullable NameDto name) {
+    public void setName(@jakarta.annotation.Nullable Name name) {
         this.name = name;
     }
 
-    public AnimalDto height(@jakarta.annotation.Nullable Float height) {
+    public Animal height(@jakarta.annotation.Nullable Float height) {
 
         this.height = height;
         return this;
@@ -163,7 +163,7 @@ public class AnimalDto extends BaseModelDto {
         this.height = height;
     }
 
-    public AnimalDto weight(@jakarta.annotation.Nullable Float weight) {
+    public Animal weight(@jakarta.annotation.Nullable Float weight) {
 
         this.weight = weight;
         return this;
@@ -199,12 +199,12 @@ public class AnimalDto extends BaseModelDto {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AnimalDto animalDto = (AnimalDto) o;
-        return Objects.equals(this.color, animalDto.color) &&
-            Objects.equals(this.owner, animalDto.owner) &&
-            Objects.equals(this.name, animalDto.name) &&
-            Objects.equals(this.height, animalDto.height) &&
-            Objects.equals(this.weight, animalDto.weight) &&
+        Animal animal = (Animal) o;
+        return Objects.equals(this.color, animal.color) &&
+            Objects.equals(this.owner, animal.owner) &&
+            Objects.equals(this.name, animal.name) &&
+            Objects.equals(this.height, animal.height) &&
+            Objects.equals(this.weight, animal.weight) &&
             super.equals(o);
     }
 

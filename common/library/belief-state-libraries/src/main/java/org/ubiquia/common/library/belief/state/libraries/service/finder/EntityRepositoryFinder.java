@@ -42,16 +42,18 @@ public class EntityRepositoryFinder {
     @SuppressWarnings("rawtypes")
     @Transactional
     public EntityRepository findRepositoryFor(final String className) {
-        var beanName = className + "Repository";
+
+        var entityName = className.replace("Entity", "");
+        var beanName = entityName + "Repository";
 
         EntityRepository entityRepository = null;
         if (this.applicationContext.containsBean(beanName)) {
             entityRepository = (EntityRepository) this.applicationContext.getBean(beanName);
         } else {
 
-            var lowerCase = Character.toLowerCase(className.charAt(0));
+            var lowerCase = Character.toLowerCase(entityName.charAt(0));
             beanName = lowerCase
-                + className.substring(1)
+                + entityName.substring(1)
                 + "Repository";
 
             if (this.applicationContext.containsBean(beanName)) {

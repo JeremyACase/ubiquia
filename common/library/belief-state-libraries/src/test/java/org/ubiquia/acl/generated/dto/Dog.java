@@ -15,53 +15,47 @@ package org.ubiquia.acl.generated.dto;
 
 
 import com.fasterxml.jackson.annotation.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.DecimalMin;
 import java.util.Objects;
 
 /**
- * The model of a wiener dog.
+ * The model of a dog.
  */
 @JsonPropertyOrder({
-    DachschundDto.JSON_PROPERTY_APEX_PREDATOR
+    Dog.JSON_PROPERTY_BARK_DECIBELS
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = Dachschund.class, name = "Dachschund"),
+    @JsonSubTypes.Type(value = Poodle.class, name = "Poodle"),
+})
 
-public class DachschundDto extends DogDto {
-    public static final String JSON_PROPERTY_APEX_PREDATOR = "apexPredator";
-    @jakarta.annotation.Nonnull
-    private Boolean apexPredator = true;
-
-    public DachschundDto() {
-
-    }
-
-    public DachschundDto apexPredator(@jakarta.annotation.Nonnull Boolean apexPredator) {
-
-        this.apexPredator = apexPredator;
-        return this;
-    }
+public class Dog extends Animal {
+    public static final String JSON_PROPERTY_BARK_DECIBELS = "barkDecibels";
+    @jakarta.annotation.Nullable
+    protected Float barkDecibels;
 
     /**
-     * Get apexPredator
+     * Get barkDecibels
+     * minimum: 0
      *
-     * @return apexPredator
+     * @return barkDecibels
      */
-    @jakarta.annotation.Nonnull
-    @NotNull
+    @jakarta.annotation.Nullable
+    @DecimalMin("0")
+    @JsonProperty(JSON_PROPERTY_BARK_DECIBELS)
+    @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-    @JsonProperty(JSON_PROPERTY_APEX_PREDATOR)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
-    public Boolean getApexPredator() {
-        return apexPredator;
+    public Float getBarkDecibels() {
+        return barkDecibels;
     }
 
 
-    @JsonProperty(JSON_PROPERTY_APEX_PREDATOR)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
-    public void setApexPredator(@jakarta.annotation.Nonnull Boolean apexPredator) {
-        this.apexPredator = apexPredator;
+    @JsonProperty(JSON_PROPERTY_BARK_DECIBELS)
+    @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+    public void setBarkDecibels(@jakarta.annotation.Nullable Float barkDecibels) {
+        this.barkDecibels = barkDecibels;
     }
 
     @Override
@@ -72,22 +66,22 @@ public class DachschundDto extends DogDto {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DachschundDto dachschundDto = (DachschundDto) o;
-        return Objects.equals(this.apexPredator, dachschundDto.apexPredator) &&
+        Dog dogDto = (Dog) o;
+        return Objects.equals(this.barkDecibels, dogDto.barkDecibels) &&
             super.equals(o);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(apexPredator, super.hashCode());
+        return Objects.hash(barkDecibels, super.hashCode());
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("class DachschundDto {\n");
+        sb.append("class DogDto {\n");
         sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-        sb.append("    apexPredator: ").append(toIndentedString(apexPredator)).append("\n");
+        sb.append("    barkDecibels: ").append(toIndentedString(barkDecibels)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -105,7 +99,7 @@ public class DachschundDto extends DogDto {
 
     @Override
     public String getModelType() {
-        return "Dachschund";
+        return "Dog";
     }
 
 

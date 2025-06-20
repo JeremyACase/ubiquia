@@ -1,8 +1,8 @@
 package org.ubiquia.common.library.belief.state.libraries.repository;
 
 
-import org.ubiquia.acl.generated.entity.Shark;
+import org.ubiquia.acl.generated.entity.SharkEntity;
 
-public interface SharkRepository extends EntityRepository<Shark> {
+public interface SharkRepository extends EntityRepository<SharkEntity> {
 
 }

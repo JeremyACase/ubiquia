@@ -3,11 +3,11 @@ package org.ubiquia.common.library.belief.state.libraries.service.mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.ubiquia.acl.generated.dto.SharkDto;
-import org.ubiquia.acl.generated.entity.Shark;
+import org.ubiquia.acl.generated.dto.Shark;
+import org.ubiquia.acl.generated.entity.SharkEntity;
 
 @Component
-public class SharkEgressDtoMapper extends AbstractEgressDtoMapper<Shark, SharkDto> {
+public class SharkEgressDtoMapper extends AbstractEgressDtoMapper<SharkEntity, Shark> {
 
     protected static final Logger logger = LoggerFactory.getLogger(SharkEgressDtoMapper.class);
 
@@ -17,8 +17,8 @@ public class SharkEgressDtoMapper extends AbstractEgressDtoMapper<Shark, SharkDt
     }
 
     @Override
-    public SharkDto getNewDto() {
-        return new SharkDto();
+    public Shark getNewDto() {
+        return new Shark();
     }
 
 

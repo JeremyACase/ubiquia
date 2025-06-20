@@ -11,33 +11,42 @@
  */
 
 
-package org.ubiquia.acl.generated.dto;
+package org.ubiquia.acl.generated.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
-import org.ubiquia.common.model.acl.dto.AbstractAclEntityDto;
+import org.ubiquia.common.model.acl.entity.AbstractAclEntity;
 
 /**
  * A model with some name information.
  */
 @JsonPropertyOrder({
-    NameDto.JSON_PROPERTY_FIRST_NAME,
-    NameDto.JSON_PROPERTY_LAST_NAME
+    NameEntity.JSON_PROPERTY_FIRST_NAME,
+    NameEntity.JSON_PROPERTY_LAST_NAME
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
-public class NameDto extends AbstractAclEntityDto {
+@jakarta.annotation.Generated(value = "org.ubiquia.core.belief.state.generator.service.generator.acl.UbiquiaAclEntityCodegen", date = "2025-06-18T01:59:36.137342500Z[UTC]", comments = "Generator version: 7.13.0")
+@Entity
+public class NameEntity extends AbstractAclEntity {
     public static final String JSON_PROPERTY_FIRST_NAME = "firstName";
     public static final String JSON_PROPERTY_LAST_NAME = "lastName";
     @jakarta.annotation.Nonnull
+
+
     private String firstName;
     @jakarta.annotation.Nullable
+
+
     private String lastName;
 
-    public NameDto firstName(@jakarta.annotation.Nonnull String firstName) {
+    public NameEntity() {
+    }
+
+    public NameEntity firstName(@jakarta.annotation.Nonnull String firstName) {
 
         this.firstName = firstName;
         return this;
@@ -65,7 +74,7 @@ public class NameDto extends AbstractAclEntityDto {
         this.firstName = firstName;
     }
 
-    public NameDto lastName(@jakarta.annotation.Nullable String lastName) {
+    public NameEntity lastName(@jakarta.annotation.Nullable String lastName) {
 
         this.lastName = lastName;
         return this;
@@ -100,9 +109,9 @@ public class NameDto extends AbstractAclEntityDto {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        NameDto nameDto = (NameDto) o;
-        return Objects.equals(this.firstName, nameDto.firstName) &&
-            Objects.equals(this.lastName, nameDto.lastName);
+        NameEntity nameEntity = (NameEntity) o;
+        return Objects.equals(this.firstName, nameEntity.firstName) &&
+            Objects.equals(this.lastName, nameEntity.lastName);
     }
 
     @Override
@@ -113,7 +122,7 @@ public class NameDto extends AbstractAclEntityDto {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("class NameDto {\n");
+        sb.append("class Name {\n");
         sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");
         sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
         sb.append("}");
@@ -135,6 +144,5 @@ public class NameDto extends AbstractAclEntityDto {
     public String getModelType() {
         return "Name";
     }
-
 
 }

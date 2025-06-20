@@ -72,7 +72,9 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
     @SuppressWarnings("unchecked")
     public void tryBuildRelationships(T model) throws Exception {
 
-        if (!this.cachedEntityClass.getName().equalsIgnoreCase(model.getModelType())) {
+        var entityName = this.getEntityClassName(model);
+
+        if (!this.cachedEntityClass.getName().equalsIgnoreCase(entityName)) {
             var mapperBean = this.tryGetRelationshipBuilder(model);
             if (Objects.nonNull(mapperBean)) {
                 mapperBean.tryBuildRelationships(model);
@@ -93,9 +95,11 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
     @SuppressWarnings("rawtypes")
     private EntityRelationshipBuilder tryGetRelationshipBuilder(
         final AbstractAclEntity model) {
-        EntityRelationshipBuilder relationshipBuilder = null;
 
-        if (!model.getModelType().equalsIgnoreCase(this.cachedEntityClass.getSimpleName())) {
+        EntityRelationshipBuilder relationshipBuilder = null;
+        var entityName = this.getEntityClassName(model);
+
+        if (!entityName.equalsIgnoreCase(this.cachedEntityClass.getSimpleName())) {
             relationshipBuilder = this
                 .entityRelationshipBuilderFinder
                 .findRelationshipBuilderFor(model);
@@ -175,8 +179,9 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
                     key.getName());
 
                 var entity = (AbstractAclEntity) value;
-                var entityClassName = entity.getModelType();
-                if (!entityClassName.equalsIgnoreCase(this.cachedEntityClass.getSimpleName())) {
+                var entityName = this.getEntityClassName(model);
+
+                if (!entityName.equalsIgnoreCase(this.cachedEntityClass.getSimpleName())) {
                     var mapperBean = this.tryGetRelationshipBuilder(entity);
                     if (Objects.nonNull(mapperBean)) {
                         mapperBean.tryBuildRelationships(entity);
@@ -275,8 +280,8 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
                     key.getName());
 
                 var entity = (AbstractAclEntity) childModelValue;
-                var entityClassName = entity.getModelType();
-                if (!entityClassName.equalsIgnoreCase(this.cachedEntityClass.getSimpleName())) {
+                var entityName = this.getEntityClassName(entity);
+                if (!entityName.equalsIgnoreCase(this.cachedEntityClass.getSimpleName())) {
                     var mapperBean = this.tryGetRelationshipBuilder(entity);
                     if (Objects.isNull(mapperBean)) {
                         throw new Exception("ERROR: Could not find a relationship mapper for "
@@ -628,5 +633,10 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
             }
         }
         return cached;
+    }
+
+    private String getEntityClassName(final AbstractAclEntity entity) {
+        var name = entity.getModelType() + "Entity";
+        return name;
     }
 }

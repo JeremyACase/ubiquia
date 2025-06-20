@@ -21,25 +21,25 @@ import java.util.Objects;
  * A transaction of a transaction.
  */
 @JsonPropertyOrder({
-    AdoptionTransactionDto.JSON_PROPERTY_OWNER,
-    AdoptionTransactionDto.JSON_PROPERTY_PET
+    AdoptionTransaction.JSON_PROPERTY_OWNER,
+    AdoptionTransaction.JSON_PROPERTY_PET
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
 
-public class AdoptionTransactionDto extends BaseModelDto {
+public class AdoptionTransaction extends BaseModel {
     public static final String JSON_PROPERTY_OWNER = "owner";
     public static final String JSON_PROPERTY_PET = "pet";
     @jakarta.annotation.Nullable
-    private PersonDto owner;
+    private Person owner;
     @jakarta.annotation.Nullable
-    private AnimalDto pet;
+    private Animal pet;
 
-    public AdoptionTransactionDto() {
+    public AdoptionTransaction() {
 
     }
 
-    public AdoptionTransactionDto owner(@jakarta.annotation.Nullable PersonDto owner) {
+    public AdoptionTransaction owner(@jakarta.annotation.Nullable Person owner) {
 
         this.owner = owner;
         return this;
@@ -56,18 +56,18 @@ public class AdoptionTransactionDto extends BaseModelDto {
     @JsonProperty(JSON_PROPERTY_OWNER)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-    public PersonDto getOwner() {
+    public Person getOwner() {
         return owner;
     }
 
 
     @JsonProperty(JSON_PROPERTY_OWNER)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setOwner(@jakarta.annotation.Nullable PersonDto owner) {
+    public void setOwner(@jakarta.annotation.Nullable Person owner) {
         this.owner = owner;
     }
 
-    public AdoptionTransactionDto pet(@jakarta.annotation.Nullable AnimalDto pet) {
+    public AdoptionTransaction pet(@jakarta.annotation.Nullable Animal pet) {
 
         this.pet = pet;
         return this;
@@ -84,14 +84,14 @@ public class AdoptionTransactionDto extends BaseModelDto {
     @JsonProperty(JSON_PROPERTY_PET)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-    public AnimalDto getPet() {
+    public Animal getPet() {
         return pet;
     }
 
 
     @JsonProperty(JSON_PROPERTY_PET)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setPet(@jakarta.annotation.Nullable AnimalDto pet) {
+    public void setPet(@jakarta.annotation.Nullable Animal pet) {
         this.pet = pet;
     }
 
@@ -103,9 +103,9 @@ public class AdoptionTransactionDto extends BaseModelDto {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AdoptionTransactionDto adoptionTransactionDto = (AdoptionTransactionDto) o;
-        return Objects.equals(this.owner, adoptionTransactionDto.owner) &&
-            Objects.equals(this.pet, adoptionTransactionDto.pet) &&
+        AdoptionTransaction adoptionTransaction = (AdoptionTransaction) o;
+        return Objects.equals(this.owner, adoptionTransaction.owner) &&
+            Objects.equals(this.pet, adoptionTransaction.pet) &&
             super.equals(o);
     }
 

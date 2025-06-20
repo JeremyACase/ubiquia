@@ -3,11 +3,11 @@ package org.ubiquia.common.library.belief.state.libraries.service.mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.ubiquia.acl.generated.dto.DachschundDto;
-import org.ubiquia.acl.generated.entity.Dachschund;
+import org.ubiquia.acl.generated.dto.Dachschund;
+import org.ubiquia.acl.generated.entity.DachschundEntity;
 
 @Component
-public class DachschundEgressDtoMapper extends AbstractEgressDtoMapper<Dachschund, DachschundDto> {
+public class DachschundEgressDtoMapper extends AbstractEgressDtoMapper<DachschundEntity, Dachschund> {
 
     protected static final Logger logger = LoggerFactory.getLogger(DachschundEgressDtoMapper.class);
 
@@ -17,8 +17,8 @@ public class DachschundEgressDtoMapper extends AbstractEgressDtoMapper<Dachschun
     }
 
     @Override
-    public DachschundDto getNewDto() {
-        return new DachschundDto();
+    public Dachschund getNewDto() {
+        return new Dachschund();
     }
 
 

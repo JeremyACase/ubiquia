@@ -3,11 +3,11 @@ package org.ubiquia.common.library.belief.state.libraries.service.mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.ubiquia.acl.generated.dto.CatDto;
-import org.ubiquia.acl.generated.entity.Cat;
+import org.ubiquia.acl.generated.dto.Cat;
+import org.ubiquia.acl.generated.entity.CatEntity;
 
 @Component
-public class CatEgressDtoMapper extends AbstractEgressDtoMapper<Cat, CatDto> {
+public class CatEgressDtoMapper extends AbstractEgressDtoMapper<CatEntity, Cat> {
 
     protected static final Logger logger = LoggerFactory.getLogger(CatEgressDtoMapper.class);
 
@@ -17,8 +17,8 @@ public class CatEgressDtoMapper extends AbstractEgressDtoMapper<Cat, CatDto> {
     }
 
     @Override
-    public CatDto getNewDto() {
-        return new CatDto();
+    public Cat getNewDto() {
+        return new Cat();
     }
 
 

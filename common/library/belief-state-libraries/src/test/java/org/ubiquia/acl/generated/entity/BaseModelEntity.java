@@ -16,8 +16,6 @@ package org.ubiquia.acl.generated.entity;
 
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.Entity;
-import jakarta.validation.constraints.Pattern;
-import java.util.Objects;
 import org.ubiquia.common.model.acl.entity.AbstractAclEntity;
 
 /**
@@ -30,17 +28,17 @@ import org.ubiquia.common.model.acl.entity.AbstractAclEntity;
 )
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = AdoptionTransaction.class, name = "AdoptionTransaction"),
-    @JsonSubTypes.Type(value = Animal.class, name = "Animal"),
-    @JsonSubTypes.Type(value = Cat.class, name = "Cat"),
-    @JsonSubTypes.Type(value = Dachschund.class, name = "Dachschund"),
-    @JsonSubTypes.Type(value = Dog.class, name = "Dog"),
-    @JsonSubTypes.Type(value = Person.class, name = "Person"),
-    @JsonSubTypes.Type(value = Poodle.class, name = "Poodle"),
-    @JsonSubTypes.Type(value = Shark.class, name = "Shark"),
+    @JsonSubTypes.Type(value = AdoptionTransactionEntity.class, name = "AdoptionTransaction"),
+    @JsonSubTypes.Type(value = AnimalEntity.class, name = "Animal"),
+    @JsonSubTypes.Type(value = CatEntity.class, name = "Cat"),
+    @JsonSubTypes.Type(value = DachschundEntity.class, name = "Dachschund"),
+    @JsonSubTypes.Type(value = DogEntity.class, name = "Dog"),
+    @JsonSubTypes.Type(value = PersonEntity.class, name = "Person"),
+    @JsonSubTypes.Type(value = PoodleEntity.class, name = "Poodle"),
+    @JsonSubTypes.Type(value = SharkEntity.class, name = "Shark"),
 })
 
 @Entity
-public class BaseModel extends AbstractAclEntity {
+public class BaseModelEntity extends AbstractAclEntity {
 
 }
