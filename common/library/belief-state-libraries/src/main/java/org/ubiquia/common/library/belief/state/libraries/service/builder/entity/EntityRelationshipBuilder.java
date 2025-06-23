@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.belief.state.libraries.service.finder.EntityRelationshipBuilderFinder;
 import org.ubiquia.common.library.belief.state.libraries.service.finder.EntityRepositoryFinder;
-import org.ubiquia.common.model.acl.entity.AbstractAclEntity;
+import org.ubiquia.common.model.acl.entity.AbstractAclModel;
 
 @Service
-public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
+public abstract class EntityRelationshipBuilder<T extends AbstractAclModel>
     implements InterfaceLogger {
 
     protected final HashMap<Field, Field> cachedEntityFieldMap;
@@ -94,7 +94,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
      */
     @SuppressWarnings("rawtypes")
     private EntityRelationshipBuilder tryGetRelationshipBuilder(
-        final AbstractAclEntity model) {
+        final AbstractAclModel model) {
 
         EntityRelationshipBuilder relationshipBuilder = null;
         var entityName = this.getEntityClassName(model);
@@ -148,14 +148,14 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
 
                     // ...now set the child field's value to point to the parent model...
                     if (List.class.isAssignableFrom(field.getType())) {
-                        var list = (List<AbstractAclEntity>) field.get(fieldValue);
+                        var list = (List<AbstractAclModel>) field.get(fieldValue);
                         if (Objects.isNull(list)) {
                             list = new ArrayList<>();
                             field.set(fieldValue, list);
                         }
                         list.add(model);
                     } else if (Set.class.isAssignableFrom(field.getType())) {
-                        var set = (Set<AbstractAclEntity>) field.get(fieldValue);
+                        var set = (Set<AbstractAclModel>) field.get(fieldValue);
                         if (Objects.isNull(set)) {
                             set = new HashSet<>();
                             field.set(fieldValue, set);
@@ -178,7 +178,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
                     value.getClass().getSimpleName(),
                     key.getName());
 
-                var entity = (AbstractAclEntity) value;
+                var entity = (AbstractAclModel) value;
                 var entityName = this.getEntityClassName(model);
 
                 if (!entityName.equalsIgnoreCase(this.cachedEntityClass.getSimpleName())) {
@@ -190,14 +190,14 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
 
                 // ...now set the child field's value to point to the parent model...
                 if (List.class.isAssignableFrom(field.getType())) {
-                    var list = (List<AbstractAclEntity>) field.get(value);
+                    var list = (List<AbstractAclModel>) field.get(value);
                     if (Objects.isNull(list)) {
                         list = new ArrayList<>();
                         field.set(value, list);
                     }
                     list.add(model);
                 }  else if (Set.class.isAssignableFrom(field.getType())) {
-                    var set = (Set<AbstractAclEntity>) field.get(value);
+                    var set = (Set<AbstractAclModel>) field.get(value);
                     if (Objects.isNull(set)) {
                         set = new HashSet<>();
                         field.set(value, set);
@@ -255,7 +255,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
 
                     // ...now set the child field's childModelValue to point to the parent parentModel...
                     if (List.class.isAssignableFrom(field.getType())) {
-                        var childList = (List<AbstractAclEntity>) field.get(childModelValue);
+                        var childList = (List<AbstractAclModel>) field.get(childModelValue);
                         if (Objects.isNull(childList)) {
                             childList = new ArrayList<>();
                             field.set(childModelValue, childList);
@@ -279,7 +279,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
                     childModelValue.getClass().getSimpleName(),
                     key.getName());
 
-                var entity = (AbstractAclEntity) childModelValue;
+                var entity = (AbstractAclModel) childModelValue;
                 var entityName = this.getEntityClassName(entity);
                 if (!entityName.equalsIgnoreCase(this.cachedEntityClass.getSimpleName())) {
                     var mapperBean = this.tryGetRelationshipBuilder(entity);
@@ -292,7 +292,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
 
                 // ...now set the child field's childModelValue to point to the parent parentModel...
                 if (List.class.isAssignableFrom(field.getType())) {
-                    var list = (List<AbstractAclEntity>) field.get(childModelValue);
+                    var list = (List<AbstractAclModel>) field.get(childModelValue);
                     if (Objects.isNull(list)) {
                         list = new ArrayList<>();
                         field.set(childModelValue, list);
@@ -346,7 +346,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
 
                     // ...now set the child field's childModelValue to point to the parent parentModel...
                     if (Set.class.isAssignableFrom(field.getType())) {
-                        var childSet = (Set<AbstractAclEntity>) field.get(childModelValue);
+                        var childSet = (Set<AbstractAclModel>) field.get(childModelValue);
                         if (Objects.isNull(childSet)) {
                             childSet = new HashSet<>();
                             field.set(childModelValue, childSet);
@@ -370,7 +370,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
                     childModelValue.getClass().getSimpleName(),
                     key.getName());
 
-                var entity = (AbstractAclEntity) childModelValue;
+                var entity = (AbstractAclModel) childModelValue;
                 var entityClassName = entity.getModelType();
                 if (!entityClassName.equalsIgnoreCase(this.cachedEntityClass.getSimpleName())) {
                     var mapperBean = this.tryGetRelationshipBuilder(entity);
@@ -383,7 +383,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
 
                 // ...now set the child field's childModelValue to point to the parent parentModel...
                 if (Set.class.isAssignableFrom(field.getType())) {
-                    var set = (Set<AbstractAclEntity>) field.get(childModelValue);
+                    var set = (Set<AbstractAclModel>) field.get(childModelValue);
                     if (Objects.isNull(set)) {
                         set = new HashSet<>();
                         field.set(childModelValue, set);
@@ -463,7 +463,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
         var cached = false;
 
         // ...determine if any of those fields reference this model via a relationship...
-        if (AbstractAclEntity.class.isAssignableFrom(field.getType())) {
+        if (AbstractAclModel.class.isAssignableFrom(field.getType())) {
             cached = this.tryCacheEntityRelationship(field);
         }
         return cached;
@@ -533,7 +533,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
             var elementType = (ParameterizedType) field.getGenericType();
             var elementClass = (Class<?>) elementType.getActualTypeArguments()[0];
 
-            if (AbstractAclEntity.class.isAssignableFrom(elementClass)) {
+            if (AbstractAclModel.class.isAssignableFrom(elementClass)) {
                 var subFields = Arrays.stream(FieldUtils.getAllFields(elementClass)).toList();
                 var fieldReference = subFields.stream().filter(x ->
                     x.getType().isAssignableFrom(this.cachedEntityClass)).findFirst();
@@ -591,7 +591,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
             var elementType = (ParameterizedType) field.getGenericType();
             var elementClass = (Class<?>) elementType.getActualTypeArguments()[0];
 
-            if (AbstractAclEntity.class.isAssignableFrom(elementClass)) {
+            if (AbstractAclModel.class.isAssignableFrom(elementClass)) {
                 var subFields = Arrays.stream(FieldUtils.getAllFields(elementClass)).toList();
                 var fieldReference = subFields.stream().filter(x ->
                     x.getType().isAssignableFrom(this.cachedEntityClass)).findFirst();
@@ -635,7 +635,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclEntity>
         return cached;
     }
 
-    private String getEntityClassName(final AbstractAclEntity entity) {
+    private String getEntityClassName(final AbstractAclModel entity) {
         var name = entity.getModelType() + "Entity";
         return name;
     }

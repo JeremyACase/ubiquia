@@ -14,12 +14,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.belief.state.libraries.service.finder.EntityRepositoryFinder;
 import org.ubiquia.common.model.acl.dto.AbstractAclEntityDto;
-import org.ubiquia.common.model.acl.entity.AbstractAclEntity;
+import org.ubiquia.common.model.acl.entity.AbstractAclModel;
 
 @Service
 public abstract class AbstractIngressDtoMapper<
     F extends AbstractAclEntityDto,
-    T extends AbstractAclEntity> {
+    T extends AbstractAclModel> {
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -65,9 +65,9 @@ public abstract class AbstractIngressDtoMapper<
         throws ClassNotFoundException,
         IllegalAccessException {
 
-        if (AbstractAclEntity.class.isAssignableFrom(to.getClass())) {
+        if (AbstractAclModel.class.isAssignableFrom(to.getClass())) {
 
-            var cast = (AbstractAclEntity) to;
+            var cast = (AbstractAclModel) to;
 
             var clazz = Class.forName("org.ubiquia.acl.generated.entity."
                 + cast.getModelType()
@@ -80,7 +80,7 @@ public abstract class AbstractIngressDtoMapper<
                 if (Objects.nonNull(field.get(to))) {
 
                     // ...if we have a single Ubiquia entity...
-                    if (AbstractAclEntity.class.isAssignableFrom(field.getType())) {
+                    if (AbstractAclModel.class.isAssignableFrom(field.getType())) {
                         this.tryHydrateOneToOneRelationship(to, field);
 
                     // ...else if we have a list of Ubiquia entities...
@@ -106,17 +106,17 @@ public abstract class AbstractIngressDtoMapper<
         var elementType = (ParameterizedType) field.getGenericType();
         var elementClass = (Class<?>) elementType.getActualTypeArguments()[0];
 
-        if (AbstractAclEntity.class.isAssignableFrom(elementClass)
+        if (AbstractAclModel.class.isAssignableFrom(elementClass)
             && Objects.nonNull(field.get(to))) {
 
-            var hydratedList = new ArrayList<AbstractAclEntity>();
+            var hydratedList = new ArrayList<AbstractAclModel>();
             for (var element : (List<?>) field.get(to)) {
 
                 var repository = this
                     .entityRepositoryFinder
                     .findRepositoryFor(element);
 
-                var entity = (AbstractAclEntity) element;
+                var entity = (AbstractAclModel) element;
 
                 // ...use any provided ID's to create our database relationships.
                 if (Objects.nonNull(entity.getId())) {
@@ -125,10 +125,10 @@ public abstract class AbstractIngressDtoMapper<
                         throw new IllegalArgumentException("ERROR: Entity not found: "
                             + entity.getId());
                     }
-                    var hydrated = (AbstractAclEntity) Hibernate.unproxy(record.get());
+                    var hydrated = (AbstractAclModel) Hibernate.unproxy(record.get());
                     hydratedList.add(hydrated);
                 } else {
-                    var hydrated = (AbstractAclEntity) Hibernate.unproxy(element);
+                    var hydrated = (AbstractAclModel) Hibernate.unproxy(element);
                     hydratedList.add(hydrated);
                 }
             }
@@ -147,7 +147,7 @@ public abstract class AbstractIngressDtoMapper<
     private void tryHydrateOneToOneRelationship(T to, final Field field)
         throws IllegalAccessException {
 
-        var entity = (AbstractAclEntity) field.get(to);
+        var entity = (AbstractAclModel) field.get(to);
 
         // we have been provided an ID, use it to create to associate our entities.
         if (Objects.nonNull(entity.getId())) {

@@ -30,12 +30,12 @@ import org.ubiquia.common.library.belief.state.libraries.service.logic.AclContro
 import org.ubiquia.common.library.dao.component.EntityDao;
 import org.ubiquia.common.model.acl.dto.AbstractAclEntityDto;
 import org.ubiquia.common.model.acl.embeddable.KeyValuePair;
-import org.ubiquia.common.model.acl.entity.AbstractAclEntity;
+import org.ubiquia.common.model.acl.entity.AbstractAclModel;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 
 public abstract class AbstractAclModelController<
-    T extends AbstractAclEntity,
+    T extends AbstractAclModel,
     D extends AbstractAclEntityDto>
     implements InterfaceModelController<T, D>,
     InterfaceLogger {
@@ -528,19 +528,19 @@ public abstract class AbstractAclModelController<
     @SuppressWarnings("unchecked")
     private void associateParentAndChild(
         Field childField,
-        AbstractAclEntity parentEntity,
-        AbstractAclEntity childEntity)
+        AbstractAclModel parentEntity,
+        AbstractAclModel childEntity)
         throws IllegalAccessException {
 
         if (List.class.isAssignableFrom(childField.getType())) {
-            var list = (List<AbstractAclEntity>) childField.get(parentEntity);
+            var list = (List<AbstractAclModel>) childField.get(parentEntity);
             if (Objects.isNull(list)) {
                 list = new ArrayList<>();
                 childField.set(parentEntity, list);
             }
             list.add(childEntity);
         } else if (Set.class.isAssignableFrom(childField.getType())) {
-            var set = (Set<AbstractAclEntity>) childField.get(parentEntity);
+            var set = (Set<AbstractAclModel>) childField.get(parentEntity);
             if (Objects.isNull(set)) {
                 set = new HashSet<>();
                 childField.set(parentEntity, set);
@@ -559,7 +559,7 @@ public abstract class AbstractAclModelController<
      * @return A child record if one is present in the database.
      */
     @SuppressWarnings("unchecked")
-    private AbstractAclEntity getChildRecord(
+    private AbstractAclModel getChildRecord(
         final Field childField,
         final Association association) {
 
@@ -585,7 +585,7 @@ public abstract class AbstractAclModelController<
                 + association.getChildAssociation().getChildId());
         }
 
-        var childEntity = (AbstractAclEntity) childRecord.get();
+        var childEntity = (AbstractAclModel) childRecord.get();
         return childEntity;
     }
 }

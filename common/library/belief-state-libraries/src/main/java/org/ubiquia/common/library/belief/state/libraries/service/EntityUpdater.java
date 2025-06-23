@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.acl.embeddable.KeyValuePair;
-import org.ubiquia.common.model.acl.entity.AbstractAclEntity;
+import org.ubiquia.common.model.acl.entity.AbstractAclModel;
 
 /**
  * A service dedicated to updating fields for entity models.
@@ -32,7 +32,7 @@ public class EntityUpdater {
      * @throws IllegalAccessException Reflection exceptions.
      */
     public void trySetValue(
-        AbstractAclEntity entity,
+        AbstractAclModel entity,
         final List<KeyValuePair> keyValuePairs) throws IllegalAccessException {
 
         logger.debug("Attempting to set entity of type {} with id {} with key-value-pair {}",
@@ -63,7 +63,7 @@ public class EntityUpdater {
      * @throws IllegalAccessException Reflection exceptions.
      */
     private void trySetValueViaType(
-        AbstractAclEntity entity,
+        AbstractAclModel entity,
         final Field field,
         final KeyValuePair keyValuePair) throws IllegalAccessException {
 
@@ -99,7 +99,7 @@ public class EntityUpdater {
                 field.set(entity, list);
             }
             list.add(keyValuePair.getValue());
-        } else if (AbstractAclEntity.class.isAssignableFrom(field.getType())) {
+        } else if (AbstractAclModel.class.isAssignableFrom(field.getType())) {
             throw new IllegalArgumentException("ERROR: Cannot update an entire AEntity entity; "
                 + "; maybe try updating the child entity instead?");
         }

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ubiquia.acl.generated.dto.Animal;
-import org.ubiquia.acl.generated.entity.AnimalEntity;
+import org.ubiquia.acl.generated.entity.AnimalModel;
 import org.ubiquia.common.library.belief.state.libraries.repository.AnimalRepository;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.AnimalRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
@@ -14,14 +14,14 @@ import org.ubiquia.common.library.belief.state.libraries.service.mapper.Abstract
 
 @RestController
 @RequestMapping("/ubiquia/belief-state-service/animal")
-public class AnimalController extends AbstractAclModelController<AnimalEntity, Animal> {
+public class AnimalController extends AbstractAclModelController<AnimalModel, Animal> {
 
 
     private static final Logger logger = LoggerFactory.getLogger(AnimalController.class);
     @Autowired
     protected AnimalRelationshipBuilder entityRelationshipBuilder;
     @Autowired
-    private AbstractIngressDtoMapper<Animal, AnimalEntity> ingressMapper;
+    private AbstractIngressDtoMapper<Animal, AnimalModel> ingressMapper;
     @Autowired
     private AnimalRepository entityRepository;
 
@@ -31,12 +31,12 @@ public class AnimalController extends AbstractAclModelController<AnimalEntity, A
     }
 
     @Override
-    public EntityRelationshipBuilder<AnimalEntity> getEntityRelationshipBuilder() {
+    public EntityRelationshipBuilder<AnimalModel> getEntityRelationshipBuilder() {
         return this.entityRelationshipBuilder;
     }
 
     @Override
-    public AbstractIngressDtoMapper<Animal, AnimalEntity> getIngressMapper() {
+    public AbstractIngressDtoMapper<Animal, AnimalModel> getIngressMapper() {
         return this.ingressMapper;
     }
 

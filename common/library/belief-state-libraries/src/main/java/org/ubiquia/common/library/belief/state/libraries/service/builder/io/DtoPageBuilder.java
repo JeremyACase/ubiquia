@@ -9,11 +9,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.belief.state.libraries.service.finder.EgressMapperFinder;
 import org.ubiquia.common.model.acl.dto.AbstractAclEntityDto;
-import org.ubiquia.common.model.acl.entity.AbstractAclEntity;
+import org.ubiquia.common.model.acl.entity.AbstractAclModel;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 
 @Service
-public class DtoPageBuilder<T extends AbstractAclEntity, D extends AbstractAclEntityDto> {
+public class DtoPageBuilder<T extends AbstractAclModel, D extends AbstractAclEntityDto> {
 
     @Autowired
     private EgressMapperFinder egressMapperFinder;

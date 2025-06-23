@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ubiquia.acl.generated.dto.Dog;
-import org.ubiquia.acl.generated.entity.DogEntity;
+import org.ubiquia.acl.generated.entity.DogModel;
 import org.ubiquia.common.library.belief.state.libraries.repository.DogRepository;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.DogRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
@@ -14,14 +14,14 @@ import org.ubiquia.common.library.belief.state.libraries.service.mapper.Abstract
 
 @RestController
 @RequestMapping("/ubiquia/belief-state-service/dog")
-public class DogController extends AbstractAclModelController<DogEntity, Dog> {
+public class DogController extends AbstractAclModelController<DogModel, Dog> {
 
 
     private static final Logger logger = LoggerFactory.getLogger(DogController.class);
     @Autowired
     protected DogRelationshipBuilder entityRelationshipBuilder;
     @Autowired
-    private AbstractIngressDtoMapper<Dog, DogEntity> ingressMapper;
+    private AbstractIngressDtoMapper<Dog, DogModel> ingressMapper;
     @Autowired
     private DogRepository entityRepository;
 
@@ -31,12 +31,12 @@ public class DogController extends AbstractAclModelController<DogEntity, Dog> {
     }
 
     @Override
-    public EntityRelationshipBuilder<DogEntity> getEntityRelationshipBuilder() {
+    public EntityRelationshipBuilder<DogModel> getEntityRelationshipBuilder() {
         return this.entityRelationshipBuilder;
     }
 
     @Override
-    public AbstractIngressDtoMapper<Dog, DogEntity> getIngressMapper() {
+    public AbstractIngressDtoMapper<Dog, DogModel> getIngressMapper() {
         return this.ingressMapper;
     }
 

@@ -1,9 +1,8 @@
 package org.ubiquia.core.belief.state.generator.service.generator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
-import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -12,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
 import org.ubiquia.core.belief.state.generator.service.compiler.BeliefStateCompiler;
+import org.ubiquia.core.belief.state.generator.service.decorator.InheritancePreprocessor;
+import org.ubiquia.core.belief.state.generator.service.decorator.UbiquiaModelInjector;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiDtoGenerator;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiEntityGenerator;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiDtoYamlMapper;
@@ -26,10 +27,16 @@ public class BeliefStateGenerator {
     private BeliefStateCompiler beliefStateCompiler;
 
     @Autowired
-    private JsonSchemaToOpenApiEntityYamlMapper jsonSchemaToOpenApiEntityYamlMapper;
+    private GenerationCleanupProcessor generationCleanupProcessor;
+
+    @Autowired
+    private InheritancePreprocessor inheritancePreprocessor;
 
     @Autowired
     private JsonSchemaToOpenApiDtoYamlMapper jsonSchemaToOpenApiDtoYamlMapper;
+
+    @Autowired
+    private JsonSchemaToOpenApiEntityYamlMapper jsonSchemaToOpenApiEntityYamlMapper;
 
     @Autowired
     private OpenApiEntityGenerator openApiEntityGenerator;
@@ -40,21 +47,30 @@ public class BeliefStateGenerator {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private UbiquiaModelInjector ubiquiaModelInjector;
+
     public void generateBeliefStateFrom(final AgentCommunicationLanguageDto acl)
         throws Exception {
 
         logger.info("Generating new Belief State from: {}",
             this.objectMapper.writeValueAsString(acl));
 
-        var openApiEntityYaml = this.jsonSchemaToOpenApiEntityYamlMapper.translateJsonSchemaToOpenApiYaml(
-            this.objectMapper.writeValueAsString(acl.getJsonSchema())
-        );
+        var jsonSchema = this.objectMapper.writeValueAsString(acl.getJsonSchema());
+        jsonSchema = this.ubiquiaModelInjector.appendAclModels(jsonSchema);
+        jsonSchema = this.inheritancePreprocessor.appendInheritance(jsonSchema);
+
+        var openApiEntityYaml =
+            this.jsonSchemaToOpenApiEntityYamlMapper
+                .translateJsonSchemaToOpenApiYaml(jsonSchema);
         this.openApiEntityGenerator.generateOpenApiEntitiesFrom(openApiEntityYaml);
 
-        var openApiDtoYaml = this.jsonSchemaToOpenApiDtoYamlMapper.translateJsonSchemaToOpenApiYaml(
-            this.objectMapper.writeValueAsString(acl.getJsonSchema())
-        );
+        var openApiDtoYaml =
+            this.jsonSchemaToOpenApiDtoYamlMapper
+                .translateJsonSchemaToOpenApiYaml(jsonSchema);
         this.openApiDtoGenerator.generateOpenApiDtosFrom(openApiDtoYaml);
+
+        this.generationCleanupProcessor.removeBlacklistedFiles(Paths.get("generated"));
 
         var beliefStateLibraries = this.getJarPaths("belief-state-libs");
 
@@ -65,11 +81,11 @@ public class BeliefStateGenerator {
     }
 
     private List<String> getJarPaths(final String libsDirPath) {
-        File libsDir = new File(libsDirPath);
-        List<String> jarPaths = new ArrayList<>();
+        var libsDir = new File(libsDirPath);
+        var jarPaths = new ArrayList<String>();
 
         if (libsDir.exists() && libsDir.isDirectory()) {
-            for (File file : libsDir.listFiles()) {
+            for (var file : libsDir.listFiles()) {
                 if (file.isFile() && file.getName().endsWith(".jar")) {
                     logger.debug("...found belief state library dependency: {}",
                         file.getAbsolutePath());

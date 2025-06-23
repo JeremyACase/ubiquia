@@ -27,27 +27,9 @@
         "firstName"
       ]
     },
-    "KeyValuePair": {
-      "description": "A model defining a key-value-pair that can be persisted in the MACHINA database where the value is a string.",
-      "type": "object",
-      "required": [
-        "key"
-      ],
-      "properties": {
-        "key": {
-          "type": "string"
-        },
-        "value": {
-          "type": "string"
-        }
-      }
-    },
     "BaseModel": {
       "description": "A base model.",
       "type": "object",
-      "discriminator": {
-        "propertyName": "modelType"
-      },
       "properties": {
         "modelVersion": {
           "type": "string",
@@ -55,10 +37,7 @@
           "default": "1.2.3",
           "readOnly": true
         }
-      },
-      "required": [
-        "modelVersion"
-      ]
+      }
     },
     "AdoptionTransaction": {
       "description": "A transaction of a transaction.",
@@ -75,10 +54,7 @@
         "pet": {
           "$ref": "#/definitions/Animal"
         }
-      },
-      "required": [
-        "modelType"
-      ]
+      }
     },
     "Person": {
       "description": "A model of a person.",
@@ -101,10 +77,7 @@
             "$ref": "#/definitions/Animal"
           }
         }
-      },
-      "required": [
-        "modelType"
-      ]
+      }
     },
     "Animal": {
       "description": "The model of an animal.",
@@ -135,10 +108,7 @@
           "example": 1.2,
           "minimum": 0
         }
-      },
-      "required": [
-        "modelType"
-      ]
+      }
     },
     "Dog": {
       "description": "The model of a dog.",
@@ -154,10 +124,7 @@
           "example": 1.2,
           "minimum": 0
         }
-      },
-      "required": [
-        "modelType"
-      ]
+      }
     },
     "Dachschund": {
       "description": "The model of a wiener dog.",
@@ -173,7 +140,6 @@
         }
       },
       "required": [
-        "modelType",
         "apexPredator"
       ]
     },
@@ -191,10 +157,7 @@
           "default": 0,
           "minimum": 0
         }
-      },
-      "required": [
-        "modelType"
-      ]
+      }
     },
     "Cat": {
       "description": "The model of a cat.",
@@ -210,10 +173,7 @@
           "example": 1.2,
           "minimum": 0
         }
-      },
-      "required": [
-        "modelType"
-      ]
+      }
     },
     "Shark": {
       "description": "The model of a shark.",
@@ -233,10 +193,7 @@
           "type": "boolean",
           "default": true
         }
-      },
-      "required": [
-        "modelType"
-      ]
+      }
     }
   },
   "properties": {
@@ -245,9 +202,6 @@
     },
     "Name": {
       "$ref": "#/definitions/Name"
-    },
-    "KeyValuePair": {
-      "$ref": "#/definitions/KeyValuePair"
     },
     "BaseModel": {
       "$ref": "#/definitions/BaseModel"

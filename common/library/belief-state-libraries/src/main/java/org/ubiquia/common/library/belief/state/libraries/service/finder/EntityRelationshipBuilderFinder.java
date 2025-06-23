@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
-import org.ubiquia.common.model.acl.entity.AbstractAclEntity;
+import org.ubiquia.common.model.acl.entity.AbstractAclModel;
 
 /**
  * A service that can "find" a particular entity relationship builder from the context.
@@ -23,7 +23,7 @@ public class EntityRelationshipBuilderFinder {
      * @return The mapper if found, else null.
      */
     @SuppressWarnings("rawtypes")
-    public EntityRelationshipBuilder findRelationshipBuilderFor(final AbstractAclEntity model) {
+    public EntityRelationshipBuilder findRelationshipBuilderFor(final AbstractAclModel model) {
         EntityRelationshipBuilder mapperBean = null;
 
         var mapperBeanName = model.getModelType() + "RelationshipBuilder";

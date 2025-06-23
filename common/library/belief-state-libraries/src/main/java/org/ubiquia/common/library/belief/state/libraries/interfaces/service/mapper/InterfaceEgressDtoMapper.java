@@ -2,9 +2,9 @@ package org.ubiquia.common.library.belief.state.libraries.interfaces.service.map
 
 import org.slf4j.Logger;
 import org.ubiquia.common.model.acl.dto.AbstractAclEntityDto;
-import org.ubiquia.common.model.acl.entity.AbstractAclEntity;
+import org.ubiquia.common.model.acl.entity.AbstractAclModel;
 
-public interface InterfaceEgressDtoMapper<F extends AbstractAclEntity, T extends AbstractAclEntityDto> {
+public interface InterfaceEgressDtoMapper<F extends AbstractAclModel, T extends AbstractAclEntityDto> {
 
     String getModelType();
 

@@ -13,11 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.belief.state.libraries.interfaces.service.mapper.InterfaceEgressDtoMapper;
 import org.ubiquia.common.model.acl.dto.AbstractAclEntityDto;
-import org.ubiquia.common.model.acl.entity.AbstractAclEntity;
+import org.ubiquia.common.model.acl.entity.AbstractAclModel;
 
 @Service
 public abstract class AbstractEgressDtoMapper<
-    F extends AbstractAclEntity,
+    F extends AbstractAclModel,
     T extends AbstractAclEntityDto>
     implements InterfaceEgressDtoMapper<F, T>,
     InterfaceLogger {
@@ -129,7 +129,7 @@ public abstract class AbstractEgressDtoMapper<
                 var arg = type.getActualTypeArguments()[0];
 
                 if (arg instanceof Class<?> elementClass) {
-                    isCollectionOfAclEntities = AbstractAclEntity.class.isAssignableFrom(elementClass);
+                    isCollectionOfAclEntities = AbstractAclModel.class.isAssignableFrom(elementClass);
                 }
 
             } catch (Exception e) {
@@ -217,7 +217,7 @@ public abstract class AbstractEgressDtoMapper<
                 dtoField.getName(),
                 type.getSimpleName());
 
-            if (AbstractAclEntity.class.isAssignableFrom(type)) {
+            if (AbstractAclModel.class.isAssignableFrom(type)) {
                 var lowerCase = Character.toLowerCase(type.getSimpleName().charAt(0));
                 var simpleName = lowerCase + type.getSimpleName().substring(1);
 
@@ -234,7 +234,7 @@ public abstract class AbstractEgressDtoMapper<
                         this.applicationContext
                             .getBean(fullTypeCamelCase);
 
-                    var mapped = mapperBean.map((AbstractAclEntity) unproxied);
+                    var mapped = mapperBean.map((AbstractAclModel) unproxied);
                     mapped = (AbstractAclEntityDto) Hibernate.unproxy(mapped);
                     dtoField.set(dto, mapped);
 
@@ -247,7 +247,7 @@ public abstract class AbstractEgressDtoMapper<
                         this.applicationContext
                             .getBean(fullType);
 
-                    var mapped = mapperBean.map((AbstractAclEntity) unproxied);
+                    var mapped = mapperBean.map((AbstractAclModel) unproxied);
                     mapped = (AbstractAclEntityDto) Hibernate.unproxy(mapped);
                     dtoField.set(dto, mapped);
                 }
