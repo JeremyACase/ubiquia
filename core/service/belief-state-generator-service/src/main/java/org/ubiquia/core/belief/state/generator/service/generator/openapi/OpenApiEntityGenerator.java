@@ -19,9 +19,6 @@ public class OpenApiEntityGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenApiEntityGenerator.class);
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     public void generateOpenApiEntitiesFrom(final String openApiYaml) throws IOException {
 
         logger.debug("Generating new Belief State from: {}", openApiYaml);
@@ -37,14 +34,14 @@ public class OpenApiEntityGenerator {
 
         var configurator = new CodegenConfigurator()
             .setInputSpec(specFilePath)
-            .setGeneratorName("java-jpa-relation")
+            .setGeneratorName("ubiquia-acl-entity-generator")
             .setOutputDir("generated")
             .setTemplateDir(templatePath)
             .addAdditionalProperty("gson", false)
             .addAdditionalProperty("jackson", false)
             .addAdditionalProperty("library", "native")
             .addAdditionalProperty("modelPropertyNaming", "original")
-            .addAdditionalProperty("modelPackage", "org.ubiquia.acl.generated.entity")
+            .addAdditionalProperty("modelPackage", "org.ubiquia.acl.generated")
             .addAdditionalProperty("useBeanValidation", true);
 
         configurator.setGlobalProperties(Map.of(
@@ -53,7 +50,8 @@ public class OpenApiEntityGenerator {
             "modelTests", "false",
             "apis", "false",
             "apiDocs", "false",
-            "apiTests", "false"
+            "apiTests", "false",
+            "supportingFiles", "true"
         ));
 
         var generator = new DefaultGenerator();

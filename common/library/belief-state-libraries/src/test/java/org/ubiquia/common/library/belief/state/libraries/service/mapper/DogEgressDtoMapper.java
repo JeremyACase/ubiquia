@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.ubiquia.acl.generated.dto.Dog;
-import org.ubiquia.acl.generated.entity.DogModel;
+import org.ubiquia.acl.generated.entity.DogEntity;
 
 @Component
-public class DogEgressDtoMapper extends AbstractEgressDtoMapper<DogModel, Dog> {
+public class DogEgressDtoMapper extends AbstractEgressDtoMapper<DogEntity, Dog> {
 
     protected static final Logger logger = LoggerFactory.getLogger(DogEgressDtoMapper.class);
 

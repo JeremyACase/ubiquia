@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import org.instancio.Instancio;
 import org.springframework.stereotype.Service;
 import org.ubiquia.acl.generated.dto.*;
-import org.ubiquia.common.model.acl.dto.AbstractAclEntityDto;
+import org.ubiquia.common.model.acl.dto.AbstractAclModel;
 
 @Service
 public class MockFactory {
@@ -19,11 +19,11 @@ public class MockFactory {
     public Person generatePerson() {
         var model = Instancio
             .of(Person.class)
-            .ignore(field(AbstractAclEntityDto::getId))
-            .ignore(field(AbstractAclEntityDto::getCreatedAt))
-            .ignore(field(AbstractAclEntityDto::getUpdatedAt))
+            .ignore(field(AbstractAclModel::getId))
+            .ignore(field(AbstractAclModel::getCreatedAt))
+            .ignore(field(AbstractAclModel::getUpdatedAt))
             .set(field(Person::getPets), new ArrayList<>())
-            .set(field(AbstractAclEntityDto::getModelType), "Person")
+            .set(field(AbstractAclModel::getModelType), "Person")
             .create();
         return model;
     }
@@ -36,9 +36,9 @@ public class MockFactory {
     public Cat generateCat() {
         var model = Instancio
             .of(Cat.class)
-            .ignore(field(AbstractAclEntityDto::getId))
-            .ignore(field(AbstractAclEntityDto::getCreatedAt))
-            .ignore(field(AbstractAclEntityDto::getUpdatedAt))
+            .ignore(field(AbstractAclModel::getId))
+            .ignore(field(AbstractAclModel::getCreatedAt))
+            .ignore(field(AbstractAclModel::getUpdatedAt))
             .ignore(field(Animal::getOwner))
             .create();
         return model;
@@ -52,9 +52,9 @@ public class MockFactory {
     public Shark generateShark() {
         var model = Instancio
             .of(Shark.class)
-            .ignore(field(AbstractAclEntityDto::getId))
-            .ignore(field(AbstractAclEntityDto::getCreatedAt))
-            .ignore(field(AbstractAclEntityDto::getUpdatedAt))
+            .ignore(field(AbstractAclModel::getId))
+            .ignore(field(AbstractAclModel::getCreatedAt))
+            .ignore(field(AbstractAclModel::getUpdatedAt))
             .ignore(field(Animal::getOwner))
             .create();
         return model;
@@ -68,9 +68,9 @@ public class MockFactory {
     public Dachschund generateWienerDog() {
         var warWeen = Instancio
             .of(Dachschund.class)
-            .ignore(field(AbstractAclEntityDto::getId))
-            .ignore(field(AbstractAclEntityDto::getCreatedAt))
-            .ignore(field(AbstractAclEntityDto::getUpdatedAt))
+            .ignore(field(AbstractAclModel::getId))
+            .ignore(field(AbstractAclModel::getCreatedAt))
+            .ignore(field(AbstractAclModel::getUpdatedAt))
             .ignore(field(Animal::getOwner))
             .create();
         return warWeen;

@@ -19,9 +19,6 @@ public class OpenApiDtoGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenApiDtoGenerator.class);
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     public void generateOpenApiDtosFrom(final String openApiYaml) {
 
         logger.debug("Generating new Belief State from: {}", openApiYaml);
@@ -50,7 +47,7 @@ public class OpenApiDtoGenerator {
             .addAdditionalProperty("library", "native")
             .addAdditionalProperty("modelPropertyNaming", "original")
             .addAdditionalProperty("javaxPackage", "jakarta")
-            .addAdditionalProperty("modelPackage", "org.ubiquia.acl.generated.dto");
+            .addAdditionalProperty("modelPackage", "org.ubiquia.acl.generated");
 
         configurator.setGlobalProperties(Map.of(
             "models", "",

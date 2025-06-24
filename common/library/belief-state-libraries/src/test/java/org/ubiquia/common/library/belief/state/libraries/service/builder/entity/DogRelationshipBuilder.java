@@ -3,10 +3,10 @@ package org.ubiquia.common.library.belief.state.libraries.service.builder.entity
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.ubiquia.acl.generated.entity.DogModel;
+import org.ubiquia.acl.generated.entity.DogEntity;
 
 @Service
-public class DogRelationshipBuilder extends EntityRelationshipBuilder<DogModel> {
+public class DogRelationshipBuilder extends EntityRelationshipBuilder<DogEntity> {
 
     protected static final Logger logger = LoggerFactory.getLogger(DogRelationshipBuilder.class);
 

@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.ubiquia.common.model.acl.entity.AbstractAclModel;
+import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
 
-public interface EntityRepository<T extends AbstractAclModel>
+public interface EntityRepository<T extends AbstractAclModelEntity>
     extends PagingAndSortingRepository<T, String>,
     CrudRepository<T, String> {
 

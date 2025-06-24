@@ -2,9 +2,9 @@ package org.ubiquia.common.library.belief.state.libraries.service.mapper;
 
 import org.springframework.stereotype.Service;
 import org.ubiquia.acl.generated.dto.Animal;
-import org.ubiquia.acl.generated.entity.AnimalModel;
+import org.ubiquia.acl.generated.entity.AnimalEntity;
 
 @Service
-public class AnimalIngressDtoMapper extends AbstractIngressDtoMapper<Animal, AnimalModel> {
+public class AnimalIngressDtoMapper extends AbstractIngressDtoMapper<Animal, AnimalEntity> {
 
 }

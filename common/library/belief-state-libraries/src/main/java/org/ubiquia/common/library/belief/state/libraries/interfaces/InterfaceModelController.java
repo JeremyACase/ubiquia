@@ -14,15 +14,15 @@ import org.ubiquia.common.library.belief.state.libraries.model.association.Assoc
 import org.ubiquia.common.library.belief.state.libraries.repository.EntityRepository;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractIngressDtoMapper;
-import org.ubiquia.common.model.acl.dto.AbstractAclEntityDto;
+import org.ubiquia.common.model.acl.dto.AbstractAclModel;
 import org.ubiquia.common.model.acl.embeddable.KeyValuePair;
-import org.ubiquia.common.model.acl.entity.AbstractAclModel;
+import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 
 public interface InterfaceModelController<
-    T extends AbstractAclModel,
-    D extends AbstractAclEntityDto> {
+    T extends AbstractAclModelEntity,
+    D extends AbstractAclModel> {
 
     EntityRelationshipBuilder<T> getEntityRelationshipBuilder();
 

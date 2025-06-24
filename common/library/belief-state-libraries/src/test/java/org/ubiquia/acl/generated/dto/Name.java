@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
-import org.ubiquia.common.model.acl.dto.AbstractAclEntityDto;
+import org.ubiquia.common.model.acl.dto.AbstractAclModel;
 
 /**
  * A model with some name information.
@@ -29,7 +29,7 @@ import org.ubiquia.common.model.acl.dto.AbstractAclEntityDto;
     Name.JSON_PROPERTY_LAST_NAME
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
-public class Name extends AbstractAclEntityDto {
+public class Name extends AbstractAclModel {
     public static final String JSON_PROPERTY_FIRST_NAME = "firstName";
     public static final String JSON_PROPERTY_LAST_NAME = "lastName";
     @jakarta.annotation.Nonnull
