@@ -15,4 +15,15 @@ public class {{classname}}EgressDtoMapper extends AbstractEgressDtoMapper<{{clas
         return logger;
     }
 
+    @Override
+    public {{classname}} getNewDto() {
+        var dto = new {{classname}}();
+        dto.setModelType("{{classname}}");
+        return dto;
+    }
+
+    @Override
+    public String getModelType() {
+        return "{{classname}}";
+    }
 }

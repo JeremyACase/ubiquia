@@ -2,8 +2,13 @@ package {{package}};
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import org.ubiquia.common.library.belief.state.libraries.controller.AbstractAclModelController;
+import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractEgressDtoMapper;
+import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractIngressDtoMapper;
 
 @RestController
 @RequestMapping("/ubiquia/{{classname}}")
@@ -12,13 +17,13 @@ public class {{classname}}Controller extends AbstractAclModelController<{{classn
     private static final Logger logger = LoggerFactory.getLogger({{classname}}Controller.class);
 
     @Autowired
-    private IngressDTOMapper<{{classname}}, {{classname}}Entity> ingressMapper;
+    private AbstractIngressDtoMapper<{{classname}}, {{classname}}Entity> ingressMapper;
 
     @Autowired
-    protected {{classname}}RelationshipBuilder entityRelationshipBuilder;
+    protected {{classname}}EntityRelationshipBuilder entityRelationshipBuilder;
 
     @Autowired
-    private {{classname}}Repository entityRepository;
+    private {{classname}}EntityRepository entityRepository;
 
     @Override
     public Logger getLogger() {
@@ -26,17 +31,17 @@ public class {{classname}}Controller extends AbstractAclModelController<{{classn
     }
 
     @Override
-    public EntityRelationshipBuilder<{{classname}}> getEntityRelationshipMapper() {
+    public EntityRelationshipBuilder<{{classname}}Entity> getEntityRelationshipBuilder() {
         return this.entityRelationshipBuilder;
     }
 
     @Override
-    public IngressDTOMapper<{{classname}}, {{classname}}Entity> getIngressMapper() {
+    public AbstractIngressDtoMapper<{{classname}}, {{classname}}Entity> getIngressMapper() {
         return this.ingressMapper;
     }
 
     @Override
-    public {{classname}}Repository getEntityRepository() {
+    public {{classname}}EntityRepository getEntityRepository() {
         return this.entityRepository;
     }
 }
