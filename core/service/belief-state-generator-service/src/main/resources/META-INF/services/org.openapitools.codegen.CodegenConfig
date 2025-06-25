@@ -1,1 +1,2 @@
 org.ubiquia.core.belief.state.generator.service.generator.acl.UbiquiaAclEntityGenerator
+org.ubiquia.core.belief.state.generator.service.generator.acl.UbiquiaAclDtoGenerator

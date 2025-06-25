@@ -16,10 +16,18 @@ public class GenerationCleanupProcessor {
     private final List<String> BLACKLISTED_FILENAMES = List.of(
         "AbstractAclModel.java",
         "AbstractAclModelEntity.java",
+        "AbstractAclModelEntityRelationshipBuilder.java",
         "AbstractAclModelEntityRepository.java",
+        "AbstractAclModelController.java",
+        "AbstractAclModelIngressDtoMapper.java",
+        "AbstractAclModelEgressDtoMapper.java",
         "KeyValuePair.java",
         "KeyValuePairEntity.java",
-        "KeyValuePairEntityRepository.java"
+        "KeyValuePairController.java",
+        "KeyValuePairEntityRepository.java",
+        "KeyValuePairEntityRelationshipBuilder.java",
+        "KeyValuePairIngressDtoMapper.java",
+        "KeyValuePairEgressDtoMapper.java"
     );
 
     public void removeBlacklistedFiles(final Path generatedDir) throws IOException {

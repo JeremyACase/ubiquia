@@ -38,7 +38,7 @@ public class OpenApiDtoGenerator {
 
         var configurator = new CodegenConfigurator()
             .setInputSpec(specFilePath)
-            .setGeneratorName("java")
+            .setGeneratorName("ubiquia-acl-dto-generator")
             .setOutputDir("generated")
             .setTemplateDir(templatePath)
             .addAdditionalProperty("useBeanValidation", true)

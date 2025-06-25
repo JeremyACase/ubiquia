@@ -36,6 +36,7 @@ public class UbiquiaAclEntityGenerator extends JavaClientCodegen {
         this.setEnablePostProcessFile(true);
 
         modelTemplateFiles.put("modelRepository.mustache", "Repository.java");
+        modelTemplateFiles.put("modelRelationshipBuilder.mustache", "RelationshipBuilder.java");
     }
 
     /* ------------------------------------------------------------
@@ -104,15 +105,19 @@ public class UbiquiaAclEntityGenerator extends JavaClientCodegen {
         if ("model".equals(fileType)) {
             String filename = file.getName();
 
-            if (filename.endsWith("Repository.java")) {
-                String modelName = filename.replace("Repository.java", "");
+            // Check for Repository.java or ModelRelationshipBuilder.java
+            if (filename.endsWith("Repository.java") || filename.endsWith("RelationshipBuilder.java")) {
+                String modelName = filename
+                    .replace("Repository.java", "")
+                    .replace("RelationshipBuilder.java", "");
+
                 CodegenModel model = modelIndex.get(modelName);
                 if (model != null && model.isEnum) {
                     boolean deleted = file.delete();
                     if (deleted) {
-                        System.out.printf("Deleted enum repository file: " + file.getAbsolutePath());
+                        System.out.printf("Deleted enum-generated file: %s%n", file.getAbsolutePath());
                     } else {
-                        System.out.printf("Failed to delete file: " + file.getAbsolutePath());
+                        System.out.printf("Failed to delete file: %s%n", file.getAbsolutePath());
                     }
                 }
             }

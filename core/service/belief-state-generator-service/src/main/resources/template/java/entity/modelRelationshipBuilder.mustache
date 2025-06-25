@@ -1,0 +1,17 @@
+package {{package}};
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
+import org.springframework.stereotype.Service;
+
+@Service
+public class {{classname}}RelationshipBuilder extends EntityRelationshipBuilder<{{classname}}> {
+
+    private static final Logger logger = LoggerFactory.getLogger({{classname}}RelationshipBuilder.class);
+
+    @Override
+    public Logger getLogger() {
+        return logger;
+    }
+}

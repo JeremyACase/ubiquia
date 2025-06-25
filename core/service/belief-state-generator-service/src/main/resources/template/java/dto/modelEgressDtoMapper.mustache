@@ -1,0 +1,18 @@
+package {{package}};
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractEgressDtoMapper;
+
+@Service
+public class {{classname}}EgressDtoMapper extends AbstractEgressDtoMapper<{{classname}}Entity, {{classname}}> {
+
+    private static final Logger logger = LoggerFactory.getLogger({{classname}}EgressDtoMapper.class);
+
+    @Override
+    public Logger getLogger() {
+        return logger;
+    }
+
+}
