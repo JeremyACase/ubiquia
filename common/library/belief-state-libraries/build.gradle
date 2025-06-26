@@ -26,7 +26,6 @@ dependencies {
 
     testImplementation group: 'com.h2database', name: 'h2', version: "${H2_VERSION}"
     testImplementation group: 'org.instancio', name: 'instancio-junit', version: "${INSTANCIO_VERSION}"
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 jacocoTestReport {

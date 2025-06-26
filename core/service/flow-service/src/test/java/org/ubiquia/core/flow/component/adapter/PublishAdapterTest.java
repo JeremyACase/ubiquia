@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdgeDto;
 import org.ubiquia.common.model.ubiquia.embeddable.BrokerSettings;
@@ -32,6 +33,7 @@ import org.ubiquia.core.flow.mock.MockRegistrar;
         "port=9092"
     }
 )
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class PublishAdapterTest {
 
     @Autowired

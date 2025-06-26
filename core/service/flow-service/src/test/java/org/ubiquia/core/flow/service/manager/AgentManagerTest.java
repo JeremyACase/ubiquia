@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdgeDto;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
@@ -21,6 +22,7 @@ import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AgentManagerTest {
 
     @Autowired

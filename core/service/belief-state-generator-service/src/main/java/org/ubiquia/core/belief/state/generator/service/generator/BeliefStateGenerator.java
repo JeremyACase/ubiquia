@@ -17,6 +17,7 @@ import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApi
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiEntityGenerator;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiDtoYamlMapper;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiEntityYamlMapper;
+import org.ubiquia.core.belief.state.generator.service.packager.BeliefStateUberizer;
 
 @Service
 public class BeliefStateGenerator {
@@ -28,6 +29,9 @@ public class BeliefStateGenerator {
 
     @Autowired
     private GenerationCleanupProcessor generationCleanupProcessor;
+
+    @Autowired
+    private GenerationSupportProcessor generationSupportProcessor;
 
     @Autowired
     private InheritancePreprocessor inheritancePreprocessor;
@@ -50,6 +54,9 @@ public class BeliefStateGenerator {
     @Autowired
     private UbiquiaModelInjector ubiquiaModelInjector;
 
+    @Autowired
+    private BeliefStateUberizer beliefStateUberizer;
+
     public void generateBeliefStateFrom(final AgentCommunicationLanguageDto acl)
         throws Exception {
 
@@ -71,6 +78,7 @@ public class BeliefStateGenerator {
         this.openApiDtoGenerator.generateOpenApiDtosFrom(openApiDtoYaml);
 
         this.generationCleanupProcessor.removeBlacklistedFiles(Paths.get("generated"));
+        this.generationSupportProcessor.postProcess();
 
         var beliefStateLibraries = this.getJarPaths("belief-state-libs");
 
@@ -78,6 +86,18 @@ public class BeliefStateGenerator {
             "generated",
             "compiled",
             beliefStateLibraries);
+
+        var beliefStateName =
+            acl.getDomain().toLowerCase()
+            + "-"
+            + acl.getVersion().toString()
+            + ".jar";
+
+        this.beliefStateUberizer.createUberJar(
+            "packaged/" + beliefStateName,
+            "compiled",
+            beliefStateLibraries
+        );
     }
 
     private List<String> getJarPaths(final String libsDirPath) {

@@ -42,7 +42,6 @@ public class TestHelper {
     private UbiquiaAgentRepository ubiquiaAgentRepository;
 
     public void setupAgentState() {
-        this.clearDatabase();
         this.adapterManager.teardownAllAdapters();
         this.ubiquiaAgentLogic.tryInitializeAgentInDatabase();
     }
@@ -72,18 +71,5 @@ public class TestHelper {
             .get(adapterEntity.getId());
 
         return adapter;
-    }
-
-    /**
-     * Clear the database between tests.
-     */
-    @Transactional
-    private void clearDatabase() {
-        this.flowMessageRepository.deleteAll();
-        this.flowEventRepository.deleteAll();
-        this.adapterRepository.deleteAll();
-        this.agentRepository.deleteAll();
-        this.graphRepository.deleteAll();
-        this.aclRepository.deleteAll();
     }
 }

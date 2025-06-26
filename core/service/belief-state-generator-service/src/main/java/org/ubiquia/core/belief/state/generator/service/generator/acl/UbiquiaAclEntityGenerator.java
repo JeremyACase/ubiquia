@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.JavaClientCodegen;
 import org.openapitools.codegen.model.ModelsMap;
 
@@ -35,6 +36,7 @@ public class UbiquiaAclEntityGenerator extends JavaClientCodegen {
 
         this.setEnablePostProcessFile(true);
 
+        supportingFiles.clear();
         modelTemplateFiles.put("modelRepository.mustache", "Repository.java");
         modelTemplateFiles.put("modelRelationshipBuilder.mustache", "RelationshipBuilder.java");
     }
