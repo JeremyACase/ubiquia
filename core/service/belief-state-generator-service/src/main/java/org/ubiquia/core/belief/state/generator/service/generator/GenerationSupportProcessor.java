@@ -15,8 +15,12 @@ public class GenerationSupportProcessor {
 
     public void postProcess() throws IOException {
         this.copyFile(
-            "src/main/resources/template/java/support/Application.Java",
+            "src/main/resources/template/java/support/Application.Java.template",
             "generated/src/main/java/org/ubiquia/acl/generated/Application.java");
+
+        this.copyFile(
+            "src/main/resources/template/java/support/application.yaml.template",
+            "generated/src/main/resources/application.yaml");
     }
 
     private void copyFile(

@@ -24,3 +24,4 @@ jacoco.xml
 compiled/
 generated/
 packaged/*.jar
+belief-state-libs/

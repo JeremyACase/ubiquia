@@ -23,6 +23,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-validation"
     implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-loader-tools"
 
     // Adding these for now to prevent failures occurring when generating OpenAPI files from yaml
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
@@ -58,4 +59,38 @@ test {
     useJUnitPlatform()
 }
 
-build.dependsOn jacocoTestReport
+
+task copyRuntimeLibs(type: Copy) {
+    description = 'Copies all runtime dependencies and project jars to build/belief-state-libs'
+
+    from configurations.runtimeClasspath
+
+    def projectJars = [
+        ':common:model:acl',
+        ':common:model:ubiquia',
+        ':common:library:advice',
+        ':common:library:api',
+        ':common:library:belief-state-libraries',
+        ':common:library:config',
+        ':common:library:dao',
+        ':common:library:logic'
+    ]
+
+    projectJars.each { path ->
+        def subproject = project(path)
+
+        // Add the compiled jar
+        def jarTask = subproject.tasks.named('jar')
+        dependsOn(jarTask)
+        from(jarTask.map { it.archiveFile.get().asFile })
+
+        // Add runtime dependencies from the subproject
+        dependsOn(subproject.configurations.runtimeClasspath)
+        from(subproject.configurations.runtimeClasspath)
+    }
+
+    into "belief-state-libs"
+}
+
+
+build.dependsOn copyRuntimeLibs

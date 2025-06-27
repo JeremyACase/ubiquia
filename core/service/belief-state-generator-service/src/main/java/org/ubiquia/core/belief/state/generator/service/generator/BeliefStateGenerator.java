@@ -10,14 +10,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
-import org.ubiquia.core.belief.state.generator.service.compiler.BeliefStateCompiler;
+import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateCompiler;
 import org.ubiquia.core.belief.state.generator.service.decorator.InheritancePreprocessor;
 import org.ubiquia.core.belief.state.generator.service.decorator.UbiquiaModelInjector;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiDtoGenerator;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiEntityGenerator;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiDtoYamlMapper;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiEntityYamlMapper;
-import org.ubiquia.core.belief.state.generator.service.packager.BeliefStateUberizer;
+import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateUberizer;
 
 @Service
 public class BeliefStateGenerator {

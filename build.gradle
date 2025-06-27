@@ -66,6 +66,7 @@ subprojects {
         testRuntimeOnly  "org.junit.platform:junit-platform-commons:${JUNIT_PLATFORM_VERSION}"
     }
 }
+
 checkstyle {
     configFile file("${rootDir}/config/checkstyle/checkstyle.xml")
     toolVersion '10.23.1';
