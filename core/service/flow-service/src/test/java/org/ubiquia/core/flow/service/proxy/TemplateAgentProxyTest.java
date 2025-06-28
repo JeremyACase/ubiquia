@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.ubiquia.common.model.ubiquia.dto.GraphEdgeDto;
+import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
@@ -88,7 +88,7 @@ public class TemplateAgentProxyTest {
         ingressAgent.setAdapter(ingressAdapter);
         hiddenAgent.setAdapter(hiddenAdapter);
 
-        var edge = new GraphEdgeDto();
+        var edge = new GraphEdge();
         edge.setLeftAdapterName(ingressAdapter.getAdapterName());
         edge.setRightAdapterNames(new ArrayList<>());
         edge.getRightAdapterNames().add(hiddenAdapter.getAdapterName());

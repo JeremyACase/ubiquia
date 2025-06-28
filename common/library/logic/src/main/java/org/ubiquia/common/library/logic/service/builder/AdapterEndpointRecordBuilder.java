@@ -4,12 +4,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
+import org.ubiquia.common.model.ubiquia.dto.Adapter;
 
 @Service
 public class AdapterEndpointRecordBuilder {
 
-    public URI getAgentUriFrom(final AdapterDto adapter)
+    public URI getAgentUriFrom(final Adapter adapter)
         throws URISyntaxException {
 
         return new URI(

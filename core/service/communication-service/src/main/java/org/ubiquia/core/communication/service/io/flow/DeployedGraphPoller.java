@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.library.config.UbiquiaAgentConfig;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
-import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
 import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
 import org.ubiquia.core.communication.service.manager.flow.AgentProxyManager;
@@ -25,7 +25,7 @@ public class DeployedGraphPoller {
 
     private static final Logger logger = LoggerFactory.getLogger(DeployedGraphPoller.class);
 
-    private final Map<String, GraphDto> currentGraphs = new HashMap<>();
+    private final Map<String, Graph> currentGraphs = new HashMap<>();
 
     @Autowired
     private FlowServiceConfig flowServiceConfig;
@@ -141,7 +141,7 @@ public class DeployedGraphPoller {
                 targetUri,
                 HttpMethod.GET,
                 requestEntity,
-                new ParameterizedTypeReference<GenericPageImplementation<GraphDto>>() {
+                new ParameterizedTypeReference<GenericPageImplementation<Graph>>() {
                 }
             );
 

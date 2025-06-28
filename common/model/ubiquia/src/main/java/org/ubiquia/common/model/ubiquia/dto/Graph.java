@@ -1,38 +1,32 @@
-package org.ubiquia.common.model.ubiquia.entity;
+package org.ubiquia.common.model.ubiquia.dto;
 
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
+import org.ubiquia.common.model.ubiquia.embeddable.NameAndVersionPair;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 
-
-@Entity
-public class Graph extends AbstractEntity {
+public class Graph extends AbstractModel {
 
     private String graphName;
 
     private String author;
 
-    private List<String> capabilities;
-
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "acl_graph_join_id", nullable = false)
-    private AgentCommunicationLanguage agentCommunicationLanguage;
+    private List<String> capabilities;
+
+    private NameAndVersionPair agentCommunicationLanguage;
+
+    private List<GraphEdge> edges;
 
     private SemanticVersion version;
 
-    @OneToMany(mappedBy = "graph", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private List<Adapter> adapters;
 
-    @OneToMany(mappedBy = "graph", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-    private List<Agent> agents;
+    private List<Adapter> agentlessAdapters;
 
-    @ManyToMany(mappedBy = "deployedGraphs", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<UbiquiaAgent> ubiquiaAgentsDeployingGraph;
+    private List<Agent> agents;
 
     @Override
     public String getModelType() {
@@ -75,7 +69,6 @@ public class Graph extends AbstractEntity {
         this.version = version;
     }
 
-    @NotNull
     public List<Adapter> getAdapters() {
         return adapters;
     }
@@ -84,22 +77,12 @@ public class Graph extends AbstractEntity {
         this.adapters = adapters;
     }
 
-    @NotNull
     public List<Agent> getAgents() {
         return agents;
     }
 
     public void setAgents(List<Agent> agents) {
         this.agents = agents;
-    }
-
-    @NotNull
-    public AgentCommunicationLanguage getAgentCommunicationLanguage() {
-        return agentCommunicationLanguage;
-    }
-
-    public void setAgentCommunicationLanguage(AgentCommunicationLanguage agentCommunicationLanguage) {
-        this.agentCommunicationLanguage = agentCommunicationLanguage;
     }
 
     public List<String> getCapabilities() {
@@ -110,12 +93,29 @@ public class Graph extends AbstractEntity {
         this.capabilities = capabilities;
     }
 
-    public List<UbiquiaAgent> getUbiquiaAgentsDeployingGraph() {
-        return ubiquiaAgentsDeployingGraph;
+    public List<GraphEdge> getEdges() {
+        return edges;
     }
 
-    public void setUbiquiaAgentsDeployingGraph(List<UbiquiaAgent> ubiquiaAgentsDeployingGraph) {
-        this.ubiquiaAgentsDeployingGraph = ubiquiaAgentsDeployingGraph;
+    public void setEdges(List<GraphEdge> edges) {
+        this.edges = edges;
+    }
+
+    public List<Adapter> getAgentlessAdapters() {
+        return agentlessAdapters;
+    }
+
+    public void setAgentlessAdapters(List<Adapter> agentlessAdapters) {
+        this.agentlessAdapters = agentlessAdapters;
+    }
+
+    @NotNull
+    public NameAndVersionPair getAgentCommunicationLanguage() {
+        return agentCommunicationLanguage;
+    }
+
+    public void setAgentCommunicationLanguage(NameAndVersionPair agentCommunicationLanguage) {
+        this.agentCommunicationLanguage = agentCommunicationLanguage;
     }
 }
 

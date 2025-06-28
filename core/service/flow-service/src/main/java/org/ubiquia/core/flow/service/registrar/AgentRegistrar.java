@@ -12,13 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.AgentDto;
-import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.dto.Agent;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.model.ubiquia.embeddable.CommunicationServiceSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.Config;
 import org.ubiquia.common.model.ubiquia.embeddable.ScaleSettings;
-import org.ubiquia.common.model.ubiquia.entity.Agent;
-import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
+import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.common.model.ubiquia.enums.AgentType;
 import org.ubiquia.core.flow.repository.AgentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
@@ -49,16 +49,16 @@ public class AgentRegistrar {
      * @throws JsonProcessingException Exceptions from parsing agent configuration.
      */
     @Transactional
-    public List<Agent> registerAgentsFor(
-        Graph graphEntity,
-        final GraphDto graphRegistration)
+    public List<AgentEntity> registerAgentsFor(
+        GraphEntity graphEntity,
+        final Graph graphRegistration)
         throws JsonProcessingException {
 
         logger.info("...registering agents for graph: {}...",
             graphRegistration.getGraphName());
 
         // TODO: Verify agent subschema is valid
-        var agentEntities = new ArrayList<Agent>();
+        var agentEntities = new ArrayList<AgentEntity>();
         for (var agent : graphRegistration.getAgents()) {
             var agentEntity = this.tryGetAgentEntityFrom(
                 graphRegistration,
@@ -78,7 +78,7 @@ public class AgentRegistrar {
      *
      * @param agentEntity The agent to clean.
      */
-    private void cleanAgent(Agent agentEntity) {
+    private void cleanAgent(AgentEntity agentEntity) {
 
         if (Objects.isNull(agentEntity.getTags())) {
             agentEntity.setTags(new HashSet<>());
@@ -119,7 +119,7 @@ public class AgentRegistrar {
      * @return The newly-registered agent.
      */
     @Transactional
-    private Agent persistAgentWithParentGraph(Agent agentEntity, Graph graphEntity) {
+    private AgentEntity persistAgentWithParentGraph(AgentEntity agentEntity, GraphEntity graphEntity) {
 
         if (Objects.isNull(graphEntity.getAgents())) {
             graphEntity.setAgents(new ArrayList<>());
@@ -143,9 +143,9 @@ public class AgentRegistrar {
      * @throws JsonProcessingException Exceptions from processing the registration object.
      */
     @Transactional
-    private Agent tryGetAgentEntityFrom(
-        final GraphDto graphRegistration,
-        final AgentDto agentRegistration)
+    private AgentEntity tryGetAgentEntityFrom(
+        final Graph graphRegistration,
+        final Agent agentRegistration)
         throws JsonProcessingException {
 
         var record = this.agentRepository
@@ -167,7 +167,7 @@ public class AgentRegistrar {
                 + "!");
         }
 
-        var agentEntity = new Agent();
+        var agentEntity = new AgentEntity();
 
         if (Objects.nonNull(agentRegistration.getConfig())) {
 

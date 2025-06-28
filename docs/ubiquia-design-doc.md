@@ -11,38 +11,38 @@ This is a design document for Ubiquia, a Multi-Agent-System orchestration tool a
 * [Goals and Non-Goals](#goals-and-non-goals)
 * [Tech Stack](#tech-stack)
 * [Architecture](#architecture)
-    * [High-Level Architecture Diagram](#high-level-architecture-diagram)
-    * [Components](#components)
-    * [Message Broker](#message-broker)
-    * [Databases](#databases)
-    * [Observability](#observability)
-    * [Deployment](#deployment)
+  * [High-Level Architecture Diagram](#high-level-architecture-diagram)
+  * [Components](#components)
+  * [Message Broker](#message-broker)
+  * [Databases](#databases)
+  * [Observability](#observability)
+  * [Deployment](#deployment)
 * [Components and Services](#components-and-services)
-    * [Flow Service](#flow-service)
-    * [Authorization Service](#authorization-service)
-    * [Communication Service](#communication-service)
-    * [Executive Service](#executive-service)
-    * [Learning Service](#learning-service)
-    * [Vectorization Service](#vectorization-service)
+  * [Flow Service](#flow-service)
+  * [Authorization Service](#authorization-service)
+  * [Communication Service](#communication-service)
+  * [Executive Service](#executive-service)
+  * [Learning Service](#learning-service)
+  * [Vectorization Service](#vectorization-service)
 * [Data Model](#data-model)
-    * [Flow Service](#flow-service)
+  * [Flow Service](#flow-service)
 * [Scalability and Resilience](#scalability-and-resilience)
-    * [Scalability](#scalability)
-    * [Resilience](#resilience)
+  * [Scalability](#scalability)
+  * [Resilience](#resilience)
 * [Security](#security)
-    * [Authorization](#authorization)
-    * [Data Protection](#data-protection)
-    * [Input Validation](#input-validation)
-    * [Audit Logging](#audit-logging)
-    * [Compliance and Hardening](#compliance-and-hardening)
+  * [Authorization](#authorization)
+  * [Data Protection](#data-protection)
+  * [Input Validation](#input-validation)
+  * [Audit Logging](#audit-logging)
+  * [Compliance and Hardening](#compliance-and-hardening)
 * [Observability](#observability)
-    * [Metrics](#metrics)
-    * [Grafana Dashboards](#grafana-dashboards)
-    * [YugabyteDB Dashboards](#yugabytedb-dashboards)
-    * [Logging](#logging)
+  * [Metrics](#metrics)
+  * [Grafana Dashboards](#grafana-dashboards)
+  * [YugabyteDB Dashboards](#yugabytedb-dashboards)
+  * [Logging](#logging)
 * [Deployment Strategy](#deployment-strategy)
-    * [Overview](#overview)
-    * [Helm Structure](#helm-structure)
+  * [Overview](#overview)
+  * [Helm Structure](#helm-structure)
 * [Tradeoffs](#tradeoffs)
 
 
@@ -51,7 +51,7 @@ This is a design document for Ubiquia, a Multi-Agent-System orchestration tool a
 **Ubiquia**  is a software system designed to serve as a general-purpose framework for decentralized autonomous situational awareness (ASA.) It is designed with lessons learned from MACHINA as well as recent advancements in Multi Agent Systems (MAS) and Large Language Models (LLMs) such as ChatGPT 3.5.
 
 **Use Case Example:**
-Ubiquia can be used to orchestrate a collection of SDA assets--human, LLM, hardware, or otherwise--into an autonomous system capable of surviving a military conflict while still providing invaluable real-time awareness. 
+Ubiquia can be used to orchestrate a collection of SDA assets--human, LLM, hardware, or otherwise--into an autonomous system capable of surviving a military conflict while still providing invaluable real-time awareness.
 
 ---
 
@@ -114,14 +114,14 @@ TODO
   - **Direct Acylic Graph Registration**: The Flow Service will be able to allow registration of Directed Acyclic Graph workflows comprised of agents and adapters.
   - **Direct Acylic Graph Orchestration**: The Flow Service will double as a Kubernetes operator capable of orchestrating DAG's across Kubernetes clusters dynamically and at runtime.
   - **Schema Validation**: The Flow Service will be able to verify input/output of agents based on an ACL. This is especially important for LLM-based agents.
-  - **Vector Database Interface**: For agents that are Large Language Models (LLM's), Flow Service will be able to interface with a vector database on behalf of the LLM. 
-  - **Back Pressure**: Leveraging queues and the inbox/outbox pattern, Flow Service will provide a "back pressure" endpoint allowing for the Executive Service to be able to actuate Flow Service DAG's across ubiquia Agents to alleviate pressure. 
+  - **Vector Database Interface**: For agents that are Large Language Models (LLM's), Flow Service will be able to interface with a vector database on behalf of the LLM.
+  - **Back Pressure**: Leveraging queues and the inbox/outbox pattern, Flow Service will provide a "back pressure" endpoint allowing for the Executive Service to be able to actuate Flow Service DAG's across ubiquia Agents to alleviate pressure.
   - **DAG Dataflow**: Flow Service will persist data into the distributed database via a queueing mechanism via the inbox/outbox pattern.
 - **API**:
-    - **ACL**: The ability to register, query, and delete ACL's
-    - **DAGs**: The ability to register, deploy, teardown, query, and delete DAG's
-    - **Agent Adapters**: The ability to interface with the adapter deployed for any given agent depending on the type (e.g., Push, Merge, etc.)
-    - **Back Pressure**: The ability to query for back pressure for any given adapter.
+  - **ACL**: The ability to register, query, and delete ACL's
+  - **DAGs**: The ability to register, deploy, teardown, query, and delete DAG's
+  - **Agent Adapters**: The ability to interface with the adapter deployed for any given agent depending on the type (e.g., Push, Merge, etc.)
+  - **Back Pressure**: The ability to query for back pressure for any given adapter.
 - **Dependencies**
   - **SQL Database**: Either H2 (for testing) or YugabyteDB.
   - **Vector Database**: A vector database to store vector embeddings for any LLM agents.
@@ -130,7 +130,7 @@ TODO
 - **Responsibilies**
   - **Reverse Proxy**: The Communications Service will be able to expose services from within a ubiquia agent and Kubernetes agent externally, and be able to do so dynamically (such as will be needed when deploying Flow Service DAG's.)
 - **API**:
-    - **???**: TODO: Find a way for Comm service to get "Flow Service DAG events" (either via broker or by REST, broker complicates stuff though...) to ensure it can dynamically "surface" internal APIs via Kubernetes 
+  - **???**: TODO: Find a way for Comm service to get "Flow Service DAG events" (either via broker or by REST, broker complicates stuff though...) to ensure it can dynamically "surface" internal APIs via Kubernetes
 
 ### Executive Service
 - **Responsibilies**

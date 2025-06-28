@@ -12,13 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
-import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.dto.Adapter;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.CommunicationServiceSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
-import org.ubiquia.common.model.ubiquia.entity.Adapter;
-import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
+import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.AgentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
@@ -59,12 +59,12 @@ public class AdapterRegistrar {
      * @return A list of newly-registered adapters.
      */
     @Transactional
-    public List<Adapter> registerAdaptersFor(
-        Graph graphEntity,
-        final GraphDto graphRegistration)
+    public List<AdapterEntity> registerAdaptersFor(
+        GraphEntity graphEntity,
+        final Graph graphRegistration)
         throws JsonProcessingException {
 
-        var adapterEntities = new ArrayList<Adapter>();
+        var adapterEntities = new ArrayList<AdapterEntity>();
 
         var adaptersAttachedToAgents =
             this.tryRegisterAdaptersAttachedToAgents(
@@ -94,8 +94,8 @@ public class AdapterRegistrar {
      * @param adapterRegistration The JSON representing the adapter's registration data.
      */
     private void setAdapterSettings(
-        Adapter adapterEntity,
-        final AdapterDto adapterRegistration) {
+        AdapterEntity adapterEntity,
+        final Adapter adapterRegistration) {
 
         var entitySettings = adapterEntity.getAdapterSettings();
         var registrationSettings = adapterRegistration.getAdapterSettings();
@@ -169,7 +169,7 @@ public class AdapterRegistrar {
      * @param graphRegistration The graph to connect adapters for.
      */
     @Transactional
-    private void tryConnectGraphAdapters(final GraphDto graphRegistration) {
+    private void tryConnectGraphAdapters(final Graph graphRegistration) {
 
         if (Objects.nonNull(graphRegistration.getEdges())) {
             for (var edge : graphRegistration.getEdges()) {
@@ -217,9 +217,9 @@ public class AdapterRegistrar {
      * @return An adapter entity.
      */
     @Transactional
-    private Adapter tryGetAdapterEntityFrom(
-        final Graph graphEntity,
-        final AdapterDto adapterRegistration) throws JsonProcessingException {
+    private AdapterEntity tryGetAdapterEntityFrom(
+        final GraphEntity graphEntity,
+        final Adapter adapterRegistration) throws JsonProcessingException {
 
         var adapterEntity = this.tryGetAdapterEntityHelper(graphEntity, adapterRegistration);
         this.setAdapterSettings(adapterEntity, adapterRegistration);
@@ -233,11 +233,11 @@ public class AdapterRegistrar {
      * @param adapterRegistration The object representing a new adapter.
      * @return A new adapter entity.
      */
-    private Adapter tryGetAdapterEntityHelper(
-        final Graph graphEntity,
-        final AdapterDto adapterRegistration) throws JsonProcessingException {
+    private AdapterEntity tryGetAdapterEntityHelper(
+        final GraphEntity graphEntity,
+        final Adapter adapterRegistration) throws JsonProcessingException {
 
-        var adapterEntity = new Adapter();
+        var adapterEntity = new AdapterEntity();
         adapterEntity.setGraph(graphEntity);
         adapterEntity.setCommunicationServiceSettings(adapterRegistration.getCommunicationServiceSettings());
         adapterEntity.setAdapterType(adapterRegistration.getAdapterType());
@@ -282,13 +282,13 @@ public class AdapterRegistrar {
      * @param graphRegistration The object representing the graph registration.
      * @return A list of newly-registered adapters.
      */
-    private List<Adapter> tryRegisterAdaptersAttachedToAgents(
-        Graph graphEntity,
-        final GraphDto graphRegistration)
+    private List<AdapterEntity> tryRegisterAdaptersAttachedToAgents(
+        GraphEntity graphEntity,
+        final Graph graphRegistration)
         throws JsonProcessingException {
         logger.info("...registering adapters attached to agents...");
 
-        var adapterEntities = new ArrayList<Adapter>();
+        var adapterEntities = new ArrayList<AdapterEntity>();
 
         for (var agent : graphRegistration.getAgents()) {
             logger.info("...registering adapter for agent {}...",
@@ -331,12 +331,12 @@ public class AdapterRegistrar {
      * @param graphRegistration The object representing the graph registration.
      * @return A list of newly-registered adapters.
      */
-    private List<Adapter> tryRegisterAdaptersWithoutAgents(
-        final Graph graphEntity,
-        final GraphDto graphRegistration) throws JsonProcessingException {
+    private List<AdapterEntity> tryRegisterAdaptersWithoutAgents(
+        final GraphEntity graphEntity,
+        final Graph graphRegistration) throws JsonProcessingException {
         logger.info("...registering adapters without agents...");
 
-        var adapterEntities = new ArrayList<Adapter>();
+        var adapterEntities = new ArrayList<AdapterEntity>();
 
         for (var adapterRegistration : graphRegistration.getAgentlessAdapters()) {
             logger.info("...registering adapter of type {}...",

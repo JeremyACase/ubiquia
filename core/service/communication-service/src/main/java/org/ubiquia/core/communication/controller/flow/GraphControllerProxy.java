@@ -8,21 +8,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
-import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/ubiquia/communication-service/flow-service/graph")
 public class GraphControllerProxy
-    extends AbstractUbiquiaDaoControllerProxy<GraphDto> {
+    extends AbstractUbiquiaDaoControllerProxy<Graph> {
 
     @Autowired
     private FlowServiceConfig flowServiceConfig;
 
     @PostMapping("/register/post")
     public Mono<ResponseEntity<IngressResponse>> proxyGraphPost(
-        @RequestBody Mono<GraphDto> body,
+        @RequestBody Mono<Graph> body,
         ServerHttpRequest request) {
 
         var proxied = super.proxyToPostEndpoint("/register/post", request, body);

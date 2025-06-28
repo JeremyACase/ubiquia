@@ -1,10 +1,8 @@
 package org.ubiquia.core.belief.state.generator.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import java.io.IOException;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
+import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 import org.ubiquia.common.model.ubiquia.embeddable.DomainGeneration;
 import org.ubiquia.core.belief.state.generator.service.generator.BeliefStateGenerator;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
@@ -63,7 +61,7 @@ public class BeliefStateGeneratorController {
         logger.debug("...querying URL: {}...", uri);
 
         var responseType = new ParameterizedTypeReference
-            <GenericPageImplementation<AgentCommunicationLanguageDto>>() {
+            <GenericPageImplementation<AgentCommunicationLanguage>>() {
         };
 
         var response =

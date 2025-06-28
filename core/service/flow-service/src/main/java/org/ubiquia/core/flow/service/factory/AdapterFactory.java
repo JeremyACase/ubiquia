@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
-import org.ubiquia.common.model.ubiquia.entity.Adapter;
-import org.ubiquia.common.model.ubiquia.entity.Agent;
-import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
+import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
+import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.common.model.ubiquia.enums.AdapterType;
 import org.ubiquia.core.flow.component.adapter.*;
 import org.ubiquia.core.flow.service.builder.adapter.AdapterBuilder;
@@ -37,8 +37,8 @@ public class AdapterFactory {
      * @throws Exception Exception from trying to build the adapter.
      */
     public AbstractAdapter makeAdapterFor(
-        final Adapter adapterEntity,
-        final Graph graphEntity,
+        final AdapterEntity adapterEntity,
+        final GraphEntity graphEntity,
         final GraphDeployment graphDeployment)
         throws Exception {
 
@@ -64,7 +64,7 @@ public class AdapterFactory {
      * @throws Exception Exceptions from building the adapter.
      */
     public AbstractAdapter makeAdapterFor(
-        final Agent agentEntity,
+        final AgentEntity agentEntity,
         final GraphDeployment graphDeployment)
         throws Exception {
 

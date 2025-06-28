@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.FlowMessageDto;
+import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.service.io.Inbox;
 import org.ubiquia.core.flow.service.telemetry.MicroMeterHelper;
@@ -36,7 +36,7 @@ public class AdapterInboxPollCommand {
     }
 
     @Transactional
-    public List<FlowMessageDto> tryPollInboxFor(final AbstractAdapter adapter) {
+    public List<FlowMessage> tryPollInboxFor(final AbstractAdapter adapter) {
         var adapterContext = adapter.getAdapterContext();
         this.getLogger().debug("Adapter {} of graph {} with is polling inbox...",
             adapterContext.getAdapterName(),
@@ -47,7 +47,7 @@ public class AdapterInboxPollCommand {
             sample = this.microMeterHelper.startSample();
         }
 
-        var messages = new ArrayList<FlowMessageDto>();
+        var messages = new ArrayList<FlowMessage>();
         try {
             messages.addAll(this.inbox.tryQueryInboxMessagesFor(adapter));
         } catch (Exception e) {

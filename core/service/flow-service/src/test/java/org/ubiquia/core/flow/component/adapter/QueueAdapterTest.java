@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.model.ubiquia.adapter.QueueAdapterEgress;
-import org.ubiquia.common.model.ubiquia.dto.GraphEdgeDto;
+import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.AdapterType;
 import org.ubiquia.core.flow.TestHelper;
@@ -74,7 +74,7 @@ public class QueueAdapterTest {
         queueAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
         graph.getAgentlessAdapters().add(queueAdapter);
 
-        var edge = new GraphEdgeDto();
+        var edge = new GraphEdge();
         edge.setLeftAdapterName(ingressAdapter.getAdapterName());
         edge.setRightAdapterNames(new ArrayList<>());
         edge.getRightAdapterNames().add(queueAdapter.getAdapterName());
@@ -136,7 +136,7 @@ public class QueueAdapterTest {
         queueAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
         graph.getAgentlessAdapters().add(queueAdapter);
 
-        var edge = new GraphEdgeDto();
+        var edge = new GraphEdge();
         edge.setLeftAdapterName(ingressAdapter.getAdapterName());
         edge.setRightAdapterNames(new ArrayList<>());
         edge.getRightAdapterNames().add(queueAdapter.getAdapterName());

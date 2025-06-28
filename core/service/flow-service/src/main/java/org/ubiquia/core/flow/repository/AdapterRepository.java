@@ -2,11 +2,11 @@ package org.ubiquia.core.flow.repository;
 
 
 import java.util.Optional;
-import org.ubiquia.common.model.ubiquia.entity.Adapter;
+import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
 
-public interface AdapterRepository extends AbstractEntityRepository<Adapter> {
+public interface AdapterRepository extends AbstractEntityRepository<AdapterEntity> {
 
-    Optional<Adapter> findByGraphGraphNameAndAdapterName(
+    Optional<AdapterEntity> findByGraphGraphNameAndAdapterName(
         final String graphName,
         final String adapterName);
 }

@@ -13,12 +13,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
-import org.ubiquia.common.model.ubiquia.dto.AbstractEntityDto;
+import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
 import org.ubiquia.core.communication.interfaces.InterfaceUbiquiaDaoControllerProxy;
 import reactor.core.publisher.Mono;
 
 @RestController
-public abstract class AbstractUbiquiaDaoControllerProxy<T extends AbstractEntityDto>
+public abstract class AbstractUbiquiaDaoControllerProxy<T extends AbstractModel>
     implements InterfaceUbiquiaDaoControllerProxy {
 
     @Autowired

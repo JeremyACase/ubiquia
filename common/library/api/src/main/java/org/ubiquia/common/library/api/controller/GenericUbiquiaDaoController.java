@@ -17,16 +17,15 @@ import org.ubiquia.common.library.api.interfaces.InterfaceUbiquiaDaoController;
 import org.ubiquia.common.library.api.service.builder.IngressResponseBuilder;
 import org.ubiquia.common.library.api.service.visitor.PageValidator;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
-import org.ubiquia.common.model.ubiquia.dto.AbstractEntityDto;
-import org.ubiquia.common.model.ubiquia.entity.AbstractEntity;
+import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
 
 /**
  * An abstract RESTful controller to be inherited by other controllers. As the base class
  * controller, it defines a handful of useful variables and features for derived classes.
  */
 public abstract class GenericUbiquiaDaoController<
-    T extends AbstractEntity,
-    D extends AbstractEntityDto>
+    T extends org.ubiquia.common.model.ubiquia.entity.AbstractModelEntity,
+    D extends AbstractModel>
     implements InterfaceLogger,
     InterfaceUbiquiaDaoController<T, D> {
 

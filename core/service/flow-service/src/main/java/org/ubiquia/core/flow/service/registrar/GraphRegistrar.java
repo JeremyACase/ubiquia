@@ -9,9 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.GraphDto;
-import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguage;
-import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
+import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguageEntity;
+import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.core.flow.repository.AgentCommunicationLanguageRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.service.visitor.validator.GraphValidator;
@@ -48,7 +48,7 @@ public class GraphRegistrar {
      * @throws Exception Exceptions from an invalid graph.
      */
     @Transactional
-    public Graph tryRegister(final GraphDto graphRegistration) throws Exception {
+    public GraphEntity tryRegister(final Graph graphRegistration) throws Exception {
 
         logger.info("...registering graph {} with version {} for domain {}...",
             graphRegistration.getGraphName(),
@@ -82,7 +82,7 @@ public class GraphRegistrar {
      *
      * @param graph The graph object to clean.
      */
-    private void cleanGraphRegistration(GraphDto graph) {
+    private void cleanGraphRegistration(Graph graph) {
 
         if (Objects.isNull(graph.getAgentlessAdapters())) {
             graph.setAgentlessAdapters(new ArrayList<>());
@@ -113,9 +113,9 @@ public class GraphRegistrar {
      * @return The newly-persisted graph.
      */
     @Transactional
-    private Graph persistGraph(
-        AgentCommunicationLanguage agentCommunicationLanguageEntity,
-        Graph graphEntity) {
+    private GraphEntity persistGraph(
+        AgentCommunicationLanguageEntity agentCommunicationLanguageEntity,
+        GraphEntity graphEntity) {
 
         if (Objects.isNull(agentCommunicationLanguageEntity.getGraphs())) {
             agentCommunicationLanguageEntity.setGraphs(new ArrayList<>());
@@ -137,7 +137,7 @@ public class GraphRegistrar {
      * @return A graph entity.
      */
     @Transactional
-    private Graph tryGetGraphEntityFrom(final GraphDto graphRegistration) {
+    private GraphEntity tryGetGraphEntityFrom(final Graph graphRegistration) {
 
         var record = this.graphRepository
             .findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatch(
@@ -155,7 +155,7 @@ public class GraphRegistrar {
                 + " has already been registered!");
         }
 
-        var graphEntity = new Graph();
+        var graphEntity = new GraphEntity();
         graphEntity.setAuthor(graphRegistration.getAuthor());
         graphEntity.setCapabilities(graphRegistration.getCapabilities());
         graphEntity.setDescription(graphRegistration.getDescription());
@@ -180,8 +180,8 @@ public class GraphRegistrar {
      * @return The graph's ontology.
      */
     @Transactional
-    private AgentCommunicationLanguage tryGetAgentCommunicationLanguageFrom(
-        final GraphDto graphRegistration) {
+    private AgentCommunicationLanguageEntity tryGetAgentCommunicationLanguageFrom(
+        final Graph graphRegistration) {
 
         var acl = graphRegistration.getAgentCommunicationLanguage();
         if (Objects.isNull(acl)) {

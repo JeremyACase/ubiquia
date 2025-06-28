@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
-import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguageEntity;
 import org.ubiquia.core.flow.repository.AgentCommunicationLanguageRepository;
 import org.ubiquia.core.flow.service.visitor.validator.JsonSchemaValidator;
 
@@ -35,8 +35,8 @@ public class AgentCommunicationLanguageRegistrar {
      * @throws JsonProcessingException Exceptions from parsing JSON schemas.
      */
     @Transactional
-    public AgentCommunicationLanguage tryRegister(
-        final AgentCommunicationLanguageDto agentCommunicationLanguage)
+    public AgentCommunicationLanguageEntity tryRegister(
+        final AgentCommunicationLanguage agentCommunicationLanguage)
         throws JsonProcessingException {
         var schema = this.objectMapper.writeValueAsString(agentCommunicationLanguage.getJsonSchema());
         if (!this.jsonSchemaValidator.isValidJsonSchema(schema)) {
@@ -62,7 +62,7 @@ public class AgentCommunicationLanguageRegistrar {
         agentCommunicationLanguage.setJsonSchema(null);
         var entity = this.objectMapper.convertValue(
             agentCommunicationLanguage,
-            AgentCommunicationLanguage.class);
+            AgentCommunicationLanguageEntity.class);
         entity.setJsonSchema(schema);
 
         if (Objects.isNull(entity.getTags())) {

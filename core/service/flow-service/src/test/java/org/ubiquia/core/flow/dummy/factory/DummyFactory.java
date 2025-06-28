@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import org.instancio.Instancio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.AbstractEntityDto;
-import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
-import org.ubiquia.common.model.ubiquia.dto.AgentDto;
-import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
+import org.ubiquia.common.model.ubiquia.dto.Adapter;
+import org.ubiquia.common.model.ubiquia.dto.Agent;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.NameAndVersionPair;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
@@ -43,25 +43,25 @@ public class DummyFactory {
      *
      * @return A dummy adapter.
      */
-    public AdapterDto generateAdapter() {
+    public Adapter generateAdapter() {
         var adapter = Instancio
-            .of(AdapterDto.class)
-            .ignore(field(AbstractEntityDto::getId))
-            .ignore(field(AbstractEntityDto::getCreatedAt))
-            .ignore(field(AbstractEntityDto::getUpdatedAt))
-            .ignore(field(AdapterDto::getGraph))
-            .ignore(field(AdapterDto::getBrokerSettings))
-            .ignore(field(AdapterDto::getAgent))
-            .ignore(field(AdapterDto::getDownstreamAdapters))
-            .ignore(field(AdapterDto::getEgressSettings))
-            .ignore(field(AdapterDto::getOutputSubSchema))
-            .ignore(field(AdapterDto::getPollSettings))
-            .ignore(field(AdapterDto::getOverrideSettings))
-            .ignore(field(AdapterDto::getAdapterType))
-            .set(field(AdapterDto::getAdapterSettings), new AdapterSettings())
-            .set(field(AdapterDto::getFlowEvents), new ArrayList<>())
-            .set(field(AdapterDto::getInputSubSchemas), new ArrayList<>())
-            .set(field(AbstractEntityDto::getModelType), "Adapter")
+            .of(Adapter.class)
+            .ignore(field(AbstractModel::getId))
+            .ignore(field(AbstractModel::getCreatedAt))
+            .ignore(field(AbstractModel::getUpdatedAt))
+            .ignore(field(Adapter::getGraph))
+            .ignore(field(Adapter::getBrokerSettings))
+            .ignore(field(Adapter::getAgent))
+            .ignore(field(Adapter::getDownstreamAdapters))
+            .ignore(field(Adapter::getEgressSettings))
+            .ignore(field(Adapter::getOutputSubSchema))
+            .ignore(field(Adapter::getPollSettings))
+            .ignore(field(Adapter::getOverrideSettings))
+            .ignore(field(Adapter::getAdapterType))
+            .set(field(Adapter::getAdapterSettings), new AdapterSettings())
+            .set(field(Adapter::getFlowEvents), new ArrayList<>())
+            .set(field(Adapter::getInputSubSchemas), new ArrayList<>())
+            .set(field(AbstractModel::getModelType), "Adapter")
             .create();
         return adapter;
     }
@@ -71,19 +71,19 @@ public class DummyFactory {
      *
      * @return An agent.
      */
-    public AgentDto generateAgent() {
+    public Agent generateAgent() {
         var agent = Instancio
-            .of(AgentDto.class)
-            .ignore(field(AbstractEntityDto::getId))
-            .ignore(field(AbstractEntityDto::getCreatedAt))
-            .ignore(field(AbstractEntityDto::getUpdatedAt))
-            .ignore(field(AgentDto::getAdapter))
-            .ignore(field(AgentDto::getConfig))
-            .ignore(field(AgentDto::getEnvironmentVariables))
-            .ignore(field(AgentDto::getGraph))
-            .ignore(field(AgentDto::getOverrideSettings))
-            .set(field(AbstractEntityDto::getModelType), "Agent")
-            .set(field(AgentDto::getAgentType), AgentType.TEMPLATE)
+            .of(Agent.class)
+            .ignore(field(AbstractModel::getId))
+            .ignore(field(AbstractModel::getCreatedAt))
+            .ignore(field(AbstractModel::getUpdatedAt))
+            .ignore(field(Agent::getAdapter))
+            .ignore(field(Agent::getConfig))
+            .ignore(field(Agent::getEnvironmentVariables))
+            .ignore(field(Agent::getGraph))
+            .ignore(field(Agent::getOverrideSettings))
+            .set(field(AbstractModel::getModelType), "Agent")
+            .set(field(Agent::getAgentType), AgentType.TEMPLATE)
             .create();
         return agent;
     }
@@ -94,7 +94,7 @@ public class DummyFactory {
      * @return A dummy graph.
      */
     @Transactional
-    public GraphDto generateGraph() throws IOException {
+    public Graph generateGraph() throws IOException {
 
         var acl = this.mockRegistrar.tryRegisterAcl();
 
@@ -103,17 +103,17 @@ public class DummyFactory {
         nameAndVersionPair.setVersion(acl.getVersion());
 
         var graph = Instancio
-            .of(GraphDto.class)
-            .ignore(field(AbstractEntityDto::getId))
-            .ignore(field(AbstractEntityDto::getCreatedAt))
-            .ignore(field(AbstractEntityDto::getUpdatedAt))
-            .set(field(GraphDto::getAdapters), new ArrayList<>())
-            .set(field(GraphDto::getAgents), new ArrayList<>())
-            .set(field(GraphDto::getAgentlessAdapters), new ArrayList<>())
-            .set(field(GraphDto::getEdges), new ArrayList<>())
-            .set(field(GraphDto::getVersion), this.getSemanticVersion())
-            .set(field(GraphDto::getAgentCommunicationLanguage), nameAndVersionPair)
-            .set(field(AbstractEntityDto::getModelType), "Graph")
+            .of(Graph.class)
+            .ignore(field(AbstractModel::getId))
+            .ignore(field(AbstractModel::getCreatedAt))
+            .ignore(field(AbstractModel::getUpdatedAt))
+            .set(field(Graph::getAdapters), new ArrayList<>())
+            .set(field(Graph::getAgents), new ArrayList<>())
+            .set(field(Graph::getAgentlessAdapters), new ArrayList<>())
+            .set(field(Graph::getEdges), new ArrayList<>())
+            .set(field(Graph::getVersion), this.getSemanticVersion())
+            .set(field(Graph::getAgentCommunicationLanguage), nameAndVersionPair)
+            .set(field(AbstractModel::getModelType), "Graph")
             .create();
         return graph;
     }

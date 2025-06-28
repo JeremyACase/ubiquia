@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.embeddable.SubSchema;
-import org.ubiquia.common.model.ubiquia.entity.Adapter;
+import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
 import org.ubiquia.common.model.ubiquia.enums.EgressType;
 import org.ubiquia.common.model.ubiquia.enums.HttpOutputType;
 
@@ -29,12 +29,12 @@ public class AdapterValidator {
     /**
      * Try to validate a list of adapters.
      *
-     * @param adapters The adapters to validate.
+     * @param adapterEntities The adapters to validate.
      * @throws Exception Exceptions from attempting to validate any adapter.
      */
-    public void tryValidate(final List<Adapter> adapters) throws Exception {
+    public void tryValidate(final List<AdapterEntity> adapterEntities) throws Exception {
         logger.info("...validating adapters...");
-        for (var adapter : adapters) {
+        for (var adapter : adapterEntities) {
             this.tryValidate(adapter);
         }
         logger.info("...validated adapters...");
@@ -43,54 +43,54 @@ public class AdapterValidator {
     /**
      * Attempt to validate an adapter, mostly depending on its type.
      *
-     * @param adapter The adapter to validate.
+     * @param adapterEntity The adapter to validate.
      * @throws Exception Exceptions from validating the adapter.
      */
-    public void tryValidate(final Adapter adapter) throws Exception {
-        switch (adapter.getAdapterType()) {
+    public void tryValidate(final AdapterEntity adapterEntity) throws Exception {
+        switch (adapterEntity.getAdapterType()) {
             case EGRESS: {
-                this.tryValidateEgressAdapter(adapter);
+                this.tryValidateEgressAdapter(adapterEntity);
             }
             break;
 
             case MERGE: {
-                this.tryValidateMergeAdapter(adapter);
+                this.tryValidateMergeAdapter(adapterEntity);
             }
             break;
 
             case POLL: {
-                this.tryValidatePollAdapter(adapter);
+                this.tryValidatePollAdapter(adapterEntity);
             }
             break;
 
             case PUBLISH: {
-                this.tryValidatePublishAdapter(adapter);
+                this.tryValidatePublishAdapter(adapterEntity);
             }
             break;
 
             case PUSH: {
-                this.tryValidatePushAdapter(adapter);
+                this.tryValidatePushAdapter(adapterEntity);
             }
             break;
 
             case QUEUE: {
-                this.tryValidateQueueAdapter(adapter);
+                this.tryValidateQueueAdapter(adapterEntity);
             }
             break;
 
             case HIDDEN: {
-                this.tryValidateHiddenAdapter(adapter);
+                this.tryValidateHiddenAdapter(adapterEntity);
             }
             break;
 
             case SUBSCRIBE: {
-                this.tryValidateSubscribeAdapter(adapter);
+                this.tryValidateSubscribeAdapter(adapterEntity);
             }
             break;
 
             default: {
                 throw new Exception("ERROR: Unrecognized adapter type: "
-                    + adapter.getAdapterType());
+                    + adapterEntity.getAdapterType());
             }
         }
     }
@@ -98,31 +98,31 @@ public class AdapterValidator {
     /**
      * Determine if two adapters having matching output and input schemas.
      *
-     * @param outputAdapter The output adapter.
-     * @param inputAdapter  The input adapter.
+     * @param outputAdapterEntity The output adapter.
+     * @param inputAdapterEntity  The input adapter.
      * @return Whether or not the adapters have matching output/input schemas.
      */
     public Boolean haveMatchingInputOutput(
-        final Adapter outputAdapter,
-        final Adapter inputAdapter) {
+        final AdapterEntity outputAdapterEntity,
+        final AdapterEntity inputAdapterEntity) {
 
         var hasMatchingInputOutput = false;
 
-        if (Objects.nonNull(outputAdapter.getOutputSubSchema())) {
+        if (Objects.nonNull(outputAdapterEntity.getOutputSubSchema())) {
 
             var matchingInputSubSchema = this.tryGetMatchingInputSubSchema(
-                outputAdapter,
-                inputAdapter);
+                outputAdapterEntity,
+                inputAdapterEntity);
 
             if (matchingInputSubSchema.isEmpty()) {
                 logger.info("Could not find a matching sub schema between output adapter {}"
                         + " and input  {}",
-                    outputAdapter.getAdapterName(),
-                    inputAdapter.getAdapterName());
+                    outputAdapterEntity.getAdapterName(),
+                    inputAdapterEntity.getAdapterName());
             } else {
                 hasMatchingInputOutput = this.subSchemaValidator.areEquivalent(
                     matchingInputSubSchema.get(),
-                    outputAdapter.getOutputSubSchema());
+                    outputAdapterEntity.getOutputSubSchema());
             }
         }
 
@@ -134,7 +134,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter entity to validate.
      */
-    public void tryValidateEgressAdapter(final Adapter adapterEntity) {
+    public void tryValidateEgressAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
         this.validateAdapterHasNoAgent(adapterEntity);
         this.validateAdapterHasNoDownstreamAdapters(adapterEntity);
@@ -149,7 +149,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter entity to validate.
      */
-    public void tryValidateMergeAdapter(final Adapter adapterEntity) {
+    public void tryValidateMergeAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
         this.validateAdapterIsNotPassthroughWithAnAgent(adapterEntity);
         this.validateAdapterHasEgressSettings(adapterEntity);
@@ -162,7 +162,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter entity to validate.
      */
-    public void tryValidatePollAdapter(final Adapter adapterEntity) {
+    public void tryValidatePollAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
         this.validateAdapterIsNotPassthroughWithAnAgent(adapterEntity);
         this.validateAdapterHasNoUpstreamAdapters(adapterEntity);
@@ -177,7 +177,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter entity to validate.
      */
-    public void tryValidatePublishAdapter(final Adapter adapterEntity) {
+    public void tryValidatePublishAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
         this.validateAdapterHasNoAgent(adapterEntity);
         this.validateAdapterHasASingleUpstreamAdapter(adapterEntity);
@@ -193,7 +193,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter entity to validate.
      */
-    public void tryValidatePushAdapter(final Adapter adapterEntity) {
+    public void tryValidatePushAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
         this.validateAdapterIsNotPassthroughWithAnAgent(adapterEntity);
         this.validateAdapterHasNoUpstreamAdapters(adapterEntity);
@@ -208,7 +208,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter entity to validate.
      */
-    public void tryValidateQueueAdapter(final Adapter adapterEntity) {
+    public void tryValidateQueueAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
         this.validateAdapterHasNoAgent(adapterEntity);
         this.validateAdapterHasASingleUpstreamAdapter(adapterEntity);
@@ -224,7 +224,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter entity to validate.
      */
-    public void tryValidateHiddenAdapter(final Adapter adapterEntity) {
+    public void tryValidateHiddenAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
         this.validateAdapterIsNotPassthroughWithAnAgent(adapterEntity);
         this.validateAdapterHasASingleUpstreamAdapter(adapterEntity);
@@ -239,7 +239,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter entity to validate.
      */
-    public void tryValidateSubscribeAdapter(final Adapter adapterEntity) {
+    public void tryValidateSubscribeAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
         this.validateAdapterIsNotPassthroughWithAnAgent(adapterEntity);
         this.validateAdapterHasEgressSettings(adapterEntity);
@@ -253,16 +253,16 @@ public class AdapterValidator {
      * Helper method that attempts to find a matching input sub schema for a pair of output/input
      * adapters.
      *
-     * @param outputAdapter The output adapter.
-     * @param inputAdapter  The input adapter.
+     * @param outputAdapterEntity The output adapter.
+     * @param inputAdapterEntity  The input adapter.
      * @return A matching subschema, if applicable.
      */
     private Optional<SubSchema> tryGetMatchingInputSubSchema(
-        final Adapter outputAdapter,
-        final Adapter inputAdapter) {
+        final AdapterEntity outputAdapterEntity,
+        final AdapterEntity inputAdapterEntity) {
 
-        var outputSubSchema = outputAdapter.getOutputSubSchema();
-        var match = inputAdapter.getInputSubSchemas()
+        var outputSubSchema = outputAdapterEntity.getOutputSubSchema();
+        var match = inputAdapterEntity.getInputSubSchemas()
             .stream()
             .filter(x -> x.getModelName().equals(outputSubSchema.getModelName()))
             .findFirst();
@@ -274,7 +274,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter to verify.
      */
-    private void tryValidateAdapterSettings(final Adapter adapterEntity) {
+    private void tryValidateAdapterSettings(final AdapterEntity adapterEntity) {
         logger.info("Validating {} adapter for graph {} named {}...",
             adapterEntity.getAdapterType(),
             adapterEntity.getGraph().getGraphName(),
@@ -294,7 +294,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter to verify.
      */
-    private void validateAdapterHasEgressSettings(final Adapter adapterEntity) {
+    private void validateAdapterHasEgressSettings(final AdapterEntity adapterEntity) {
 
         logger.info("...validating adapter for graph {} named {} has "
                 + "valid egress settings...",
@@ -339,7 +339,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter to verify.
      */
-    private void validateAdapterHasPollSettings(final Adapter adapterEntity) {
+    private void validateAdapterHasPollSettings(final AdapterEntity adapterEntity) {
 
         logger.info("...validating adapter for graph {} named {} has "
                 + "valid egress settings...",
@@ -373,7 +373,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter to verify.
      */
-    private void validateAdapterHasNoEgressSettings(final Adapter adapterEntity) {
+    private void validateAdapterHasNoEgressSettings(final AdapterEntity adapterEntity) {
 
         logger.info("...validating adapter named {} for graph {} has "
                 + "no egress settings...",
@@ -393,7 +393,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter to validate.
      */
-    private void validateAdapterHasASingleUpstreamAdapter(final Adapter adapterEntity) {
+    private void validateAdapterHasASingleUpstreamAdapter(final AdapterEntity adapterEntity) {
 
         logger.info("...validating adapter named {} for graph {} has "
                 + "only a single upstream adapter...",
@@ -412,7 +412,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter to validate.
      */
-    private void validateAdapterHasNoDownstreamAdapters(final Adapter adapterEntity) {
+    private void validateAdapterHasNoDownstreamAdapters(final AdapterEntity adapterEntity) {
 
         logger.info("...validating adapter named {} for graph {} has "
                 + "no downstream adapters...",
@@ -432,7 +432,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter to valiate.
      */
-    private void validateAdapterHasASingleInputSubSchema(final Adapter adapterEntity) {
+    private void validateAdapterHasASingleInputSubSchema(final AdapterEntity adapterEntity) {
         logger.info("...validating adapter for graph {} named {} has "
                 + "only a single input sub schema...",
             adapterEntity.getGraph().getGraphName(),
@@ -451,7 +451,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter to validate for.
      */
-    private void validateAdapterHasNoAgent(final Adapter adapterEntity) {
+    private void validateAdapterHasNoAgent(final AdapterEntity adapterEntity) {
 
         logger.info("...validating adapter for graph {} has "
                 + "no agent...",
@@ -470,7 +470,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter to validate.
      */
-    private void validateAdapterIsNotPassthroughWithAnAgent(final Adapter adapterEntity) {
+    private void validateAdapterIsNotPassthroughWithAnAgent(final AdapterEntity adapterEntity) {
 
         if (adapterEntity.getAdapterSettings().getIsPassthrough()) {
             logger.info("...adapter named {} for graph {} has "
@@ -497,7 +497,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter to validate.
      */
-    private void validateAdapterHasNoUpstreamAdapters(final Adapter adapterEntity) {
+    private void validateAdapterHasNoUpstreamAdapters(final AdapterEntity adapterEntity) {
 
         logger.info("...validating adapter named {} for graph {} has "
                 + "no upstream adapters...",
@@ -517,7 +517,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter entity that we're validating.
      */
-    private void validateAdapterIsNotPassthrough(final Adapter adapterEntity) {
+    private void validateAdapterIsNotPassthrough(final AdapterEntity adapterEntity) {
         logger.info("...validating adapter named {} for graph {} has "
                 + "is not configured as a passthrough adapter...",
             adapterEntity.getAdapterName(),
@@ -534,7 +534,7 @@ public class AdapterValidator {
      *
      * @param adapterEntity The adapter to validate.
      */
-    private void validateAdapterIsNotPassthroughWithoutDownstreamAdapters(final Adapter adapterEntity) {
+    private void validateAdapterIsNotPassthroughWithoutDownstreamAdapters(final AdapterEntity adapterEntity) {
         logger.info("...validating adapter named {} for graph {} is not a passthrough "
                 + " without downstream adapters...",
             adapterEntity.getAdapterName(),

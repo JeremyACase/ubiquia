@@ -17,7 +17,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-import org.ubiquia.common.model.ubiquia.dto.GraphEdgeDto;
+import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.AdapterType;
@@ -76,7 +76,7 @@ public class EgressAdapterTest {
         egressAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
         graph.getAgentlessAdapters().add(egressAdapter);
 
-        var edge = new GraphEdgeDto();
+        var edge = new GraphEdge();
         edge.setLeftAdapterName(ingressAdapter.getAdapterName());
         edge.setRightAdapterNames(new ArrayList<>());
         edge.getRightAdapterNames().add(egressAdapter.getAdapterName());
@@ -125,7 +125,7 @@ public class EgressAdapterTest {
         egressAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
         graph.getAgentlessAdapters().add(egressAdapter);
 
-        var edge = new GraphEdgeDto();
+        var edge = new GraphEdge();
         edge.setLeftAdapterName(ingressAdapter.getAdapterName());
         edge.setRightAdapterNames(new ArrayList<>());
         edge.getRightAdapterNames().add(egressAdapter.getAdapterName());

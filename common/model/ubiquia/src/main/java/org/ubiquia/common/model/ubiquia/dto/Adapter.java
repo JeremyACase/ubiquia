@@ -6,7 +6,7 @@ import java.util.List;
 import org.ubiquia.common.model.ubiquia.embeddable.*;
 import org.ubiquia.common.model.ubiquia.enums.AdapterType;
 
-public class AdapterDto extends AbstractEntityDto {
+public class Adapter extends AbstractModel {
 
     private String adapterName;
 
@@ -14,11 +14,11 @@ public class AdapterDto extends AbstractEntityDto {
 
     private AdapterType adapterType;
 
-    private List<FlowEventDto> flowEvents;
+    private List<FlowEvent> flowEvents;
 
     private BrokerSettings brokerSettings;
 
-    private AgentDto agent;
+    private Agent agent;
 
     private CommunicationServiceSettings communicationServiceSettings;
 
@@ -28,7 +28,7 @@ public class AdapterDto extends AbstractEntityDto {
 
     private EgressSettings egressSettings;
 
-    private GraphDto graph;
+    private Graph graph;
 
     private List<SubSchema> inputSubSchemas;
 
@@ -38,15 +38,15 @@ public class AdapterDto extends AbstractEntityDto {
 
     private PollSettings pollSettings;
 
-    private List<AdapterDto> upstreamAdapters;
+    private List<Adapter> upstreamAdapters;
 
-    private List<AdapterDto> downstreamAdapters;
+    private List<Adapter> downstreamAdapters;
 
-    public AgentDto getAgent() {
+    public Agent getAgent() {
         return agent;
     }
 
-    public void setAgent(AgentDto agent) {
+    public void setAgent(Agent agent) {
         this.agent = agent;
     }
 
@@ -66,11 +66,11 @@ public class AdapterDto extends AbstractEntityDto {
         this.endpoint = endpoint;
     }
 
-    public GraphDto getGraph() {
+    public Graph getGraph() {
         return graph;
     }
 
-    public void setGraph(GraphDto graph) {
+    public void setGraph(Graph graph) {
         this.graph = graph;
     }
 
@@ -83,27 +83,27 @@ public class AdapterDto extends AbstractEntityDto {
         this.adapterType = adapterType;
     }
 
-    public List<AdapterDto> getUpstreamAdapters() {
+    public List<Adapter> getUpstreamAdapters() {
         return upstreamAdapters;
     }
 
-    public void setUpstreamAdapters(List<AdapterDto> upstreamAdapters) {
+    public void setUpstreamAdapters(List<Adapter> upstreamAdapters) {
         this.upstreamAdapters = upstreamAdapters;
     }
 
-    public List<AdapterDto> getDownstreamAdapters() {
+    public List<Adapter> getDownstreamAdapters() {
         return downstreamAdapters;
     }
 
-    public void setDownstreamAdapters(List<AdapterDto> downstreamAdapters) {
+    public void setDownstreamAdapters(List<Adapter> downstreamAdapters) {
         this.downstreamAdapters = downstreamAdapters;
     }
 
-    public List<FlowEventDto> getFlowEvents() {
+    public List<FlowEvent> getFlowEvents() {
         return flowEvents;
     }
 
-    public void setFlowEvents(List<FlowEventDto> flowEvents) {
+    public void setFlowEvents(List<FlowEvent> flowEvents) {
         this.flowEvents = flowEvents;
     }
 

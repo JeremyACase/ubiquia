@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
-import org.ubiquia.common.model.ubiquia.dto.FlowMessageDto;
-import org.ubiquia.common.model.ubiquia.entity.FlowMessage;
+import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
+import org.ubiquia.common.model.ubiquia.entity.FlowMessageEntity;
 import org.ubiquia.core.flow.component.adapter.MergeAdapter;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
@@ -53,7 +53,7 @@ public class MergeAdapterCommand implements InterfaceLogger {
     }
 
     @Transactional
-    public void tryProcessMessageFor(final FlowMessageDto message, final MergeAdapter adapter) {
+    public void tryProcessMessageFor(final FlowMessage message, final MergeAdapter adapter) {
 
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterHelper)) {
@@ -117,7 +117,7 @@ public class MergeAdapterCommand implements InterfaceLogger {
         }
     }
 
-    private String mergeMessages(final List<FlowMessage> messages)
+    private String mergeMessages(final List<FlowMessageEntity> messages)
         throws JsonProcessingException {
 
         var mergedMap = new HashMap<String, Object>();

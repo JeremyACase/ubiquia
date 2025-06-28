@@ -9,9 +9,9 @@ import java.nio.file.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
+import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
-import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguageEntity;
 import org.ubiquia.core.flow.controller.AgentCommunicationLanguageController;
 import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.repository.AgentCommunicationLanguageRepository;
@@ -42,8 +42,8 @@ public class MockRegistrar {
      * @throws IOException Exception from reading from disk.
      */
     @Transactional
-    public AgentCommunicationLanguage tryRegisterAcl() throws IOException {
-        AgentCommunicationLanguage acl = null;
+    public AgentCommunicationLanguageEntity tryRegisterAcl() throws IOException {
+        AgentCommunicationLanguageEntity acl = null;
 
         var existingRecord = this
             .aclRepository
@@ -59,7 +59,7 @@ public class MockRegistrar {
                 schemaPath.toFile(),
                 Object.class);
 
-            var registration = new AgentCommunicationLanguageDto();
+            var registration = new AgentCommunicationLanguage();
             registration.setJsonSchema(jsonSchema);
             registration.setDomain("pets");
             registration.setVersion(new SemanticVersion());

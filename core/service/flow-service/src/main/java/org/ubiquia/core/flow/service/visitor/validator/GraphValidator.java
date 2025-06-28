@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.GraphDto;
-import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
+import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 
 /**
@@ -31,8 +31,8 @@ public class GraphValidator {
      * @throws Exception Exception thrown if the graph is not valid.
      */
     public void tryValidate(
-        final Graph graphEntity,
-        final GraphDto graphRegistration)
+        final GraphEntity graphEntity,
+        final Graph graphRegistration)
         throws Exception {
         logger.info("...validating graph with name {} and version {}... ",
             graphEntity.getGraphName(),
@@ -50,7 +50,7 @@ public class GraphValidator {
      * @param graphRegistration The graph to validate.
      */
     private void tryValidateMatchingAdapterSchemasFor(
-        final GraphDto graphRegistration) {
+        final Graph graphRegistration) {
 
         logger.info("...validating matching input/output schemas...");
         for (var edge : graphRegistration.getEdges()) {

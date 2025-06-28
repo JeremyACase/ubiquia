@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
-import org.ubiquia.common.model.ubiquia.entity.FlowEvent;
+import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.service.command.adapter.AdapterPostToAgentCommand;
 import org.ubiquia.core.flow.service.command.adapter.AdapterPutToAgentCommand;
@@ -42,7 +42,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
     }
 
     public void forwardPayload(
-        FlowEvent flowEvent,
+        FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final String payload)
         throws JsonProcessingException,
@@ -53,20 +53,20 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
         var adapterContext = adapter.getAdapterContext();
         if (adapterContext.getAdapterSettings().getIsPassthrough()) {
             this.outbox.tryQueueAgentResponse(
-                flowEvent,
+                flowEventEntity,
                 payload);
         } else if (adapterContext.getTemplateAgent()) {
-            this.templateAgentProxy.proxyAsAgentFor(flowEvent);
+            this.templateAgentProxy.proxyAsAgentFor(flowEventEntity);
         } else {
             this.trySendInputPayloadToAgent(
-                flowEvent,
+                flowEventEntity,
                 adapter,
                 payload);
         }
     }
 
     private void tryPostInputPayloadToAgent(
-        FlowEvent flowEvent,
+        FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final Object inputPayload)
         throws
@@ -80,7 +80,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
 
             case ASYNCHRONOUS: {
                 this.adapterPostToAgentCommand.tryPostInputToAgentAsynchronously(
-                    flowEvent,
+                    flowEventEntity,
                     adapter,
                     inputPayload);
             }
@@ -88,7 +88,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
 
             case SYNCHRONOUS: {
                 this.adapterPostToAgentCommand.tryPostPayloadToAgentSynchronously(
-                    flowEvent,
+                    flowEventEntity,
                     adapter,
                     inputPayload);
             }
@@ -102,7 +102,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
     }
 
     private void tryPutInputPayloadToAgent(
-        FlowEvent flowEvent,
+        FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final Object inputPayload)
         throws ValidationException,
@@ -115,7 +115,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
 
             case ASYNCHRONOUS: {
                 this.adapterPutToAgentCommand.tryPutInputToAgentAsynchronously(
-                    flowEvent,
+                    flowEventEntity,
                     adapter,
                     inputPayload);
             }
@@ -123,7 +123,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
 
             case SYNCHRONOUS: {
                 this.adapterPutToAgentCommand.tryPutPayloadToAgentSynchronously(
-                    flowEvent,
+                    flowEventEntity,
                     adapter,
                     inputPayload);
             }
@@ -137,7 +137,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
     }
 
     private void trySendInputPayloadToAgent(
-        FlowEvent flowEvent,
+        FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final Object inputPayload)
         throws ValidationException,
@@ -148,12 +148,12 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
         switch (egressSettings.getHttpOutputType()) {
 
             case PUT: {
-                this.tryPutInputPayloadToAgent(flowEvent, adapter, inputPayload);
+                this.tryPutInputPayloadToAgent(flowEventEntity, adapter, inputPayload);
             }
             break;
 
             case POST: {
-                this.tryPostInputPayloadToAgent(flowEvent, adapter, inputPayload);
+                this.tryPostInputPayloadToAgent(flowEventEntity, adapter, inputPayload);
             }
             break;
 

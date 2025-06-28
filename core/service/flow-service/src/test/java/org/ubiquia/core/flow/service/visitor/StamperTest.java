@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
-import org.ubiquia.common.model.ubiquia.entity.Adapter;
-import org.ubiquia.common.model.ubiquia.entity.FlowEvent;
+import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
+import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 
 
 @SpringBootTest
@@ -33,7 +33,7 @@ public class StamperTest {
         payload.put("stampKey", UUID.randomUUID().toString());
         var json = this.objectMapper.writeValueAsString(payload);
 
-        var event = new FlowEvent();
+        var event = new FlowEventEntity();
         event.setInputPayload(json);
         event.setInputPayloadStamps(new HashSet<>());
 
@@ -46,7 +46,7 @@ public class StamperTest {
         settings.setInputStampKeychains(new ArrayList<>());
         settings.getInputStampKeychains().add(kvp.getKey());
 
-        var adapter = new Adapter();
+        var adapter = new AdapterEntity();
         adapter.setAdapterSettings(settings);
         event.setAdapter(adapter);
 
@@ -65,7 +65,7 @@ public class StamperTest {
         payload.put("stampKey", UUID.randomUUID().toString());
         var json = this.objectMapper.writeValueAsString(payload);
 
-        var event = new FlowEvent();
+        var event = new FlowEventEntity();
         event.setOutputPayload(json);
         event.setOutputPayloadStamps(new HashSet<>());
 
@@ -78,7 +78,7 @@ public class StamperTest {
         settings.setOutputStampKeychains(new ArrayList<>());
         settings.getOutputStampKeychains().add(kvp.getKey());
 
-        var adapter = new Adapter();
+        var adapter = new AdapterEntity();
         adapter.setAdapterSettings(settings);
         event.setAdapter(adapter);
 

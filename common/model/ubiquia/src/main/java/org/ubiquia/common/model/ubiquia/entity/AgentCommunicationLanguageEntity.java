@@ -1,25 +1,33 @@
-package org.ubiquia.common.model.ubiquia.dto;
+package org.ubiquia.common.model.ubiquia.entity;
 
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 
-public class AgentCommunicationLanguageDto extends AbstractEntityDto {
+@Entity
+public class AgentCommunicationLanguageEntity extends AbstractModelEntity {
 
     private String domain;
 
-    private List<GraphDto> graphs;
+    @OneToMany(
+        mappedBy = "agentCommunicationLanguage",
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.REFRESH)
+    private List<GraphEntity> graphs;
 
     private SemanticVersion version;
 
-    private Object jsonSchema;
+    @Column(columnDefinition = "TEXT")
+    private String jsonSchema;
 
     @Override
     public String getModelType() {
         return "AgentCommunicationLanguage";
     }
 
+    @NotNull
     public String getDomain() {
         return domain;
     }
@@ -28,24 +36,22 @@ public class AgentCommunicationLanguageDto extends AbstractEntityDto {
         this.domain = domain;
     }
 
-    public List<GraphDto> getGraphs() {
-        return this.graphs;
+    public List<GraphEntity> getGraphs() {
+        return graphs;
     }
 
-    public void setGraphs(List<GraphDto> graphs) {
-        this.graphs = graphs;
+    public void setGraphs(List<GraphEntity> graphEntities) {
+        this.graphs = graphEntities;
     }
 
-    @NotNull
-    public Object getJsonSchema() {
+    public String getJsonSchema() {
         return jsonSchema;
     }
 
-    public void setJsonSchema(Object jsonSchema) {
+    public void setJsonSchema(String jsonSchema) {
         this.jsonSchema = jsonSchema;
     }
 
-    @NotNull
     public SemanticVersion getVersion() {
         return version;
     }

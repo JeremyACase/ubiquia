@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
+import org.ubiquia.common.model.ubiquia.dto.Adapter;
 import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphSettings;
@@ -42,7 +42,7 @@ public class AdapterOverrideDecoratorTest {
     public void testOverridesBaselineValues_isValid()
         throws JsonProcessingException,
         IllegalAccessException {
-        var adapter = new AdapterDto();
+        var adapter = new Adapter();
 
         adapter.setAdapterSettings(new AdapterSettings());
         adapter.getAdapterSettings().setPersistInputPayload(false);
@@ -74,7 +74,7 @@ public class AdapterOverrideDecoratorTest {
     public void testDoesNotOverrideBaselineValues_isValid()
         throws JsonProcessingException,
         IllegalAccessException {
-        var adapter = new AdapterDto();
+        var adapter = new Adapter();
 
         adapter.setAdapterSettings(new AdapterSettings());
         adapter.getAdapterSettings().setPersistInputPayload(false);
@@ -105,7 +105,7 @@ public class AdapterOverrideDecoratorTest {
     @Test
     public void testOverridesInvalidBaselineValues_throwsException()
         throws JsonProcessingException {
-        var adapter = new AdapterDto();
+        var adapter = new Adapter();
 
         adapter.setAdapterSettings(new AdapterSettings());
         adapter.getAdapterSettings().setPersistInputPayload(false);

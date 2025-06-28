@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-public class UbiquiaAgentDto {
+public class UbiquiaAgent {
 
     private String id = null;
 
@@ -16,7 +16,7 @@ public class UbiquiaAgentDto {
 
     private OffsetDateTime updatedAt = null;
 
-    private List<GraphDto> deployedGraphs;
+    private List<Graph> deployedGraphs;
 
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
     public String getId() {
@@ -44,11 +44,11 @@ public class UbiquiaAgentDto {
     }
 
     @NotNull
-    public List<GraphDto> getDeployedGraphs() {
+    public List<Graph> getDeployedGraphs() {
         return deployedGraphs;
     }
 
-    public void setDeployedGraphs(List<GraphDto> deployedGraphs) {
+    public void setDeployedGraphs(List<Graph> deployedGraphs) {
         this.deployedGraphs = deployedGraphs;
     }
 

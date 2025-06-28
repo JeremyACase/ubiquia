@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
-import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.service.command.manager.AdapterManagerCommand;
@@ -132,7 +132,7 @@ public class AdapterManager {
      * @throws Exception Any exceptions from attempting to deploy adapters.
      */
     private void tryDeployAdaptersAttachedToAgentsFor(
-        final Graph graphEntity,
+        final GraphEntity graphEntity,
         final GraphDeployment graphDeployment)
         throws Exception {
         logger.info("...deploying adapters attached to agents...");
@@ -170,7 +170,7 @@ public class AdapterManager {
      * @throws Exception Exceptions from attempting to deploy the adapters.
      */
     private void tryDeployAgentlessAdaptersFor(
-        final Graph graphEntity,
+        final GraphEntity graphEntity,
         final GraphDeployment graphDeployment)
         throws Exception {
         logger.info("...deploying adapters that are not attached to agents...");

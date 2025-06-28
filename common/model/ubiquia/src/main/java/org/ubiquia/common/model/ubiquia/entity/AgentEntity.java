@@ -7,7 +7,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.*;
 import org.ubiquia.common.model.ubiquia.enums.AgentType;
 
 @Entity
-public class Agent extends AbstractEntity {
+public class AgentEntity extends AbstractModelEntity {
 
     private AgentType type;
 
@@ -46,11 +46,11 @@ public class Agent extends AbstractEntity {
     private LivenessProbe livenessProbe;
 
     @OneToOne(mappedBy = "agent", optional = true)
-    private Adapter adapter;
+    private AdapterEntity adapter;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "graph_agent_join_id", nullable = false)
-    private Graph graph;
+    private GraphEntity graph;
 
     @ElementCollection
     private Set<Volume> volumes;
@@ -86,20 +86,20 @@ public class Agent extends AbstractEntity {
         return "Agent";
     }
 
-    public Adapter getAdapter() {
+    public AdapterEntity getAdapter() {
         return adapter;
     }
 
-    public void setAdapter(Adapter adapter) {
-        this.adapter = adapter;
+    public void setAdapter(AdapterEntity adapterEntity) {
+        this.adapter = adapterEntity;
     }
 
-    public Graph getGraph() {
+    public GraphEntity getGraph() {
         return graph;
     }
 
-    public void setGraph(Graph graph) {
-        this.graph = graph;
+    public void setGraph(GraphEntity graphEntity) {
+        this.graph = graphEntity;
     }
 
     public Image getImage() {

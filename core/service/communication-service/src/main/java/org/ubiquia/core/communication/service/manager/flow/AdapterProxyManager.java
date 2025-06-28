@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.ubiquia.common.library.logic.service.builder.AdapterEndpointRecordBuilder;
-import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
 
 @Service
@@ -27,7 +27,7 @@ public class AdapterProxyManager {
     @Autowired
     private WebClient webClient;
 
-    public void tryProcessNewlyDeployedGraph(final GraphDto graph) {
+    public void tryProcessNewlyDeployedGraph(final Graph graph) {
         var adaptersToProxy = graph.getAdapters().stream()
             .filter(adapter ->
                 Boolean.TRUE.equals(
@@ -53,7 +53,7 @@ public class AdapterProxyManager {
     /**
      * Unproxies any previously proxied URIs for the torn-down graph.
      */
-    public void tryProcessNewlyTornDownGraph(final GraphDto graph) {
+    public void tryProcessNewlyTornDownGraph(final Graph graph) {
         var adaptersToUnproxy = graph.getAdapters().stream()
             .filter(adapter -> Boolean.TRUE.equals(
                 adapter.getCommunicationServiceSettings().getExposeViaCommService()))

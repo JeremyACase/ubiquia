@@ -18,14 +18,14 @@ import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
     property = "modelType",
     visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = AdapterDto.class, name = "Adapter"),
-    @JsonSubTypes.Type(value = FlowEventDto.class, name = "FlowEvent"),
-    @JsonSubTypes.Type(value = FlowMessageDto.class, name = "FlowMessage"),
-    @JsonSubTypes.Type(value = AgentDto.class, name = "Agent"),
-    @JsonSubTypes.Type(value = AgentCommunicationLanguageDto.class, name = "AgentCommunicationLanguage"),
-    @JsonSubTypes.Type(value = GraphDto.class, name = "Graph"),
+    @JsonSubTypes.Type(value = Adapter.class, name = "Adapter"),
+    @JsonSubTypes.Type(value = FlowEvent.class, name = "FlowEvent"),
+    @JsonSubTypes.Type(value = FlowMessage.class, name = "FlowMessage"),
+    @JsonSubTypes.Type(value = Agent.class, name = "Agent"),
+    @JsonSubTypes.Type(value = AgentCommunicationLanguage.class, name = "AgentCommunicationLanguage"),
+    @JsonSubTypes.Type(value = Graph.class, name = "Graph"),
 })
-public abstract class AbstractEntityDto {
+public abstract class AbstractModel {
 
     private String id = null;
 

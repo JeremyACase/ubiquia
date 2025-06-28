@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
+import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 
 @SpringBootTest
@@ -31,7 +31,7 @@ public class BeliefStateGeneratorTest {
             schemaPath.toFile(),
             Object.class);
 
-        var acl = new AgentCommunicationLanguageDto();
+        var acl = new AgentCommunicationLanguage();
         acl.setJsonSchema(jsonSchema);
         acl.setDomain("pets");
         acl.setVersion(new SemanticVersion());

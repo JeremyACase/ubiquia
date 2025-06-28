@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.model.ubiquia.adapter.backpressure.BackPressure;
-import org.ubiquia.common.model.ubiquia.dto.FlowEventDto;
-import org.ubiquia.common.model.ubiquia.dto.FlowMessageDto;
+import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
+import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.model.adapter.AdapterContext;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
@@ -108,7 +108,7 @@ public abstract class AbstractAdapter implements InterfaceLogger {
         }
     }
 
-    public ResponseEntity<FlowEventDto> push(@RequestBody final String inputPayload)
+    public ResponseEntity<FlowEvent> push(@RequestBody final String inputPayload)
         throws Exception {
 
         Timer.Sample sample = null;
@@ -147,7 +147,7 @@ public abstract class AbstractAdapter implements InterfaceLogger {
         return response;
     }
 
-    protected void tryProcessInboxMessages(List<FlowMessageDto> messages) {
+    protected void tryProcessInboxMessages(List<FlowMessage> messages) {
         for (var message : messages) {
             this.adapterInboxMessageCommand.tryProcessInboxMessageFor(message, this);
         }

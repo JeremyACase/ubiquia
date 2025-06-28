@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgent;
+import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgentEntity;
 import org.ubiquia.common.library.config.UbiquiaAgentConfig;
 import org.ubiquia.core.flow.repository.UbiquiaAgentRepository;
 
@@ -36,7 +36,7 @@ public class UbiquiaAgentLogic {
                 , this.ubiquiaAgentConfig.getId());
             logger.info("...creating new agent record...");
 
-            var entity = new UbiquiaAgent();
+            var entity = new UbiquiaAgentEntity();
             entity.setDeployedGraphs(new ArrayList<>());
             entity.setId(this.ubiquiaAgentConfig.getId());
             entity = this.ubiquiaAgentRepository.save(entity);

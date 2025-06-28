@@ -5,9 +5,9 @@ import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import org.ubiquia.common.model.ubiquia.embeddable.FlowEventTimes;
 
-public class FlowEventDto extends AbstractEntityDto {
+public class FlowEvent extends AbstractModel {
 
-    private AdapterDto adapter;
+    private Adapter adapter;
 
     private String batchId;
 
@@ -19,9 +19,9 @@ public class FlowEventDto extends AbstractEntityDto {
 
     private FlowEventTimes flowEventTimes;
 
-    private List<KeyValuePairDto> inputPayloadStamps;
+    private List<KeyValuePair> inputPayloadStamps;
 
-    private List<KeyValuePairDto> outputPayloadStamps;
+    private List<KeyValuePair> outputPayloadStamps;
 
     @Schema(readOnly = true)
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
@@ -38,11 +38,11 @@ public class FlowEventDto extends AbstractEntityDto {
         return "FlowEvent";
     }
 
-    public AdapterDto getAdapter() {
+    public Adapter getAdapter() {
         return adapter;
     }
 
-    public void setAdapter(AdapterDto adapter) {
+    public void setAdapter(Adapter adapter) {
         this.adapter = adapter;
     }
 
@@ -70,19 +70,19 @@ public class FlowEventDto extends AbstractEntityDto {
         this.httpResponseCode = httpResponseCode;
     }
 
-    public List<KeyValuePairDto> getInputPayloadStamps() {
+    public List<KeyValuePair> getInputPayloadStamps() {
         return inputPayloadStamps;
     }
 
-    public void setInputPayloadStamps(List<KeyValuePairDto> inputPayloadStamps) {
+    public void setInputPayloadStamps(List<KeyValuePair> inputPayloadStamps) {
         this.inputPayloadStamps = inputPayloadStamps;
     }
 
-    public List<KeyValuePairDto> getOutputPayloadStamps() {
+    public List<KeyValuePair> getOutputPayloadStamps() {
         return outputPayloadStamps;
     }
 
-    public void setOutputPayloadStamps(List<KeyValuePairDto> outputPayloadStamps) {
+    public void setOutputPayloadStamps(List<KeyValuePair> outputPayloadStamps) {
         this.outputPayloadStamps = outputPayloadStamps;
     }
 

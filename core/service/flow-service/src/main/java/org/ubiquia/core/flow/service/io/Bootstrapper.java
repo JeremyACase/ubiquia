@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
-import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.core.flow.service.registrar.AgentCommunicationLanguageRegistrar;
 import org.ubiquia.core.flow.service.registrar.GraphRegistrar;
 
@@ -81,7 +81,7 @@ public class Bootstrapper {
                     logger.info("...bootstrapping file: {}", filePath.getFileName());
                     var acl = this.objectMapper.readValue(
                         filePath.toFile(),
-                        AgentCommunicationLanguageDto.class);
+                        AgentCommunicationLanguage.class);
                     this.aclRegistrar.tryRegister(acl);
                 } catch (Exception e) {
                     logger.error("Could not not bootstrap file at filepath {}: {}",
@@ -107,7 +107,7 @@ public class Bootstrapper {
             for (var filePath : filePaths) {
                 try {
                     logger.info("...bootstrapping file: {}", filePath.getFileName());
-                    var graph = yamlMapper.readValue(filePath.toFile(), GraphDto.class);
+                    var graph = yamlMapper.readValue(filePath.toFile(), Graph.class);
                     this.graphRegistrar.tryRegister(graph);
                 } catch (Exception e) {
                     logger.error("Could not not bootstrap file at filepath {}: {}",

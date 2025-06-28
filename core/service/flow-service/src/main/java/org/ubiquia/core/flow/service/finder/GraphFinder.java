@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
-import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.common.library.config.UbiquiaAgentConfig;
 import org.ubiquia.core.flow.repository.GraphRepository;
 
@@ -26,7 +26,7 @@ public class GraphFinder {
     @Autowired
     private UbiquiaAgentConfig ubiquiaAgentConfig;
 
-    public Optional<Graph> findGraphFor(String graphName, SemanticVersion version) {
+    public Optional<GraphEntity> findGraphFor(String graphName, SemanticVersion version) {
         var record = this
             .graphRepository
             .findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatch(

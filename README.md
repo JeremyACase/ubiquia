@@ -5,18 +5,18 @@ Welcome to Ubiquia — a domain-agnostic, production-grade Multi-Agent Orchestra
 ## Table of Contents
 
 * [Ubiquia Overview](#ubiquia-overview)
-    * [About](#about)
+  * [About](#about)
 * [Quickstart](#quickstart)
-    * [Quickstart: Requirements](#quick-start-requirements)
-    * [Quickstart: Scripts](#quick-start-scripts)
-    * [Quickstart: Scripts - One-Time Setup](#quick-start-scripts-one-time-setup)
+  * [Quickstart: Requirements](#quick-start-requirements)
+  * [Quickstart: Scripts](#quick-start-scripts)
+  * [Quickstart: Scripts - One-Time Setup](#quick-start-scripts-one-time-setup)
 * [Getting Started](#getting-started)
-    * [Getting Started: Requirements](#getting-started-requirements)
-    * [Getting Started: Helm Repo](#getting-started-helm-repo)
-    * [Getting Started: Installation](#getting-started-installation)
+  * [Getting Started: Requirements](#getting-started-requirements)
+  * [Getting Started: Helm Repo](#getting-started-helm-repo)
+  * [Getting Started: Installation](#getting-started-installation)
 * [For Devs](#for-devs)
-    * [For Devs: Building Ubiquia](#for-devs-building-ubiquia)
-    * [For Devs: Building Subprojects](#for-devs-building-subprojects)
+  * [For Devs: Building Ubiquia](#for-devs-building-ubiquia)
+  * [For Devs: Building Subprojects](#for-devs-building-subprojects)
 * [Contributors](#contributors)
 
 ## Ubiquia Overview
@@ -41,7 +41,7 @@ The quickest way to get up and running with Ubiquia is to follow this section.
 ### Quickstart: Requirements
 Before running Ubiquia, there are a few requirements that must be met.
 
-- [Helm](https://helm.sh/docs/intro/install/) has been installed 
+- [Helm](https://helm.sh/docs/intro/install/) has been installed
 - [KIND](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-with-go-install) has been installed
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/) has been installed
 - [Docker](https://docs.docker.com/engine/install/) has been installed (required by KIND)
@@ -79,7 +79,7 @@ Now you can re-run the installation script with a fresh Kubernetes cluster!
 ### Getting Started: Requirements
 Before running Ubiquia, there are a few requirements that must be met.
 
-- [Helm](https://helm.sh/docs/intro/install/) has been installed 
+- [Helm](https://helm.sh/docs/intro/install/) has been installed
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/) has been installed
 
 
@@ -95,7 +95,7 @@ $ helm install ubiquia ubiquia-helm --values helm/configurations/featherwweight.
 This section will contain a handful of useful commands, topics, concepts, or otherwise for developers using the Ubiquia framework.
 
 ### For Devs: Building Ubiquia
-The entire Ubiquia project can be built by invoking Gradle. This will task each subproject to build. 
+The entire Ubiquia project can be built by invoking Gradle. This will task each subproject to build.
 ```bash
 $ ./gradlew clean build
 ```

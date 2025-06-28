@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
+import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateCompiler;
 import org.ubiquia.core.belief.state.generator.service.decorator.InheritancePreprocessor;
 import org.ubiquia.core.belief.state.generator.service.decorator.UbiquiaModelInjector;
@@ -57,7 +57,7 @@ public class BeliefStateGenerator {
     @Autowired
     private BeliefStateUberizer beliefStateUberizer;
 
-    public void generateBeliefStateFrom(final AgentCommunicationLanguageDto acl)
+    public void generateBeliefStateFrom(final AgentCommunicationLanguage acl)
         throws Exception {
 
         logger.info("Generating new Belief State from: {}",

@@ -22,7 +22,7 @@ The **Belief State Service** is a component within a **Ubiquia** deployment. It 
 ### Goals
 - Enable runtime realization of Agent Communication Languages that can be translated into database schema in YugabyteDB
 - Generate a dynamic RESTful API that can allow clients to interface with the generated database schemas 
-- Allow data to propagate over a cluster (network) of Ubiquia agents allowing for location-transparency of data and consistency as communication.
+- Allow data to propagate over a cluster (network) of Ubiquia agentEntities allowing for location-transparency of data and consistency as communication.
 - Allow the DBMS to handle cascading relationships so that developers need not write domain-specific application logic towards this end
 - Leverage database schemas where appropriate to ensure the ability to automatically "evolve" and migrate database schemas. 
 

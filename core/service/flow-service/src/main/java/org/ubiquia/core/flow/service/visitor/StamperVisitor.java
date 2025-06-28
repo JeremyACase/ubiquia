@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
-import org.ubiquia.common.model.ubiquia.entity.FlowEvent;
+import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 
 /**
  * This is a service that can "stamp" payloads from adapters per their configuration. Stamps
@@ -23,14 +23,14 @@ public class StamperVisitor {
     /**
      * Attempt to stamp an input payload for an adapter.
      *
-     * @param flowEvent  The event associated with the payload.
+     * @param flowEventEntity  The event associated with the payload.
      * @param inputPayload The payload to stamp.
      * @throws JsonProcessingException Exception from trying to retrieve the stamps.
      */
-    public void tryStampInputs(FlowEvent flowEvent, final String inputPayload)
+    public void tryStampInputs(FlowEventEntity flowEventEntity, final String inputPayload)
         throws JsonProcessingException {
 
-        for (var stampKeychain : flowEvent
+        for (var stampKeychain : flowEventEntity
             .getAdapter()
             .getAdapterSettings()
             .getInputStampKeychains()) {
@@ -39,21 +39,21 @@ public class StamperVisitor {
             var kvp = new KeyValuePair();
             kvp.setKey(stampKeychain);
             kvp.setValue(stamp);
-            flowEvent.getInputPayloadStamps().add(kvp);
+            flowEventEntity.getInputPayloadStamps().add(kvp);
         }
     }
 
     /**
      * Attempt to stamp an output payload for an adapter.
      *
-     * @param flowEvent   The event associated with the payload.
+     * @param flowEventEntity   The event associated with the payload.
      * @param outputPayload The payload to stamp.
      * @throws JsonProcessingException Exception from trying to retrieve the stamps.
      */
-    public void tryStampOutputs(FlowEvent flowEvent, final String outputPayload)
+    public void tryStampOutputs(FlowEventEntity flowEventEntity, final String outputPayload)
         throws JsonProcessingException {
 
-        for (var stampKeychain : flowEvent
+        for (var stampKeychain : flowEventEntity
             .getAdapter()
             .getAdapterSettings()
             .getOutputStampKeychains()) {
@@ -61,7 +61,7 @@ public class StamperVisitor {
             var kvp = new KeyValuePair();
             kvp.setKey(stampKeychain);
             kvp.setValue(stamp);
-            flowEvent.getOutputPayloadStamps().add(kvp);
+            flowEventEntity.getOutputPayloadStamps().add(kvp);
         }
     }
 

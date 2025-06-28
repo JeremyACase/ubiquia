@@ -2,18 +2,18 @@ package org.ubiquia.core.flow.repository;
 
 
 import java.util.Optional;
-import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 
 public interface GraphRepository
-    extends AbstractEntityRepository<Graph> {
+    extends AbstractEntityRepository<GraphEntity> {
 
-    Optional<Graph> findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatch(
+    Optional<GraphEntity> findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatch(
         final String graphName,
         final Integer major,
         final Integer minor,
         final Integer patch);
 
-    Optional<Graph> findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatchAndUbiquiaAgentsDeployingGraphId(
+    Optional<GraphEntity> findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatchAndUbiquiaAgentsDeployingGraphId(
         final String graphName,
         final Integer major,
         final Integer minor,

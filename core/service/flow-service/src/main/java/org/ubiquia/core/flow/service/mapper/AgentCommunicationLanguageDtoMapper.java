@@ -6,24 +6,24 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.service.mapper.GenericDtoMapper;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
-import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguageEntity;
 
 @Service
 public class AgentCommunicationLanguageDtoMapper extends GenericDtoMapper<
-    AgentCommunicationLanguage,
-    AgentCommunicationLanguageDto> {
+    AgentCommunicationLanguageEntity,
+    AgentCommunicationLanguage> {
 
     @Autowired
     private GraphDtoMapper graphDTOMapper;
 
     @Override
-    public AgentCommunicationLanguageDto map(final AgentCommunicationLanguage from)
+    public AgentCommunicationLanguage map(final AgentCommunicationLanguageEntity from)
         throws JsonProcessingException {
 
-        AgentCommunicationLanguageDto to = null;
+        AgentCommunicationLanguage to = null;
         if (Objects.nonNull(from)) {
-            to = new AgentCommunicationLanguageDto();
+            to = new AgentCommunicationLanguage();
             super.setAbstractEntityFields(from, to);
             to.setJsonSchema(super.objectMapper.readValue(from.getJsonSchema(), Object.class));
             to.setDomain(from.getDomain());

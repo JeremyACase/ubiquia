@@ -6,27 +6,27 @@ import java.util.ArrayList;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.service.mapper.GenericDtoMapper;
-import org.ubiquia.common.model.ubiquia.dto.AgentDto;
-import org.ubiquia.common.model.ubiquia.dto.ConfigDto;
+import org.ubiquia.common.model.ubiquia.dto.Agent;
+import org.ubiquia.common.model.ubiquia.dto.Config;
 import org.ubiquia.common.model.ubiquia.embeddable.OverrideSettings;
-import org.ubiquia.common.model.ubiquia.entity.Agent;
+import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 
 
 @Service
 public class AgentDtoMapper extends GenericDtoMapper<
-    Agent,
-    AgentDto> {
+    AgentEntity,
+    Agent> {
 
     @Override
-    public AgentDto map(final Agent from) throws JsonProcessingException {
+    public Agent map(final AgentEntity from) throws JsonProcessingException {
 
-        AgentDto to = null;
+        Agent to = null;
         if (Objects.nonNull(from)) {
-            to = new AgentDto();
+            to = new Agent();
             super.setAbstractEntityFields(from, to);
 
             if (Objects.nonNull(from.getConfig())) {
-                var config = new ConfigDto();
+                var config = new Config();
                 config.setConfigMountPath(from.getConfig().getConfigMountPath());
                 var configMap = super.objectMapper.readValue(
                     from.getConfig().getConfigMap(),

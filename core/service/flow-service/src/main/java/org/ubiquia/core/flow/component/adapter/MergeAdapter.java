@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.ubiquia.common.model.ubiquia.dto.FlowMessageDto;
+import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.service.command.adapter.MergeAdapterCommand;
 
 @Component
@@ -35,7 +35,7 @@ public class MergeAdapter extends AbstractAdapter {
     }
 
     @Override
-    protected void tryProcessInboxMessages(List<FlowMessageDto> messages) {
+    protected void tryProcessInboxMessages(List<FlowMessage> messages) {
         for (var message : messages) {
             this.mergeAdapterCommand.tryProcessMessageFor(message, this);
         }

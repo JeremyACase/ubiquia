@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.ubiquia.common.library.api.controller.GenericUbiquiaDaoController;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.dao.component.EntityDao;
-import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
-import org.ubiquia.common.model.ubiquia.entity.Adapter;
+import org.ubiquia.common.model.ubiquia.dto.Adapter;
+import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
 import org.ubiquia.core.flow.service.mapper.AdapterDtoMapper;
 
 /**
@@ -17,7 +17,7 @@ import org.ubiquia.core.flow.service.mapper.AdapterDtoMapper;
  */
 @RestController
 @RequestMapping("/ubiquia/adapter")
-public class AdapterController extends GenericUbiquiaDaoController<Adapter, AdapterDto> {
+public class AdapterController extends GenericUbiquiaDaoController<AdapterEntity, Adapter> {
 
     private static final Logger logger = LoggerFactory.getLogger(AdapterController.class);
 
@@ -25,7 +25,7 @@ public class AdapterController extends GenericUbiquiaDaoController<Adapter, Adap
     private AdapterDtoMapper dtoMapper;
 
     @Autowired
-    private EntityDao<Adapter> entityDao;
+    private EntityDao<AdapterEntity> entityDao;
 
     @Override
     public Logger getLogger() {
@@ -33,12 +33,12 @@ public class AdapterController extends GenericUbiquiaDaoController<Adapter, Adap
     }
 
     @Override
-    public EntityDao<Adapter> getDataAccessObject() {
+    public EntityDao<AdapterEntity> getDataAccessObject() {
         return this.entityDao;
     }
 
     @Override
-    public InterfaceEntityToDtoMapper<Adapter, AdapterDto> getDataTransferObjectMapper() {
+    public InterfaceEntityToDtoMapper<AdapterEntity, Adapter> getDataTransferObjectMapper() {
         return this.dtoMapper;
     }
 }

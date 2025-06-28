@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
-import org.ubiquia.common.model.ubiquia.dto.FlowMessageDto;
-import org.ubiquia.common.model.ubiquia.entity.FlowEvent;
+import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
+import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 import org.ubiquia.core.flow.component.adapter.EgressAdapter;
 import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
@@ -56,7 +56,7 @@ public class EgressAdapterCommand implements InterfaceLogger {
     }
 
     public void tryProcessInboxMessageFor(
-        final FlowMessageDto flowMessage,
+        final FlowMessage flowMessage,
         final EgressAdapter adapter) {
 
         Timer.Sample sample = null;
@@ -90,7 +90,7 @@ public class EgressAdapterCommand implements InterfaceLogger {
     }
 
     private void tryEgressPayload(
-        final FlowEvent flowEvent,
+        final FlowEventEntity flowEventEntity,
         final EgressAdapter adapter,
         final String inputPayload)
         throws ValidationException,
@@ -101,7 +101,7 @@ public class EgressAdapterCommand implements InterfaceLogger {
 
             case PUT: {
                 this.adapterPutToAgentCommand.tryPutPayloadToAgentSynchronously(
-                    flowEvent,
+                    flowEventEntity,
                     adapter,
                     inputPayload);
             }
@@ -109,7 +109,7 @@ public class EgressAdapterCommand implements InterfaceLogger {
 
             case POST: {
                 this.adapterPostToAgentCommand.tryPostPayloadToAgentSynchronously(
-                    flowEvent,
+                    flowEventEntity,
                     adapter,
                     inputPayload);
             }

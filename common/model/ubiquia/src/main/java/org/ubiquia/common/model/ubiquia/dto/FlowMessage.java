@@ -3,11 +3,11 @@ package org.ubiquia.common.model.ubiquia.dto;
 
 import jakarta.validation.constraints.NotNull;
 
-public class FlowMessageDto extends AbstractEntityDto {
+public class FlowMessage extends AbstractModel {
 
-    private FlowEventDto flowEvent;
+    private FlowEvent flowEvent;
 
-    private AdapterDto targetAdapter;
+    private Adapter targetAdapter;
 
     private String payload;
 
@@ -17,20 +17,20 @@ public class FlowMessageDto extends AbstractEntityDto {
     }
 
     @NotNull
-    public FlowEventDto getFlowEvent() {
+    public FlowEvent getFlowEvent() {
         return flowEvent;
     }
 
-    public void setFlowEvent(FlowEventDto flowEvent) {
+    public void setFlowEvent(FlowEvent flowEvent) {
         this.flowEvent = flowEvent;
     }
 
     @NotNull
-    public AdapterDto getTargetAdapter() {
+    public Adapter getTargetAdapter() {
         return targetAdapter;
     }
 
-    public void setTargetAdapter(AdapterDto targetAdapter) {
+    public void setTargetAdapter(Adapter targetAdapter) {
         this.targetAdapter = targetAdapter;
     }
 

@@ -9,8 +9,7 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
-import org.ubiquia.common.model.ubiquia.dto.AbstractEntityDto;
-import org.ubiquia.common.model.ubiquia.entity.AbstractEntity;
+import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
 
 /**
  * A class dedicated to mapping from Amigos Event entities from the database to Data Transfer
@@ -18,8 +17,8 @@ import org.ubiquia.common.model.ubiquia.entity.AbstractEntity;
  */
 @Service
 public abstract class GenericDtoMapper<
-    F extends AbstractEntity,
-    T extends AbstractEntityDto>
+    F extends org.ubiquia.common.model.ubiquia.entity.AbstractModelEntity,
+    T extends AbstractModel>
     implements InterfaceEntityToDtoMapper<F, T> {
 
     @Autowired

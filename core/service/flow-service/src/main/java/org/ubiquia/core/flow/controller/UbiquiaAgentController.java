@@ -10,8 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.dao.component.EntityDao;
-import org.ubiquia.common.model.ubiquia.dto.UbiquiaAgentDto;
-import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgent;
+import org.ubiquia.common.model.ubiquia.dto.UbiquiaAgent;
+import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgentEntity;
 import org.ubiquia.common.library.config.UbiquiaAgentConfig;
 import org.ubiquia.core.flow.repository.UbiquiaAgentRepository;
 import org.ubiquia.core.flow.service.mapper.UbiquiaAgentDtoMapper;
@@ -35,7 +35,7 @@ public class UbiquiaAgentController implements InterfaceLogger {
     private UbiquiaAgentRepository ubiquiaAgentRepository;
 
     @Autowired
-    private EntityDao<UbiquiaAgent> entityDao;
+    private EntityDao<UbiquiaAgentEntity> entityDao;
 
     @Override
     public Logger getLogger() {
@@ -44,7 +44,7 @@ public class UbiquiaAgentController implements InterfaceLogger {
 
     @GetMapping(value = "/instance/get")
     @Transactional
-    public UbiquiaAgentDto getInstance() throws JsonProcessingException {
+    public UbiquiaAgent getInstance() throws JsonProcessingException {
         logger.debug("Received request for Ubiquia instance...");
         var id = this.ubiquiaAgentConfig.getId();
         var record = this.ubiquiaAgentRepository.findById(id);

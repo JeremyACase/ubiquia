@@ -14,7 +14,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
-import org.ubiquia.common.model.ubiquia.entity.FlowEvent;
+import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.service.visitor.AdapterOpenMessageVisitor;
@@ -52,7 +52,7 @@ public class AdapterPutToAgentCommand implements InterfaceLogger {
 
     @Transactional
     public ResponseEntity<Object> tryPutPayloadToAgentSynchronously(
-        FlowEvent flowEvent,
+        FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final Object inputPayload)
         throws ValidationException,
@@ -65,7 +65,7 @@ public class AdapterPutToAgentCommand implements InterfaceLogger {
         var adapterContext = adapter.getAdapterContext();
         logger.info("PUTting synchronous payload to URI: {}...", adapterContext.getEndpointUri());
 
-        var flowEventTimes = flowEvent.getFlowEventTimes();
+        var flowEventTimes = flowEventEntity.getFlowEventTimes();
         flowEventTimes.setPayloadSentToAgentTime(OffsetDateTime.now());
 
         var request = new HttpEntity<>(inputPayload, headers);
@@ -84,14 +84,14 @@ public class AdapterPutToAgentCommand implements InterfaceLogger {
                 e.getStatusCode());
         }
         flowEventTimes.setAgentResponseTime(OffsetDateTime.now());
-        flowEvent.setHttpResponseCode(response.getStatusCode().value());
-        this.adapterAgentResponseCommand.processAgentResponse(flowEvent, adapter, response);
+        flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
+        this.adapterAgentResponseCommand.processAgentResponse(flowEventEntity, adapter, response);
         return response;
     }
 
     @Transactional
     public void tryPutInputToAgentAsynchronously(
-        FlowEvent flowEvent,
+        FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final Object inputPayload) {
 
@@ -100,7 +100,7 @@ public class AdapterPutToAgentCommand implements InterfaceLogger {
             adapterContext.getEndpointUri());
 
         this.adapterOpenMessageVisitor.incrementOpenMessagesFor(adapter);
-        var eventTimes = flowEvent.getFlowEventTimes();
+        var eventTimes = flowEventEntity.getFlowEventTimes();
         this.webClient
             .put()
             .uri(adapterContext.getEndpointUri())
@@ -112,13 +112,13 @@ public class AdapterPutToAgentCommand implements InterfaceLogger {
                     this.adapterOpenMessageVisitor.decrementOpenMessagesFor(adapter);
                     eventTimes.setAgentResponseTime(OffsetDateTime.now());
                     eventTimes.setEventCompleteTime(OffsetDateTime.now());
-                    flowEvent.setHttpResponseCode(response.getStatusCode().value());
+                    flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
                     logger.info("...got response code {} from agent for batch id {}...",
                         response.getStatusCode(),
-                        flowEvent.getBatchId());
+                        flowEventEntity.getBatchId());
                     try {
                         this.adapterAgentResponseCommand.processAgentResponse(
-                            flowEvent,
+                            flowEventEntity,
                             adapter,
                             response);
                     } catch (Exception e) {
@@ -127,14 +127,14 @@ public class AdapterPutToAgentCommand implements InterfaceLogger {
                 },
                 error -> {
                     if (error instanceof HttpStatusCodeException errorCast) {
-                        flowEvent.setHttpResponseCode(errorCast.getStatusCode().value());
+                        flowEventEntity.setHttpResponseCode(errorCast.getStatusCode().value());
                     } else {
                         logger.error("ERROR response: {} ", error.getMessage());
                     }
                     eventTimes.setAgentResponseTime(OffsetDateTime.now());
                     eventTimes.setEventCompleteTime(OffsetDateTime.now());
                     this.adapterOpenMessageVisitor.decrementOpenMessagesFor(adapter);
-                    this.flowEventRepository.save(flowEvent);
+                    this.flowEventRepository.save(flowEventEntity);
                 }
             );
     }

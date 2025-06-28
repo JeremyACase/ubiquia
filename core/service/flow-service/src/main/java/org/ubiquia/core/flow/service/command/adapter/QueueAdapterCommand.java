@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.model.ubiquia.adapter.QueueAdapterEgress;
-import org.ubiquia.common.model.ubiquia.dto.FlowMessageDto;
+import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.component.adapter.QueueAdapter;
 import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
@@ -117,7 +117,7 @@ public class QueueAdapterCommand implements InterfaceLogger {
 
     @Transactional
     private QueueAdapterEgress getEgressFrom(
-        final FlowMessageDto message,
+        final FlowMessage message,
         final QueueAdapter adapter)
         throws Exception {
 

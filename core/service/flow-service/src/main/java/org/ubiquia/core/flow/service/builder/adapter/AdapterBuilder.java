@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.logic.service.builder.AdapterEndpointRecordBuilder;
-import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
+import org.ubiquia.common.model.ubiquia.dto.Adapter;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
-import org.ubiquia.common.model.ubiquia.entity.Adapter;
-import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
+import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.service.decorator.adapter.override.AdapterOverrideDecorator;
 import org.ubiquia.core.flow.service.logic.adapter.AdapterTypeLogic;
@@ -48,8 +48,8 @@ public class AdapterBuilder {
     @Transactional
     public void buildAdapter(
         AbstractAdapter adapter,
-        final Adapter adapterEntity,
-        final Graph graphEntity,
+        final AdapterEntity adapterEntity,
+        final GraphEntity graphEntity,
         final GraphDeployment graphDeployment)
         throws URISyntaxException,
         JsonProcessingException,
@@ -91,7 +91,7 @@ public class AdapterBuilder {
      * @param adapterData The adapter data from the database.
      * @throws URISyntaxException Exceptions from parsing endpoints.
      */
-    private void trySetAdapterEndpoint(AbstractAdapter adapter, final AdapterDto adapterData)
+    private void trySetAdapterEndpoint(AbstractAdapter adapter, final Adapter adapterData)
         throws URISyntaxException {
 
         var agentData = adapterData.getAgent();

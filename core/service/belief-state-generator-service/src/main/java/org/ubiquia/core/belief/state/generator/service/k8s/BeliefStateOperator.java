@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.k8s;
+package org.ubiquia.core.belief.state.generator.service.k8s;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,27 +21,23 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.Agent;
-import org.ubiquia.core.flow.service.builder.AgentDeploymentBuilder;
+import org.ubiquia.core.belief.state.generator.service.builder.BeliefStateDeploymentBuilder;
 
-/**
- * This is a service that will deploy and tear down agents by communicating with the
- * Kubernetes API server.
- */
 @ConditionalOnProperty(
     value = "ubiquia.kubernetes.enabled",
     havingValue = "true",
     matchIfMissing = false
 )
 @Service
-public class AgentOperator {
+public class BeliefStateOperator {
 
-    private static final Logger logger = LoggerFactory.getLogger(AgentOperator.class);
+    private static final Logger logger = LoggerFactory.getLogger(BeliefStateOperator.class);
     private final Integer maxDeploymentRetries = 10;
     private V1Deployment ubiquiaDeployment;
     private ApiClient apiClient;
     private GenericKubernetesApi<V1ConfigMap, V1ConfigMapList> configMapClient;
     @Autowired
-    private AgentDeploymentBuilder agentDeploymentBuilder;
+    private BeliefStateDeploymentBuilder beliefStateDeploymentBuilder;
     private GenericKubernetesApi<V1Deployment, V1DeploymentList> deploymentClient;
     private Integer deploymentRetries = 0;
     @Value("${ubiquia.kubernetes.namespace}")
@@ -80,7 +76,7 @@ public class AgentOperator {
             "services",
             apiClient);
         this.tryCacheUbiquiaDeploymentFromKubernetes();
-        this.agentDeploymentBuilder.setUbiquiaDeployment(this.ubiquiaDeployment);
+        this.beliefStateDeploymentBuilder.setUbiquiaDeployment(this.ubiquiaDeployment);
         this.initializeDeploymentUpdateInformer();
         logger.info("...Kubernetes client connection initialized.");
     }
@@ -163,7 +159,7 @@ public class AgentOperator {
             logger.info("...no current deployment exists, attempting to deploy...");
 
             var deployment = this
-                .agentDeploymentBuilder
+                .beliefStateDeploymentBuilder
                 .buildDeploymentFrom(agent);
             logger.debug("...deploying deployment: {}...",
                 this.objectMapper.writeValueAsString(deployment));
@@ -181,7 +177,7 @@ public class AgentOperator {
                     deploymentResponse.getHttpStatusCode());
             }
 
-            var service = this.agentDeploymentBuilder.buildServiceFrom(agent);
+            var service = this.beliefStateDeploymentBuilder.buildServiceFrom(agent);
             logger.debug("...deploying service: {}...",
                 this.objectMapper.writeValueAsString(service));
             var serviceResponse = this.serviceClient.create(
@@ -198,7 +194,7 @@ public class AgentOperator {
             }
 
             var configMap = this
-                .agentDeploymentBuilder
+                .beliefStateDeploymentBuilder
                 .tryBuildConfigMapFrom(agent);
             if (Objects.nonNull(configMap)) {
                 logger.info("...found a configmap for agent; attempting to deploy...");

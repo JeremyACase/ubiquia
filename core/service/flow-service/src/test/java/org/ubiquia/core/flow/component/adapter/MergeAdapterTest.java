@@ -16,7 +16,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-import org.ubiquia.common.model.ubiquia.dto.GraphEdgeDto;
+import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.AdapterType;
@@ -107,20 +107,20 @@ public class MergeAdapterTest {
         hiddenAgentTwo.setAdapter(hiddenAdapterTwo);
         mergeAgent.setAdapter(mergeAdapter);
 
-        var edgeOne = new GraphEdgeDto();
+        var edgeOne = new GraphEdge();
         edgeOne.setLeftAdapterName(ingressAdapter.getAdapterName());
         edgeOne.setRightAdapterNames(new ArrayList<>());
         edgeOne.getRightAdapterNames().add(hiddenAdapterOne.getAdapterName());
         edgeOne.getRightAdapterNames().add(hiddenAdapterTwo.getAdapterName());
         graph.getEdges().add(edgeOne);
 
-        var edgeTwo = new GraphEdgeDto();
+        var edgeTwo = new GraphEdge();
         edgeTwo.setLeftAdapterName(hiddenAdapterOne.getAdapterName());
         edgeTwo.setRightAdapterNames(new ArrayList<>());
         edgeTwo.getRightAdapterNames().add(mergeAdapter.getAdapterName());
         graph.getEdges().add(edgeTwo);
 
-        var edgeThree = new GraphEdgeDto();
+        var edgeThree = new GraphEdge();
         edgeThree.setLeftAdapterName(hiddenAdapterTwo.getAdapterName());
         edgeThree.setRightAdapterNames(new ArrayList<>());
         edgeThree.getRightAdapterNames().add(mergeAdapter.getAdapterName());

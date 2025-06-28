@@ -13,7 +13,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.client.RestTemplate;
-import org.ubiquia.common.model.ubiquia.dto.GraphEdgeDto;
+import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.BrokerSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.AdapterType;
@@ -85,7 +85,7 @@ public class PublishAdapterTest {
         publishAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
         graph.getAgentlessAdapters().add(publishAdapter);
 
-        var edge = new GraphEdgeDto();
+        var edge = new GraphEdge();
         edge.setLeftAdapterName(ingressAdapter.getAdapterName());
         edge.setRightAdapterNames(new ArrayList<>());
         edge.getRightAdapterNames().add(publishAdapter.getAdapterName());

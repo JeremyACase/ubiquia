@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.embeddable.FlowEventTimes;
-import org.ubiquia.common.model.ubiquia.entity.FlowEvent;
+import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.component.adapter.PollAdapter;
 import org.ubiquia.core.flow.repository.AdapterRepository;
@@ -39,7 +39,7 @@ public class FlowEventBuilder {
      * @param adapter The adapter to use to make an event.
      * @return A new Event.
      */
-    public FlowEvent makeEventFrom(final PollAdapter adapter) {
+    public FlowEventEntity makeEventFrom(final PollAdapter adapter) {
         var flowEvent = this.getEventHelper(adapter);
 
         // We haven't received an upstream event in this method; we're assuming it's a new batch
@@ -52,7 +52,7 @@ public class FlowEventBuilder {
         return flowEvent;
     }
 
-    public FlowEvent makeEventFrom(
+    public FlowEventEntity makeEventFrom(
         final String inputPayload,
         final AbstractAdapter adapter) throws JsonProcessingException {
 
@@ -72,7 +72,7 @@ public class FlowEventBuilder {
         return flowEvent;
     }
 
-    public FlowEvent makeEventFrom(
+    public FlowEventEntity makeEventFrom(
         final String inputPayload,
         final String batchId,
         final AbstractAdapter adapter) throws Exception {
@@ -99,7 +99,7 @@ public class FlowEventBuilder {
      * @param adapter The adapter we're using to build an event for.
      * @return A new event.
      */
-    private FlowEvent getEventHelper(final AbstractAdapter adapter) {
+    private FlowEventEntity getEventHelper(final AbstractAdapter adapter) {
 
         var adapterContext = adapter.getAdapterContext();
         logger.debug("Creating a new event for adapter: {}",
@@ -112,7 +112,7 @@ public class FlowEventBuilder {
                 + adapterContext.getAdapterId());
         }
 
-        var flowEvent = new FlowEvent();
+        var flowEvent = new FlowEventEntity();
         flowEvent.setFlowMessages(new HashSet<>());
         flowEvent.setAdapter(adapterRecord.get());
         flowEvent.setInputPayloadStamps(new HashSet<>());

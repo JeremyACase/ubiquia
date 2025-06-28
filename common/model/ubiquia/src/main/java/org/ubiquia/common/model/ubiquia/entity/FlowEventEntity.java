@@ -11,11 +11,11 @@ import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 
 @Validated
 @Entity
-public class FlowEvent extends AbstractEntity {
+public class FlowEventEntity extends AbstractModelEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "adapter_event_join_id", nullable = false)
-    private Adapter adapter;
+    private AdapterEntity adapter;
 
     private String batchId;
 
@@ -30,7 +30,7 @@ public class FlowEvent extends AbstractEntity {
     private FlowEventTimes flowEventTimes;
 
     @OneToMany(mappedBy = "flowEvent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-    private Set<FlowMessage> flowMessages;
+    private Set<FlowMessageEntity> flowMessages;
 
     @ElementCollection
     @AttributeOverrides({
@@ -65,12 +65,12 @@ public class FlowEvent extends AbstractEntity {
     }
 
     @NotNull
-    public Adapter getAdapter() {
+    public AdapterEntity getAdapter() {
         return adapter;
     }
 
-    public void setAdapter(Adapter adapter) {
-        this.adapter = adapter;
+    public void setAdapter(AdapterEntity adapterEntity) {
+        this.adapter = adapterEntity;
     }
 
     public String getInputPayload() {
@@ -97,12 +97,12 @@ public class FlowEvent extends AbstractEntity {
         this.httpResponseCode = httpResponseCode;
     }
 
-    public Set<FlowMessage> getFlowMessages() {
+    public Set<FlowMessageEntity> getFlowMessages() {
         return flowMessages;
     }
 
-    public void setFlowMessages(Set<FlowMessage> flowMessages) {
-        this.flowMessages = flowMessages;
+    public void setFlowMessages(Set<FlowMessageEntity> flowMessageEntities) {
+        this.flowMessages = flowMessageEntities;
     }
 
     public Set<KeyValuePair> getInputPayloadStamps() {

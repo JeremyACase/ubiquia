@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
-import org.ubiquia.common.model.ubiquia.dto.UbiquiaAgentDto;
+import org.ubiquia.common.model.ubiquia.dto.UbiquiaAgent;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
 import org.ubiquia.core.communication.interfaces.InterfaceUbiquiaDaoControllerProxy;
 import reactor.core.publisher.Mono;
@@ -23,7 +23,7 @@ public class UbiquiaAgentControllerProxy implements InterfaceUbiquiaDaoControlle
     private WebClient webClient;
 
     @GetMapping("/instance/get")
-    public Mono<ResponseEntity<UbiquiaAgentDto>> proxyGetInstance() {
+    public Mono<ResponseEntity<UbiquiaAgent>> proxyGetInstance() {
 
         var targetUri = UriComponentsBuilder
             .fromHttpUrl(this.getUrlHelper() + "/instance/get")
@@ -34,7 +34,7 @@ public class UbiquiaAgentControllerProxy implements InterfaceUbiquiaDaoControlle
             .get()
             .uri(targetUri)
             .retrieve()
-            .toEntity(UbiquiaAgentDto.class)
+            .toEntity(UbiquiaAgent.class)
             .onErrorResume(e -> {
                 // Handle downstream service error by returning 502
                 return Mono.just(ResponseEntity.status(502).body(null));

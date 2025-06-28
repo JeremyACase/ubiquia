@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
-import org.ubiquia.common.model.ubiquia.entity.AbstractEntity;
+import org.ubiquia.common.model.ubiquia.entity.AbstractModelEntity;
 
 @Service
 public class IngressResponseBuilder {
@@ -23,7 +23,7 @@ public class IngressResponseBuilder {
         return response;
     }
 
-    public IngressResponse buildIngressResponseFrom(final AbstractEntity entity) {
+    public IngressResponse buildIngressResponseFrom(final AbstractModelEntity entity) {
         logger.debug("...building ingress response for entity with: \nid: {} \ntype: {}",
             entity.getId(),
             entity.getModelType());

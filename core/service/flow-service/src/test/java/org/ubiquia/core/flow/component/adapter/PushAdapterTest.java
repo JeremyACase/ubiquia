@@ -21,7 +21,7 @@ import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
-import org.ubiquia.common.model.ubiquia.dto.GraphEdgeDto;
+import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
@@ -92,7 +92,7 @@ public class PushAdapterTest {
         ingressAgent.setAdapter(ingressAdapter);
         hiddenAgent.setAdapter(hiddenAdapter);
 
-        var edge = new GraphEdgeDto();
+        var edge = new GraphEdge();
         edge.setLeftAdapterName(ingressAdapter.getAdapterName());
         edge.setRightAdapterNames(new ArrayList<>());
         edge.getRightAdapterNames().add(hiddenAdapter.getAdapterName());
@@ -155,7 +155,7 @@ public class PushAdapterTest {
         ingressAgent.setAdapter(ingressAdapter);
         hiddenAgent.setAdapter(hiddenAdapter);
 
-        var edge = new GraphEdgeDto();
+        var edge = new GraphEdge();
         edge.setLeftAdapterName(ingressAdapter.getAdapterName());
         edge.setRightAdapterNames(new ArrayList<>());
         edge.getRightAdapterNames().add(hiddenAdapter.getAdapterName());

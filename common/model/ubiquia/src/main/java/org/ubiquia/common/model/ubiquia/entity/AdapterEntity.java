@@ -10,7 +10,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.*;
 import org.ubiquia.common.model.ubiquia.enums.AdapterType;
 
 @Entity
-public class Adapter extends AbstractEntity {
+public class AdapterEntity extends AbstractModelEntity {
 
     private AdapterType adapterType;
 
@@ -19,13 +19,13 @@ public class Adapter extends AbstractEntity {
     private CommunicationServiceSettings communicationServiceSettings;
 
     @OneToMany(mappedBy = "adapter", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-    private List<FlowEvent> flowEvents;
+    private List<FlowEventEntity> flowEvents;
 
     private BrokerSettings brokerSettings;
 
     @OneToOne
     @JoinColumn(name = "agent_adapter_join_id", nullable = true)
-    private Agent agent;
+    private AgentEntity agent;
 
     private String description;
 
@@ -35,7 +35,7 @@ public class Adapter extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "graph_adapter_join_id", nullable = false)
-    private Graph graph;
+    private GraphEntity graph;
 
     @ElementCollection
     private Set<SubSchema> inputSubSchemas;
@@ -49,24 +49,24 @@ public class Adapter extends AbstractEntity {
 
     private PollSettings pollSettings;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH, targetEntity = Adapter.class)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH, targetEntity = AdapterEntity.class)
     @JoinTable(name = "upstream_downstream_join_id",
         joinColumns = {@JoinColumn(name = "upstream_id")},
         inverseJoinColumns = {@JoinColumn(name = "downstream_id")})
     @Valid
-    private List<Adapter> upstreamAdapters;
+    private List<AdapterEntity> upstreamAdapters;
 
     @ManyToMany(mappedBy = "upstreamAdapters", fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
-    private List<Adapter> downstreamAdapters;
+    private List<AdapterEntity> downstreamAdapters;
 
     @OneToMany(mappedBy = "targetAdapter", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-    private List<FlowMessage> outboxMessages;
+    private List<FlowMessageEntity> outboxMessages;
 
-    public Agent getAgent() {
+    public AgentEntity getAgent() {
         return agent;
     }
 
-    public void setAgent(Agent agent) {
+    public void setAgent(AgentEntity agent) {
         this.agent = agent;
     }
 
@@ -87,11 +87,11 @@ public class Adapter extends AbstractEntity {
     }
 
     @NotNull
-    public Graph getGraph() {
+    public GraphEntity getGraph() {
         return graph;
     }
 
-    public void setGraph(Graph graph) {
+    public void setGraph(GraphEntity graph) {
         this.graph = graph;
     }
 
@@ -104,35 +104,35 @@ public class Adapter extends AbstractEntity {
         this.adapterType = adapterType;
     }
 
-    public List<Adapter> getUpstreamAdapters() {
+    public List<AdapterEntity> getUpstreamAdapters() {
         return upstreamAdapters;
     }
 
-    public void setUpstreamAdapters(List<Adapter> upstreamAdapters) {
+    public void setUpstreamAdapters(List<AdapterEntity> upstreamAdapters) {
         this.upstreamAdapters = upstreamAdapters;
     }
 
-    public List<Adapter> getDownstreamAdapters() {
+    public List<AdapterEntity> getDownstreamAdapters() {
         return downstreamAdapters;
     }
 
-    public void setDownstreamAdapters(List<Adapter> downstreamAdapters) {
-        this.downstreamAdapters = downstreamAdapters;
+    public void setDownstreamAdapters(List<AdapterEntity> downstreamAdapter) {
+        this.downstreamAdapters = downstreamAdapter;
     }
 
-    public List<FlowMessage> getOutboxMessages() {
+    public List<FlowMessageEntity> getOutboxMessages() {
         return outboxMessages;
     }
 
-    public void setOutboxMessages(List<FlowMessage> outboxMessages) {
+    public void setOutboxMessages(List<FlowMessageEntity> outboxMessages) {
         this.outboxMessages = outboxMessages;
     }
 
-    public List<FlowEvent> getFlowEvents() {
+    public List<FlowEventEntity> getFlowEvents() {
         return flowEvents;
     }
 
-    public void setFlowEvents(List<FlowEvent> flowEvents) {
+    public void setFlowEvents(List<FlowEventEntity> flowEvents) {
         this.flowEvents = flowEvents;
     }
 

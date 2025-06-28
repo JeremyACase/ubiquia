@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.FlowMessageDto;
+import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.component.adapter.QueueAdapter;
 import org.ubiquia.core.flow.repository.AdapterRepository;
@@ -44,7 +44,7 @@ public class Inbox {
      * @return An event associated with the query.
      * @throws JsonProcessingException Exceptions from parsing payloads.
      */
-    public FlowMessageDto tryQueryInboxMessagesFor(final QueueAdapter adapter)
+    public FlowMessage tryQueryInboxMessagesFor(final QueueAdapter adapter)
         throws JsonProcessingException {
 
         var adapterContext = adapter.getAdapterContext();
@@ -59,7 +59,7 @@ public class Inbox {
             pageRequest,
             adapterContext.getAdapterId());
 
-        FlowMessageDto flowMessage = null;
+        FlowMessage flowMessage = null;
         if (query.hasContent()) {
             logger.debug("queried message with ID: {}", query.getContent().get(0).getId());
             flowMessage = this.flowMessageDtoMapper.map(query.getContent().get(0));
@@ -74,7 +74,7 @@ public class Inbox {
      * @param adapter The adapter to query for.
      * @throws JsonProcessingException Exceptions from parsing payloads.
      */
-    public List<FlowMessageDto> tryQueryInboxMessagesFor(final AbstractAdapter adapter)
+    public List<FlowMessage> tryQueryInboxMessagesFor(final AbstractAdapter adapter)
         throws JsonProcessingException {
 
         var adapterContext = adapter.getAdapterContext();
@@ -90,7 +90,7 @@ public class Inbox {
             pageRequest,
             adapterContext.getAdapterId());
 
-        var messages = new ArrayList<FlowMessageDto>();
+        var messages = new ArrayList<FlowMessage>();
         for (var flowMessageEntity : query.getContent()) {
             logger.debug("queried message with ID: {}", flowMessageEntity.getId());
             var flowMessages = this.flowMessageDtoMapper.map(flowMessageEntity);

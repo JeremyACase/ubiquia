@@ -16,9 +16,8 @@ import org.ubiquia.common.library.api.controller.GenericUbiquiaDaoController;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.dao.component.EntityDao;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguageDto;
-import org.ubiquia.common.model.ubiquia.entity.Adapter;
-import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguageEntity;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.AgentCommunicationLanguageRepository;
 import org.ubiquia.core.flow.repository.AgentRepository;
@@ -32,14 +31,14 @@ import org.ubiquia.core.flow.service.registrar.AgentCommunicationLanguageRegistr
 @RestController
 @RequestMapping("/agent-communication-language")
 public class AgentCommunicationLanguageController extends GenericUbiquiaDaoController<
-    AgentCommunicationLanguage,
-    AgentCommunicationLanguageDto> {
+    AgentCommunicationLanguageEntity,
+    AgentCommunicationLanguage> {
 
     private static final Logger logger = LoggerFactory.getLogger(
         AgentCommunicationLanguageController.class);
 
     @Autowired
-    private EntityDao<AgentCommunicationLanguage> entityDao;
+    private EntityDao<AgentCommunicationLanguageEntity> entityDao;
 
     @Autowired
     private AgentCommunicationLanguageDtoMapper dtoMapper;
@@ -65,14 +64,14 @@ public class AgentCommunicationLanguageController extends GenericUbiquiaDaoContr
     }
 
     @Override
-    public EntityDao<AgentCommunicationLanguage> getDataAccessObject() {
+    public EntityDao<AgentCommunicationLanguageEntity> getDataAccessObject() {
         return this.entityDao;
     }
 
     @Override
     public InterfaceEntityToDtoMapper<
-        AgentCommunicationLanguage,
-        AgentCommunicationLanguageDto> getDataTransferObjectMapper() {
+        AgentCommunicationLanguageEntity,
+        AgentCommunicationLanguage> getDataTransferObjectMapper() {
         return this.dtoMapper;
     }
 
@@ -105,7 +104,7 @@ public class AgentCommunicationLanguageController extends GenericUbiquiaDaoContr
     @PostMapping("/register/post")
     @Transactional
     public IngressResponse register(
-        @RequestBody @Valid final AgentCommunicationLanguageDto communicationLanguage)
+        @RequestBody @Valid final AgentCommunicationLanguage communicationLanguage)
         throws JsonProcessingException {
         logger.info("Received a registration request: {}",
             super.objectMapper.writeValueAsString(communicationLanguage));
@@ -128,7 +127,7 @@ public class AgentCommunicationLanguageController extends GenericUbiquiaDaoContr
             var payload = IOUtils.toString(file.getInputStream(), "UTF-8");
             var acl = super.objectMapper.readValue(
                 payload,
-                AgentCommunicationLanguageDto.class);
+                AgentCommunicationLanguage.class);
             response = this.tryRegisterAgentCommunicationLanguage(acl);
         } catch (Exception e) {
             throw new IllegalArgumentException("ERROR: Could not transform file into agent "
@@ -147,7 +146,7 @@ public class AgentCommunicationLanguageController extends GenericUbiquiaDaoContr
      * @throws JsonProcessingException Exceptions from parsing the domain ontology.
      */
     private IngressResponse tryRegisterAgentCommunicationLanguage(
-        final AgentCommunicationLanguageDto agentCommunicationLanguage)
+        final AgentCommunicationLanguage agentCommunicationLanguage)
         throws JsonProcessingException {
 
         var entity = this.aclRegistrar.tryRegister(agentCommunicationLanguage);

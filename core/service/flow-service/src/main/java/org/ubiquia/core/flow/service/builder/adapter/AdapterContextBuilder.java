@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.logic.service.builder.AdapterEndpointRecordBuilder;
 import org.ubiquia.core.flow.model.adapter.AdapterContext;
-import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
+import org.ubiquia.common.model.ubiquia.dto.Adapter;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
-import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.common.model.ubiquia.enums.AgentType;
 import org.ubiquia.core.flow.service.logic.adapter.AdapterTypeLogic;
 
@@ -29,8 +29,8 @@ public class AdapterContextBuilder {
     private AdapterTypeLogic adapterTypeLogic;
 
     public AdapterContext buildAdapterContext(
-        final AdapterDto adapterData,
-        final Graph graphEntity,
+        final Adapter adapterData,
+        final GraphEntity graphEntity,
         final GraphDeployment graphDeployment)
         throws URISyntaxException {
 
@@ -64,7 +64,7 @@ public class AdapterContextBuilder {
         return context;
     }
 
-    private Long getBackPressurePollRatePerMinute(final AdapterDto adapterData) {
+    private Long getBackPressurePollRatePerMinute(final Adapter adapterData) {
 
         var x = TimeUnit.MINUTES.toMillis(1);
         var y = adapterData.getAdapterSettings().getBackpressurePollFrequencyMilliseconds();
@@ -74,7 +74,7 @@ public class AdapterContextBuilder {
 
     private void trySetAdapterContextEndpoint(
         AdapterContext adapterContext,
-        final AdapterDto adapterData)
+        final Adapter adapterData)
         throws URISyntaxException {
 
         if (!adapterData.getAdapterSettings().getIsPassthrough()) {

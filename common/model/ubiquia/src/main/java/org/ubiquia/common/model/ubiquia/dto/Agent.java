@@ -5,11 +5,11 @@ import java.util.List;
 import org.ubiquia.common.model.ubiquia.embeddable.*;
 import org.ubiquia.common.model.ubiquia.enums.AgentType;
 
-public class AgentDto extends AbstractEntityDto {
+public class Agent extends AbstractModel {
 
     private AgentType agentType;
 
-    private ConfigDto config;
+    private Config config;
 
     private String agentName;
 
@@ -29,9 +29,9 @@ public class AgentDto extends AbstractEntityDto {
 
     private LivenessProbe livenessProbe;
 
-    private AdapterDto adapter;
+    private Adapter adapter;
 
-    private GraphDto graph;
+    private Graph graph;
 
     private Image image;
 
@@ -62,19 +62,19 @@ public class AgentDto extends AbstractEntityDto {
         this.port = port;
     }
 
-    public AdapterDto getAdapter() {
+    public Adapter getAdapter() {
         return adapter;
     }
 
-    public void setAdapter(AdapterDto adapter) {
+    public void setAdapter(Adapter adapter) {
         this.adapter = adapter;
     }
 
-    public GraphDto getGraph() {
+    public Graph getGraph() {
         return graph;
     }
 
-    public void setGraph(GraphDto graph) {
+    public void setGraph(Graph graph) {
         this.graph = graph;
     }
 
@@ -128,11 +128,11 @@ public class AgentDto extends AbstractEntityDto {
         this.agentType = agentType;
     }
 
-    public ConfigDto getConfig() {
+    public Config getConfig() {
         return config;
     }
 
-    public void setConfig(ConfigDto config) {
+    public void setConfig(Config config) {
         this.config = config;
     }
 

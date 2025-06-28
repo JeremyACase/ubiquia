@@ -7,25 +7,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.service.mapper.GenericDtoMapper;
-import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
-import org.ubiquia.common.model.ubiquia.dto.FlowEventDto;
-import org.ubiquia.common.model.ubiquia.dto.KeyValuePairDto;
+import org.ubiquia.common.model.ubiquia.dto.Adapter;
+import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
+import org.ubiquia.common.model.ubiquia.dto.KeyValuePair;
 import org.ubiquia.common.model.ubiquia.embeddable.FlowEventTimes;
-import org.ubiquia.common.model.ubiquia.entity.FlowEvent;
+import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 
 
 @Service
-public class FlowEventDtoMapper extends GenericDtoMapper<FlowEvent, FlowEventDto> {
+public class FlowEventDtoMapper extends GenericDtoMapper<FlowEventEntity, FlowEvent> {
 
     private static final Logger logger = LoggerFactory.getLogger(FlowEventDtoMapper.class);
 
     @Override
-    public FlowEventDto map(final FlowEvent from) throws JsonProcessingException {
+    public FlowEvent map(final FlowEventEntity from) throws JsonProcessingException {
 
-        FlowEventDto to = null;
+        FlowEvent to = null;
         if (Objects.nonNull(from)) {
 
-            to = new FlowEventDto();
+            to = new FlowEvent();
             super.setAbstractEntityFields(from, to);
             to.setBatchId(from.getBatchId());
 
@@ -62,7 +62,7 @@ public class FlowEventDtoMapper extends GenericDtoMapper<FlowEvent, FlowEventDto
 
             to.setInputPayloadStamps(new ArrayList<>());
             for (var stamp : from.getInputPayloadStamps()) {
-                var kvp = new KeyValuePairDto();
+                var kvp = new KeyValuePair();
                 kvp.setKey(stamp.getKey());
                 // Attempt to parse the string into an object to avoid sending raw-string JSON
                 try {
@@ -75,7 +75,7 @@ public class FlowEventDtoMapper extends GenericDtoMapper<FlowEvent, FlowEventDto
 
             to.setOutputPayloadStamps(new ArrayList<>());
             for (var stamp : from.getOutputPayloadStamps()) {
-                var kvp = new KeyValuePairDto();
+                var kvp = new KeyValuePair();
                 kvp.setKey(stamp.getKey());
 
                 // Attempt to parse the string into an object to avoid sending raw-string JSON
@@ -88,7 +88,7 @@ public class FlowEventDtoMapper extends GenericDtoMapper<FlowEvent, FlowEventDto
                 }
                 to.getOutputPayloadStamps().add(kvp);
             }
-            var adapter = new AdapterDto();
+            var adapter = new Adapter();
             adapter.setAdapterName(from.getAdapter().getAdapterName());
             adapter.setAdapterType(from.getAdapter().getAdapterType());
 
@@ -104,7 +104,7 @@ public class FlowEventDtoMapper extends GenericDtoMapper<FlowEvent, FlowEventDto
      * @param from The database entity.
      * @param to   The dto we're mapping to.
      */
-    private void setFlowEventTimes(final FlowEvent from, FlowEventDto to) {
+    private void setFlowEventTimes(final FlowEventEntity from, FlowEvent to) {
         var toFlowEventTimes = new FlowEventTimes();
         var fromFlowEventTimes = from.getFlowEventTimes();
         toFlowEventTimes.setAgentResponseTime(

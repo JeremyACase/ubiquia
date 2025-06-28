@@ -6,13 +6,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.time.OffsetDateTime;
 import java.util.Objects;
+import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class BaseDomainEntity {
+public abstract class AbstractModelEntity {
 
     @Id
     @GeneratedValue(generator = "uuid")
@@ -25,6 +27,10 @@ public abstract class BaseDomainEntity {
 
     @UpdateTimestamp
     private OffsetDateTime updatedAt = null;
+
+    @ElementCollection
+    @Valid
+    private Set<KeyValuePair> tags = null;
 
     @Transient
     private String modelType;
@@ -47,6 +53,11 @@ public abstract class BaseDomainEntity {
         this.createdAt = createdAt;
     }
 
+    /**
+     * Time the row was last updated in the database, auto-populated by the system.
+     *
+     * @return updatedAt
+     **/
     @Valid
     public OffsetDateTime getUpdatedAt() {
         return updatedAt;
@@ -57,13 +68,27 @@ public abstract class BaseDomainEntity {
     }
 
     /**
+     * A list of tags in key-value-pair format that this record has associated with it.
+     *
+     * @return tags
+     **/
+    @Valid
+    public Set<KeyValuePair> getTags() {
+        return this.tags;
+    }
+
+    public void setTags(Set<KeyValuePair> tags) {
+        this.tags = tags;
+    }
+
+    /**
      * Type of the Model.
      *
      * @return modelType
      **/
     @NotNull
     public String getModelType() {
-        return "BaseDomainEntity";
+        return "AbstractEntity";
     }
 
     @Override
@@ -72,7 +97,7 @@ public abstract class BaseDomainEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(java.lang.Object o) {
 
         if (this == o) {
             return true;
@@ -81,7 +106,7 @@ public abstract class BaseDomainEntity {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BaseDomainEntity aentity = (BaseDomainEntity) o;
+        AbstractModelEntity aentity = (AbstractModelEntity) o;
 
         return
             Objects.equals(this.id, aentity.id)

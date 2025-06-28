@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.ubiquia.common.model.ubiquia.dto.AgentDto;
-import org.ubiquia.common.model.ubiquia.dto.ConfigDto;
+import org.ubiquia.common.model.ubiquia.dto.Agent;
+import org.ubiquia.common.model.ubiquia.dto.Config;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.OverrideSettingsStringified;
@@ -47,7 +47,7 @@ public class AgentOverrideDecoratorTest {
             + "          value: true\n"
             + "        config_1:\n"
             + "          value: true";
-        var baselineConfig = new ConfigDto();
+        var baselineConfig = new Config();
         baselineConfig.setConfigMountPath("test");
         baselineConfig.setConfigMap(baselineConfigmap);
 
@@ -56,7 +56,7 @@ public class AgentOverrideDecoratorTest {
             + "          value: false\n"
             + "        config_1:\n"
             + "          value: false";
-        var overrideConfig = new ConfigDto();
+        var overrideConfig = new Config();
         overrideConfig.setConfigMountPath("test");
         overrideConfig.setConfigMap(overriddenConfigmap);
 
@@ -72,7 +72,7 @@ public class AgentOverrideDecoratorTest {
         deployment.setGraphSettings(new GraphSettings());
         deployment.getGraphSettings().setFlag("test");
 
-        var agent = new AgentDto();
+        var agent = new Agent();
         agent.setConfig(baselineConfig);
         this.agentOverrideDecorator.tryOverrideBaselineValues(
             agent,

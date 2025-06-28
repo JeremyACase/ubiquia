@@ -6,12 +6,12 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.service.mapper.GenericDtoMapper;
-import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.model.ubiquia.embeddable.NameAndVersionPair;
-import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 
 @Service
-public class GraphDtoMapper extends GenericDtoMapper<Graph, GraphDto> {
+public class GraphDtoMapper extends GenericDtoMapper<GraphEntity, Graph> {
 
     @Autowired
     private AdapterDtoMapper adapterDtoMapper;
@@ -20,11 +20,11 @@ public class GraphDtoMapper extends GenericDtoMapper<Graph, GraphDto> {
     private AgentDtoMapper agentDtoMapper;
 
     @Override
-    public GraphDto map(final Graph from) throws JsonProcessingException {
+    public Graph map(final GraphEntity from) throws JsonProcessingException {
 
-        GraphDto to = null;
+        Graph to = null;
         if (Objects.nonNull(from)) {
-            to = new GraphDto();
+            to = new Graph();
             super.setAbstractEntityFields(from, to);
 
             to.setAuthor(from.getAuthor());

@@ -19,10 +19,10 @@ import org.ubiquia.common.library.api.controller.GenericUbiquiaDaoController;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.dao.component.EntityDao;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
-import org.ubiquia.common.model.ubiquia.dto.GraphDto;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
-import org.ubiquia.common.model.ubiquia.entity.Graph;
+import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.common.library.config.UbiquiaAgentConfig;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.AgentRepository;
@@ -38,7 +38,7 @@ import org.ubiquia.core.flow.service.registrar.GraphRegistrar;
 
 @RestController
 @RequestMapping("/ubiquia/flow-service/graph")
-public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto> {
+public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Graph> {
 
     private static final Logger logger = LoggerFactory.getLogger(GraphController.class);
 
@@ -58,7 +58,7 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
     private AgentRepository agentRepository;
 
     @Autowired
-    private EntityDao<Graph> entityDao;
+    private EntityDao<GraphEntity> entityDao;
 
     @Autowired
     private GraphFinder graphFinder;
@@ -87,12 +87,12 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
     }
 
     @Override
-    public EntityDao<Graph> getDataAccessObject() {
+    public EntityDao<GraphEntity> getDataAccessObject() {
         return this.entityDao;
     }
 
     @Override
-    public InterfaceEntityToDtoMapper<Graph, GraphDto> getDataTransferObjectMapper() {
+    public InterfaceEntityToDtoMapper<GraphEntity, Graph> getDataTransferObjectMapper() {
         return this.dtoMapper;
     }
 
@@ -121,7 +121,7 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
 
     @PostMapping("/register/post")
     @Transactional
-    public IngressResponse register(@RequestBody @Valid final GraphDto graphRegistration)
+    public IngressResponse register(@RequestBody @Valid final Graph graphRegistration)
         throws Exception {
         this.getLogger().info("Received a registration request: {}", graphRegistration);
         var graphEntity = this.graphRegistrar.tryRegister(graphRegistration);
@@ -138,7 +138,7 @@ public class GraphController extends GenericUbiquiaDaoController<Graph, GraphDto
         try {
             var payload = IOUtils.toString(file.getInputStream(), StandardCharsets.UTF_8);
             var yamlMapper = new ObjectMapper(new YAMLFactory());
-            var graphRegistration = yamlMapper.readValue(payload, GraphDto.class);
+            var graphRegistration = yamlMapper.readValue(payload, Graph.class);
             var graphEntity = this.graphRegistrar.tryRegister(graphRegistration);
             response = super.ingressResponseBuilder.buildIngressResponseFrom(graphEntity);
         } catch (Exception e) {

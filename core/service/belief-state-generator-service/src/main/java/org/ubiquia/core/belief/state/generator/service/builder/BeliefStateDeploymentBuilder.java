@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.builder;
+package org.ubiquia.core.belief.state.generator.service.builder;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -24,9 +24,9 @@ import org.ubiquia.common.model.ubiquia.embeddable.Volume;
     matchIfMissing = false
 )
 @Service
-public class AgentDeploymentBuilder {
+public class BeliefStateDeploymentBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(AgentDeploymentBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(BeliefStateDeploymentBuilder.class);
     private V1Deployment ubiquiaDeployment;
     @Autowired
     private ObjectMapper objectMapper;

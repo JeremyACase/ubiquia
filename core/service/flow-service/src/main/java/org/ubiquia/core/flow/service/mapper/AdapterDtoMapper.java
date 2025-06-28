@@ -8,14 +8,14 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.service.mapper.GenericDtoMapper;
-import org.ubiquia.common.model.ubiquia.dto.AdapterDto;
-import org.ubiquia.common.model.ubiquia.entity.Adapter;
+import org.ubiquia.common.model.ubiquia.dto.Adapter;
+import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
 
 
 @Service
 public class AdapterDtoMapper extends GenericDtoMapper<
-    Adapter,
-    AdapterDto> {
+    AdapterEntity,
+    Adapter> {
 
     @Autowired
     private AgentDtoMapper agentDtoMapper;
@@ -24,11 +24,11 @@ public class AdapterDtoMapper extends GenericDtoMapper<
     private OverrideSettingsMapper overrideSettingsMapper;
 
     @Override
-    public AdapterDto map(final Adapter from) throws JsonProcessingException {
+    public Adapter map(final AdapterEntity from) throws JsonProcessingException {
 
-        AdapterDto to = null;
+        Adapter to = null;
         if (Objects.nonNull(from)) {
-            to = new AdapterDto();
+            to = new Adapter();
             super.setAbstractEntityFields(from, to);
 
             to.setAdapterName(from.getAdapterName());
@@ -71,12 +71,12 @@ public class AdapterDtoMapper extends GenericDtoMapper<
      * @return The mapped adapters.
      * @throws JsonProcessingException Exception from mapping.
      */
-    private List<AdapterDto> mapUpstreamOrDownstreamAdapters(final List<Adapter> froms)
+    private List<Adapter> mapUpstreamOrDownstreamAdapters(final List<AdapterEntity> froms)
         throws JsonProcessingException {
-        var tos = new ArrayList<AdapterDto>();
+        var tos = new ArrayList<Adapter>();
 
         for (var from : froms) {
-            var to = new AdapterDto();
+            var to = new Adapter();
             super.setAbstractEntityFields(from, to);
             to.setAdapterName(from.getAdapterName());
             to.setAdapterType(from.getAdapterType());
