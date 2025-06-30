@@ -1,5 +1,6 @@
 package org.ubiquia.core.belief.state.generator.service.generator;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,26 +15,24 @@ import org.springframework.stereotype.Service;
 public class GenerationSupportProcessor {
 
     public void postProcess() throws IOException {
-        this.copyFile(
-            "src/main/resources/template/java/support/Application.Java.template",
+        this.copyResourceFromClasspath(
+            "template/java/support/Application.Java.template",
             "generated/src/main/java/org/ubiquia/acl/generated/Application.java");
 
-        this.copyFile(
-            "src/main/resources/template/java/support/application.yaml.template",
+        this.copyResourceFromClasspath(
+            "template/java/support/application.yaml.template",
             "generated/src/main/resources/application.yaml");
     }
 
-    private void copyFile(
-        final String sourcePathStr,
-        final String destinationPathStr) throws IOException {
-
-        var sourcePath = Paths.get(sourcePathStr);
-        var destinationPath = Paths.get(destinationPathStr);
-
-        // Ensure destination directory exists
-        Files.createDirectories(destinationPath.getParent());
-
-        // Copy the file (REPLACE_EXISTING if destination file exists)
-        Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+    private void copyResourceFromClasspath(String resourcePath, String destinationPath) throws IOException {
+        try (var in = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
+            if (in == null) {
+                throw new FileNotFoundException("Resource not found in classpath: "
+                    + resourcePath);
+            }
+            Files.createDirectories(Paths.get(destinationPath).getParent());
+            Files.copy(in, Paths.get(destinationPath), StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 }
+
