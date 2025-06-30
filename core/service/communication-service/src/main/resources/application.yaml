@@ -23,7 +23,7 @@ management:
         include: info, prometheus, health, mappings
   metrics:
     tags:
-      application: ${spring.application.name}
+      application: communication-service
 
 spring:
   server:

@@ -1,20 +1,16 @@
 buildscript {
-    ext {
-        springBootVersion = '3.5.3'
-    }
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${SPRING_BOOT_VERSION}"
     }
 }
 
 plugins {
-    id 'org.springframework.boot' version '3.5.3' apply false
+    id 'org.springframework.boot' version "${SPRING_BOOT_VERSION}" apply false
     id 'io.spring.dependency-management' version '1.1.4' apply false
 }
-
 
 allprojects {
     group = 'org.ubiquia'
@@ -22,34 +18,13 @@ allprojects {
 
     repositories {
         mavenCentral()
-        maven {
-            url 'https://jitpack.io'
-        }
+        maven { url 'https://jitpack.io' }
     }
 
-    apply plugin: "java"
-    apply plugin: "checkstyle"
-    apply plugin: "jacoco"
-    apply plugin: "io.spring.dependency-management"
-
-    ext {
-        APACHE_COMMONS_VERSION = '3.14.0'
-        H2_VERSION = '2.2.224'
-        INSTANCIO_VERSION = '5.4.1'
-        JACKSON_VERSION = '2.19.0'
-        JSON_SCHEMA_FRIEND_VERSION = '0.12.3'
-        JAVA_JSON_TOOLS = '1.2.14'
-        JUNIT_JUPITER_VERSION = '5.10.2'
-        JUNIT_PLATFORM_VERSION = '1.10.2'
-        KUBECTL_CLIENT_VERSION = '20.0.1'
-        LOGBACK_VERSION = '1.5.18'
-        MICROMETER_VERSION = '1.12.4'
-        OPENAPI_GENERATOR_VERSION = '7.13.0'
-        REFLECTIONS_VERSION = '0.10.2'
-        SPRING_BOOT_VERSION = '3.5.3'
-        SPRING_BOOT_KAFKA_VERSION = '3.3.7'
-        SPRING_DOC_VERSION = '2.6.0'
-    }
+    apply plugin: 'java'
+    apply plugin: 'checkstyle'
+    apply plugin: 'jacoco'
+    apply plugin: 'io.spring.dependency-management'
 }
 
 subprojects {
@@ -60,18 +35,40 @@ subprojects {
     dependencies {
         testImplementation "org.springframework.boot:spring-boot-starter-test"
         testImplementation "org.junit.jupiter:junit-jupiter-api:${JUNIT_JUPITER_VERSION}"
-        testRuntimeOnly  "org.junit.jupiter:junit-jupiter-engine:${JUNIT_JUPITER_VERSION}"
-        testRuntimeOnly  "org.junit.platform:junit-platform-launcher:${JUNIT_PLATFORM_VERSION}"
-        testRuntimeOnly  "org.junit.platform:junit-platform-engine:${JUNIT_PLATFORM_VERSION}"
-        testRuntimeOnly  "org.junit.platform:junit-platform-commons:${JUNIT_PLATFORM_VERSION}"
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${JUNIT_JUPITER_VERSION}"
+        testRuntimeOnly "org.junit.platform:junit-platform-launcher:${JUNIT_PLATFORM_VERSION}"
+        testRuntimeOnly "org.junit.platform:junit-platform-engine:${JUNIT_PLATFORM_VERSION}"
+        testRuntimeOnly "org.junit.platform:junit-platform-commons:${JUNIT_PLATFORM_VERSION}"
     }
 }
 
 checkstyle {
     configFile file("${rootDir}/config/checkstyle/checkstyle.xml")
-    toolVersion '10.23.1';
+    toolVersion = '10.23.1'
 }
 
 jacoco {
     toolVersion = '0.8.8'
+}
+
+tasks.register("versionizeDocker") {
+    doLast {
+        def openjdkVersion = rootProject.findProperty("OPENJDK_VERSION") ?: "21"
+
+        subprojects.each { project ->
+            def dockerfile = new File(project.projectDir, "Dockerfile")
+            if (dockerfile.exists()) {
+                def imageName = "ubiquia/${project.name}".replaceAll(':', '-')
+
+                println "Building Docker image for ${project.path} with OPENJDK_VERSION=${openjdkVersion}"
+                exec {
+                    workingDir project.projectDir
+                    commandLine "docker", "build",
+                            "--build-arg", "OPENJDK_VERSION=${openjdkVersion}",
+                            "-t", imageName,
+                            "."
+                }
+            }
+        }
+    }
 }

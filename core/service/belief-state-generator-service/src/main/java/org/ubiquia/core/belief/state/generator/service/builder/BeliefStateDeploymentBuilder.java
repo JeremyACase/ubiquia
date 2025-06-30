@@ -1,22 +1,16 @@
 package org.ubiquia.core.belief.state.generator.service.builder;
 
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.kubernetes.client.custom.IntOrString;
 import io.kubernetes.client.openapi.models.*;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
-import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.Agent;
-import org.ubiquia.common.model.ubiquia.embeddable.Volume;
+import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 
 @ConditionalOnProperty(
     value = "ubiquia.kubernetes.enabled",
@@ -27,9 +21,9 @@ import org.ubiquia.common.model.ubiquia.embeddable.Volume;
 public class BeliefStateDeploymentBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateDeploymentBuilder.class);
+    @Value("${ubiquia.jdkVersion}")
+    protected String jdkVersion;
     private V1Deployment ubiquiaDeployment;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     public V1Deployment getUbiquiaDeployment() {
         return this.ubiquiaDeployment;
@@ -39,45 +33,14 @@ public class BeliefStateDeploymentBuilder {
         this.ubiquiaDeployment = ubiquiaDeployment;
     }
 
-    /**
-     * If applicable, try to get a Kubernetes configmap for an agent.
-     *
-     * @param agent The agent to get a configmap for.
-     * @return A Configmap if applicable, or null.
-     */
-    public V1ConfigMap tryBuildConfigMapFrom(final Agent agent) {
-        V1ConfigMap configMap = null;
-
-        if (Objects.nonNull(agent.getConfig())) {
-            configMap = new V1ConfigMap();
-            var typeRef = new TypeReference<HashMap<String, String>>() {
-            };
-            var map = this.objectMapper.convertValue(
-                agent.getConfig().getConfigMap(),
-                typeRef);
-            configMap.setData(map);
-
-            configMap.setMetadata(new V1ObjectMeta());
-            configMap.getMetadata().setName(
-                agent.getAgentName().toLowerCase() + "-config");
-        }
-        return configMap;
-    }
-
-    /**
-     * Attempt to build a Kubernetes service for the agent.
-     *
-     * @param agent The agent to build a service for.
-     * @return A Kubernetes service.
-     */
     @Transactional
-    public V1Service buildServiceFrom(final Agent agent) {
+    public V1Service buildServiceFrom(final AgentCommunicationLanguage acl) {
         var service = new V1Service();
         service.setApiVersion("v1");
         service.setKind("Service");
 
         service.setMetadata(new V1ObjectMeta());
-        service.getMetadata().setName(agent.getAgentName().toLowerCase());
+        service.getMetadata().setName(acl.getDomain().toLowerCase());
 
         service.getMetadata().setLabels(new HashMap<>());
         service.getMetadata().getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
@@ -85,10 +48,10 @@ public class BeliefStateDeploymentBuilder {
         service.getMetadata().getLabels().remove("app.kubernetes.io/managed-by");
         service.getMetadata().getLabels().put(
             "component",
-            agent.getAgentName().toLowerCase());
+            acl.getDomain().toLowerCase());
         service.getMetadata().getLabels().put(
-            "ubiquia-graph",
-            agent.getGraph().getGraphName().toLowerCase());
+            "belief-state",
+            acl.getDomain().toLowerCase());
         service.getMetadata().getLabels().put("app.kubernetes.io/managed-by", "ubiquia");
 
         var serviceSpec = new V1ServiceSpec();
@@ -96,58 +59,46 @@ public class BeliefStateDeploymentBuilder {
         serviceSpec.setSelector(new HashMap<>());
         serviceSpec.getSelector().put(
             "component",
-            agent.getAgentName().toLowerCase());
+            acl.getDomain().toLowerCase());
         serviceSpec.getSelector().put(
-            "ubiquia-graph",
-            agent.getGraph().getGraphName().toLowerCase());
+            "belief-state",
+            acl.getDomain().toLowerCase());
         service.setSpec(serviceSpec);
 
         serviceSpec.setPorts(new ArrayList<>());
         var port = new V1ServicePort();
         port.setProtocol("TCP");
-        port.setPort(agent.getPort());
+        port.setPort(8080);
         port.setName("http");
         serviceSpec.getPorts().add(port);
 
         return service;
     }
 
-    /**
-     * Attempt to build a Kubernetes deployment for the agent.
-     *
-     * @param agent The agent to build a deployment for.
-     * @return A Kubernetes deployment.
-     */
     @Transactional
-    public V1Deployment buildDeploymentFrom(final Agent agent) {
+    public V1Deployment buildDeploymentFrom(final AgentCommunicationLanguage acl) {
         var deployment = new V1Deployment();
         deployment.setApiVersion("apps/v1");
         deployment.setKind("Deployment");
-        deployment.setMetadata(this.getMetadataFrom(agent));
-        deployment.setSpec(this.getDeploymentSpecFrom(agent));
+        deployment.setMetadata(this.getMetadataFrom(acl));
+        deployment.setSpec(this.getDeploymentSpecFrom(acl));
         return deployment;
     }
 
-    /**
-     * Attempt to build a Kubernetes metadata for the agent.
-     *
-     * @param agent The agent to build a metadata for.
-     * @return A Kubernetes metadata.
-     */
     @Transactional
-    private V1ObjectMeta getMetadataFrom(final Agent agent) {
+    private V1ObjectMeta getMetadataFrom(final AgentCommunicationLanguage acl) {
         var metadata = new V1ObjectMeta();
-        metadata.setName(agent.getAgentName().toLowerCase());
+        metadata.setName(acl.getDomain().toLowerCase());
 
         metadata.setLabels(new HashMap<>());
         metadata.getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
         metadata.getLabels().remove("component");
         metadata.getLabels().remove("app.kubernetes.io/managed-by");
-        metadata.getLabels().put("component", agent.getAgentName().toLowerCase());
+        metadata.getLabels().put("component", acl.getDomain().toLowerCase());
         metadata.getLabels().put("app.kubernetes.io/managed-by", "ubiquia");
         metadata.getLabels().put(
-            "ubiquia-graph",
-            agent.getGraph().getGraphName().toLowerCase());
+            "belief-state",
+            acl.getDomain().toLowerCase());
 
         metadata.setAnnotations(new HashMap<>());
         metadata.getAnnotations().putAll(this.ubiquiaDeployment.getMetadata().getAnnotations());
@@ -155,37 +106,25 @@ public class BeliefStateDeploymentBuilder {
         return metadata;
     }
 
-    /**
-     * Attempt to build a Kubernetes deployment spec for the agent.
-     *
-     * @param agent The agent to build a deployment spec for.
-     * @return A Kubernetes deployment spec.
-     */
     @Transactional
-    private V1DeploymentSpec getDeploymentSpecFrom(final Agent agent) {
+    private V1DeploymentSpec getDeploymentSpecFrom(final AgentCommunicationLanguage acl) {
         var spec = new V1DeploymentSpec();
-        spec.setReplicas(agent.getScaleSettings().getMinReplicas());
+        spec.setReplicas(1);
         spec.setSelector(this.ubiquiaDeployment.getSpec().getSelector());
         spec.getSelector().getMatchLabels().put(
             "component",
-            agent.getAgentName().toLowerCase());
+            acl.getDomain().toLowerCase());
         spec.getSelector().getMatchLabels().put(
-            "ubiquia-graph",
-            agent.getGraph().getGraphName().toLowerCase());
+            "belief-state",
+            acl.getDomain().toLowerCase());
 
-        spec.setTemplate(this.getPodTemplateSpec(agent));
+        spec.setTemplate(this.getPodTemplateSpec(acl));
 
         return spec;
     }
 
-    /**
-     * Attempt to build a Kubernetes template spec for the agent.
-     *
-     * @param agent The agent to build a template spec for.
-     * @return A Kubernetes template spec.
-     */
     @Transactional
-    private V1PodTemplateSpec getPodTemplateSpec(final Agent agent) {
+    private V1PodTemplateSpec getPodTemplateSpec(final AgentCommunicationLanguage acl) {
 
         var template = new V1PodTemplateSpec();
         template.setMetadata(new V1ObjectMeta());
@@ -193,17 +132,17 @@ public class BeliefStateDeploymentBuilder {
         template.getMetadata().getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
         template.getMetadata().getLabels().put(
             "component",
-            agent.getAgentName().toLowerCase());
+            acl.getDomain().toLowerCase());
         template.getMetadata().getLabels().put(
-            "ubiquia-graph",
-            agent.getGraph().getGraphName().toLowerCase());
+            "belief-state",
+            acl.getDomain().toLowerCase());
         template.getMetadata().getLabels().remove("app.kubernetes.io/managed-by");
         template.getMetadata().getLabels().put("app.kubernetes.io/managed-by", "ubiquia");
 
         template.setSpec(new V1PodSpec());
         template.setSpec(this.ubiquiaDeployment.getSpec().getTemplate().getSpec());
         template.getSpec().setContainers(new ArrayList<>());
-        template.getSpec().getContainers().add(this.getContainer(agent));
+        template.getSpec().getContainers().add(this.getContainer(acl));
         template.getSpec().setImagePullSecrets(
             this.ubiquiaDeployment
                 .getSpec()
@@ -212,163 +151,26 @@ public class BeliefStateDeploymentBuilder {
                 .getImagePullSecrets());
 
         template.getSpec().setVolumes(new ArrayList<>());
-        if (Objects.nonNull(agent.getConfig())) {
-            var volume = new V1Volume();
-            volume.setName(agent.getAgentName().toLowerCase()
-                + "-config");
-            volume.setConfigMap(new V1ConfigMapVolumeSource());
-            volume.getConfigMap().setName(
-                agent.getAgentName().toLowerCase()
-                    + "-config");
-
-            template.getSpec().getVolumes().add(volume);
-        }
-
-        for (var volume : agent.getVolumes()) {
-            var volumeResource = this.tryGetVolume(volume);
-            template.getSpec().addVolumesItem(volumeResource);
-        }
-
-        template.getSpec().setInitContainers(new ArrayList<>());
-        var initContainer = this.tryGetInitContainer(agent);
-        if (Objects.nonNull(initContainer)) {
-            template.getSpec().getInitContainers().add(initContainer);
-        }
-
         return template;
     }
 
-    /**
-     * Attempt to build a Kubernetes container for the agent.
-     *
-     * @param agent The agent to build a container for.
-     * @return A Kubernetes container.
-     */
     @Transactional
-    private V1Container getContainer(final Agent agent) {
+    private V1Container getContainer(final AgentCommunicationLanguage acl) {
         var container = new V1Container();
-        container.setName(agent.getAgentName().toLowerCase());
+        container.setName(acl.getDomain().toLowerCase());
         container.setImagePullPolicy("IfNotPresent");
 
-        var image = "";
-
-        if (!Strings.isEmpty(agent.getImage().getRegistry())) {
-            image += agent.getImage().getRegistry();
-            image += "/";
-        }
-
-        image = image
-            + agent.getImage().getRepository()
-            + ":"
-            + agent.getImage().getTag();
-
+        var image = "openJdk:" + this.jdkVersion;
         container.setImage(image);
 
         container.setPorts(new ArrayList<>());
         var port = new V1ContainerPort();
-        port.setContainerPort(agent.getPort());
+        port.setContainerPort(8080);
         port.setName("http");
         port.setProtocol("TCP");
         port.setHostIP("http");
         container.getPorts().add(port);
 
-        if (Objects.nonNull(agent.getConfig())) {
-            var envFrom = new V1EnvFromSource();
-            envFrom.setConfigMapRef(new V1ConfigMapEnvSource());
-            envFrom.getConfigMapRef().setName(agent.getAgentName().toLowerCase()
-                + "-config");
-
-            container.setEnvFrom(new ArrayList<>());
-            container.getEnvFrom().add(envFrom);
-        }
-
-        if (Objects.nonNull(agent.getLivenessProbe())) {
-            var probe = this.tryGetLivenessProbe(agent);
-            container.setLivenessProbe(probe);
-        }
-
-        container.setVolumeMounts(new ArrayList<>());
-        for (var volume : agent.getVolumes()) {
-            var mount = this.tryGetVolumeMount(volume);
-            container.getVolumeMounts().add(mount);
-        }
-
-        container.setEnv(new ArrayList<>());
-        for (var envVar : agent.getEnvironmentVariables()) {
-            var environmentVariable = new V1EnvVar();
-            environmentVariable.setName(envVar.getName());
-            environmentVariable.setValue(envVar.getValue());
-            container.getEnv().add(environmentVariable);
-        }
-
         return container;
-    }
-
-    /**
-     * Attempt to build a liveness probe for the agent.
-     *
-     * @param agent The agent to build a volume mount for.
-     * @return A liveness probe.
-     */
-    private V1Probe tryGetLivenessProbe(final Agent agent) {
-        V1Probe probe = null;
-        if (Objects.nonNull(agent.getLivenessProbe())) {
-            probe = new V1Probe();
-            probe.setInitialDelaySeconds(agent.getLivenessProbe()
-                .getInitialDelaySeconds());
-            var httpGet = new V1HTTPGetAction();
-            httpGet.setPath(agent.getLivenessProbe().getHttpGetPath());
-            httpGet.setPort(new IntOrString(agent.getPort()));
-            probe.setHttpGet(httpGet);
-        }
-        return probe;
-    }
-
-    /**
-     * Attempt to build a Kubernetes init container for the agent.
-     *
-     * @param agent The agent to build an init container for.
-     * @return An init container.
-     */
-    private V1Container tryGetInitContainer(final Agent agent) {
-        V1Container initContainer = null;
-        if (Objects.nonNull(agent.getInitContainer())) {
-            initContainer = new V1Container();
-            initContainer.setName(agent.getAgentName().toLowerCase()
-                + "-init-container");
-            initContainer.setImagePullPolicy("IfNotPresent");
-
-            initContainer.setCommand(agent.getInitContainer().getCommand());
-            initContainer.setArgs(agent.getInitContainer().getArgs());
-            initContainer.setImage(agent.getInitContainer().getImage());
-        }
-        return initContainer;
-    }
-
-    /**
-     * Attempt to build a Kubernetes volume for the ubiquia volume.
-     *
-     * @param volume The ubiquia volume to build a k8s volume for.
-     * @return A volume.
-     */
-    private V1Volume tryGetVolume(final Volume volume) {
-        var volumeResource = new V1Volume();
-        volumeResource.setName(volume.getName());
-        volumeResource.setPersistentVolumeClaim(new V1PersistentVolumeClaimVolumeSource());
-        volumeResource.getPersistentVolumeClaim().setClaimName(volume.getPersistentVolumeClaimName());
-        return volumeResource;
-    }
-
-    /**
-     * Attempt to build a volume mount for the agent.
-     *
-     * @param volume The volume we're building a mount for.
-     * @return A volume mount.
-     */
-    private V1VolumeMount tryGetVolumeMount(final Volume volume) {
-        var volumeMount = new V1VolumeMount();
-        volumeMount.setName(volume.getName());
-        volumeMount.setMountPath(volume.getMountPath());
-        return volumeMount;
     }
 }

@@ -24,7 +24,7 @@ management:
         include: info, prometheus, health, mappings
   metrics:
     tags:
-      application: ${spring.application.name}
+      application: flow-service
 
 spring:
   server:

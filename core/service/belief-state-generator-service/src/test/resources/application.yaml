@@ -23,7 +23,7 @@ management:
         include: info, prometheus, health, mappings
   metrics:
     tags:
-      application: ${spring.application.name}
+      application: belief-state-generator-service
 
 spring:
   server:
@@ -52,3 +52,4 @@ ubiquia:
         filepath: src/test/resources/pets-openapi.yaml
       schema:
         filepath: src/test/resources/pets-acl-json-schema.json
+  jdkVersion: @OPENJDK_VERSION@

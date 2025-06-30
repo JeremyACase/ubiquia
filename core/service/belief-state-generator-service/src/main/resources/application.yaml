@@ -24,7 +24,7 @@ management:
         include: info, prometheus, health, mappings
   metrics:
     tags:
-      application: ${spring.application.name}
+      application: belief-state-generator-service
 
 spring:
   server:
@@ -47,3 +47,4 @@ ubiquia:
       port: 8080
       url: http://ubiquia-core-flow-service
       pollFrequencyMilliseconds: 5000
+  jdkVersion: @OPENJDK_VERSION@

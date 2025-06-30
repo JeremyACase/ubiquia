@@ -1,4 +1,5 @@
-FROM openjdk:17
+ARG OPENJDK_VERSION
+FROM openjdk:${OPENJDK_VERSION}
 
 ENV PORT=8080
 ENV JAR_FILE=ubiquia-core-belief-state-generator-service.jar

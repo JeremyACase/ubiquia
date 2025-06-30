@@ -29,7 +29,10 @@ jobs:
       - name: Setup permissions
         run: chmod +x ./gradlew
 
-      - name: Build
+      - name: Versionize our Docker stuff
+        run: ./gradlew versionizeDocker
+
+      - name: Build project
         run: ./gradlew clean build
 
       - name: Upload subproject jars
@@ -42,7 +45,7 @@ jobs:
             core/service/flow-service/build/libs/*.jar
 
   containerize-and-publish:
-    needs: [build]  
+    needs: [build]
     runs-on: ubuntu-latest
 
     steps:
@@ -95,7 +98,6 @@ jobs:
             docker build -t $IMAGE_NAME:${IMAGE_TAG} ./$dir
             docker push $IMAGE_NAME:${IMAGE_TAG}
 
-            # Optionally tag as latest if it's a versioned tag
             if [[ "${IMAGE_TAG}" != "latest" ]]; then
               docker tag $IMAGE_NAME:${IMAGE_TAG} $IMAGE_NAME:latest
               docker push $IMAGE_NAME:latest

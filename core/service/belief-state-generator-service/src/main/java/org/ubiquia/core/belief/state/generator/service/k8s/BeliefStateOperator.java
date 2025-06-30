@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kubernetes.client.informer.ResourceEventHandler;
 import io.kubernetes.client.informer.SharedInformerFactory;
 import io.kubernetes.client.openapi.ApiClient;
-import io.kubernetes.client.openapi.models.*;
+import io.kubernetes.client.openapi.models.V1Deployment;
+import io.kubernetes.client.openapi.models.V1DeploymentList;
+import io.kubernetes.client.openapi.models.V1Service;
+import io.kubernetes.client.openapi.models.V1ServiceList;
 import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.generic.GenericKubernetesApi;
 import io.kubernetes.client.util.generic.options.CreateOptions;
@@ -20,7 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.Agent;
+import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 import org.ubiquia.core.belief.state.generator.service.builder.BeliefStateDeploymentBuilder;
 
 @ConditionalOnProperty(
@@ -35,7 +38,6 @@ public class BeliefStateOperator {
     private final Integer maxDeploymentRetries = 10;
     private V1Deployment ubiquiaDeployment;
     private ApiClient apiClient;
-    private GenericKubernetesApi<V1ConfigMap, V1ConfigMapList> configMapClient;
     @Autowired
     private BeliefStateDeploymentBuilder beliefStateDeploymentBuilder;
     private GenericKubernetesApi<V1Deployment, V1DeploymentList> deploymentClient;
@@ -54,13 +56,6 @@ public class BeliefStateOperator {
     public void init() throws IOException, InterruptedException {
         logger.info("Initializing Kubernetes client connection...");
         this.apiClient = ClientBuilder.standard().build();
-        this.configMapClient = new GenericKubernetesApi<>(
-            V1ConfigMap.class,
-            V1ConfigMapList.class,
-            "",
-            "v1",
-            "configmaps",
-            apiClient);
         this.deploymentClient = new GenericKubernetesApi<>(
             V1Deployment.class,
             V1DeploymentList.class,
@@ -83,31 +78,18 @@ public class BeliefStateOperator {
 
     @PreDestroy
     public void teardown() throws JsonProcessingException {
-        logger.info("Tearing down Ubiquia agent operator...");
+        logger.info("Tearing down Ubiquia belief state operator...");
 
-        var deploymentResponse = this.deploymentClient.get(this.namespace, "ubiquia-core-flow-service");
+        var deploymentResponse = this.deploymentClient.get(this.namespace, "ubiquia-core-belief-state-generator-service");
         if (deploymentResponse.getHttpStatusCode() == HttpStatus.NO_CONTENT.value()) {
             logger.info("...Ubiquia K8s deployment not found, tearing down "
-                + "deployed graphs...");
+                + "deployed belief states...");
             this.tryDeleteAllDeployedGraphResources();
         } else if (!deploymentResponse.isSuccess()) {
             logger.info("...unsuccessful request for Ubiquia K8s deployment; assuming to "
-                + "tear down deployed graphs...");
+                + "tear down deployed belief states...");
             this.tryDeleteAllDeployedGraphResources();
         }
-    }
-
-    /**
-     * Delete a graph's deployed resources from Kubernetes.
-     *
-     * @param graphName The graph to delete.
-     */
-    public void deleteGraphResources(final String graphName) {
-        logger.info("...deleting graph: {}...", graphName);
-        this.deploymentClient.delete(this.namespace, graphName);
-        this.serviceClient.delete(this.namespace, graphName);
-        this.configMapClient.delete(this.namespace, graphName + "-config");
-        logger.info("...deleted.");
     }
 
     /**
@@ -144,25 +126,27 @@ public class BeliefStateOperator {
         factory.startAllRegisteredInformers();
     }
 
-    public void tryDeployAgent(final Agent agent)
+    public void tryDeployBeliefState(final AgentCommunicationLanguage acl)
         throws JsonProcessingException {
 
-        logger.info("Trying to deploy an agent for with name {} for graph {}...",
-            agent.getAgentName(),
-            agent.getGraph().getGraphName());
+        logger.info("Trying to deploy a belief state for ACL: \nDomain: {} \nVersion: {}",
+            acl.getDomain(),
+            acl.getVersion());
 
         var currentDeployment = this.deploymentClient.get(
             this.namespace,
-            agent.getAgentName().toLowerCase());
+            acl.getDomain().toLowerCase() + acl.getVersion());
 
         if (Objects.isNull(currentDeployment.getObject())) {
             logger.info("...no current deployment exists, attempting to deploy...");
 
             var deployment = this
                 .beliefStateDeploymentBuilder
-                .buildDeploymentFrom(agent);
+                .buildDeploymentFrom(acl);
+
             logger.debug("...deploying deployment: {}...",
                 this.objectMapper.writeValueAsString(deployment));
+
             var deploymentResponse = this.deploymentClient.create(
                 this.namespace,
                 deployment,
@@ -177,7 +161,7 @@ public class BeliefStateOperator {
                     deploymentResponse.getHttpStatusCode());
             }
 
-            var service = this.beliefStateDeploymentBuilder.buildServiceFrom(agent);
+            var service = this.beliefStateDeploymentBuilder.buildServiceFrom(acl);
             logger.debug("...deploying service: {}...",
                 this.objectMapper.writeValueAsString(service));
             var serviceResponse = this.serviceClient.create(
@@ -193,28 +177,9 @@ public class BeliefStateOperator {
                     serviceResponse.getHttpStatusCode());
             }
 
-            var configMap = this
-                .beliefStateDeploymentBuilder
-                .tryBuildConfigMapFrom(agent);
-            if (Objects.nonNull(configMap)) {
-                logger.info("...found a configmap for agent; attempting to deploy...");
-                var configMapResponse = this.configMapClient.create(
-                    this.namespace,
-                    configMap,
-                    new CreateOptions());
-                if (!configMapResponse.isSuccess()) {
-                    throw new IllegalArgumentException("ERROR - unable to create configMap; "
-                        + "response from Kubernetes: "
-                        + this.objectMapper.writeValueAsString(configMapResponse));
-                } else {
-                    logger.info("...deployed successfully; response code: {}",
-                        configMapResponse.getHttpStatusCode());
-                }
-            }
-
             logger.info("...completed deployment...");
         } else {
-            logger.info("...deployment found for that agent and graph; not deploying...");
+            logger.info("...deployment found for that ACL; not deploying...");
         }
     }
 
@@ -224,13 +189,13 @@ public class BeliefStateOperator {
      * @param deployment The deployment containing the deleted Ubiquia resource.
      */
     private void tryProcessDeploymentDeletion(V1Deployment deployment) {
-        if (deployment.getMetadata().getName().equals("ubiquia-core-flow-service")) {
+        if (deployment.getMetadata().getName().equals("ubiquia-core-belief-state-generator-service")) {
             logger.info("Received a deletion update for Ubiquia itself; proceeding to teardown"
-                + " any deployed DAG resources...");
+                + " any deployed belief state resources...");
             try {
                 this.tryDeleteAllDeployedGraphResources();
             } catch (Exception e) {
-                logger.error("ERROR: Could not delete graphs: {}", e.getMessage());
+                logger.error("ERROR: Could not delete belief states: {}", e.getMessage());
             }
         }
     }
@@ -251,7 +216,7 @@ public class BeliefStateOperator {
         } else {
             if (Objects.isNull(this.ubiquiaDeployment)) {
                 logger.info("...trying to fetch Ubiquia deployment data from Kubernetes...");
-                var response = this.deploymentClient.get(this.namespace, "ubiquia-core-flow-service");
+                var response = this.deploymentClient.get(this.namespace, "ubiquia-core-belief-state-generator-service");
                 if (response.isSuccess()) {
                     this.ubiquiaDeployment = response.getObject();
                     logger.info("...successfully fetched Ubiquia deployment data from Kubernetes...");
@@ -274,22 +239,19 @@ public class BeliefStateOperator {
     public void tryDeleteAllDeployedGraphResources() throws JsonProcessingException {
         var listOptions = new ListOptions();
 
-        listOptions.setLabelSelector("ubiquia-graph");
+        listOptions.setLabelSelector("belief-state");
         var response = this.deploymentClient.list(this.namespace, listOptions);
 
         if (response.isSuccess()) {
-            for (var deployedGraph : response.getObject().getItems()) {
-                logger.info("...deleting graph resources with name: {}...",
-                    deployedGraph.getMetadata().getName());
+            for (var deployedBeliefState : response.getObject().getItems()) {
+                logger.info("...deleting belief state resources with name: {}...",
+                    deployedBeliefState.getMetadata().getName());
                 this.deploymentClient.delete(
                     this.namespace,
-                    deployedGraph.getMetadata().getName());
+                    deployedBeliefState.getMetadata().getName());
                 this.serviceClient.delete(
                     this.namespace,
-                    deployedGraph.getMetadata().getName());
-                this.configMapClient.delete(
-                    this.namespace,
-                    deployedGraph.getMetadata().getName() + "-config");
+                    deployedBeliefState.getMetadata().getName());
             }
         } else {
             throw new IllegalArgumentException("ERROR: Got response from Kubernetes: "

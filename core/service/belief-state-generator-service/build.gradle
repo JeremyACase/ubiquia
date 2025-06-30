@@ -38,6 +38,7 @@ dependencies {
     implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"
     implementation "org.openapitools:openapi-generator:${OPENAPI_GENERATOR_VERSION}"
 
+    runtimeOnly "com.h2database:h2:${H2_VERSION}"
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${MICROMETER_VERSION}"
 
     testImplementation "org.instancio:instancio-junit:${INSTANCIO_VERSION}"
@@ -61,6 +62,31 @@ test {
     useJUnitPlatform()
 }
 
+def openJdkVersion = rootProject.findProperty("OPENJDK_VERSION") ?: "21"
+
+tasks.named("processResources") {
+    inputs.property("OPENJDK_VERSION", openJdkVersion)
+    filteringCharset = 'UTF-8'
+
+    filesMatching('application.yaml') {
+        println "✅ Forcing expand for main: $path"
+        filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [
+                OPENJDK_VERSION: openJdkVersion
+        ])
+    }
+}
+
+tasks.named("processTestResources") {
+    inputs.property("OPENJDK_VERSION", openJdkVersion)
+    filteringCharset = 'UTF-8'
+
+    filesMatching('application.yaml') {
+        println "✅ Forcing expand for test: $path"
+        filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [
+                OPENJDK_VERSION: openJdkVersion
+        ])
+    }
+}
 
 task copyRuntimeLibs(type: Copy) {
     description = 'Copies all runtime dependencies and project jars to build/belief-state-libs'
@@ -94,5 +120,16 @@ task copyRuntimeLibs(type: Copy) {
     into "belief-state-libs"
 }
 
-build.mustRunAfter copyRuntimeLibs
-build.dependsOn copyRuntimeLibs
+tasks.named("build") {
+    dependsOn tasks.named("copyRuntimeLibs")
+    dependsOn tasks.named("processResources")
+    mustRunAfter tasks.named("copyRuntimeLibs")
+    mustRunAfter tasks.named("processResources")
+}
+
+tasks.named("test") {
+    dependsOn tasks.named("copyRuntimeLibs")
+    dependsOn tasks.named("processTestResources")
+    mustRunAfter tasks.named("copyRuntimeLibs")
+    mustRunAfter tasks.named("processTestResources")
+}
