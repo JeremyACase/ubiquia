@@ -3,14 +3,17 @@ name: Build Pipeline
 on:
   push:
     branches:
-      - main  # Trigger on push to the main branch
+      - main
     tags:
-      - 'v*'  # Trigger on tag push (e.g., v1.0.0)
+      - 'v*'
 
 env:
   DOCKER_REGISTRY: docker.io
   DOCKER_REPO: ubiquia
-  SUBPROJECTS: "core/service/belief-state-generator-service core/service/communication-service core/service/flow-service "
+  SUBPROJECTS: |
+    core/service/belief-state-generator-service
+    core/service/communication-service
+    core/service/flow-service
 
 jobs:
 
@@ -29,13 +32,10 @@ jobs:
       - name: Setup permissions
         run: chmod +x ./gradlew
 
-      - name: Versionize our Docker stuff
-        run: ./gradlew versionizeDocker
-
-      - name: Build project
+      - name: Build project JARs
         run: ./gradlew clean build
 
-      - name: Upload subproject jars
+      - name: Upload subproject JARs
         uses: actions/upload-artifact@v4
         with:
           name: jars
