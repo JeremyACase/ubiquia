@@ -7,7 +7,7 @@ import org.ubiquia.common.library.advice.exception.AbstractGlobalExceptionHandle
  * Global exception handler that will catch REST errors and communicate them
  * appropriately.
  */
-@ControllerAdvice
-public class GlobalExceptionHandler extends AbstractGlobalExceptionHandler {
+//@ControllerAdvice
+//public class GlobalExceptionHandler extends AbstractGlobalExceptionHandler {
 
-}
+//}
