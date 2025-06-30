@@ -16,7 +16,7 @@ public class GenerationSupportProcessor {
 
     public void postProcess() throws IOException {
         this.copyResourceFromClasspath(
-            "template/java/support/Application.Java.template",
+            "template/java/support/Application.java.template",
             "generated/src/main/java/org/ubiquia/acl/generated/Application.java");
 
         this.copyResourceFromClasspath(
