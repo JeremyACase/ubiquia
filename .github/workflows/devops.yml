@@ -49,7 +49,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -61,6 +60,7 @@ jobs:
 
       - name: Move JARs into subproject directories
         run: |
+          IFS=$'\n'
           for dir in $SUBPROJECTS; do
             base=$(basename $dir)
             jar=$(find . -name "*${base}*.jar" | head -n 1)
@@ -73,6 +73,11 @@ jobs:
               exit 1
             fi
           done
+
+      - name: Load OPENJDK_VERSION from gradle.properties
+        run: |
+          export OPENJDK_VERSION=$(grep '^OPENJDK_VERSION=' gradle.properties | cut -d'=' -f2)
+          echo "OPENJDK_VERSION=$OPENJDK_VERSION" >> $GITHUB_ENV
 
       - name: Determine image tag
         id: image_tag
@@ -91,11 +96,14 @@ jobs:
 
       - name: Build and push Docker images for each subproject
         run: |
+          IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
             IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
             echo "Building image for $dir -> $IMAGE_NAME:${IMAGE_TAG}"
-            docker build -t $IMAGE_NAME:${IMAGE_TAG} ./$dir
+            docker build \
+              --build-arg OPENJDK_VERSION=${OPENJDK_VERSION} \
+              -t $IMAGE_NAME:${IMAGE_TAG} $dir
             docker push $IMAGE_NAME:${IMAGE_TAG}
 
             if [[ "${IMAGE_TAG}" != "latest" ]]; then

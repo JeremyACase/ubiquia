@@ -51,24 +51,3 @@ jacoco {
     toolVersion = '0.8.8'
 }
 
-tasks.register("buildDocker") {
-    doLast {
-        def openjdkVersion = rootProject.findProperty("OPENJDK_VERSION") ?: "21"
-
-        subprojects.each { project ->
-            def dockerfile = new File(project.projectDir, "Dockerfile")
-            if (dockerfile.exists()) {
-                def imageName = "ubiquia/${project.name}".replaceAll(':', '-')
-
-                println "Building Docker image for ${project.path} with OPENJDK_VERSION=${openjdkVersion}"
-                exec {
-                    workingDir project.projectDir
-                    commandLine "docker", "build",
-                            "--build-arg", "OPENJDK_VERSION=${openjdkVersion}",
-                            "-t", imageName,
-                            "."
-                }
-            }
-        }
-    }
-}
