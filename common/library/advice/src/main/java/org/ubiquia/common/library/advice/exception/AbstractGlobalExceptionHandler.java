@@ -34,24 +34,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public abstract class AbstractGlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**
-     * Generic exception handler that will catch anything not more-specifically
-     * defined elsewhere.
-     *
-     * @param ex      The exception that occurred.
-     * @param request The originating request.
-     * @return A response to the REST request.
-     */
-    @ResponseBody
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleUnkownException(
-        Exception ex,
-        WebRequest request) {
-        var error = this.handlerHelper(ex, "Unknown exception occurred: ");
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    /**
      * Catch any IO exceptions and return the response to the client.
      *
      * @param ex      The exception.
