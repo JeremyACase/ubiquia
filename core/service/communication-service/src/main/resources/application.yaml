@@ -23,14 +23,14 @@ management:
         include: info, prometheus, health, mappings
   metrics:
     tags:
-      application: communication-service
+      application: ubiquia-core-communication-service
 
 spring:
   server:
   port: 8080
 
   application:
-    name: communication-service
+    name: ubiquia-core-communication-service
 
 springdoc:
   swagger-ui:

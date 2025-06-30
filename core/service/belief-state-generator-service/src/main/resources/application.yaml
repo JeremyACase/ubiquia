@@ -24,14 +24,14 @@ management:
         include: info, prometheus, health, mappings
   metrics:
     tags:
-      application: belief-state-generator-service
+      application: ubiquia-core-belief-state-generator-service
 
 spring:
   server:
   port: 8080
 
   application:
-    name: belief-state-generator-service
+    name: ubiquia-core-belief-state-generator-service
 
 springdoc:
   swagger-ui:

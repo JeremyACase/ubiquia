@@ -65,11 +65,11 @@ management:
         include: info,prometheus,health,mappings
   metrics:
     tags:
-      application: flow-service
+      application: ubiquia-core-flow-service
 
 spring:
   application:
-    name: flow-service
+    name: ubiquia-core-flow-service
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1

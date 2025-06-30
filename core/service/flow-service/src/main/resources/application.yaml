@@ -24,14 +24,14 @@ management:
         include: info, prometheus, health, mappings
   metrics:
     tags:
-      application: flow-service
+      application: ubiquia-core-flow-service
 
 spring:
   server:
   port: 8080
 
   application:
-    name: flow-service
+    name: ubiquia-core-flow-service
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
