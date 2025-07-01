@@ -41,6 +41,11 @@ ubiquia:
   agent:
     # This is a default UUID for development purposes
     id: 0328ca73-4d50-409f-85a8-7168ce80bd96
+  beliefStateGeneratorService:
+    template:
+      filepath:
+        dto: "src/main/resources/template/java/dto"
+        entity: "src/main/resources/template/java/entity"
   flow:
     service:
       port: 8080
@@ -52,4 +57,5 @@ ubiquia:
         filepath: src/test/resources/pets-openapi.yaml
       schema:
         filepath: src/test/resources/pets-acl-json-schema.json
+
   jdkVersion: @OPENJDK_VERSION@

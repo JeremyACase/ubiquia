@@ -42,6 +42,11 @@ ubiquia:
   agent:
     # This is a default UUID for development purposes
     id: 0328ca73-4d50-409f-85a8-7168ce80bd96
+  beliefStateGeneratorService:
+    template:
+      filepath:
+        dto: "/app/etc/resrouces/template/java/dto"
+        entity: "/app/etc/resrouces/template/java/entity"
   flow:
     service:
       port: 8080

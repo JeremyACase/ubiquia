@@ -49,6 +49,11 @@ data:
     ubiquia:
       agent:
         id: {{ .Values.ubiquia.agent.id }}
+      beliefStateGeneratorService:
+        template:
+          filepath:
+            dto: "/app/etc/resrouces/template/java/dto"
+            entity: "/app/etc/resrouces/template/java/entity"
       flow:
         service:
           port: {{ .Values.convenience.variables.spring.port }}

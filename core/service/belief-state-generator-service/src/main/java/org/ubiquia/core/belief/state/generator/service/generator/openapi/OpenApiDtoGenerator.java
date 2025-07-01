@@ -1,6 +1,5 @@
 package org.ubiquia.core.belief.state.generator.service.generator.openapi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -11,13 +10,16 @@ import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.config.CodegenConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OpenApiDtoGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenApiDtoGenerator.class);
+
+    @Value("${ubiquia.beliefStateGeneratorService.template.filepath.dto}")
+    private String templateFilepathDto;
 
     public void generateOpenApiDtosFrom(final String openApiYaml) {
 
@@ -32,7 +34,7 @@ public class OpenApiDtoGenerator {
         }
         var specFilePath = tempPath.toAbsolutePath().toString();
 
-        var templatePath = Paths.get("src/main/resources/template/java/dto")
+        var templatePath = Paths.get(this.templateFilepathDto)
             .toAbsolutePath()
             .toString();
 

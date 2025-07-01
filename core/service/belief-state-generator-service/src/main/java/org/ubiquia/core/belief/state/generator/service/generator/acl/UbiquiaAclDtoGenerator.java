@@ -14,11 +14,11 @@ public class UbiquiaAclDtoGenerator extends JavaClientCodegen {
     public void processOpts() {
         super.processOpts();
 
-        this.setEnablePostProcessFile(true);
+        super.setEnablePostProcessFile(true);
 
-        modelTemplateFiles.put("modelIngressDtoMapper.mustache", "IngressDtoMapper.java");
-        modelTemplateFiles.put("modelEgressDtoMapper.mustache", "EgressDtoMapper.java");
-        modelTemplateFiles.put("modelController.mustache", "Controller.java");
+        super.modelTemplateFiles.put("modelIngressDtoMapper.mustache", "IngressDtoMapper.java");
+        super.modelTemplateFiles.put("modelEgressDtoMapper.mustache", "EgressDtoMapper.java");
+        super.modelTemplateFiles.put("modelController.mustache", "Controller.java");
     }
 
     @Override

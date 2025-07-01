@@ -11,12 +11,16 @@ import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.config.CodegenConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OpenApiEntityGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenApiEntityGenerator.class);
+
+    @Value("${ubiquia.beliefStateGeneratorService.template.filepath.entity}")
+    private String templateFilepathEntity;
 
     public void generateOpenApiEntitiesFrom(final String openApiYaml) throws IOException {
 
@@ -27,7 +31,7 @@ public class OpenApiEntityGenerator {
         Files.writeString(tempPath, openApiYaml, StandardCharsets.UTF_8);
 
         var specFilePath = tempPath.toAbsolutePath().toString();
-        var templatePath = Paths.get("src/main/resources/template/java/entity")
+        var templatePath = Paths.get(this.templateFilepathEntity)
             .toAbsolutePath()
             .toString();
 
