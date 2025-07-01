@@ -1,5 +1,5 @@
 ARG OPENJDK_VERSION
-FROM eclipse-temurin-jdk:${OPENJDK_VERSION}
+FROM eclipse-temurin:${OPENJDK_VERSION}
 
 ENV PORT=8080
 ENV JAR_FILE=ubiquia-core-belief-state-generator-service.jar
