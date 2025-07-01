@@ -1,5 +1,5 @@
 ARG OPENJDK_VERSION
-FROM eclipse-temurin:${OPENJDK_VERSION}
+FROM eclipse-temurin-jre:${OPENJDK_VERSION}
 
 ENV PORT=8080
 ENV JAR_FILE=ubiquia-core-communication-service.jar
