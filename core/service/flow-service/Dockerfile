@@ -1,5 +1,5 @@
 ARG OPENJDK_VERSION
-FROM openjdk:${OPENJDK_VERSION}
+FROM eclipse-temurin:${OPENJDK_VERSION}
 
 ENV PORT=8080
 ENV JAR_FILE=ubiquia-core-flow-service.jar

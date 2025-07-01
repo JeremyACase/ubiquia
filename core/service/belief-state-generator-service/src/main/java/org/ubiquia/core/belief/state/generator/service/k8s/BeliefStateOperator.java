@@ -84,11 +84,11 @@ public class BeliefStateOperator {
         if (deploymentResponse.getHttpStatusCode() == HttpStatus.NO_CONTENT.value()) {
             logger.info("...Ubiquia K8s deployment not found, tearing down "
                 + "deployed belief states...");
-            this.tryDeleteAllDeployedGraphResources();
+            this.tryDeleteAllDeployedBeliefStateResources();
         } else if (!deploymentResponse.isSuccess()) {
             logger.info("...unsuccessful request for Ubiquia K8s deployment; assuming to "
                 + "tear down deployed belief states...");
-            this.tryDeleteAllDeployedGraphResources();
+            this.tryDeleteAllDeployedBeliefStateResources();
         }
     }
 
@@ -126,7 +126,9 @@ public class BeliefStateOperator {
         factory.startAllRegisteredInformers();
     }
 
-    public void tryDeployBeliefState(final AgentCommunicationLanguage acl)
+    public void tryDeployBeliefState(
+        final AgentCommunicationLanguage acl,
+        final String beliefStateJarPath)
         throws JsonProcessingException {
 
         logger.info("Trying to deploy a belief state for ACL: \nDomain: {} \nVersion: {}",
@@ -142,7 +144,7 @@ public class BeliefStateOperator {
 
             var deployment = this
                 .beliefStateDeploymentBuilder
-                .buildDeploymentFrom(acl);
+                .buildDeploymentFrom(acl, beliefStateJarPath);
 
             logger.debug("...deploying deployment: {}...",
                 this.objectMapper.writeValueAsString(deployment));
@@ -193,7 +195,7 @@ public class BeliefStateOperator {
             logger.info("Received a deletion update for Ubiquia itself; proceeding to teardown"
                 + " any deployed belief state resources...");
             try {
-                this.tryDeleteAllDeployedGraphResources();
+                this.tryDeleteAllDeployedBeliefStateResources();
             } catch (Exception e) {
                 logger.error("ERROR: Could not delete belief states: {}", e.getMessage());
             }
@@ -236,7 +238,7 @@ public class BeliefStateOperator {
      *
      * @throws JsonProcessingException Json exception from logging the K8s response.
      */
-    public void tryDeleteAllDeployedGraphResources() throws JsonProcessingException {
+    public void tryDeleteAllDeployedBeliefStateResources() throws JsonProcessingException {
         var listOptions = new ListOptions();
 
         listOptions.setLabelSelector("belief-state");

@@ -5,6 +5,7 @@ import io.kubernetes.client.openapi.models.*;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -76,12 +77,20 @@ public class BeliefStateDeploymentBuilder {
     }
 
     @Transactional
-    public V1Deployment buildDeploymentFrom(final AgentCommunicationLanguage acl) {
+    public V1Deployment buildDeploymentFrom(
+        final AgentCommunicationLanguage acl,
+        final String beliefStateJarPath) {
+
         var deployment = new V1Deployment();
         deployment.setApiVersion("apps/v1");
         deployment.setKind("Deployment");
-        deployment.setMetadata(this.getMetadataFrom(acl));
-        deployment.setSpec(this.getDeploymentSpecFrom(acl));
+
+        var metadata = this.getMetadataFrom(acl);
+        deployment.setMetadata(metadata);
+
+        var spec = this.getDeploymentSpecFrom(acl, beliefStateJarPath);
+        deployment.setSpec(spec);
+
         return deployment;
     }
 
@@ -107,7 +116,10 @@ public class BeliefStateDeploymentBuilder {
     }
 
     @Transactional
-    private V1DeploymentSpec getDeploymentSpecFrom(final AgentCommunicationLanguage acl) {
+    private V1DeploymentSpec getDeploymentSpecFrom(
+        final AgentCommunicationLanguage acl,
+        final String beliefStateJarPath) {
+
         var spec = new V1DeploymentSpec();
         spec.setReplicas(1);
         spec.setSelector(this.ubiquiaDeployment.getSpec().getSelector());
@@ -118,13 +130,16 @@ public class BeliefStateDeploymentBuilder {
             "belief-state",
             acl.getDomain().toLowerCase());
 
-        spec.setTemplate(this.getPodTemplateSpec(acl));
+        var template = this.getPodTemplateSpec(acl, beliefStateJarPath);
+        spec.setTemplate(template);
 
         return spec;
     }
 
     @Transactional
-    private V1PodTemplateSpec getPodTemplateSpec(final AgentCommunicationLanguage acl) {
+    private V1PodTemplateSpec getPodTemplateSpec(
+        final AgentCommunicationLanguage acl,
+        final String beliefStateJarPath) {
 
         var template = new V1PodTemplateSpec();
         template.setMetadata(new V1ObjectMeta());
@@ -142,7 +157,9 @@ public class BeliefStateDeploymentBuilder {
         template.setSpec(new V1PodSpec());
         template.setSpec(this.ubiquiaDeployment.getSpec().getTemplate().getSpec());
         template.getSpec().setContainers(new ArrayList<>());
-        template.getSpec().getContainers().add(this.getContainer(acl));
+
+        var container = this.getContainer(acl);
+        template.getSpec().getContainers().add(container);
         template.getSpec().setImagePullSecrets(
             this.ubiquiaDeployment
                 .getSpec()
@@ -151,16 +168,24 @@ public class BeliefStateDeploymentBuilder {
                 .getImagePullSecrets());
 
         template.getSpec().setVolumes(new ArrayList<>());
+
+        var jarVolume = new V1Volume()
+            .name("belief-jar-volume")
+            .hostPath(new V1HostPathVolumeSource()
+                .path(beliefStateJarPath)
+                .type("File"));
+        template.getSpec().getVolumes().add(jarVolume);
+
         return template;
     }
 
-    @Transactional
     private V1Container getContainer(final AgentCommunicationLanguage acl) {
+
         var container = new V1Container();
         container.setName(acl.getDomain().toLowerCase());
         container.setImagePullPolicy("IfNotPresent");
 
-        var image = "openJdk:" + this.jdkVersion;
+        var image = "eclipse-temurin:" + this.jdkVersion;
         container.setImage(image);
 
         container.setPorts(new ArrayList<>());
@@ -168,8 +193,20 @@ public class BeliefStateDeploymentBuilder {
         port.setContainerPort(8080);
         port.setName("http");
         port.setProtocol("TCP");
-        port.setHostIP("http");
         container.getPorts().add(port);
+
+        var jarName = acl.getDomain().toLowerCase()
+            + acl.getVersion().toString()
+            + ".jar";
+
+        container.setVolumeMounts(new ArrayList<>());
+        container.getVolumeMounts().add(new V1VolumeMount()
+            .name("belief-jar-volume")
+            .mountPath("/app/" + jarName)
+            .subPath(jarName));
+
+        container.setCommand(List.of("java"));
+        container.setArgs(List.of("-jar", "/app/" + jarName));
 
         return container;
     }

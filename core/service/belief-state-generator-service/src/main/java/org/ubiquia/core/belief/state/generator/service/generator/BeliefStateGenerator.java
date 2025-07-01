@@ -5,9 +5,11 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateCompiler;
@@ -15,6 +17,7 @@ import org.ubiquia.core.belief.state.generator.service.decorator.InheritancePrep
 import org.ubiquia.core.belief.state.generator.service.decorator.UbiquiaModelInjector;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiDtoGenerator;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiEntityGenerator;
+import org.ubiquia.core.belief.state.generator.service.k8s.BeliefStateOperator;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiDtoYamlMapper;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiEntityYamlMapper;
 import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateUberizer;
@@ -26,6 +29,9 @@ public class BeliefStateGenerator {
 
     @Autowired
     private BeliefStateCompiler beliefStateCompiler;
+
+    @Autowired(required = false)
+    private BeliefStateOperator beliefStateOperator;
 
     @Autowired
     private GenerationCleanupProcessor generationCleanupProcessor;
@@ -93,11 +99,16 @@ public class BeliefStateGenerator {
             + acl.getVersion().toString()
             + ".jar";
 
+        var jarPath = "packaged/" + beliefStateName;
         this.beliefStateUberizer.createUberJar(
-            "packaged/" + beliefStateName,
+            jarPath,
             "compiled",
             beliefStateLibraries
         );
+
+        if (Objects.nonNull(this.beliefStateOperator)) {
+            this.beliefStateOperator.tryDeployBeliefState(acl, jarPath);
+        }
     }
 
     private List<String> getJarPaths(final String libsDirPath) {
