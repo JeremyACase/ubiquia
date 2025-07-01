@@ -52,8 +52,8 @@ data:
       beliefStateGeneratorService:
         template:
           filepath:
-            dto: "/app/etc/resrouces/template/java/dto"
-            entity: "/app/etc/resrouces/template/java/entity"
+            dto: "/app/etc/resources/template/java/dto"
+            entity: "/app/etc/resources/template/java/entity"
       flow:
         service:
           port: {{ .Values.convenience.variables.spring.port }}
