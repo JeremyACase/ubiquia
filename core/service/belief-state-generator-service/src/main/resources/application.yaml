@@ -43,6 +43,9 @@ ubiquia:
     # This is a default UUID for development purposes
     id: 0328ca73-4d50-409f-85a8-7168ce80bd96
   beliefStateGeneratorService:
+    libraries:
+      directory:
+        path: "belief-state-libs"
     template:
       filepath:
         dto: "/app/etc/resources/template/java/dto"
@@ -53,3 +56,4 @@ ubiquia:
       url: http://ubiquia-core-flow-service
       pollFrequencyMilliseconds: 5000
   jdkVersion: @OPENJDK_VERSION@
+

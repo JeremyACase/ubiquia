@@ -42,6 +42,9 @@ ubiquia:
     # This is a default UUID for development purposes
     id: 0328ca73-4d50-409f-85a8-7168ce80bd96
   beliefStateGeneratorService:
+    libraries:
+      directory:
+        path: "belief-state-libs"
     template:
       filepath:
         dto: "src/main/resources/template/java/dto"

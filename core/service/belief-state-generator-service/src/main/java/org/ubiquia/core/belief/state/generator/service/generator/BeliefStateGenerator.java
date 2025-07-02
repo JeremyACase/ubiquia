@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
@@ -26,6 +27,9 @@ import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateUberiz
 public class BeliefStateGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateGenerator.class);
+
+    @Value("${ubiquia.beliefStateGeneratorService.libraries.directory.path}")
+    private String beliefStateLibsDirectory;
 
     @Autowired
     private BeliefStateCompiler beliefStateCompiler;
@@ -86,7 +90,7 @@ public class BeliefStateGenerator {
         this.generationCleanupProcessor.removeBlacklistedFiles(Paths.get("generated"));
         this.generationSupportProcessor.postProcess();
 
-        var beliefStateLibraries = this.getJarPaths("belief-state-libs");
+        var beliefStateLibraries = this.getJarPaths(this.beliefStateLibsDirectory);
 
         this.beliefStateCompiler.compileGeneratedSources(
             "generated",

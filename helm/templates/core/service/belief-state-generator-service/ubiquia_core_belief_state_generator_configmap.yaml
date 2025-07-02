@@ -50,6 +50,9 @@ data:
       agent:
         id: {{ .Values.ubiquia.agent.id }}
       beliefStateGeneratorService:
+        libraries:
+          directory:
+            path: "/app/resources/belief-state-libs"
         template:
           filepath:
             dto: "/app/resources/template/java/dto"

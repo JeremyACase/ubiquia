@@ -11,71 +11,99 @@
     "definitions": {
       "ColorType": {
         "type": "string",
-        "enum": ["BLUE", "GREEN", "BROWN", "BLACK", "WHITE", "GRAY"]
+        "enum": [
+          "BLUE",
+          "GREEN",
+          "BROWN",
+          "BLACK",
+          "WHITE",
+          "GRAY"
+        ]
       },
       "Name": {
         "description": "A model with some name information.",
         "type": "object",
         "properties": {
-          "firstName": { "type": "string" },
-          "lastName": { "type": "string" }
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          }
         },
-        "required": ["firstName"]
-      },
-      "KeyValuePair": {
-        "description": "A model defining a key-value-pair that can be persisted in the Ubiquia database where the value is a string.",
-        "type": "object",
-        "required": ["key"],
-        "properties": {
-          "key": { "type": "string" },
-          "value": { "type": "string" }
-        }
+        "required": [
+          "firstName"
+        ]
       },
       "BaseModel": {
         "description": "A base model.",
         "type": "object",
-        "discriminator": { "propertyName": "modelType" },
         "properties": {
-          "tags": {
-            "description": "A list of tags for this model",
-            "type": "array",
-            "items": { "$ref": "#/definitions/KeyValuePair" },
-            "default": [],
-            "uniqueItems": true
+          "modelVersion": {
+            "type": "string",
+            "pattern": "^([0-9]+\\.){2}(\\*|[0-9]+)(-.*)?",
+            "default": "1.2.3",
+            "readOnly": true
           }
         }
       },
       "AdoptionTransaction": {
         "description": "A transaction of a transaction.",
         "type": "object",
-        "allOf": [{ "$ref": "#/definitions/BaseModel" }],
+        "allOf": [
+          {
+            "$ref": "#/definitions/BaseModel"
+          }
+        ],
         "properties": {
-          "owner": { "$ref": "#/definitions/Person" },
-          "pet": { "$ref": "#/definitions/Animal" }
-        },
-        "required": ["modelType"]
+          "owner": {
+            "$ref": "#/definitions/Person"
+          },
+          "pet": {
+            "$ref": "#/definitions/Animal"
+          }
+        }
       },
       "Person": {
         "description": "A model of a person.",
         "type": "object",
-        "allOf": [{ "$ref": "#/definitions/BaseModel" }],
+        "allOf": [
+          {
+            "$ref": "#/definitions/BaseModel"
+          }
+        ],
         "properties": {
-          "hairColor": { "$ref": "#/definitions/ColorType" },
-          "name": { "$ref": "#/definitions/Name" },
+          "hairColor": {
+            "$ref": "#/definitions/ColorType"
+          },
+          "name": {
+            "$ref": "#/definitions/Name"
+          },
           "pets": {
             "type": "array",
-            "items": { "$ref": "#/definitions/Animal" }
+            "items": {
+              "$ref": "#/definitions/Animal"
+            }
           }
-        },
-        "required": ["modelType"]
+        }
       },
       "Animal": {
         "description": "The model of an animal.",
-        "allOf": [{ "$ref": "#/definitions/BaseModel" }],
+        "allOf": [
+          {
+            "$ref": "#/definitions/BaseModel"
+          }
+        ],
         "properties": {
-          "color": { "$ref": "#/definitions/ColorType" },
-          "owner": { "$ref": "#/definitions/Person" },
-          "name": { "$ref": "#/definitions/Name" },
+          "color": {
+            "$ref": "#/definitions/ColorType"
+          },
+          "owner": {
+            "$ref": "#/definitions/Person"
+          },
+          "name": {
+            "$ref": "#/definitions/Name"
+          },
           "height": {
             "type": "number",
             "format": "float",
@@ -88,12 +116,15 @@
             "example": 1.2,
             "minimum": 0
           }
-        },
-        "required": ["modelType"]
+        }
       },
       "Dog": {
         "description": "The model of a dog.",
-        "allOf": [{ "$ref": "#/definitions/Animal" }],
+        "allOf": [
+          {
+            "$ref": "#/definitions/Animal"
+          }
+        ],
         "properties": {
           "barkDecibels": {
             "type": "number",
@@ -101,20 +132,32 @@
             "example": 1.2,
             "minimum": 0
           }
-        },
-        "required": ["modelType"]
+        }
       },
       "Dachschund": {
         "description": "The model of a wiener dog.",
-        "allOf": [{ "$ref": "#/definitions/Dog" }],
+        "allOf": [
+          {
+            "$ref": "#/definitions/Dog"
+          }
+        ],
         "properties": {
-          "apexPredator": { "type": "boolean", "default": true }
+          "apexPredator": {
+            "type": "boolean",
+            "default": true
+          }
         },
-        "required": ["modelType", "apexPredator"]
+        "required": [
+          "apexPredator"
+        ]
       },
       "Poodle": {
         "description": "The model of a poodle.",
-        "allOf": [{ "$ref": "#/definitions/Dog" }],
+        "allOf": [
+          {
+            "$ref": "#/definitions/Dog"
+          }
+        ],
         "properties": {
           "dogShowsWon": {
             "type": "number",
@@ -122,12 +165,15 @@
             "default": 0,
             "minimum": 0
           }
-        },
-        "required": ["modelType"]
+        }
       },
       "Cat": {
         "description": "The model of a cat.",
-        "allOf": [{ "$ref": "#/definitions/Animal" }],
+        "allOf": [
+          {
+            "$ref": "#/definitions/Animal"
+          }
+        ],
         "properties": {
           "meowDecibels": {
             "type": "number",
@@ -135,12 +181,15 @@
             "example": 1.2,
             "minimum": 0
           }
-        },
-        "required": ["modelType"]
+        }
       },
       "Shark": {
         "description": "The model of a shark.",
-        "allOf": [{ "$ref": "#/definitions/Animal" }],
+        "allOf": [
+          {
+            "$ref": "#/definitions/Animal"
+          }
+        ],
         "properties": {
           "peopleBitten": {
             "type": "number",
@@ -148,53 +197,47 @@
             "default": 0,
             "minimum": 0
           },
-          "friendly": { "type": "boolean", "default": true }
-        },
-        "required": ["modelType"]
-      },
-      "BinaryFile": {
-        "description": "A binary file (e.g., PNG) uploaded to a RESTful service.",
-        "type": "string",
-        "contentEncoding": "base64",
-        "contentMediaType": "image/png"
-      },
-      "ClassificationResult": {
-        "description": "The classification result of an image or other input.",
-        "type": "object",
-        "properties": {
-          "label": {
-            "type": "integer",
-            "description": "Index of the predicted class."
-          },
-          "score": {
-            "type": "number",
-            "format": "float",
-            "description": "Confidence score of the prediction, between 0 and 1.",
-            "minimum": 0,
-            "maximum": 1
+          "friendly": {
+            "type": "boolean",
+            "default": true
           }
-        },
-        "required": [
-          "label",
-          "score"
-        ]
+        }
       }
     },
     "properties": {
-      "ColorType": { "$ref": "#/definitions/ColorType" },
-      "Name": { "$ref": "#/definitions/Name" },
-      "KeyValuePair": { "$ref": "#/definitions/KeyValuePair" },
-      "BaseModel": { "$ref": "#/definitions/BaseModel" },
-      "AdoptionTransaction": { "$ref": "#/definitions/AdoptionTransaction" },
-      "Person": { "$ref": "#/definitions/Person" },
-      "Animal": { "$ref": "#/definitions/Animal" },
-      "Dog": { "$ref": "#/definitions/Dog" },
-      "Dachschund": { "$ref": "#/definitions/Dachschund" },
-      "Poodle": { "$ref": "#/definitions/Poodle" },
-      "Cat": { "$ref": "#/definitions/Cat" },
-      "Shark": { "$ref": "#/definitions/Shark" },
-      "BinaryFile": { "$ref": "#/definitions/BinaryFile" },
-      "ClassificationResult": { "$ref": "#/definitions/ClassificationResult" }
+      "ColorType": {
+        "$ref": "#/definitions/ColorType"
+      },
+      "Name": {
+        "$ref": "#/definitions/Name"
+      },
+      "BaseModel": {
+        "$ref": "#/definitions/BaseModel"
+      },
+      "AdoptionTransaction": {
+        "$ref": "#/definitions/AdoptionTransaction"
+      },
+      "Person": {
+        "$ref": "#/definitions/Person"
+      },
+      "Animal": {
+        "$ref": "#/definitions/Animal"
+      },
+      "Dog": {
+        "$ref": "#/definitions/Dog"
+      },
+      "Dachschund": {
+        "$ref": "#/definitions/Dachschund"
+      },
+      "Poodle": {
+        "$ref": "#/definitions/Poodle"
+      },
+      "Cat": {
+        "$ref": "#/definitions/Cat"
+      },
+      "Shark": {
+        "$ref": "#/definitions/Shark"
+      }
     }
   }
 }
