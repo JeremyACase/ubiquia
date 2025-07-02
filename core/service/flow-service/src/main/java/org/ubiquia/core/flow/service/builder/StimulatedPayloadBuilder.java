@@ -89,11 +89,18 @@ public class StimulatedPayloadBuilder {
             var schemaStore = new SchemaStore(true);
             var schema = schemaStore.loadSchemaJson(jsonSchema);
 
+            // Only assuming a single input for now; will need to update for MERGE adapters.
+            var inputSchema = entity
+                .getInputSubSchemas()
+                .stream()
+                .toList()
+                .get(0);
+
             var match = schema
                 .getSubSchemas()
                 .keySet()
                 .stream()
-                .filter(x -> x.toString().contains(entity.getOutputSubSchema().getModelName()))
+                .filter(x -> x.toString().contains(inputSchema.getModelName()))
                 .findFirst();
 
             if (match.isEmpty()) {

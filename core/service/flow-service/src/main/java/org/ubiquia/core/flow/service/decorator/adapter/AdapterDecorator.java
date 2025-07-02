@@ -120,19 +120,19 @@ public class AdapterDecorator {
 
             try {
                 this.stimulatedPayloadBuilder.initializeSchema(adapterContext.getAdapterId());
+                var executor = new ScheduledThreadPoolExecutor(1);
+                var task = executor.scheduleAtFixedRate(
+                    adapter::stimulateAgent,
+                    adapterContext.getAdapterSettings().getStimulateFrequencyMilliseconds(),
+                    adapterContext.getAdapterSettings().getStimulateFrequencyMilliseconds(),
+                    TimeUnit.MILLISECONDS);
+                adapterContext.getTasks().add(task);
+                logger.info("...completed back pressure polling initialization...");
             } catch (GenerationException e) {
                 logger.error("ERROR: Could not initialize schema for adapter {}",
                     adapterContext.getAdapterName());
             }
 
-            var executor = new ScheduledThreadPoolExecutor(1);
-            var task = executor.scheduleAtFixedRate(
-                adapter::stimulateAgent,
-                adapterContext.getAdapterSettings().getStimulateFrequencyMilliseconds(),
-                adapterContext.getAdapterSettings().getStimulateFrequencyMilliseconds(),
-                TimeUnit.MILLISECONDS);
-            adapterContext.getTasks().add(task);
-            logger.info("...completed back pressure polling initialization...");
         } else {
             logger.debug("...Adapter not configured for input stimulation; "
                 + "not initializing stimulation.");
