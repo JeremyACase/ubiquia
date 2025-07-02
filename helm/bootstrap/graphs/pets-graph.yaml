@@ -136,7 +136,6 @@ agents:
             persistInputPayload: false
             persistOutputPayload: false
             validateOutputPayload: true
-            stimulateInputPayload: true
 
   - agentName: Pet-Generator-Agent
 
@@ -184,6 +183,7 @@ agents:
             persistOutputPayload: true
             validateInputPayload: true
             validateOutputPayload: true
+            stimulateInputPayload: true
 
 # This is a list of adapters that should be deployed with the graph that are not to be associated
 # with agents. These are typically useful as ingress/egress components to a DAG.

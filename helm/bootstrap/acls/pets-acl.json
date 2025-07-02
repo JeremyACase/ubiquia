@@ -48,7 +48,7 @@
         }
       },
       "AdoptionTransaction": {
-        "description": "A transaction of a transaction.",
+        "description": "A transaction of an adoption.",
         "type": "object",
         "allOf": [
           {
@@ -63,6 +63,29 @@
             "$ref": "#/definitions/Animal"
           }
         }
+      },
+      "ClassificationResult": {
+        "description": "The result of our ML model making a classification inference.",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/definitions/BaseModel"
+          }
+        ],
+        "properties": {
+          "class": {
+            "type": "string",
+            "description": "The class label predicted by the model."
+          },
+          "confidence": {
+            "type": "number",
+            "format": "float",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "The confidence score (between 0 and 1) for the predicted class."
+          }
+        },
+        "required": ["class", "confidence"]
       },
       "Person": {
         "description": "A model of a person.",

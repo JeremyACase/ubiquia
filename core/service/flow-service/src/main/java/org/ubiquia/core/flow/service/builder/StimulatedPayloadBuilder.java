@@ -59,7 +59,7 @@ public class StimulatedPayloadBuilder {
             new Random());
         var fuzzyData = generator.generate(jsonSchema, 10);
         var stringifiedPayload = this.objectMapper.writeValueAsString(fuzzyData);
-        logger.info("Generated dummy stimulation data: {}", stringifiedPayload);
+        logger.debug("Generated dummy stimulation data: {}", stringifiedPayload);
         return stringifiedPayload;
     }
 
@@ -105,7 +105,7 @@ public class StimulatedPayloadBuilder {
 
             if (match.isEmpty()) {
                 throw new RuntimeException("ERROR: Cannot find subschema named  '"
-                    + entity.getOutputSubSchema().getModelName()
+                    + inputSchema.getModelName()
                     + "' in agent communication language named '"
                     + entity.getAgent().getGraph().getAgentCommunicationLanguage().getDomain()
                     + "'!");
