@@ -32,7 +32,6 @@ public class BeliefStateNameBuilder {
             acl.getVersion());
 
         var name = acl.getDomain()
-            + "-belief-state-"
             + acl.getVersion().toString()
             + ".jar";
 
