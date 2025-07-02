@@ -5,7 +5,7 @@ ENV PORT=8080
 ENV JAR_FILE=ubiquia-core-belief-state-generator-service.jar
 ENV TARGET_DIR=/app
 
-COPY build/resources/main/ ${TARGET_DIR}/resources/
+COPY build/resources/main/template/ ${TARGET_DIR}/resources/template/
 COPY build/libs/ubiquia-core-belief-state-generator-service.jar ${TARGET_DIR}/${JAR_FILE}
 
 EXPOSE ${PORT}
