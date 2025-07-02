@@ -3,6 +3,7 @@ package org.ubiquia.core.flow.service.builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import java.util.HashMap;
 import java.util.Random;
 import net.jimblackler.jsongenerator.DefaultConfig;
@@ -69,6 +70,7 @@ public class StimulatedPayloadBuilder {
      * @param adapterId The id of the adapter to initialize a schema for.
      * @throws GenerationException Exception from generating dummy data.
      */
+    @Transactional
     private void tryInitializeSchema(final String adapterId) throws GenerationException {
 
         if (!this.cachedAdapterSchemas.containsKey(adapterId)) {
