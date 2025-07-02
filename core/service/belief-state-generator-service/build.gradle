@@ -71,7 +71,7 @@ tasks.named("processResources") {
 
     // Ensure Gradle doesn't ignore mustache files.
     from("src/main/resources") {
-        include "**/*"
+        include "**/*.mustache"
     }
 
     // Inject our openJDK version into our yaml file.
