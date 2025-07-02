@@ -56,11 +56,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Log contents of build/resources/main
-        run: |
-          echo "Checking template contents:"
-          find core/service/belief-state-generator-service/build/resources/main
-
       - name: Build and push Docker images for each subproject
         run: |
           IFS=$'\n'
