@@ -11,10 +11,9 @@ metadata:
     helm.sh/chart: {{ include "ubiquia.chart" . }}
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce 
   resources:
     requests:
-      storage: {{ .Values.pvc.size | default "1Gi" }}
-  {{- if .Values.pvc.storageClass }}
-  storageClassName: {{ .Values.pvc.storageClass }}
-  {{- end }}
+      storage: 1Gi
+  storageClassName: standard
+  volumeName: belief-state-jars-pv

@@ -57,14 +57,14 @@ data:
           filepath:
             dto: "/app/resources/template/java/dto"
             entity: "/app/resources/template/java/entity"
-          uber:
-            jars:
-              path: "/belief-state-jars/"
+        uber:
+          jars:
+            path: "/belief-state-jars/"
       flow:
         service:
           port: {{ .Values.convenience.variables.spring.port }}
           url: http://ubiquia-core-flow-service
-      jdkVersion: 21
+      jdkVersion: 21 # TODO: Make sure this is controlled by the top-level gradle.properties variable
       kubernetes:
         enabled: true
         namespace: {{ .Release.Namespace }}

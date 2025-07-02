@@ -32,13 +32,24 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
 
+      nodeSelector:
+        kubernetes.io/hostname: ubiquia-agent-0-control-plane
+
+      tolerations:
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+
       volumes:
         - name: config
           configMap:
             name: ubiquia-core-belief-state-generator-config
         - name: belief-state-jars-volume
           persistentVolumeClaim:
-            claimName: ubiquia-core-belief-state-generator-service-belief-states-jar-pvc
+            claimName: ubiquia-core-belief-state-generator-service-belief-state-jars-pvc
 
       containers:
         - name: flow-service
@@ -56,7 +67,7 @@ spec:
               containerPort: {{ .Values.convenience.variables.spring.port }}
               protocol: TCP
 
-          livenessProbe: 
+          livenessProbe:
             httpGet:
               path: /actuator/health
               port: {{ .Values.convenience.variables.spring.port }}

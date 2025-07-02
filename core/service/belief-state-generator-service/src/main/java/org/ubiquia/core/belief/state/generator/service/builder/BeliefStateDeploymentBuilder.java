@@ -156,7 +156,7 @@ public class BeliefStateDeploymentBuilder {
         var jarVolume = new V1Volume()
             .name("belief-jar-volume")
             .persistentVolumeClaim(new V1PersistentVolumeClaimVolumeSource()
-                .claimName("ubiquia-core-belief-state-generator-service-belief-states-jar-pvc"));  // Match your PVC name
+                .claimName("ubiquia-core-belief-state-generator-service-belief-state-jars-pvc")); 
         podSpec.setVolumes(List.of(jarVolume));
 
         template.setSpec(podSpec);

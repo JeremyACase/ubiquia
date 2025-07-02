@@ -13,6 +13,9 @@ logging:
   # Allowable values are: OFF, ERROR, WARN, INFO, DEBUG, TRACE, ALL
   ubiquia: DEBUG 
 
+pvc:
+  
+
 ubiquia:
   agent:
     # This is a default UUID for development purposes
