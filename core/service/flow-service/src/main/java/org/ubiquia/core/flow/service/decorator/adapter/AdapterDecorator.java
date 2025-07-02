@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import net.jimblackler.jsonschemafriend.GenerationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.component.adapter.PollAdapter;
 import org.ubiquia.core.flow.component.adapter.QueueAdapter;
 import org.ubiquia.core.flow.component.adapter.SubscribeAdapter;
+import org.ubiquia.core.flow.service.builder.StimulatedPayloadBuilder;
 import org.ubiquia.core.flow.service.decorator.adapter.broker.AdapterBrokerDecorator;
 
 
@@ -38,6 +40,8 @@ public class AdapterDecorator {
     private AdapterEndpointRecordBuilder adapterEndpointRecordBuilder;
     @Autowired
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
+    @Autowired
+    private StimulatedPayloadBuilder stimulatedPayloadBuilder;
 
     /**
      * Initialize the provided adapter so that it begins polling in order to calculate
@@ -113,6 +117,14 @@ public class AdapterDecorator {
             logger.info("...Initializing periodic input stimulation for adapter {} of graph {}...",
                 adapterContext.getAdapterName(),
                 adapterContext.getGraphName());
+
+            try {
+                this.stimulatedPayloadBuilder.initializeSchema(adapterContext.getAdapterId());
+            } catch (GenerationException e) {
+                logger.error("ERROR: Could not initialize schema for adapter {}",
+                    adapterContext.getAdapterName());
+            }
+
             var executor = new ScheduledThreadPoolExecutor(1);
             var task = executor.scheduleAtFixedRate(
                 adapter::stimulateAgent,

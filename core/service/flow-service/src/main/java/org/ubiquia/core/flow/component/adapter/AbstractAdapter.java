@@ -149,7 +149,7 @@ public abstract class AbstractAdapter implements InterfaceLogger {
             var event = this.flowEventBuilder.makeEventFrom(stimulatePayload, this);
             this.adapterPayloadOrchestrator.forwardPayload(event, this, stimulatePayload);
         } catch (Exception e) {
-            this.getLogger().error("ERROR: Error while stimulating agent: {}", e);
+            this.getLogger().error("ERROR: Error while stimulating agent: ", e);
         }
 
         if (Objects.nonNull(sample)) {
