@@ -20,7 +20,6 @@ spec:
         prometheus.io/scrape: 'true'
         prometheus.io/path: '/actuator/prometheus'
         prometheus.io/port: "{{ .Values.convenience.variables.spring.port }}"
-
       labels:
         {{- include "ubiquia.selectorLabels" . | nindent 8 }}
         {{- include "ubiquia.podLabels" . | nindent 8 }}
@@ -31,23 +30,34 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+
       volumes:
-      - name: config
-        configMap:
-          name: ubiquia-core-belief-state-generator-config
-      containers:
-      - name: flow-service
-        volumeMounts:
         - name: config
-          mountPath: /app/etc
-        livenessProbe: 
-          httpGet:
-            path: /actuator/health
-            port: {{ .Values.convenience.variables.spring.port }}
-          initialDelaySeconds: 60  
-        image: {{ include "ubiquia.core.beliefStateGeneratorService.image" . }}
-        imagePullPolicy: {{ .Values.infrastructure.image.pullPolicy }}
-        ports:
-          - name: http
-            containerPort: {{ .Values.convenience.variables.spring.port }}
-            protocol: TCP
+          configMap:
+            name: ubiquia-core-belief-state-generator-config
+        - name: belief-state-jars-volume
+          persistentVolumeClaim:
+            claimName: ubiquia-core-belief-state-generator-service-belief-states-jar-pvc
+
+      containers:
+        - name: flow-service
+          image: {{ include "ubiquia.core.beliefStateGeneratorService.image" . }}
+          imagePullPolicy: {{ .Values.infrastructure.image.pullPolicy }}
+
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc
+            - name: belief-state-jars-volume
+              mountPath: /belief-state-jars
+
+          ports:
+            - name: http
+              containerPort: {{ .Values.convenience.variables.spring.port }}
+              protocol: TCP
+
+          livenessProbe: 
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.convenience.variables.spring.port }}
+            initialDelaySeconds: 60

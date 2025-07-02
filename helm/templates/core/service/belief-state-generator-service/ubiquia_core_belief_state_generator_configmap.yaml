@@ -57,6 +57,9 @@ data:
           filepath:
             dto: "/app/resources/template/java/dto"
             entity: "/app/resources/template/java/entity"
+          uber:
+            jars:
+              path: "/belief-state-jars/"
       flow:
         service:
           port: {{ .Values.convenience.variables.spring.port }}

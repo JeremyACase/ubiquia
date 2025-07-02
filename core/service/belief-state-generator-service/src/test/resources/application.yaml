@@ -49,6 +49,9 @@ ubiquia:
       filepath:
         dto: "src/main/resources/template/java/dto"
         entity: "src/main/resources/template/java/entity"
+    uber:
+      jars:
+        path: "packaged/"
   flow:
     service:
       port: 8080

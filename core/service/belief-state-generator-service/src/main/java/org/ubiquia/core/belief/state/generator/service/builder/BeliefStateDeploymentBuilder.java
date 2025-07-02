@@ -41,7 +41,7 @@ public class BeliefStateDeploymentBuilder {
         service.setKind("Service");
 
         service.setMetadata(new V1ObjectMeta());
-        service.getMetadata().setName(acl.getDomain().toLowerCase());
+        service.getMetadata().setName(acl.getDomain().toLowerCase() + "-belief-state");
 
         service.getMetadata().setLabels(new HashMap<>());
         service.getMetadata().getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
@@ -97,7 +97,7 @@ public class BeliefStateDeploymentBuilder {
     @Transactional
     private V1ObjectMeta getMetadataFrom(final AgentCommunicationLanguage acl) {
         var metadata = new V1ObjectMeta();
-        metadata.setName(acl.getDomain().toLowerCase());
+        metadata.setName(acl.getDomain().toLowerCase() + "-belief-state");
 
         metadata.setLabels(new HashMap<>());
         metadata.getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
@@ -139,74 +139,61 @@ public class BeliefStateDeploymentBuilder {
     @Transactional
     private V1PodTemplateSpec getPodTemplateSpec(
         final AgentCommunicationLanguage acl,
-        final String beliefStateJarPath) {
+        final String beliefStateJarName) {
 
         var template = new V1PodTemplateSpec();
         template.setMetadata(new V1ObjectMeta());
         template.getMetadata().setLabels(new HashMap<>());
         template.getMetadata().getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
-        template.getMetadata().getLabels().put(
-            "component",
-            acl.getDomain().toLowerCase());
-        template.getMetadata().getLabels().put(
-            "belief-state",
-            acl.getDomain().toLowerCase());
+        template.getMetadata().getLabels().put("component", acl.getDomain().toLowerCase());
+        template.getMetadata().getLabels().put("belief-state", acl.getDomain().toLowerCase());
         template.getMetadata().getLabels().remove("app.kubernetes.io/managed-by");
         template.getMetadata().getLabels().put("app.kubernetes.io/managed-by", "ubiquia");
 
-        template.setSpec(new V1PodSpec());
-        template.setSpec(this.ubiquiaDeployment.getSpec().getTemplate().getSpec());
-        template.getSpec().setContainers(new ArrayList<>());
+        var podSpec = new V1PodSpec();
+        podSpec.setContainers(new ArrayList<>());
+        podSpec.setImagePullSecrets(this.ubiquiaDeployment.getSpec().getTemplate().getSpec().getImagePullSecrets());
 
-        var container = this.getContainer(acl);
-        template.getSpec().getContainers().add(container);
-        template.getSpec().setImagePullSecrets(
-            this.ubiquiaDeployment
-                .getSpec()
-                .getTemplate()
-                .getSpec()
-                .getImagePullSecrets());
+        // Create container with updated volume mount
+        var container = this.getContainer(acl, beliefStateJarName);
+        podSpec.getContainers().add(container);
 
-        template.getSpec().setVolumes(new ArrayList<>());
-
+        // PVC volume
         var jarVolume = new V1Volume()
             .name("belief-jar-volume")
-            .hostPath(new V1HostPathVolumeSource()
-                .path(beliefStateJarPath)
-                .type("File"));
-        template.getSpec().getVolumes().add(jarVolume);
+            .persistentVolumeClaim(new V1PersistentVolumeClaimVolumeSource()
+                .claimName("ubiquia-core-belief-state-generator-service-belief-states-jar-pvc"));  // Match your PVC name
+        podSpec.setVolumes(List.of(jarVolume));
 
+        template.setSpec(podSpec);
         return template;
     }
 
-    private V1Container getContainer(final AgentCommunicationLanguage acl) {
+    private V1Container getContainer(
+        final AgentCommunicationLanguage acl,
+        final String beliefStateJarName) {
 
         var container = new V1Container();
         container.setName(acl.getDomain().toLowerCase());
         container.setImagePullPolicy("IfNotPresent");
+        container.setImage("eclipse-temurin-jre:" + this.jdkVersion);
 
-        var image = "eclipse-temurin-jre:" + this.jdkVersion;
-        container.setImage(image);
+        // Port setup
+        var port = new V1ContainerPort()
+            .containerPort(8080)
+            .name("http")
+            .protocol("TCP");
+        container.setPorts(List.of(port));
 
-        container.setPorts(new ArrayList<>());
-        var port = new V1ContainerPort();
-        port.setContainerPort(8080);
-        port.setName("http");
-        port.setProtocol("TCP");
-        container.getPorts().add(port);
-
-        var jarName = acl.getDomain().toLowerCase()
-            + acl.getVersion().toString()
-            + ".jar";
-
-        container.setVolumeMounts(new ArrayList<>());
-        container.getVolumeMounts().add(new V1VolumeMount()
+        // Volume mount with subPath
+        container.setVolumeMounts(List.of(new V1VolumeMount()
             .name("belief-jar-volume")
-            .mountPath("/app/" + jarName)
-            .subPath(jarName));
+            .mountPath("/belief-state-jars/" + beliefStateJarName)
+            .subPath(beliefStateJarName)));
 
+        // Startup command
         container.setCommand(List.of("java"));
-        container.setArgs(List.of("-jar", "/app/" + jarName));
+        container.setArgs(List.of("-jar", "/app/" + beliefStateJarName));
 
         return container;
     }
