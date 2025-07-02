@@ -1,6 +1,46 @@
 # Ubiquia
 
-Welcome to Ubiquia — a domain-agnostic, production-grade Multi-Agent Orchestration System built from the ground up for dynamic, runtime data flows, resilient compute, and robust distributed belief state sharing.
+> **A runtime-compiled, DAG-orchestrated, schema-driven platform for building intelligent agent ecosystems — at production scale.**
+
+Ubiquia is a **domain-agnostic, production-grade Multi-Agent Orchestration System**. It lets you declaratively define agent communication protocols and workflows, then compiles and deploys them into a **live, resilient, and self-validating distributed system** — all from JSON schemas and YAML DAGs.
+
+---
+
+## 🌟 Why Ubiquia?
+
+Ubiquia is not another workflow engine or LLM wrapper. It's a **foundational infrastructure layer** designed to support:
+
+- **Typed agent communication** (via JSON Schema)
+- **Runtime deployment** of RESTful belief state servers
+- **Persistent, self-evolving DAGs** of intelligent agents
+- **Schema-validated I/O contracts between services**
+- **Distributed system messaging with SQL-level guarantees**
+
+Ubiquia enables a future where **LLMs**, **symbolic agents**, and **software systems** can collaborate in validated, evolving ecosystems — with no glue code.
+
+---
+
+## 🔥 Key Innovations
+
+- 🧠 **Schema-to-Service Compilation**  
+  Generate and deploy fully-typed REST APIs from JSON Schema definitions. No scaffolding. No boilerplate. Just the schema.
+
+- 🗺️ **Declarative DAGs → Kubernetes Agents**  
+  Define a multi-agent system with a single YAML file. Ubiquia reads the DAG and deploys it to Kubernetes — each node a live, stateful microservice.
+
+- 🧬 **Distributed Belief State via SQL**  
+  Agents share a global belief state, backed by **YugabyteDB**, a resilient, distributed SQL system designed for horizontal scale and high availability.
+
+- 🧾 **Runtime Schema Enforcement**  
+  Every I/O channel between agents is validated in real time. No brittle prompt logic, no undefined behavior — just contract-based communication.
+
+- 🔄 **Recursive System Evolution** *(Experimental)*  
+  DAGs and belief schemas can be evolved by agents themselves, opening the door to recursive intelligence: **AutoGPT, but type-safe and production-ready.**
+
+- 🧰 **Spring Boot + Helm + Gradle**  
+  Built on rock-solid Java infrastructure and Kubernetes-native deployment patterns. DevOps-friendly and cloud-ready.
+
+---
 
 ## Table of Contents
 
@@ -18,22 +58,6 @@ Welcome to Ubiquia — a domain-agnostic, production-grade Multi-Agent Orchestra
   * [For Devs: Building Ubiquia](#for-devs-building-ubiquia)
   * [For Devs: Building Subprojects](#for-devs-building-subprojects)
 * [Contributors](#contributors)
-
-## Ubiquia Overview
-
-### About
-Ubiquia is a production-grade multi-agent system (MAS) orchestration tool that brings the power of dynamic, runtime agent coordination to real-world deployments. Key features include:
-
-- 🛠️ **Production-Ready MAS Orchestration:** A carefully architected orchestration engine designed to handle dynamic, real-time data flows and resilient agent networks.
-- 🌐 **Distributed Belief State with YugabyteDB:** Built on YugabyteDB, a resilient, distributed SQL database that underpins Ubiquia’s shared global belief state, ensuring eventual consistency and high availability.
-- 🔄 **Dynamic Domain Ontology Realization:** Ubiquia can derive bidirectional, relational database schemas--domain ontologies--directly from JSON schemas at runtime, enabling rapid modeling that adapts to evolving requirements.
-- 🔍 **Runtime Schema Validation:** Employs JSON Schema validation to ensure that all data exchanged between agents and the orchestration layer adheres to well-defined, dynamically loaded schemas.
-- 🌐 **Automatic RESTful API Generation:** Automatically creates a RESTful server that exposes these domain ontologies as APIs, providing seamless CRUD operations for runtime-managed data.
-- 🚀 **Kubernetes-Native Deployment:** Ubiquia is designed to run seamlessly in containerized environments orchestrated by Kubernetes, making it easy to deploy, scale, and maintain in real-world production clusters.
-- 🔄 **Resilience to Network Partitions:** Engineered to gracefully handle transient network partitions, ensuring that agents can rejoin the system and maintain a consistent belief state.
-- ☕ **Spring Boot Foundation:** Leverages the battle-tested Spring Boot ecosystem for robust microservice capabilities, including dependency injection, lifecycle management, and secure configuration.
-
-Together, these features make Ubiquia a production-ready, highly reliable MAS orchestration tool that is both developer-friendly and operationally robust.
 
 ## Quickstart
 The quickest way to get up and running with Ubiquia is to follow this section.
