@@ -46,7 +46,7 @@ public class BeliefStateDeploymentBuilder {
         service.setKind("Service");
 
         service.setMetadata(new V1ObjectMeta());
-        var beliefStateName = this.beliefStateNameBuilder.getBeliefStateNameFrom(acl);
+        var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(acl);
         service.getMetadata().setName(beliefStateName);
 
         service.getMetadata().setLabels(new HashMap<>());
@@ -102,7 +102,7 @@ public class BeliefStateDeploymentBuilder {
     private V1ObjectMeta getMetadataFrom(final AgentCommunicationLanguage acl) {
         var metadata = new V1ObjectMeta();
 
-        var beliefStateName = this.beliefStateNameBuilder.getBeliefStateNameFrom(acl);
+        var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(acl);
         metadata.setName(beliefStateName);
 
         metadata.setLabels(new HashMap<>());
@@ -124,7 +124,7 @@ public class BeliefStateDeploymentBuilder {
     @Transactional
     private V1DeploymentSpec getDeploymentSpecFrom(final AgentCommunicationLanguage acl) {
 
-        var beliefStateName = this.beliefStateNameBuilder.getBeliefStateNameFrom(acl);
+        var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(acl);
 
         var spec = new V1DeploymentSpec();
         spec.setReplicas(1);
@@ -145,7 +145,7 @@ public class BeliefStateDeploymentBuilder {
     @Transactional
     private V1PodTemplateSpec getPodTemplateSpec(final AgentCommunicationLanguage acl) {
 
-        var beliefStateName = this.beliefStateNameBuilder.getBeliefStateNameFrom(acl);
+        var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(acl);
 
         var template = new V1PodTemplateSpec();
         template.setMetadata(new V1ObjectMeta());
@@ -194,7 +194,7 @@ public class BeliefStateDeploymentBuilder {
             .protocol("TCP");
         container.setPorts(List.of(port));
 
-        var beliefStateJarName = this.beliefStateNameBuilder.getBeliefStateNameFrom(acl) + ".jar";
+        var beliefStateJarName = this.beliefStateNameBuilder.getJarBeliefStateNameFrom(acl);
         var mountPath = this.uberJarsPath + beliefStateJarName;
 
         // Volume mount with subPath

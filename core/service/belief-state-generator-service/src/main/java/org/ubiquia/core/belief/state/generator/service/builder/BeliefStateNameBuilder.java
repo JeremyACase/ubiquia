@@ -11,15 +11,30 @@ public class BeliefStateNameBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateNameBuilder.class);
 
-    public String getBeliefStateNameFrom(final AgentCommunicationLanguage acl) {
-        logger.debug("Building belief state name from acl... \ndomain: {} \nversion: {}",
+    public String getKubernetesBeliefStateNameFrom(final AgentCommunicationLanguage acl) {
+        logger.debug("Building k8s belief state name from acl... \ndomain: {} \nversion: {}",
             acl.getDomain(),
             acl.getVersion());
 
 
         var name = acl.getDomain()
             + "-belief-state-"
-            + acl.getVersion();
+            + acl.getVersion().toString().replace(".", "-");
+
+        logger.debug("...generated name: {}", name);
+
+        return name;
+    }
+
+    public String getJarBeliefStateNameFrom(final AgentCommunicationLanguage acl) {
+        logger.debug("Building jar belief state name from acl... \ndomain: {} \nversion: {}",
+            acl.getDomain(),
+            acl.getVersion());
+
+        var name = acl.getDomain()
+            + "-belief-state-"
+            + acl.getVersion().toString()
+            + ".jar";
 
         logger.debug("...generated name: {}", name);
 
