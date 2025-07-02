@@ -192,7 +192,7 @@ public class BeliefStateDeploymentBuilder {
 
         // Startup command
         container.setCommand(List.of("java"));
-        container.setArgs(List.of("-jar", "/app/" + beliefStateJarName));
+        container.setArgs(List.of("-jar", "/belief-state-jars/" + beliefStateJarName));
 
         return container;
     }
