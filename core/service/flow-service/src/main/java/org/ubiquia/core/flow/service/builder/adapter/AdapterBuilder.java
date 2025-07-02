@@ -63,6 +63,11 @@ public class AdapterBuilder {
 
         var adapterData = this.adapterDtoMapper.map(adapterEntity);
 
+        this.adapterOverrideDecorator.tryOverrideBaselineValues(
+            adapterData,
+            adapterEntity.getOverrideSettings().stream().toList(),
+            graphDeployment);
+
         var context = this.adapterContextBuilder.buildAdapterContext(
             adapterData,
             graphEntity,
@@ -71,11 +76,6 @@ public class AdapterBuilder {
 
         var tags = this.adapterTagBuilder.buildAdapterTags(adapter);
         context.setTags(tags);
-
-        this.adapterOverrideDecorator.tryOverrideBaselineValues(
-            adapterData,
-            adapterEntity.getOverrideSettings().stream().toList(),
-            graphDeployment);
 
         this.trySetAdapterEndpoint(adapter, adapterData);
         adapter.initializeBehavior();

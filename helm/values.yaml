@@ -11,7 +11,7 @@ config:
 
 logging:
   # Allowable values are: OFF, ERROR, WARN, INFO, DEBUG, TRACE, ALL
-  ubiquia: DEBUG 
+  ubiquia: INFO 
 
 pvc:
   
