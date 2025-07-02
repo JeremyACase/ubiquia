@@ -126,9 +126,7 @@ public class BeliefStateOperator {
         factory.startAllRegisteredInformers();
     }
 
-    public void tryDeployBeliefState(
-        final AgentCommunicationLanguage acl,
-        final String beliefStateJarPath)
+    public void tryDeployBeliefState(final AgentCommunicationLanguage acl)
         throws JsonProcessingException {
 
         logger.info("Trying to deploy a belief state for ACL: \nDomain: {} \nVersion: {}",
@@ -144,7 +142,7 @@ public class BeliefStateOperator {
 
             var deployment = this
                 .beliefStateDeploymentBuilder
-                .buildDeploymentFrom(acl, beliefStateJarPath);
+                .buildDeploymentFrom(acl);
 
             logger.debug("...deploying deployment: {}...",
                 this.objectMapper.writeValueAsString(deployment));

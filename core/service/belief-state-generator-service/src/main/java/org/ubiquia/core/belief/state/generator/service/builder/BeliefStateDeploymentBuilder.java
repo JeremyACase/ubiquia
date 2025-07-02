@@ -77,9 +77,7 @@ public class BeliefStateDeploymentBuilder {
     }
 
     @Transactional
-    public V1Deployment buildDeploymentFrom(
-        final AgentCommunicationLanguage acl,
-        final String beliefStateJarPath) {
+    public V1Deployment buildDeploymentFrom(final AgentCommunicationLanguage acl) {
 
         var deployment = new V1Deployment();
         deployment.setApiVersion("apps/v1");
@@ -88,7 +86,7 @@ public class BeliefStateDeploymentBuilder {
         var metadata = this.getMetadataFrom(acl);
         deployment.setMetadata(metadata);
 
-        var spec = this.getDeploymentSpecFrom(acl, beliefStateJarPath);
+        var spec = this.getDeploymentSpecFrom(acl);
         deployment.setSpec(spec);
 
         return deployment;
@@ -116,9 +114,7 @@ public class BeliefStateDeploymentBuilder {
     }
 
     @Transactional
-    private V1DeploymentSpec getDeploymentSpecFrom(
-        final AgentCommunicationLanguage acl,
-        final String beliefStateJarPath) {
+    private V1DeploymentSpec getDeploymentSpecFrom(final AgentCommunicationLanguage acl) {
 
         var spec = new V1DeploymentSpec();
         spec.setReplicas(1);
@@ -130,16 +126,14 @@ public class BeliefStateDeploymentBuilder {
             "belief-state",
             acl.getDomain().toLowerCase());
 
-        var template = this.getPodTemplateSpec(acl, beliefStateJarPath);
+        var template = this.getPodTemplateSpec(acl);
         spec.setTemplate(template);
 
         return spec;
     }
 
     @Transactional
-    private V1PodTemplateSpec getPodTemplateSpec(
-        final AgentCommunicationLanguage acl,
-        final String beliefStateJarName) {
+    private V1PodTemplateSpec getPodTemplateSpec(final AgentCommunicationLanguage acl) {
 
         var template = new V1PodTemplateSpec();
         template.setMetadata(new V1ObjectMeta());
@@ -155,7 +149,7 @@ public class BeliefStateDeploymentBuilder {
         podSpec.setImagePullSecrets(this.ubiquiaDeployment.getSpec().getTemplate().getSpec().getImagePullSecrets());
 
         // Create container with updated volume mount
-        var container = this.getContainer(acl, beliefStateJarName);
+        var container = this.getContainer(acl);
         podSpec.getContainers().add(container);
 
         // PVC volume
@@ -169,9 +163,7 @@ public class BeliefStateDeploymentBuilder {
         return template;
     }
 
-    private V1Container getContainer(
-        final AgentCommunicationLanguage acl,
-        final String beliefStateJarName) {
+    private V1Container getContainer(final AgentCommunicationLanguage acl) {
 
         var container = new V1Container();
         container.setName(acl.getDomain().toLowerCase());
@@ -184,6 +176,13 @@ public class BeliefStateDeploymentBuilder {
             .name("http")
             .protocol("TCP");
         container.setPorts(List.of(port));
+
+        // TODO: Make a common logic
+        var beliefStateJarName =
+            acl.getDomain().toLowerCase()
+                + "-"
+                + acl.getVersion().toString()
+                + ".jar";
 
         // Volume mount with subPath
         container.setVolumeMounts(List.of(new V1VolumeMount()

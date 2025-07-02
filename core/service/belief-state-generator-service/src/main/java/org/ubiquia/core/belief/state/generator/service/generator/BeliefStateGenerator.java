@@ -113,7 +113,7 @@ public class BeliefStateGenerator {
         );
 
         if (Objects.nonNull(this.beliefStateOperator)) {
-            this.beliefStateOperator.tryDeployBeliefState(acl, jarPath);
+            this.beliefStateOperator.tryDeployBeliefState(acl);
         }
     }
 
