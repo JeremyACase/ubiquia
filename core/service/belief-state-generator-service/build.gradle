@@ -69,13 +69,20 @@ tasks.named("processResources") {
     inputs.property("OPENJDK_VERSION", openJdkVersion)
     filteringCharset = 'UTF-8'
 
-    filesMatching('application.yaml') {
+    // Ensure Gradle doesn't ignore mustache files.
+    from("src/main/resources") {
+        include "**/*"
+    }
+
+    // Inject our openJDK version into our yaml file.
+    filesMatching("application.yaml") {
         println "✅ Forcing expand for main: $path"
         filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [
                 OPENJDK_VERSION: openJdkVersion
         ])
     }
 }
+
 
 tasks.named("processTestResources") {
     inputs.property("OPENJDK_VERSION", openJdkVersion)
