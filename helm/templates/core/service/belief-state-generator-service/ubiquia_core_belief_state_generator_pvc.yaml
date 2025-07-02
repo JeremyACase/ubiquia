@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ubiquia-core-belief-state-generator-service-belief-states-jar-pvc
+  name: ubiquia-core-belief-state-generator-service-belief-state-jars-pvc
   namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: {{ include "ubiquia.name" . }}
