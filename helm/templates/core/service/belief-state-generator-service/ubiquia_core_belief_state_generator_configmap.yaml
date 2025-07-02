@@ -61,3 +61,7 @@ data:
         service:
           port: {{ .Values.convenience.variables.spring.port }}
           url: http://ubiquia-core-flow-service
+      jdkVersion: 21
+      kubernetes:
+        enabled: true
+        namespace: {{ .Release.Namespace }}
