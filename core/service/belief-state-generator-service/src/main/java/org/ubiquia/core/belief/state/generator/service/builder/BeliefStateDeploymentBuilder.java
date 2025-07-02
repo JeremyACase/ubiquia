@@ -194,7 +194,7 @@ public class BeliefStateDeploymentBuilder {
             .protocol("TCP");
         container.setPorts(List.of(port));
 
-        var beliefStateJarName = this.beliefStateNameBuilder.getBeliefStateNameFrom(acl);
+        var beliefStateJarName = this.beliefStateNameBuilder.getBeliefStateNameFrom(acl) + ".jar";
         var mountPath = this.uberJarsPath + beliefStateJarName;
 
         // Volume mount with subPath
