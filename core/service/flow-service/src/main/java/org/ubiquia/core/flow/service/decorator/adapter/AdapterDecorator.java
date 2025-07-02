@@ -104,6 +104,29 @@ public class AdapterDecorator {
         logger.info("...completed polling initialization...");
     }
 
+    public void tryInitializeInputStimulationFor(AbstractAdapter adapter) {
+
+        var adapterContext = adapter.getAdapterContext();
+        var settings = adapter.getAdapterContext().getAdapterSettings();
+
+        if (settings.getStimulateInputPayload()) {
+            logger.info("...Initializing periodic input stimulation for adapter {} of graph {}...",
+                adapterContext.getAdapterName(),
+                adapterContext.getGraphName());
+            var executor = new ScheduledThreadPoolExecutor(1);
+            var task = executor.scheduleAtFixedRate(
+                adapter::stimulateAgent,
+                adapterContext.getAdapterSettings().getStimulateFrequencyMilliseconds(),
+                adapterContext.getAdapterSettings().getStimulateFrequencyMilliseconds(),
+                TimeUnit.MILLISECONDS);
+            adapterContext.getTasks().add(task);
+            logger.info("...completed back pressure polling initialization...");
+        } else {
+            logger.debug("...Adapter not configured for input stimulation; "
+                + "not initializing stimulation.");
+        }
+    }
+
     /**
      * Initialize an adapter to have a subscription to a broker.
      *

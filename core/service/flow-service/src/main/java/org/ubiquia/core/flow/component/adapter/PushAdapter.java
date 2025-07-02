@@ -21,6 +21,7 @@ public class PushAdapter extends AbstractAdapter {
     public void initializeBehavior() {
         super.initializeBehavior();
         super.adapterDecorator.registerPushEndpointFor(this);
+        super.adapterDecorator.tryInitializeInputStimulationFor(this);
         this.getLogger().info("...{} adapter initialization complete...",
             this.getAdapterContext().getAdapterType());
     }

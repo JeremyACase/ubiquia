@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,11 @@ public class BeliefStateDeploymentBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateDeploymentBuilder.class);
     @Value("${ubiquia.jdkVersion}")
-    protected String jdkVersion;
+    private String jdkVersion;
+    @Value("${ubiquia.beliefStateGeneratorService.uber.jars.path}")
+    private String uberJarsPath;
+    @Autowired
+    private BeliefStateNameBuilder beliefStateNameBuilder;
     private V1Deployment ubiquiaDeployment;
 
     public V1Deployment getUbiquiaDeployment() {
@@ -41,29 +46,30 @@ public class BeliefStateDeploymentBuilder {
         service.setKind("Service");
 
         service.setMetadata(new V1ObjectMeta());
-        service.getMetadata().setName(acl.getDomain().toLowerCase() + "-belief-state");
+        var beliefStateName = this.beliefStateNameBuilder.getBeliefStateNameFrom(acl);
+        service.getMetadata().setName(beliefStateName);
 
         service.getMetadata().setLabels(new HashMap<>());
         service.getMetadata().getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
         service.getMetadata().getLabels().remove("component");
         service.getMetadata().getLabels().remove("app.kubernetes.io/managed-by");
         service.getMetadata().getLabels().put(
-            "component",
+            "domain",
             acl.getDomain().toLowerCase());
         service.getMetadata().getLabels().put(
             "belief-state",
-            acl.getDomain().toLowerCase());
+            beliefStateName);
         service.getMetadata().getLabels().put("app.kubernetes.io/managed-by", "ubiquia");
 
         var serviceSpec = new V1ServiceSpec();
         serviceSpec.setType("ClusterIP");
         serviceSpec.setSelector(new HashMap<>());
         serviceSpec.getSelector().put(
-            "component",
+            "domain",
             acl.getDomain().toLowerCase());
         serviceSpec.getSelector().put(
             "belief-state",
-            acl.getDomain().toLowerCase());
+            beliefStateName);
         service.setSpec(serviceSpec);
 
         serviceSpec.setPorts(new ArrayList<>());
@@ -95,7 +101,9 @@ public class BeliefStateDeploymentBuilder {
     @Transactional
     private V1ObjectMeta getMetadataFrom(final AgentCommunicationLanguage acl) {
         var metadata = new V1ObjectMeta();
-        metadata.setName(acl.getDomain().toLowerCase() + "-belief-state");
+
+        var beliefStateName = this.beliefStateNameBuilder.getBeliefStateNameFrom(acl);
+        metadata.setName(beliefStateName);
 
         metadata.setLabels(new HashMap<>());
         metadata.getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
@@ -105,7 +113,7 @@ public class BeliefStateDeploymentBuilder {
         metadata.getLabels().put("app.kubernetes.io/managed-by", "ubiquia");
         metadata.getLabels().put(
             "belief-state",
-            acl.getDomain().toLowerCase());
+            beliefStateName);
 
         metadata.setAnnotations(new HashMap<>());
         metadata.getAnnotations().putAll(this.ubiquiaDeployment.getMetadata().getAnnotations());
@@ -116,15 +124,17 @@ public class BeliefStateDeploymentBuilder {
     @Transactional
     private V1DeploymentSpec getDeploymentSpecFrom(final AgentCommunicationLanguage acl) {
 
+        var beliefStateName = this.beliefStateNameBuilder.getBeliefStateNameFrom(acl);
+
         var spec = new V1DeploymentSpec();
         spec.setReplicas(1);
         spec.setSelector(this.ubiquiaDeployment.getSpec().getSelector());
         spec.getSelector().getMatchLabels().put(
-            "component",
+            "domain",
             acl.getDomain().toLowerCase());
         spec.getSelector().getMatchLabels().put(
             "belief-state",
-            acl.getDomain().toLowerCase());
+            beliefStateName);
 
         var template = this.getPodTemplateSpec(acl);
         spec.setTemplate(template);
@@ -135,18 +145,25 @@ public class BeliefStateDeploymentBuilder {
     @Transactional
     private V1PodTemplateSpec getPodTemplateSpec(final AgentCommunicationLanguage acl) {
 
+        var beliefStateName = this.beliefStateNameBuilder.getBeliefStateNameFrom(acl);
+
         var template = new V1PodTemplateSpec();
         template.setMetadata(new V1ObjectMeta());
         template.getMetadata().setLabels(new HashMap<>());
         template.getMetadata().getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
-        template.getMetadata().getLabels().put("component", acl.getDomain().toLowerCase());
-        template.getMetadata().getLabels().put("belief-state", acl.getDomain().toLowerCase());
+        template.getMetadata().getLabels().put("domain", acl.getDomain().toLowerCase());
+        template.getMetadata().getLabels().put("belief-state", beliefStateName);
         template.getMetadata().getLabels().remove("app.kubernetes.io/managed-by");
         template.getMetadata().getLabels().put("app.kubernetes.io/managed-by", "ubiquia");
 
         var podSpec = new V1PodSpec();
         podSpec.setContainers(new ArrayList<>());
-        podSpec.setImagePullSecrets(this.ubiquiaDeployment.getSpec().getTemplate().getSpec().getImagePullSecrets());
+        podSpec.setImagePullSecrets(this
+            .ubiquiaDeployment
+            .getSpec()
+            .getTemplate()
+            .getSpec()
+            .getImagePullSecrets());
 
         // Create container with updated volume mount
         var container = this.getContainer(acl);
@@ -154,7 +171,7 @@ public class BeliefStateDeploymentBuilder {
 
         // PVC volume
         var jarVolume = new V1Volume()
-            .name("belief-jar-volume")
+            .name("belief-state-jar-volume")
             .persistentVolumeClaim(new V1PersistentVolumeClaimVolumeSource()
                 .claimName("ubiquia-core-belief-state-generator-service-belief-state-jars-pvc")); 
         podSpec.setVolumes(List.of(jarVolume));
@@ -177,22 +194,18 @@ public class BeliefStateDeploymentBuilder {
             .protocol("TCP");
         container.setPorts(List.of(port));
 
-        // TODO: Make a common logic
-        var beliefStateJarName =
-            acl.getDomain().toLowerCase()
-                + "-"
-                + acl.getVersion().toString()
-                + ".jar";
+        var beliefStateJarName = this.beliefStateNameBuilder.getBeliefStateNameFrom(acl);
+        var mountPath = this.uberJarsPath + beliefStateJarName;
 
         // Volume mount with subPath
         container.setVolumeMounts(List.of(new V1VolumeMount()
-            .name("belief-jar-volume")
-            .mountPath("/belief-state-jars/" + beliefStateJarName)
+            .name("belief-state-jar-volume")
+            .mountPath(mountPath)
             .subPath(beliefStateJarName)));
 
         // Startup command
         container.setCommand(List.of("java"));
-        container.setArgs(List.of("-jar", "/belief-state-jars/" + beliefStateJarName));
+        container.setArgs(List.of("-jar", mountPath));
 
         return container;
     }

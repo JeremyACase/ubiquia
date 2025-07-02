@@ -38,7 +38,7 @@ else
     kubectl create namespace ubiquia
 fi
 
-# Create a mount for KIND to mount into
+# Create a mount for KIND to mount into to store our generated belief state jars
 docker exec ubiquia-agent-0-control-plane mkdir -p /mnt/data/belief-state-jars
 
 # This is to ensure the flow-service can manipulate the Kubernetes cluster; it will likely be a different service account in prod

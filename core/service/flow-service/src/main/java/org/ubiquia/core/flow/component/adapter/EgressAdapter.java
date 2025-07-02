@@ -31,6 +31,7 @@ public class EgressAdapter extends AbstractAdapter {
         super.adapterDecorator.initializeBackPressurePollingFor(this);
         super.adapterDecorator.registerBackpressureEndpointFor(this);
         super.adapterDecorator.registerPushEndpointFor(this);
+        super.adapterDecorator.tryInitializeInputStimulationFor(this);
         this.getLogger().info("...{} adapter initialization complete...",
             this.getAdapterContext().getAdapterType());
     }

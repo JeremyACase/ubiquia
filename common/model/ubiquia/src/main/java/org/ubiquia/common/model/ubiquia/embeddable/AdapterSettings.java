@@ -8,6 +8,8 @@ import java.util.List;
 @Embeddable
 public class AdapterSettings {
 
+    private Boolean stimulateInputPayload = false;
+
     private Boolean validateInputPayload = false;
 
     private Boolean validateOutputPayload = false;
@@ -15,6 +17,8 @@ public class AdapterSettings {
     private Boolean persistInputPayload = false;
 
     private Boolean persistOutputPayload = false;
+
+    private Long stimulateFrequencyMilliseconds = 5000L;
 
     private Long inboxPollFrequencyMilliseconds = 1000L;
 
@@ -96,5 +100,21 @@ public class AdapterSettings {
 
     public void setIsPassthrough(Boolean passthrough) {
         isPassthrough = passthrough;
+    }
+
+    public Boolean getStimulateInputPayload() {
+        return stimulateInputPayload;
+    }
+
+    public void setStimulateInputPayload(Boolean stimulateInputPayload) {
+        this.stimulateInputPayload = stimulateInputPayload;
+    }
+
+    public Long getStimulateFrequencyMilliseconds() {
+        return stimulateFrequencyMilliseconds;
+    }
+
+    public void setStimulateFrequencyMilliseconds(Long stimulateFrequencyMilliseconds) {
+        this.stimulateFrequencyMilliseconds = stimulateFrequencyMilliseconds;
     }
 }

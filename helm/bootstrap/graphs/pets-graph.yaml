@@ -136,6 +136,7 @@ agents:
             persistInputPayload: false
             persistOutputPayload: false
             validateOutputPayload: true
+            stimulateInputPayload: true
 
   - agentName: Pet-Generator-Agent
 
@@ -147,11 +148,6 @@ agents:
       registry: ubiquia
       repository: pet-store-data-transform
       tag: latest
-
-    # An example of configuring our agent to run with a volume which can be provisioned in a K8s cluster
-    # livenessProbe:
-    #   httpGetPath: /actuator/health
-    #   initialDelaySeconds: 30
 
     overrideSettings:
       - flag: demo

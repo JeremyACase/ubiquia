@@ -16,6 +16,7 @@ import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.model.adapter.AdapterContext;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
+import org.ubiquia.core.flow.service.builder.StimulatedPayloadBuilder;
 import org.ubiquia.core.flow.service.calculator.BackPressureCalculator;
 import org.ubiquia.core.flow.service.command.adapter.AdapterInboxMessageCommand;
 import org.ubiquia.core.flow.service.command.adapter.AdapterInboxPollCommand;
@@ -65,6 +66,8 @@ public abstract class AbstractAdapter implements InterfaceLogger {
     protected RestTemplate restTemplate;
     @Autowired
     protected StamperVisitor stamper;
+    @Autowired
+    private StimulatedPayloadBuilder stimulatedPayloadBuilder;
     private AdapterContext adapterContext;
 
     public AdapterContext getAdapterContext() {
@@ -130,6 +133,31 @@ public abstract class AbstractAdapter implements InterfaceLogger {
         }
 
         return response;
+    }
+
+    public void stimulateAgent() {
+
+        Timer.Sample sample = null;
+        if (Objects.nonNull(this.microMeterHelper)) {
+            sample = this.microMeterHelper.startSample();
+        }
+
+        this.getLogger().info("Stimulating agent with dummy input payload...");
+
+        try {
+            var stimulatePayload = this.stimulatedPayloadBuilder.buildStimulatedPayloadFor(this);
+            var event = this.flowEventBuilder.makeEventFrom(stimulatePayload, this);
+            this.adapterPayloadOrchestrator.forwardPayload(event, this, stimulatePayload);
+        } catch (Exception e) {
+            this.getLogger().error("ERROR: Error while stimulating agent: {}", e);
+        }
+
+        if (Objects.nonNull(sample)) {
+            this.microMeterHelper.endSample(
+                sample,
+                "stimulateAgent",
+                this.adapterContext.getTags());
+        }
     }
 
     public void tryPollInbox() {
