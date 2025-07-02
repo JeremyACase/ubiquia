@@ -2,7 +2,7 @@
 
 > **A runtime-compiled, DAG-orchestrated, schema-driven platform for building intelligent agent ecosystems — at production scale.**
 
-Ubiquia is a **domain-agnostic, production-grade Multi-Agent Orchestration System**. It lets you declaratively define agent communication protocols and workflows, then compiles and deploys them into a **live, resilient, and self-validating distributed system** — all from JSON schemas and YAML DAGs.
+Ubiquia is a **domain-agnostic, production-grade Multi-Agent Orchestration System**. It lets you declaratively define agent communication protocols and workflows, then compiles and deploys them into a **live, resilient, and self-validating distributed system** — all from JSON schemas and YAML-ized Directed Acyclic Graphs (DAG's).
 
 ---
 
@@ -11,7 +11,7 @@ Ubiquia is a **domain-agnostic, production-grade Multi-Agent Orchestration Syste
 Ubiquia is not another workflow engine or LLM wrapper. It's a **foundational infrastructure layer** designed to support:
 
 - **Typed agent communication** (via JSON Schema)
-- **Runtime deployment** of RESTful belief state servers
+- **Runtime deployment** of distributed, RESTful belief states
 - **Persistent, self-evolving DAGs** of intelligent agents
 - **Schema-validated I/O contracts between services**
 - **Distributed system messaging with SQL-level guarantees**
@@ -28,8 +28,15 @@ Ubiquia enables a future where **LLMs**, **symbolic agents**, and **software sys
 - 🗺️ **Declarative DAGs → Kubernetes Agents**  
   Define a multi-agent system with a single YAML file. Ubiquia reads the DAG and deploys it to Kubernetes — each node a live, stateful microservice.
 
-- 🧬 **Distributed Belief State via SQL**  
-  Agents share a global belief state, backed by **YugabyteDB**, a resilient, distributed SQL system designed for horizontal scale and high availability.
+- 🌍 **Cross-Cluster DAG Communication**  
+  DAGs can span **multiple Kubernetes clusters**, enabling agents to operate across physical or cloud boundaries. This supports:
+  - **Resilient compute**: workloads can route around degraded or partitioned clusters  
+  - **Topology-aware orchestration**: agents and DAG nodes can execute **close to data, users, or compute availability zones**
+
+- 🧬 **Distributed Belief State via Configurable SQL Backend**  
+  Agents share a global belief state backed by a **relational SQL database**, with support for either:
+  - **YugabyteDB** for distributed, horizontally scalable, highly available environments  
+  - **H2** for lightweight, in-memory or single-node scenarios such as local dev, testing, or compute-constrained environments
 
 - 🧾 **Runtime Schema Enforcement**  
   Every I/O channel between agents is validated in real time. No brittle prompt logic, no undefined behavior — just contract-based communication.
@@ -58,6 +65,8 @@ Ubiquia enables a future where **LLMs**, **symbolic agents**, and **software sys
   * [For Devs: Building Ubiquia](#for-devs-building-ubiquia)
   * [For Devs: Building Subprojects](#for-devs-building-subprojects)
 * [Contributors](#contributors)
+* [Who Is This For?](#who-is-this-for)
+* [License](#license)
 
 ## Quickstart
 The quickest way to get up and running with Ubiquia is to follow this section.
@@ -137,5 +146,19 @@ Concrete Example:
 $ ./gradlew :core:service:flow-service:build
 ```
 
+## Who Is This For?
+
+- **ML engineers** who want LLM agents with schema validation  
+- **Backend developers** who want to design systems with declarative intent and runtime validation  
+- **Systems engineers** building distributed or autonomous orchestration platforms  
+- **Scientists & researchers** modeling intelligent ecosystems or recursive planners  
+- **DoD/IC technologists** looking to modernize simulation, orchestration, or planning infrastructure
+
+---
+
 ## Contributors
 * __Jeremy Case__: jeremycase@odysseyconsult.com
+
+## License
+
+Apache 2.0 — Open source, extensible, and ready for real-world deployment.
