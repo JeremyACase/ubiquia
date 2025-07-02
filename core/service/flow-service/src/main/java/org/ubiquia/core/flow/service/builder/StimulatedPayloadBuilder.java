@@ -12,6 +12,7 @@ import net.jimblackler.jsongenerator.JsonGeneratorException;
 import net.jimblackler.jsonschemafriend.GenerationException;
 import net.jimblackler.jsonschemafriend.Schema;
 import net.jimblackler.jsonschemafriend.SchemaStore;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,14 @@ public class StimulatedPayloadBuilder {
             }
 
             var entity = record.get();
+
+            // Force initialize everything since we're being invoked in a scheduled thread
+            Hibernate.initialize(entity);
+            Hibernate.initialize(entity.getAgent());
+            Hibernate.initialize(entity.getAgent().getGraph());
+            Hibernate.initialize(entity.getAgent().getGraph().getAgentCommunicationLanguage());
+            Hibernate.initialize(entity.getOutputSubSchema());
+
             var jsonSchema = entity
                 .getAgent()
                 .getGraph()
