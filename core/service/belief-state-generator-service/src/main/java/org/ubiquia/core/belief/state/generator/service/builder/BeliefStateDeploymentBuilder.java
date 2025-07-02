@@ -168,7 +168,7 @@ public class BeliefStateDeploymentBuilder {
         var container = new V1Container();
         container.setName(acl.getDomain().toLowerCase());
         container.setImagePullPolicy("IfNotPresent");
-        container.setImage("eclipse-temurin-jre:" + this.jdkVersion);
+        container.setImage("eclipse-temurin:" + this.jdkVersion);
 
         // Port setup
         var port = new V1ContainerPort()

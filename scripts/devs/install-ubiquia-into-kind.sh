@@ -14,7 +14,7 @@ if ! command -v kind &> /dev/null; then
     exit 1
 fi
 
-# Optional: Check Helm and kubectl are also available
+# Check Helm and kubectl are also available
 for cmd in helm kubectl; do
     if ! command -v "$cmd" &> /dev/null; then
         echo "ERROR: '$cmd' command not found. Please install $cmd and ensure it's available in your PATH."
@@ -23,7 +23,6 @@ for cmd in helm kubectl; do
 done
 
 helm dependency update helm/
-helm dependency build helm/
 
 if kind get clusters | grep -q "^ubiquia-agent-0$"; then
     echo "KIND cluster 'ubiquia-agent-0' already exists."
@@ -31,7 +30,13 @@ else
     kind create cluster --name ubiquia-agent-0
 fi
 
-kubectl create namespace ubiquia
+# Check if the namespace 'ubiquia' already exists
+if kubectl get namespace ubiquia &> /dev/null; then
+    echo "Namespace 'ubiquia' already exists."
+else
+    echo "Creating namespace 'ubiquia'..."
+    kubectl create namespace ubiquia
+fi
 
 # Create a mount for KIND to mount into
 docker exec ubiquia-agent-0-control-plane mkdir -p /mnt/data/belief-state-jars
