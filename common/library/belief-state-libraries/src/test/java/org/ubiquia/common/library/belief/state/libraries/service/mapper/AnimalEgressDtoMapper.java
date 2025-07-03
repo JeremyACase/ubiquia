@@ -3,8 +3,8 @@ package org.ubiquia.common.library.belief.state.libraries.service.mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.ubiquia.acl.generated.dto.Animal;
-import org.ubiquia.acl.generated.entity.AnimalEntity;
+import org.ubiquia.acl.generated.Animal;
+import org.ubiquia.acl.generated.AnimalEntity;
 
 @Component
 public class AnimalEgressDtoMapper extends AbstractEgressDtoMapper<AnimalEntity, Animal> {

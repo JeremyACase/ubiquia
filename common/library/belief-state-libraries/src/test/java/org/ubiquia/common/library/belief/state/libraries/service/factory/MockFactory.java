@@ -5,7 +5,7 @@ import static org.instancio.Select.field;
 import java.util.ArrayList;
 import org.instancio.Instancio;
 import org.springframework.stereotype.Service;
-import org.ubiquia.acl.generated.dto.*;
+import org.ubiquia.acl.generated.*;
 import org.ubiquia.common.model.acl.dto.AbstractAclModel;
 
 @Service

@@ -11,7 +11,7 @@
  */
 
 
-package org.ubiquia.acl.generated.dto;
+package org.ubiquia.acl.generated;
 
 import com.fasterxml.jackson.annotation.*;
 import jakarta.validation.Valid;

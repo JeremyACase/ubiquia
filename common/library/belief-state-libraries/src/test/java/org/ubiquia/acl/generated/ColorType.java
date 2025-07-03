@@ -11,7 +11,7 @@
  */
 
 
-package org.ubiquia.acl.generated.enums;
+package org.ubiquia.acl.generated;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;

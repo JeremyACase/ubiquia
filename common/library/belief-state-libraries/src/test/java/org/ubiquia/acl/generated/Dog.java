@@ -11,7 +11,7 @@
  */
 
 
-package org.ubiquia.acl.generated.dto;
+package org.ubiquia.acl.generated;
 
 
 import com.fasterxml.jackson.annotation.*;
@@ -19,49 +19,43 @@ import jakarta.validation.constraints.DecimalMin;
 import java.util.Objects;
 
 /**
- * The model of a cat.
+ * The model of a dog.
  */
 @JsonPropertyOrder({
-    Cat.JSON_PROPERTY_MEOW_DECIBELS
+    Dog.JSON_PROPERTY_BARK_DECIBELS
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = Dachschund.class, name = "Dachschund"),
+    @JsonSubTypes.Type(value = Poodle.class, name = "Poodle"),
+})
 
-public class Cat extends Animal {
-    public static final String JSON_PROPERTY_MEOW_DECIBELS = "meowDecibels";
+public class Dog extends Animal {
+    public static final String JSON_PROPERTY_BARK_DECIBELS = "barkDecibels";
     @jakarta.annotation.Nullable
-    private Float meowDecibels;
-
-    public Cat() {
-
-    }
-
-    public Cat meowDecibels(@jakarta.annotation.Nullable Float meowDecibels) {
-
-        this.meowDecibels = meowDecibels;
-        return this;
-    }
+    protected Float barkDecibels;
 
     /**
-     * Get meowDecibels
+     * Get barkDecibels
      * minimum: 0
      *
-     * @return meowDecibels
+     * @return barkDecibels
      */
     @jakarta.annotation.Nullable
     @DecimalMin("0")
-    @JsonProperty(JSON_PROPERTY_MEOW_DECIBELS)
+    @JsonProperty(JSON_PROPERTY_BARK_DECIBELS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-    public Float getMeowDecibels() {
-        return meowDecibels;
+    public Float getBarkDecibels() {
+        return barkDecibels;
     }
 
 
-    @JsonProperty(JSON_PROPERTY_MEOW_DECIBELS)
+    @JsonProperty(JSON_PROPERTY_BARK_DECIBELS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setMeowDecibels(@jakarta.annotation.Nullable Float meowDecibels) {
-        this.meowDecibels = meowDecibels;
+    public void setBarkDecibels(@jakarta.annotation.Nullable Float barkDecibels) {
+        this.barkDecibels = barkDecibels;
     }
 
     @Override
@@ -72,22 +66,22 @@ public class Cat extends Animal {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Cat catDto = (Cat) o;
-        return Objects.equals(this.meowDecibels, catDto.meowDecibels) &&
+        Dog dogDto = (Dog) o;
+        return Objects.equals(this.barkDecibels, dogDto.barkDecibels) &&
             super.equals(o);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(meowDecibels, super.hashCode());
+        return Objects.hash(barkDecibels, super.hashCode());
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("class CatDto {\n");
+        sb.append("class DogDto {\n");
         sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-        sb.append("    meowDecibels: ").append(toIndentedString(meowDecibels)).append("\n");
+        sb.append("    barkDecibels: ").append(toIndentedString(barkDecibels)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -105,7 +99,7 @@ public class Cat extends Animal {
 
     @Override
     public String getModelType() {
-        return "Cat";
+        return "Dog";
     }
 
 

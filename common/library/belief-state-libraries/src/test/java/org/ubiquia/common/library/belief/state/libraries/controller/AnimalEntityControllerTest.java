@@ -15,8 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.client.RestTemplate;
-import org.ubiquia.acl.generated.dto.Animal;
-import org.ubiquia.acl.generated.dto.Person;
+import org.ubiquia.acl.generated.Animal;
+import org.ubiquia.acl.generated.Person;
 import org.ubiquia.common.library.belief.state.libraries.service.factory.MockFactory;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 
