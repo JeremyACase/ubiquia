@@ -183,6 +183,33 @@ public class BeliefStateOperator {
         }
     }
 
+    public void deleteBeliefStateResources(final String beliefStateName) {
+        logger.info("...deleting K8s resources for belief state: {}...", beliefStateName);
+
+        var listOptions = new ListOptions();
+        listOptions.setLabelSelector("belief-state=" + beliefStateName);
+
+        var deployments = this.deploymentClient.list(this.namespace, listOptions);
+        for (var deployment : deployments.getObject().getItems()) {
+            logger.info("...deleting deployment with name: {}...",
+                deployment.getMetadata().getName());
+            this.deploymentClient.delete(
+                this.namespace,
+                deployment.getMetadata().getName());
+        }
+
+        var services = this.serviceClient.list(this.namespace, listOptions);
+        for (var service : services.getObject().getItems()) {
+            logger.info("...deleting service with name: {}...",
+                service.getMetadata().getName());
+            this.deploymentClient.delete(
+                this.namespace,
+                service.getMetadata().getName());
+        }
+
+        logger.info("...deleted.");
+    }
+
     /**
      * Delete any deployed DAG resources.
      *

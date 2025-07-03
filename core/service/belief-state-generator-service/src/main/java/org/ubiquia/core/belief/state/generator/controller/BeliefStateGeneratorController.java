@@ -14,8 +14,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
-import org.ubiquia.common.model.ubiquia.embeddable.DomainGeneration;
+import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
+import org.ubiquia.core.belief.state.generator.service.builder.BeliefStateNameBuilder;
 import org.ubiquia.core.belief.state.generator.service.generator.BeliefStateGenerator;
+import org.ubiquia.core.belief.state.generator.service.k8s.BeliefStateOperator;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
 
 @RestController
@@ -28,6 +30,12 @@ public class BeliefStateGeneratorController {
     private BeliefStateGenerator beliefStateGenerator;
 
     @Autowired
+    private BeliefStateNameBuilder beliefStateNameBuilder;
+
+    @Autowired
+    private BeliefStateOperator beliefStateOperator;
+
+    @Autowired
     private FlowServiceConfig flowServiceConfig;
 
     @Autowired
@@ -36,13 +44,14 @@ public class BeliefStateGeneratorController {
     @Autowired
     private RestTemplate restTemplate;
 
-    @PostMapping("/generate/domain")
+    @PostMapping("/generate/belief-state")
     @Transactional
-    public DomainGeneration generateDomain(@RequestBody @Valid final DomainGeneration domainGeneration)
+    public BeliefStateGeneration generateBeliefState(
+        @RequestBody @Valid final BeliefStateGeneration beliefStateGeneration)
         throws Exception {
 
-        logger.info("Received a domain generation request: {}...",
-            this.objectMapper.writeValueAsString(domainGeneration));
+        logger.info("Received a belief state generation request: {}...",
+            this.objectMapper.writeValueAsString(beliefStateGeneration));
 
         var url = this.flowServiceConfig.getUrl()
             + ":"
@@ -53,10 +62,10 @@ public class BeliefStateGeneratorController {
             .fromHttpUrl(url)
             .queryParam("page", 0)
             .queryParam("size", 1)
-            .queryParam("domain", domainGeneration.getName())
-            .queryParam("version.major", domainGeneration.getVersion().getMajor())
-            .queryParam("version.minor", domainGeneration.getVersion().getMinor())
-            .queryParam("version.patch", domainGeneration.getVersion().getPatch())
+            .queryParam("domain", beliefStateGeneration.getDomainName())
+            .queryParam("version.major", beliefStateGeneration.getVersion().getMajor())
+            .queryParam("version.minor", beliefStateGeneration.getVersion().getMinor())
+            .queryParam("version.patch", beliefStateGeneration.getVersion().getPatch())
             .toUriString();
         logger.debug("...querying URL: {}...", uri);
 
@@ -71,13 +80,31 @@ public class BeliefStateGeneratorController {
             Objects.requireNonNull(response.getBody()).getNumberOfElements() <= 0) {
 
             throw new IllegalArgumentException("Could not find a registered Agent Communication "
-                + "Language for: " + this.objectMapper.writeValueAsString(domainGeneration));
+                + "Language for: " + this.objectMapper.writeValueAsString(beliefStateGeneration));
         }
 
         var acl = response.getBody().getContent().get(0);
         this.beliefStateGenerator.generateBeliefStateFrom(acl);
 
-        return domainGeneration;
+        return beliefStateGeneration;
+    }
+
+    @PostMapping("/teardown/belief-state")
+    @Transactional
+    public BeliefStateGeneration teardownBeliefState(
+        @RequestBody @Valid final BeliefStateGeneration beliefStateGeneration)
+        throws Exception {
+
+        logger.info("Received a belief state teardown request: {}...",
+            this.objectMapper.writeValueAsString(beliefStateGeneration));
+
+        var beliefStateName = this
+            .beliefStateNameBuilder
+            .getKubernetesBeliefStateNameFrom(beliefStateGeneration);
+
+        this.beliefStateOperator.deleteBeliefStateResources(beliefStateName);
+
+        return beliefStateGeneration;
     }
 }
 

@@ -26,7 +26,9 @@ public class GraphFinder {
     @Autowired
     private UbiquiaAgentConfig ubiquiaAgentConfig;
 
-    public Optional<GraphEntity> findGraphFor(String graphName, SemanticVersion version) {
+    public Optional<GraphEntity> findGraphFor(
+        final String graphName,
+        final SemanticVersion version) {
         var record = this
             .graphRepository
             .findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatch(

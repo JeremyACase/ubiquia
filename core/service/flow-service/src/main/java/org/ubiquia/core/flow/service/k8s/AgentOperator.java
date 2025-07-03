@@ -107,10 +107,38 @@ public class AgentOperator {
      * @param graphName The graph to delete.
      */
     public void deleteGraphResources(final String graphName) {
-        logger.info("...deleting graph: {}...", graphName);
-        this.deploymentClient.delete(this.namespace, graphName);
-        this.serviceClient.delete(this.namespace, graphName);
-        this.configMapClient.delete(this.namespace, graphName + "-config");
+        logger.info("...deleting K8s resources for graph: {}...", graphName);
+
+        var listOptions = new ListOptions();
+        listOptions.setLabelSelector("ubiquia-graph=" + graphName);
+
+        var deployments = this.deploymentClient.list(this.namespace, listOptions);
+        for (var deployment : deployments.getObject().getItems()) {
+            logger.info("...deleting deployment with name: {}...",
+                deployment.getMetadata().getName());
+            this.deploymentClient.delete(
+                this.namespace,
+                deployment.getMetadata().getName());
+        }
+
+        var services = this.serviceClient.list(this.namespace, listOptions);
+        for (var service : services.getObject().getItems()) {
+            logger.info("...deleting service with name: {}...",
+                service.getMetadata().getName());
+            this.deploymentClient.delete(
+                this.namespace,
+                service.getMetadata().getName());
+        }
+
+        var configMaps = this.configMapClient.list(this.namespace, listOptions);
+        for (var configMap : configMaps.getObject().getItems()) {
+            logger.info("...deleting config map with name: {}...",
+                configMap.getMetadata().getName());
+            this.deploymentClient.delete(
+                this.namespace,
+                configMap.getMetadata().getName());
+        }
+
         logger.info("...deleted.");
     }
 

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.ubiquia.common.model.ubiquia.embeddable.DomainGeneration;
+import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
 import org.ubiquia.core.communication.config.BeliefStateGeneratorServiceConfig;
 import reactor.core.publisher.Mono;
 
@@ -24,8 +24,8 @@ public class BeliefStateGeneratorControllerProxy {
     private WebClient webClient;
 
     @PostMapping("/generate/domain")
-    public Mono<ResponseEntity<DomainGeneration>> proxyGenerateDomain(
-        @RequestBody Mono<DomainGeneration> body) {
+    public Mono<ResponseEntity<BeliefStateGeneration>> proxyGenerateDomain(
+        @RequestBody Mono<BeliefStateGeneration> body) {
 
         var url = this.getUrlHelper();
         var uri = UriComponentsBuilder.fromHttpUrl(url + "/generate/domain")
@@ -36,9 +36,9 @@ public class BeliefStateGeneratorControllerProxy {
             .webClient
             .method(HttpMethod.POST)
             .uri(uri)
-            .body(body, DomainGeneration.class)
+            .body(body, BeliefStateGeneration.class)
             .retrieve()
-            .toEntity(DomainGeneration.class);
+            .toEntity(BeliefStateGeneration.class);
 
         return response;
     }

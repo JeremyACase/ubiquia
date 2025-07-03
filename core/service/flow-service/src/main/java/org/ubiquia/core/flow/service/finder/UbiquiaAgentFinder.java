@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgentEntity;
 import org.ubiquia.common.library.config.UbiquiaAgentConfig;
@@ -22,14 +23,14 @@ public class UbiquiaAgentFinder {
     @Autowired
     private UbiquiaAgentConfig ubiquiaAgentConfig;
 
-    public Optional<UbiquiaAgentEntity> findAgentFor(String graphName, SemanticVersion version) {
+    public Optional<UbiquiaAgentEntity> findAgentFor(final GraphDeployment graphDeployment) {
         var ubiquiaAgentRecord = this
             .ubiquiaAgentRepository
             .findByDeployedGraphsGraphNameAndDeployedGraphsVersionMajorAndDeployedGraphsVersionMinorAndDeployedGraphsVersionPatchAndId(
-                graphName,
-                version.getMajor(),
-                version.getMinor(),
-                version.getPatch(),
+                graphDeployment.getName(),
+                graphDeployment.getVersion().getMajor(),
+                graphDeployment.getVersion().getMinor(),
+                graphDeployment.getVersion().getPatch(),
                 this.ubiquiaAgentConfig.getId());
         return ubiquiaAgentRecord;
     }

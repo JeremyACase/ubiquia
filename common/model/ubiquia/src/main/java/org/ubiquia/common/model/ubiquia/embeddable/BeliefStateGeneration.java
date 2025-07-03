@@ -5,19 +5,19 @@ import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 
 @Embeddable
-public class DomainGeneration {
+public class BeliefStateGeneration {
 
-    private String name;
+    private String domainName;
 
     private SemanticVersion version;
 
     @NotNull
-    public String getName() {
-        return name;
+    public String getDomainName() {
+        return domainName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
     }
 
     @NotNull

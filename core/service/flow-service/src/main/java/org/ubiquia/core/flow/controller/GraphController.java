@@ -206,36 +206,37 @@ public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Gr
 
     @PostMapping("/teardown")
     @Transactional
-    public void tryTeardownGraph(
-        @RequestParam(value = "graph-name") String graphName,
-        @RequestBody @Valid SemanticVersion version) {
+    public void tryTeardownGraph(@RequestBody @Valid GraphDeployment deployment) {
 
         this.getLogger().info("Received a request to teardown graph {} with version {}...",
-            graphName,
-            version);
+            deployment.getName(),
+            deployment.getVersion());
 
-        var record = this.graphFinder.findGraphFor(graphName, version);
+        var record = this.graphFinder.findGraphFor(
+            deployment.getName(),
+            deployment.getVersion());
+
         if (record.isEmpty()) {
             throw new IllegalArgumentException("ERROR: Could not find a graph registered with name "
-                + graphName
+                + deployment.getName()
                 + " and semantic version "
-                + version);
+                + deployment.getVersion());
         } else {
-            this.adapterManager.tearDownAdaptersFor(graphName, version);
+            this.adapterManager.tearDownAdaptersFor(deployment);
 
             if (Objects.nonNull(this.agentOperator)) {
                 this.getLogger().info("...running in kubernetes; attempting to tear down any of the graph's "
                     + " resources deployed in Kubernetes...");
-                this.agentOperator.deleteGraphResources(graphName);
+                this.agentOperator.deleteGraphResources(deployment.getName());
             }
 
-            var ubiquiaAgentRecord = this.ubiquiaAgentFinder.findAgentFor(graphName, version);
+            var ubiquiaAgentRecord = this.ubiquiaAgentFinder.findAgentFor(deployment);
 
             if (ubiquiaAgentRecord.isEmpty()) {
                 throw new RuntimeException("ERROR: Could not find a Ubiquia Agent for "
-                    + graphName
+                    + deployment.getName()
                     + " and semantic version "
-                    + version
+                    + deployment.getVersion()
                     + " and id "
                     + this.ubiquiaAgentConfig.getId());
             }

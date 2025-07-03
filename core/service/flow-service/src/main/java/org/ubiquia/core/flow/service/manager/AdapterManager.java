@@ -83,24 +83,22 @@ public class AdapterManager {
         logger.info("...all adapters torn down.");
     }
 
-    /**
-     * Attempt to tear down any deployed adapters for a graph.
-     *
-     * @param graphName The graph name to tear down.
-     * @param version   The version of the graph to tear down.
-     */
     @Transactional
-    public void tearDownAdaptersFor(final String graphName, final SemanticVersion version) {
+    public void tearDownAdaptersFor(final GraphDeployment deployment) {
 
-        logger.info("Tearing down adapters for graph named {}...", graphName);
+        logger.info("Tearing down adapters for graph with name {} and version: {}...",
+            deployment.getName(),
+            deployment.getVersion());
+
         var graphRecord = this.graphRepository
             .findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatch(
-                graphName,
-                version.getMajor(),
-                version.getMinor(),
-                version.getPatch());
+                deployment.getName(),
+                deployment.getVersion().getMajor(),
+                deployment.getVersion().getMinor(),
+                deployment.getVersion().getPatch());
+
         if (graphRecord.isPresent()) {
-            if (this.adapterMap.containsKey(graphName)) {
+            if (this.adapterMap.containsKey(deployment.getName())) {
                 var graphEntity = graphRecord.get();
                 for (var adapterEntity : graphEntity.getAdapters()) {
                     var adapter = this.adapterMap
@@ -113,15 +111,20 @@ public class AdapterManager {
 
                     this.adapterManagerCommand.tearDown(adapter);
                 }
-                logger.info("...completed tearing down adapters for graph named {}.",
-                    graphName);
+                logger.info("...completed tearing down adapters for graph with name {} " +
+                        "and version: {}...",
+                    deployment.getName(),
+                    deployment.getVersion());
             } else {
-                logger.info("...no adapters present for graph: {}... ", graphName);
+                logger.info("...no adapters present for graph: {}... ",
+                    deployment.getName());
             }
         } else {
             throw new IllegalArgumentException("ERROR: Could not tear down adapters; "
                 + "graph doesn't exist with name "
-                + graphName);
+                + deployment.getName()
+                + " and version "
+                + deployment.getVersion());
         }
     }
 
