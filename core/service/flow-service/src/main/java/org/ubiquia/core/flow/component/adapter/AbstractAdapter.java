@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.Timer;
 import java.util.List;
 import java.util.Objects;
+import net.jimblackler.jsonschemafriend.GenerationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -78,7 +79,7 @@ public abstract class AbstractAdapter implements InterfaceLogger {
         this.adapterContext = adapterContext;
     }
 
-    public void initializeBehavior() {
+    public void initializeBehavior() throws GenerationException {
         var adapterContext = this.getAdapterContext();
         this.getLogger().info("...Initializing {} adapter named {} for graph {}...",
             adapterContext.getAdapterType(),

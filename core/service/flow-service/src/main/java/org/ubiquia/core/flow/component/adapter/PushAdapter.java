@@ -1,6 +1,7 @@
 package org.ubiquia.core.flow.component.adapter;
 
 
+import net.jimblackler.jsonschemafriend.GenerationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -18,9 +19,10 @@ public class PushAdapter extends AbstractAdapter {
     }
 
     @Override
-    public void initializeBehavior() {
+    public void initializeBehavior() throws GenerationException {
         super.initializeBehavior();
         super.adapterDecorator.registerPushEndpointFor(this);
+        super.adapterDecorator.initializeOutputLogicFor(this);
         super.adapterDecorator.tryInitializeInputStimulationFor(this);
         this.getLogger().info("...{} adapter initialization complete...",
             this.getAdapterContext().getAdapterType());

@@ -189,6 +189,39 @@ agents:
 # with agents. These are typically useful as ingress/egress components to a DAG.
 agentlessAdapters:
 
+  - modelType: Adapter
+    adapterType: EGRESS
+    adapterName: Pet-Egress-Adapter
+    description: This is an example adapter that POSTs incoming payloads to a belief state.
+
+    endpoint: http://pets-1-2-3:8080/ubiquia/Animal/add
+
+    inputSubSchemas:
+      - modelName: Animal
+
+    outputSubSchema:
+      modelName: Animal
+
+    egressSettings:
+      httpOutputType: POST
+      egressType: SYNCHRONOUS
+      egressConcurrency: 1
+
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: false
+
+    overrideSettings:
+      - flag: demo
+        key: adapterSettings
+        value:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: true
+          validateOutputPayload: true
+
 # This is how Ubiquia knows how to connect adapters together into a Directed Acyclic Graph. Conceptually, 
 # data flows from left-to-right. As adapters receive payloads, they will send them to their respective 
 # agents (if they have them), package up the agent response (if applicable), and send
@@ -197,3 +230,6 @@ edges:
   - leftAdapterName: Pet-Store-Image-Classifier-Adapter
     rightAdapterNames:
       - Pet-Generator-Adapter
+  - leftAdapterName: Pet-Generator-Adapter
+    rightAdapterNames:
+      - Pet-Egress-Adapter

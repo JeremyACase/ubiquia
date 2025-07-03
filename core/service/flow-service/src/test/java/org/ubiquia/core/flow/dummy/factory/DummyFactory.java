@@ -93,7 +93,6 @@ public class DummyFactory {
      *
      * @return A dummy graph.
      */
-    @Transactional
     public Graph generateGraph() throws IOException {
 
         var acl = this.mockRegistrar.tryRegisterAcl();

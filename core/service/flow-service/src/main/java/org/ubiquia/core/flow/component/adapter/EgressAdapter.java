@@ -2,6 +2,7 @@ package org.ubiquia.core.flow.component.adapter;
 
 
 import java.util.List;
+import net.jimblackler.jsonschemafriend.GenerationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,11 @@ public class EgressAdapter extends AbstractAdapter {
     }
 
     @Override
-    public void initializeBehavior() {
+    public void initializeBehavior() throws GenerationException {
         super.initializeBehavior();
         super.adapterDecorator.initializeInboxPollingFor(this);
         super.adapterDecorator.initializeBackPressurePollingFor(this);
+        super.adapterDecorator.initializeOutputLogicFor(this);
         super.adapterDecorator.registerBackpressureEndpointFor(this);
         super.adapterDecorator.registerPushEndpointFor(this);
         super.adapterDecorator.tryInitializeInputStimulationFor(this);

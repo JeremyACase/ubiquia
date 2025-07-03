@@ -4,6 +4,7 @@ package org.ubiquia.core.flow.component.adapter;
 import io.micrometer.core.instrument.Timer;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
+import net.jimblackler.jsonschemafriend.GenerationException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +27,10 @@ public class SubscribeAdapter
     }
 
     @Override
-    public void initializeBehavior() {
+    public void initializeBehavior() throws GenerationException {
         super.initializeBehavior();
         super.adapterDecorator.initializeSubscriptionFor(this);
+        super.adapterDecorator.initializeOutputLogicFor(this);
         super.adapterDecorator.registerPushEndpointFor(this);
         super.adapterDecorator.tryInitializeInputStimulationFor(this);
         this.getLogger().info("...{} adapter initialization complete...",

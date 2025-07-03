@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import java.net.URI;
 import java.net.URISyntaxException;
+import net.jimblackler.jsonschemafriend.GenerationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,8 @@ public class AdapterBuilder {
         final GraphDeployment graphDeployment)
         throws URISyntaxException,
         JsonProcessingException,
-        IllegalAccessException {
+        IllegalAccessException,
+        GenerationException {
 
         logger.info("...building {} adapter named {} for graph {} with settings {}...",
             adapterEntity.getAdapterType(),

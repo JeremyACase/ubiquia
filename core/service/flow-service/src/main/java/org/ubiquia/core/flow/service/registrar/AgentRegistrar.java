@@ -119,7 +119,9 @@ public class AgentRegistrar {
      * @return The newly-registered agent.
      */
     @Transactional
-    private AgentEntity persistAgentWithParentGraph(AgentEntity agentEntity, GraphEntity graphEntity) {
+    private AgentEntity persistAgentWithParentGraph(
+        AgentEntity agentEntity,
+        GraphEntity graphEntity) {
 
         if (Objects.isNull(graphEntity.getAgents())) {
             graphEntity.setAgents(new ArrayList<>());

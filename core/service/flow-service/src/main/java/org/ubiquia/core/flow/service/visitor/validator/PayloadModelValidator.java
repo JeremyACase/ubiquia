@@ -37,17 +37,15 @@ public class PayloadModelValidator {
      *
      * @param inputPayload The input payload to validate.
      * @param adapter      The adapter we're validating an input payload for.
-     * @throws GenerationException Exception from generating our schema.
      * @throws ValidationException Exception from validating the payload.
      */
     public void tryValidateInputPayloadFor(
         final String inputPayload,
         final AbstractAdapter adapter)
-        throws GenerationException, ValidationException {
+        throws ValidationException {
 
         var adapterContext = adapter.getAdapterContext();
         if (adapterContext.getAdapterSettings().getValidateInputPayload()) {
-            this.tryInitializeInputPayloadSchema(adapterContext.getAdapterId());
             var schema = this.inputSchemaCache.get(adapterContext.getAdapterId());
             var validator = new net.jimblackler.jsonschemafriend.Validator();
             validator.validateJson(schema, inputPayload);
@@ -59,18 +57,16 @@ public class PayloadModelValidator {
      *
      * @param outputPayload The input payload to validate.
      * @param adapter       The adapter we're validating an input payload for.
-     * @throws GenerationException Exception from generating our schema.
      * @throws ValidationException Exception from validating the payload.
      */
     public void tryValidateOutputPayloadFor(
         final String outputPayload,
         final AbstractAdapter adapter)
-        throws GenerationException, ValidationException {
+        throws ValidationException {
 
         var adapterContext = adapter.getAdapterContext();
 
         if (adapterContext.getAdapterSettings().getValidateOutputPayload()) {
-            this.tryInitializeOutputSchema(adapterContext.getAdapterId());
             var schema = this.outputSchemaCache.get(adapterContext.getAdapterId());
             var validator = new net.jimblackler.jsonschemafriend.Validator();
             validator.validateJson(schema, outputPayload);
@@ -83,7 +79,7 @@ public class PayloadModelValidator {
      * @param adapterId The ID of the adapter to initialize.
      * @throws GenerationException Exception from generating our schema.
      */
-    private void tryInitializeOutputSchema(final String adapterId) throws GenerationException {
+    public void tryInitializeOutputSchema(final String adapterId) throws GenerationException {
 
         if (!this.outputSchemaCache.containsKey(adapterId)) {
             logger.info("Initializing input schema cache for adapter id {}...", adapterId);
@@ -93,32 +89,36 @@ public class PayloadModelValidator {
             }
 
             var adapterEntity = record.get();
-            var jsonSchema = adapterEntity
-                .getAgent()
-                .getGraph()
-                .getAgentCommunicationLanguage()
-                .getJsonSchema();
 
-            var schemaStore = new SchemaStore(true);
-            var schema = schemaStore.loadSchemaJson(jsonSchema);
+            if (Objects.nonNull(adapterEntity.getOutputSubSchema())) {
+                var jsonSchema = adapterEntity
+                    .getGraph()
+                    .getAgentCommunicationLanguage()
+                    .getJsonSchema();
 
-            var match = schema
-                .getSubSchemas()
-                .keySet()
-                .stream()
-                .filter(x -> x.toString().contains(adapterEntity.getOutputSubSchema().getModelName()))
-                .findFirst();
+                var schemaStore = new SchemaStore(true);
+                var schema = schemaStore.loadSchemaJson(jsonSchema);
 
-            if (match.isEmpty()) {
-                throw new RuntimeException("ERROR: Cannot find subschema named  '"
-                    + adapterEntity.getOutputSubSchema().getModelName()
-                    + "' in domain ontology named '"
-                    + adapterEntity.getAgent().getGraph().getAgentCommunicationLanguage().getDomain()
-                    + "'!");
+                var match = schema
+                    .getSubSchemas()
+                    .keySet()
+                    .stream()
+                    .filter(x -> x.toString().contains(adapterEntity.getOutputSubSchema().getModelName()))
+                    .findFirst();
+
+                if (match.isEmpty()) {
+                    throw new RuntimeException("ERROR: Cannot find subschema named  '"
+                        + adapterEntity.getOutputSubSchema().getModelName()
+                        + "' in domain ontology named '"
+                        + adapterEntity.getAgent().getGraph().getAgentCommunicationLanguage().getDomain()
+                        + "'!");
+                }
+                var jsonSubSchema = schema.getSubSchemas().get(match.get());
+                this.outputSchemaCache.put(adapterId, jsonSubSchema);
+                logger.info("...initialized.");
+            } else {
+                logger.info("...no output schema defined; not initializing.");
             }
-            var jsonSubSchema = schema.getSubSchemas().get(match.get());
-            this.outputSchemaCache.put(adapterId, jsonSubSchema);
-            logger.info("Initialized...");
         }
     }
 
@@ -128,7 +128,7 @@ public class PayloadModelValidator {
      * @param adapterId The ID of the adapter to initialize.
      * @throws GenerationException Exception from generating our schema.
      */
-    private void tryInitializeInputPayloadSchema(final String adapterId)
+    public void tryInitializeInputPayloadSchema(final String adapterId)
         throws GenerationException {
 
         if (!this.inputSchemaCache.containsKey(adapterId)) {
@@ -140,7 +140,6 @@ public class PayloadModelValidator {
 
             var entity = record.get();
             var jsonSchema = entity
-                .getAgent()
                 .getGraph()
                 .getAgentCommunicationLanguage()
                 .getJsonSchema();
@@ -174,7 +173,7 @@ public class PayloadModelValidator {
 
             var jsonSubSchema = schema.getSubSchemas().get(jsonSubSchemaURI);
             this.inputSchemaCache.put(adapterId, jsonSubSchema);
-            logger.info("Initialized...");
+            logger.info("...initialized.");
         }
     }
 }

@@ -14,12 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.ubiquia.common.library.logic.service.builder.AdapterEndpointRecordBuilder;
-import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
-import org.ubiquia.core.flow.component.adapter.PollAdapter;
-import org.ubiquia.core.flow.component.adapter.QueueAdapter;
-import org.ubiquia.core.flow.component.adapter.SubscribeAdapter;
+import org.ubiquia.core.flow.component.adapter.*;
 import org.ubiquia.core.flow.service.builder.StimulatedPayloadBuilder;
 import org.ubiquia.core.flow.service.decorator.adapter.broker.AdapterBrokerDecorator;
+import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
 
 
 /**
@@ -38,6 +36,8 @@ public class AdapterDecorator {
     private AdapterBrokerDecorator adapterBrokerDecorator;
     @Autowired
     private AdapterEndpointRecordBuilder adapterEndpointRecordBuilder;
+    @Autowired
+    private PayloadModelValidator payloadModelValidator;
     @Autowired
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
     @Autowired
@@ -66,17 +66,31 @@ public class AdapterDecorator {
         logger.info("...completed back pressure polling initialization...");
     }
 
+    public void initializeOutputLogicFor(AbstractAdapter adapter)
+        throws GenerationException {
+
+        var adapterContext = adapter.getAdapterContext();
+        logger.info("...Initializing output logic for adapter {} of graph {}...",
+            adapterContext.getAdapterName(),
+            adapterContext.getGraphName());
+
+        this.payloadModelValidator.tryInitializeOutputSchema(adapterContext.getAdapterId());
+        logger.info("...completed egress logic initialization...");
+    }
+
     /**
      * Initialize the adapter so that it begins polling for incoming messages.
      *
      * @param adapter The adapter to initialize.
      */
-    public void initializeInboxPollingFor(AbstractAdapter adapter) {
+    public void initializeInboxPollingFor(AbstractAdapter adapter)
+        throws GenerationException {
         var adapterContext = adapter.getAdapterContext();
         logger.info("...Initializing polling of inbox for adapter {} of graph {}...",
             adapterContext.getAdapterName(),
             adapterContext.getGraphName());
 
+        this.payloadModelValidator.tryInitializeInputPayloadSchema(adapterContext.getAdapterId());
         var executor = new ScheduledThreadPoolExecutor(1);
         var task = executor.scheduleAtFixedRate(
             adapter::tryPollInbox,
@@ -92,11 +106,13 @@ public class AdapterDecorator {
      *
      * @param adapter The adapter to initialize.
      */
-    public void initializePollingFor(PollAdapter adapter) {
+    public void initializePollingFor(PollAdapter adapter) throws GenerationException {
         var adapterContext = adapter.getAdapterContext();
         logger.info("...Initializing polling for adapter {} of graph {}... ",
             adapterContext.getAdapterName(),
             adapterContext.getGraphName());
+
+        this.payloadModelValidator.tryInitializeInputPayloadSchema(adapterContext.getAdapterId());
 
         var executor = new ScheduledThreadPoolExecutor(1);
         var task = executor.scheduleAtFixedRate(
@@ -108,7 +124,8 @@ public class AdapterDecorator {
         logger.info("...completed polling initialization...");
     }
 
-    public void tryInitializeInputStimulationFor(AbstractAdapter adapter) {
+    public void tryInitializeInputStimulationFor(AbstractAdapter adapter)
+        throws GenerationException {
 
         var adapterContext = adapter.getAdapterContext();
         var settings = adapter.getAdapterContext().getAdapterSettings();
@@ -118,21 +135,15 @@ public class AdapterDecorator {
                 adapterContext.getAdapterName(),
                 adapterContext.getGraphName());
 
-            try {
-                this.stimulatedPayloadBuilder.initializeSchema(adapterContext.getAdapterId());
-                var executor = new ScheduledThreadPoolExecutor(1);
-                var task = executor.scheduleAtFixedRate(
-                    adapter::stimulateAgent,
-                    adapterContext.getAdapterSettings().getStimulateFrequencyMilliseconds(),
-                    adapterContext.getAdapterSettings().getStimulateFrequencyMilliseconds(),
-                    TimeUnit.MILLISECONDS);
-                adapterContext.getTasks().add(task);
-                logger.info("...completed back pressure polling initialization...");
-            } catch (GenerationException e) {
-                logger.error("ERROR: Could not initialize schema for adapter {}",
-                    adapterContext.getAdapterName());
-            }
-
+            this.stimulatedPayloadBuilder.initializeSchema(adapterContext.getAdapterId());
+            var executor = new ScheduledThreadPoolExecutor(1);
+            var task = executor.scheduleAtFixedRate(
+                adapter::stimulateAgent,
+                adapterContext.getAdapterSettings().getStimulateFrequencyMilliseconds(),
+                adapterContext.getAdapterSettings().getStimulateFrequencyMilliseconds(),
+                TimeUnit.MILLISECONDS);
+            adapterContext.getTasks().add(task);
+            logger.info("...completed back pressure polling initialization...");
         } else {
             logger.debug("...Adapter not configured for input stimulation; "
                 + "not initializing stimulation.");
@@ -208,7 +219,7 @@ public class AdapterDecorator {
      * @param adapter The adapter to create an endpoint for.
      * @throws RuntimeException Exceptions from creating the endpoints.
      */
-    public void registerPopEndpointFor(final QueueAdapter adapter) throws RuntimeException {
+    public void registerPopEndpointFor(QueueAdapter adapter) throws RuntimeException {
 
         var adapterContext = adapter.getAdapterContext();
 
