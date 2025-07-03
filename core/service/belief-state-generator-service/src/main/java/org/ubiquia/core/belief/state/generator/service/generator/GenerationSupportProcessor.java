@@ -20,6 +20,10 @@ public class GenerationSupportProcessor {
             "generated/src/main/java/org/ubiquia/acl/generated/Application.java");
 
         this.copyResourceFromClasspath(
+            "template/java/support/GlobalExceptionHandler.java.template",
+            "generated/src/main/java/org/ubiquia/acl/generated/GlobalExceptionHandler.java");
+
+        this.copyResourceFromClasspath(
             "template/java/support/application.yaml.template",
             "generated/src/main/resources/application.yaml");
     }
