@@ -7,5 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] - 2025-06-04
 
+## [0.2.0] 2025-07-03
+### Added
+- Teardown for belief states
+### Fixed
+- Teardown now properly works for graph K8s resources
+
 ### Added
 - Initial commit

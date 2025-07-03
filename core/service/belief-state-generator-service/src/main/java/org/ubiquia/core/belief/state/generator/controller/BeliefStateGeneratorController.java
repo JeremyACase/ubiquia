@@ -32,7 +32,7 @@ public class BeliefStateGeneratorController {
     @Autowired
     private BeliefStateNameBuilder beliefStateNameBuilder;
 
-    @Autowired
+    @Autowired(required = false)
     private BeliefStateOperator beliefStateOperator;
 
     @Autowired
@@ -98,11 +98,13 @@ public class BeliefStateGeneratorController {
         logger.info("Received a belief state teardown request: {}...",
             this.objectMapper.writeValueAsString(beliefStateGeneration));
 
-        var beliefStateName = this
-            .beliefStateNameBuilder
-            .getKubernetesBeliefStateNameFrom(beliefStateGeneration);
+        if (Objects.nonNull(this.beliefStateOperator)) {
+            var beliefStateName = this
+                .beliefStateNameBuilder
+                .getKubernetesBeliefStateNameFrom(beliefStateGeneration);
 
-        this.beliefStateOperator.deleteBeliefStateResources(beliefStateName);
+            this.beliefStateOperator.deleteBeliefStateResources(beliefStateName);
+        }
 
         return beliefStateGeneration;
     }
