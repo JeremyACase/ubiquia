@@ -458,7 +458,8 @@ public boolean equals(Object o) {
 
     @Override
     public String getModelType() {
-        return "{{classname}}";
+        // TODO: It's probably better to replace this via the code gen, but this works for now
+        return "{{classname}}".replace("Entity", "");
     }
 
 }

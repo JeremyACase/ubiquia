@@ -53,6 +53,17 @@ public class UbiquiaAclEntityGenerator extends JavaClientCodegen {
             mm.getModels().forEach(m -> modelIndex.put(m.getModel().classname, m.getModel()));
         }
 
+        // Remove 'Entity' suffix from classnames
+        for (CodegenModel model : modelIndex.values()) {
+            if (model.classname.endsWith("Entity")) {
+                model.vendorExtensions.put("x-base-classname", model.classname.replaceFirst(
+                    "Entity$", ""));
+            } else {
+                model.vendorExtensions.put("x-base-classname", model.classname);
+            }
+            System.out.printf("Model %s → x-base-classname = %s%n", model.classname, model.vendorExtensions.get("x-base-classname"));
+        }
+
         /* 2️⃣ collect potential relationship pairs */
         Map<String, RelationPair> pairs = new HashMap<>();
 
