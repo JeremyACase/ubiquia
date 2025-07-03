@@ -194,13 +194,10 @@ agentlessAdapters:
     adapterName: Pet-Egress-Adapter
     description: This is an example adapter that POSTs incoming payloads to a belief state.
 
-    endpoint: http://pets-1-2-3:8080/ubiquia/Animal/add
+    endpoint: http://pets-belief-state-1-2-3:8080/ubiquia/Animal/add
 
     inputSubSchemas:
       - modelName: Animal
-
-    outputSubSchema:
-      modelName: Animal
 
     egressSettings:
       httpOutputType: POST
