@@ -51,8 +51,6 @@ Ubiquia enables a future where **LLMs**, **symbolic agents**, and **software sys
 
 ## Table of Contents
 
-* [Ubiquia Overview](#ubiquia-overview)
-  * [About](#about)
 * [Quickstart](#quickstart)
   * [Quickstart: Requirements](#quick-start-requirements)
   * [Quickstart: Scripts](#quick-start-scripts)
@@ -61,6 +59,7 @@ Ubiquia enables a future where **LLMs**, **symbolic agents**, and **software sys
   * [Getting Started: Requirements](#getting-started-requirements)
   * [Getting Started: Helm Repo](#getting-started-helm-repo)
   * [Getting Started: Installation](#getting-started-installation)
+  * [Getting Started: Project Overview](#getting-started-project-overview)
 * [For Devs](#for-devs)
   * [For Devs: Building Ubiquia](#for-devs-building-ubiquia)
   * [For Devs: Building Subprojects](#for-devs-building-subprojects)
@@ -72,12 +71,14 @@ Ubiquia enables a future where **LLMs**, **symbolic agents**, and **software sys
 The quickest way to get up and running with Ubiquia is to follow this section.
 
 ### Quickstart: Requirements
-Before running Ubiquia, there are a few requirements that must be met.
+Before running Ubiquia, make sure the following tools are installed:
 
-- [Helm](https://helm.sh/docs/intro/install/) has been installed
-- [KIND](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-with-go-install) has been installed
-- [Kubectl](https://kubernetes.io/docs/tasks/tools/) has been installed
-- [Docker](https://docs.docker.com/engine/install/) has been installed (required by KIND)
+| Tool        | Minimum Version | Install Link |
+|-------------|-----------------|--------------|
+| Helm        | 3.12.0          | [helm.sh/docs](https://helm.sh/docs/intro/install/) |
+| KIND        | 0.20.0          | [kind.sigs.k8s.io](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-with-go-install) |
+| Kubectl     | 1.27.0          | [kubernetes.io](https://kubernetes.io/docs/tasks/tools/) |
+| Docker      | 24.0.0          | [docs.docker.com](https://docs.docker.com/engine/install/) |
 
 ### Quickstart: Scripts
 Some convenience scripts are provided to users in this repo to get users up and running. ***The scripts must be executed in the root Ubiquia directory.***
@@ -109,11 +110,24 @@ Now you can re-run the installation script with a fresh Kubernetes cluster!
 
 ## Getting Started
 
-### Getting Started: Requirements
-Before running Ubiquia, there are a few requirements that must be met.
+### Getting Started: Development Requirements
+Before running Ubiquia, ensure the following tools are installed.
 
-- [Helm](https://helm.sh/docs/intro/install/) has been installed
-- [Kubectl](https://kubernetes.io/docs/tasks/tools/) has been installed
+#### Installation Tools
+
+| Tool        | Minimum Version | Install Link |
+|-------------|-----------------|--------------|
+| Helm        | 3.12.0          | [helm.sh/docs](https://helm.sh/docs/intro/install/) |
+| Kubectl     | 1.27.0          | [kubernetes.io](https://kubernetes.io/docs/tasks/tools/) |
+| Kubernetes  | 1.27.0          | [kubernetes.io](https://kubernetes.io/docs/setup/) |
+
+#### Development Tools
+
+| Tool        | Minimum Version | Install Link |
+|-------------|-----------------|--------------|
+| Docker      | 24.0.0          | [docs.docker.com](https://docs.docker.com/engine/install/) |
+| KIND        | 0.20.0          | [kind.sigs.k8s.io](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-with-go-install) |
+| OpenJDK     | 21              | [jdk.java.net/21](https://jdk.java.net/21/) or a preferred distribution |
 
 
 ### Getting Started: Installation
@@ -122,6 +136,28 @@ Ubiquia should be able to be installed into any Kubernetes environment using Hel
 Example Ubiquia Installation
 ```bash
 $ helm install ubiquia ubiquia-helm --values helm/configurations/featherwweight.yaml -n ubiquia
+```
+
+### Getting Started: Project Overview
+Ubiquia is a modular multi-agent orchestration platform designed for scalable, belief-driven AI systems running on Kubernetes.
+
+To ensure modularity, clarity, and maintainability, the codebase is divided into subprojects. Each will eventually have its own README and design documents — some already do, and others are coming soon.
+
+```text
+root/
+├── build.gradle            # Top-level Gradle build
+├── settings.gradle         # Declares subprojects
+├── gradle.properties       # Centralized version declarations
+├── helm/                   # Helm chart for Kubernetes deployment
+├── scripts/                # Dev and ops automation scripts
+├── docs/                   # System-level documentation and diagrams
+├── config/                 # Project-wide config (e.g., Checkstyle rules) or development config separate of Helm
+├── common/ 
+│   ├── library/            # Shared APIs and libraries used across services
+│   └── model/              # Shared model definitions and database entities  
+├── core/
+│   └── service/            # Core agent services (compiled DAG nodes)
+└──
 ```
 
 ## For Devs
