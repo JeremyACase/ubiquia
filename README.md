@@ -65,6 +65,7 @@ Ubiquia enables a future where **LLMs**, **symbolic agents**, and **software sys
   * [For Devs: Building Subprojects](#for-devs-building-subprojects)
 * [Contributors](#contributors)
 * [Who Is This For?](#who-is-this-for)
+* [Glossary](#glossary)
 * [License](#license)
 
 ## Quickstart
@@ -190,6 +191,27 @@ $ ./gradlew :core:service:flow-service:build
 - **Scientists & researchers** modeling intelligent ecosystems or recursive planners  
 - **DoD/IC technologists** looking to modernize simulation, orchestration, or planning infrastructure
 
+---
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **ACL (Agent Communication Language)** | A JSON Schema-based contract that defines the types of messages agents can send or receive. Enforces runtime validation of agent I/O. |
+| **Adapter** | A software component that connects nodes in a DAG and defines how messages are transported or transformed (e.g., `publish`, `merge`, `poll`). |
+| **Agent** | A stateful microservice deployed as part of a DAG, capable of sending, receiving, and acting on messages according to ACLs. |
+| **Agentless Adapter** | An adapter node in a DAG that performs flow control (e.g., routing, polling, merging) but does not host an agent implementation. |
+| **Belief State** | A shared, distributed, and SQL-backed representation of the system’s current knowledge. Agents can read from and write to it, supporting coordination and memory across the system. |
+| **Belief-State Generator** | A codegen service that transforms ACLs into typed Java classes and Spring Boot REST services, enabling agents to interact with the belief state in a schema-safe way. |
+| **Communication Service** | A reverse proxy and routing gateway that dynamically exposes core services and agent/adapters based on DAG configuration. |
+| **DAO (Data Access Object)** | A component that abstracts and encapsulates database interactions, commonly used to query or persist belief state entities. |
+| **DAG (Directed Acyclic Graph)** | A directed graph with no cycles, used to define agent topologies and message flow in Ubiquia. DAGs are authored in YAML and compiled into orchestrated services. |
+| **DAG Manifest** | A YAML configuration file that declares how a DAG and its agents/adapters should be deployed, configured, and interconnected. |
+| **DTO (Data Transfer Object)** | A simple object used to encapsulate data transferred between layers or services in Ubiquia. Used heavily in REST APIs. |
+| **Flow Service** | A core Ubiquia microservice responsible for materializing DAGs into running agents and adapters. Manages lifecycle, registration, and event querying. |
+| **MAO (Multi-Agent Orchestration)** | The process of managing and coordinating interactions among agents in a MAS. Ubiquia handles MAO through DAG deployment and adapter coordination. |
+| **MAS (Multi-Agent System)** | A system composed of multiple intelligent agents that interact or work together to perform tasks or solve problems. Ubiquia provides runtime infrastructure for these systems. |
+| **Schema Registry** | A repository of JSON Schemas (ACLs) that define I/O contracts for agents and services. Used for validation, code generation, and schema evolution. |
 ---
 
 ## Contributors
