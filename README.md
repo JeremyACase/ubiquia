@@ -156,7 +156,7 @@ root/
 │   ├── library/            # Shared APIs and libraries used across services
 │   └── model/              # Shared model definitions and database entities  
 ├── core/
-│   └── service/            # Core agent services (compiled DAG nodes)
+│   └── service/            # Core services that will run as as K8s microservices
 └──
 ```
 
