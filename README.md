@@ -201,7 +201,7 @@ $ ./gradlew :core:service:flow-service:build
 | **Adapter** | A software component that connects nodes in a DAG and defines how messages are transported or transformed (e.g., `publish`, `merge`, `poll`). |
 | **Agent** | A stateful microservice deployed as part of a DAG, capable of sending, receiving, and acting on messages according to ACLs. |
 | **Agentless Adapter** | An adapter node in a DAG that performs flow control (e.g., routing, polling, merging) but does not host an agent implementation. |
-| **Belief State** | A shared, distributed, and SQL-backed representation of the system’s current knowledge. Agents can read from and write to it via adapters, supporting coordination and memory across the system. |
+| **Belief State** | A shared, distributed, and SQL-backed representation of the system’s current knowledge. Agents can read from and write to it, supporting coordination and memory across the system. |
 | **Belief-State Generator** | A codegen service that transforms ACLs into typed Java classes and Spring Boot REST services, enabling agents to interact with the belief state in a schema-safe way. |
 | **Communication Service** | A reverse proxy and routing gateway that dynamically exposes core services and agent/adapters based on DAG configuration. |
 | **DAO (Data Access Object)** | A component that abstracts and encapsulates database interactions, commonly used to query or persist belief state entities. |
