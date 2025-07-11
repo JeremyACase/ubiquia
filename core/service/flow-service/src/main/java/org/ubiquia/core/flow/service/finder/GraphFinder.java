@@ -31,7 +31,7 @@ public class GraphFinder {
         final SemanticVersion version) {
         var record = this
             .graphRepository
-            .findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatch(
+            .findByNameAndVersionMajorAndVersionMinorAndVersionPatch(
                 graphName,
                 version.getMajor(),
                 version.getMinor(),

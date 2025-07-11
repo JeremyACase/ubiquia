@@ -12,7 +12,7 @@ import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgentEntity;
 public interface UbiquiaAgentRepository extends PagingAndSortingRepository<UbiquiaAgentEntity, String>,
     CrudRepository<UbiquiaAgentEntity, String> {
 
-    Optional<UbiquiaAgentEntity> findByDeployedGraphsGraphNameAndDeployedGraphsVersionMajorAndDeployedGraphsVersionMinorAndDeployedGraphsVersionPatchAndId(
+    Optional<UbiquiaAgentEntity> findByDeployedGraphsNameAndDeployedGraphsVersionMajorAndDeployedGraphsVersionMinorAndDeployedGraphsVersionPatchAndId(
         final String graphName,
         final Integer major,
         final Integer minor,

@@ -31,9 +31,9 @@ public class BrokerEgress {
 
         var adapterContext = adapter.getAdapterContext();
         logger.debug("Got a request to publish the output of an event for adapter of graph {} "
-                + " and agent {}",
+                + " and component {}",
             adapterContext.getGraphName(),
-            adapterContext.getAgentName());
+            adapterContext.getComponentName());
 
 
         switch (adapterContext.getBrokerSettings().getType()) {

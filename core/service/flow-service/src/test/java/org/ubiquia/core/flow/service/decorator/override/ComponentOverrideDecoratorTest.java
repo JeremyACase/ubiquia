@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.ubiquia.common.model.ubiquia.dto.Agent;
+import org.ubiquia.common.model.ubiquia.dto.Component;
 import org.ubiquia.common.model.ubiquia.dto.Config;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphSettings;
@@ -21,10 +21,10 @@ import org.ubiquia.core.flow.TestHelper;
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class AgentOverrideDecoratorTest {
+public class ComponentOverrideDecoratorTest {
 
     @Autowired
-    private AgentOverrideDecorator agentOverrideDecorator;
+    private ComponentOverrideDecorator componentOverrideDecorator;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -72,15 +72,15 @@ public class AgentOverrideDecoratorTest {
         deployment.setGraphSettings(new GraphSettings());
         deployment.getGraphSettings().setFlag("test");
 
-        var agent = new Agent();
-        agent.setConfig(baselineConfig);
-        this.agentOverrideDecorator.tryOverrideBaselineValues(
-            agent,
+        var component = new Component();
+        component.setConfig(baselineConfig);
+        this.componentOverrideDecorator.tryOverrideBaselineValues(
+            component,
             overrideSettingsList,
             deployment);
 
         Assertions.assertEquals(
             overrideConfig.getConfigMap(),
-            agent.getConfig().getConfigMap());
+            component.getConfig().getConfigMap());
     }
 }

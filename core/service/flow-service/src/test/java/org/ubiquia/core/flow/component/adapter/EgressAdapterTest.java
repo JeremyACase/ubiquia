@@ -58,15 +58,15 @@ public class EgressAdapterTest {
 
         var graph = this.dummyFactory.generateGraph();
 
-        var ingressAgent = this.dummyFactory.generateAgent();
-        graph.getAgents().add(ingressAgent);
+        var ingressComponent = this.dummyFactory.generateComponent();
+        graph.getComponents().add(ingressComponent);
 
         var ingressAdapter = this.dummyFactory.generateAdapter();
         ingressAdapter.setAdapterType(AdapterType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressAdapter.getInputSubSchemas().add(subSchema);
         ingressAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-        ingressAgent.setAdapter(ingressAdapter);
+        ingressComponent.setAdapter(ingressAdapter);
 
         var egressAdapter = this.dummyFactory.generateAdapter();
         egressAdapter.setAdapterType(AdapterType.EGRESS);
@@ -74,17 +74,17 @@ public class EgressAdapterTest {
         egressAdapter.getEgressSettings().setHttpOutputType(HttpOutputType.POST);
         egressAdapter.setEndpoint("http://localhost:8080/test");
         egressAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
-        graph.getAgentlessAdapters().add(egressAdapter);
+        graph.getComponentlessAdapters().add(egressAdapter);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getAdapterName());
+        edge.setLeftAdapterName(ingressAdapter.getName());
         edge.setRightAdapterNames(new ArrayList<>());
-        edge.getRightAdapterNames().add(egressAdapter.getAdapterName());
+        edge.getRightAdapterNames().add(egressAdapter.getName());
         graph.getEdges().add(edge);
 
         this.graphController.register(graph);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getGraphName());
+        deployment.setName(graph.getName());
         deployment.setVersion(graph.getVersion());
         this.graphController.tryDeployGraph(deployment);
 
@@ -95,7 +95,7 @@ public class EgressAdapterTest {
 
         var adapter = (PushAdapter) this
             .testHelper
-            .findAdapter(ingressAdapter.getAdapterName(), graph.getGraphName());
+            .findAdapter(ingressAdapter.getName(), graph.getName());
         adapter.push("test");
 
         Thread.sleep(10000);
@@ -107,15 +107,15 @@ public class EgressAdapterTest {
 
         var graph = this.dummyFactory.generateGraph();
 
-        var ingressAgent = this.dummyFactory.generateAgent();
-        graph.getAgents().add(ingressAgent);
+        var ingressComponent = this.dummyFactory.generateComponent();
+        graph.getComponents().add(ingressComponent);
 
         var ingressAdapter = this.dummyFactory.generateAdapter();
         ingressAdapter.setAdapterType(AdapterType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressAdapter.getInputSubSchemas().add(subSchema);
         ingressAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-        ingressAgent.setAdapter(ingressAdapter);
+        ingressComponent.setAdapter(ingressAdapter);
 
         var egressAdapter = this.dummyFactory.generateAdapter();
         egressAdapter.setAdapterType(AdapterType.EGRESS);
@@ -123,17 +123,17 @@ public class EgressAdapterTest {
         egressAdapter.getEgressSettings().setHttpOutputType(HttpOutputType.PUT);
         egressAdapter.setEndpoint("http://localhost:8080/test");
         egressAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
-        graph.getAgentlessAdapters().add(egressAdapter);
+        graph.getComponentlessAdapters().add(egressAdapter);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getAdapterName());
+        edge.setLeftAdapterName(ingressAdapter.getName());
         edge.setRightAdapterNames(new ArrayList<>());
-        edge.getRightAdapterNames().add(egressAdapter.getAdapterName());
+        edge.getRightAdapterNames().add(egressAdapter.getName());
         graph.getEdges().add(edge);
 
         this.graphController.register(graph);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getGraphName());
+        deployment.setName(graph.getName());
         deployment.setVersion(graph.getVersion());
         this.graphController.tryDeployGraph(deployment);
 
@@ -144,7 +144,7 @@ public class EgressAdapterTest {
 
         var adapter = (PushAdapter) this
             .testHelper
-            .findAdapter(ingressAdapter.getAdapterName(), graph.getGraphName());
+            .findAdapter(ingressAdapter.getName(), graph.getName());
         adapter.push("test");
 
         Thread.sleep(10000);

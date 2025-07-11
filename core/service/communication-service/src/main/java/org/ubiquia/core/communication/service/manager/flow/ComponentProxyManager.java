@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
 
 @Service
-public class AgentProxyManager {
+public class ComponentProxyManager {
     private static final Logger logger = LoggerFactory.getLogger(AdapterProxyManager.class);
 
     @Autowired

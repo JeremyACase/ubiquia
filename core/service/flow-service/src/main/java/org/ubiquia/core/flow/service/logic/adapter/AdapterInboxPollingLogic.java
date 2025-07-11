@@ -30,7 +30,7 @@ public class AdapterInboxPollingLogic {
         var context = adapter.getAdapterContext();
 
         var valid = false;
-        if (context.getTemplateAgent()) {
+        if (context.getTemplateComponent()) {
             valid = true;
         } else {
             var type = context.getAdapterType();

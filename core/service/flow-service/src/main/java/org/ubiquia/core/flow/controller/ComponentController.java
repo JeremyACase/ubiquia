@@ -8,24 +8,24 @@ import org.springframework.web.bind.annotation.RestController;
 import org.ubiquia.common.library.api.controller.GenericUbiquiaDaoController;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.dao.component.EntityDao;
-import org.ubiquia.common.model.ubiquia.dto.Agent;
-import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
-import org.ubiquia.core.flow.service.mapper.AgentDtoMapper;
+import org.ubiquia.common.model.ubiquia.dto.Component;
+import org.ubiquia.common.model.ubiquia.entity.ComponentEntity;
+import org.ubiquia.core.flow.service.mapper.ComponentDtoMapper;
 
 /**
- * A controller that exposes a RESTful interface for agents.
+ * A controller that exposes a RESTful interface for components within a DAG.
  */
 @RestController
-@RequestMapping("/ubiquia/agent")
-public class AgentController extends GenericUbiquiaDaoController<AgentEntity, Agent> {
+@RequestMapping("/ubiquia/component")
+public class ComponentController extends GenericUbiquiaDaoController<ComponentEntity, Component> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AgentController.class);
-
-    @Autowired
-    private AgentDtoMapper dtoMapper;
+    private static final Logger logger = LoggerFactory.getLogger(ComponentController.class);
 
     @Autowired
-    private EntityDao<AgentEntity> entityDao;
+    private ComponentDtoMapper dtoMapper;
+
+    @Autowired
+    private EntityDao<ComponentEntity> entityDao;
 
     @Override
     public Logger getLogger() {
@@ -33,12 +33,12 @@ public class AgentController extends GenericUbiquiaDaoController<AgentEntity, Ag
     }
 
     @Override
-    public EntityDao<AgentEntity> getDataAccessObject() {
+    public EntityDao<ComponentEntity> getDataAccessObject() {
         return this.entityDao;
     }
 
     @Override
-    public InterfaceEntityToDtoMapper<AgentEntity, Agent> getDataTransferObjectMapper() {
+    public InterfaceEntityToDtoMapper<ComponentEntity, Component> getDataTransferObjectMapper() {
         return this.dtoMapper;
     }
 }

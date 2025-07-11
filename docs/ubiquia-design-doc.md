@@ -58,12 +58,12 @@ Ubiquia can be used to orchestrate a collection of SDA assets--human, LLM, hardw
 ## Goals and Non-Goals
 
 ### Goals
-- Enable decentralized coordination between agents across arbitrary scales
+- Enable decentralized coordination between components across arbitrary scales
 - Implement dynamic task reassignment based on current node capacity and priority.
-- Enable decentralized coordination between agents to optimize resource distribution.
-- Provide observability into agent decisions and system performance.
-- Allow new agents to join--or leave--dynamically without downtime.
-- Require heterogenous ubiquia agents to be able to realize business logic at runtime.
+- Enable decentralized coordination between components to optimize resource distribution.
+- Provide observability into component decisions and system performance.
+- Allow new components to join--or leave--dynamically without downtime.
+- Require heterogenous ubiquia components to be able to realize business logic at runtime.
 
 ### Non-Goals
 - Ubiquia does not handle physical device provisioning.
@@ -84,8 +84,8 @@ TODO
 
 ### Components
 - **Flow Service**: Allows for user-defined logic to be registered, instantiated, and ochestrated in runtime.
-- **Executive Service**: Coordinates tasks across a network of ubiquia agents
-- **Learning Service**: Responsible for updating model weights within agents or even reinforcement learning across LLM agents
+- **Executive Service**: Coordinates tasks across a network of ubiquia components
+- **Learning Service**: Responsible for updating model weights within components or even reinforcement learning across LLM components
 - **Mission Logic Service**: TODO: Chat with Justin
 - **Communication Service**: Exposes internal service APIs externally - dynamically (such as API's exposed in Flow Service DAG's.)
 - **Vectorization Service**: Translates tokenized input into vectors for any LLM Agents on behalf of Flow Service
@@ -111,36 +111,36 @@ TODO
 ### Flow Service
 - **Responsibilies**
   - **Agent Communication Language Registration**: The Flow Service will be able to handle "Agent Communication Language" (ACL) registration.
-  - **Direct Acylic Graph Registration**: The Flow Service will be able to allow registration of Directed Acyclic Graph workflows comprised of agents and adapters.
+  - **Direct Acylic Graph Registration**: The Flow Service will be able to allow registration of Directed Acyclic Graph workflows comprised of components and adapters.
   - **Direct Acylic Graph Orchestration**: The Flow Service will double as a Kubernetes operator capable of orchestrating DAG's across Kubernetes clusters dynamically and at runtime.
-  - **Schema Validation**: The Flow Service will be able to verify input/output of agents based on an ACL. This is especially important for LLM-based agents.
-  - **Vector Database Interface**: For agents that are Large Language Models (LLM's), Flow Service will be able to interface with a vector database on behalf of the LLM.
+  - **Schema Validation**: The Flow Service will be able to verify input/output of components based on an ACL. This is especially important for LLM-based components.
+  - **Vector Database Interface**: For components that are Large Language Models (LLM's), Flow Service will be able to interface with a vector database on behalf of the LLM.
   - **Back Pressure**: Leveraging queues and the inbox/outbox pattern, Flow Service will provide a "back pressure" endpoint allowing for the Executive Service to be able to actuate Flow Service DAG's across ubiquia Agents to alleviate pressure.
   - **DAG Dataflow**: Flow Service will persist data into the distributed database via a queueing mechanism via the inbox/outbox pattern.
 - **API**:
   - **ACL**: The ability to register, query, and delete ACL's
   - **DAGs**: The ability to register, deploy, teardown, query, and delete DAG's
-  - **Agent Adapters**: The ability to interface with the adapter deployed for any given agent depending on the type (e.g., Push, Merge, etc.)
+  - **Agent Adapters**: The ability to interface with the adapter deployed for any given component depending on the type (e.g., Push, Merge, etc.)
   - **Back Pressure**: The ability to query for back pressure for any given adapter.
 - **Dependencies**
   - **SQL Database**: Either H2 (for testing) or YugabyteDB.
-  - **Vector Database**: A vector database to store vector embeddings for any LLM agents.
+  - **Vector Database**: A vector database to store vector embeddings for any LLM components.
 
 ### Communications Service
 - **Responsibilies**
-  - **Reverse Proxy**: The Communications Service will be able to expose services from within a ubiquia agent and Kubernetes agent externally, and be able to do so dynamically (such as will be needed when deploying Flow Service DAG's.)
+  - **Reverse Proxy**: The Communications Service will be able to expose services from within a ubiquia component and Kubernetes component externally, and be able to do so dynamically (such as will be needed when deploying Flow Service DAG's.)
 - **API**:
   - **???**: TODO: Find a way for Comm service to get "Flow Service DAG events" (either via broker or by REST, broker complicates stuff though...) to ensure it can dynamically "surface" internal APIs via Kubernetes
 
 ### Executive Service
 - **Responsibilies**
-  - **Task Distribution**: Actuate Flow Service graphs across a network of ubiquia agents towards optimal usage of compute resources
+  - **Task Distribution**: Actuate Flow Service graphs across a network of ubiquia components towards optimal usage of compute resources
 - **API**
-  - **Leader Election**: Synchronize with other executive services across a network of ubiquia agents to do leader election
+  - **Leader Election**: Synchronize with other executive services across a network of ubiquia components to do leader election
 
 ### Learning Service
 - **Responsibilities**
-  - **Update Model Weights**: Allows for an API to update model weights for any LLM agents existing in the ubiquia agent
+  - **Update Model Weights**: Allows for an API to update model weights for any LLM components existing in the ubiquia component
 
 ### Vectorization Service
 - **Responsibilities**
@@ -171,13 +171,13 @@ TODO
         "pollStartedTime": "2022-08-30T21:00:00.000Z",
         "payloadEgressedTime": "2022-08-30T21:00:00.000Z",
     },
-    "inputPayload": "I'm the input payload sent to the agent",
+    "inputPayload": "I'm the input payload sent to the component",
     "inputPayloadStamps": [
       {
         "filename": "abc.xyz"
       }
     ],
-    "outputPayload": "I'm the out payload the agent responded with",
+    "outputPayload": "I'm the out payload the component responded with",
     "outputPayloadStamps": [
       {
         "pet": "dog"
@@ -273,18 +273,18 @@ TODO
 ### Scalability
 
 - **Autoscaling**: Kubernetes Horizontal Pod Autoscaler (HPA) scales ubiquia core microservices based on CPU and custom Prometheus metrics (e.g., request latency, queue depth).
-- **In-Transit Compute**: Executive Service will autoscale agents of Flow Service DAG's across ubiquia agents depending on available compute resources and edge requirements (e.g., processing large binaries via edge sensors.)
+- **In-Transit Compute**: Executive Service will autoscale components of Flow Service DAG's across ubiquia components depending on available compute resources and edge requirements (e.g., processing large binaries via edge sensors.)
 - **Database Connection Pooling**: Hikari in Spring Boot is used to manage database connection pooling to prevent overload under high concurrency.
 - **Inbox/Outbox Queue Design**: Messages flowing over Flow Service DAG's can be treated as queue, where messages can be popped faster or slower depending on compute requirements.
 - **Rate Limiting**: API Gateway enforces rate limits per user to protect backend services.
-- **Agent Weights**: Ubiquia instances will be configurable with different "weights" (e.g., light, heavy, etc.) so that heterogenous agents of a cluster can be run across anything between edge devices and the cloud.
+- **Agent Weights**: Ubiquia instances will be configurable with different "weights" (e.g., light, heavy, etc.) so that heterogenous components of a cluster can be run across anything between edge devices and the cloud.
 
 ### Resilience
 
 - **Retry Policy**: HTTP/gRPC calls to internal services use exponential backoff with jitter and a maximum retry budget.
 - **Timeouts**: All outbound requests have defined timeouts (e.g., 2s for internal calls, 5s for external).
 - **Pod Disruption Budgets**: Ensures a minimum number of replicas remain available during rolling updates or node drains.
-- **Operator Notifications**: Production agents will leverage Grafana towards sending notifications to operators when the system changes.
+- **Operator Notifications**: Production components will leverage Grafana towards sending notifications to operators when the system changes.
 
 ## Security
 
@@ -363,7 +363,7 @@ Grafana is the central dashboarding and observability platform for this service.
 
 The system will be deployed to a Kubernetes cluster using Helm as the package manager. Each microservice (e.g., Auth Service, Flow Service, Belief State) will have its own Helm chart or will be bundled into a single Helm umbrella chart for the system.
 
-Deployments target three environments: **dev**, **staging**, and **production**. CI/CD pipelines automate deployments using Helm with GitOps-style promotion. Override values for each will be denoted, as will several "weight configurations" for a given ubiquia agent (e.g., "featherweight", "lightweight", "heavyweight", etc.)
+Deployments target three environments: **dev**, **staging**, and **production**. CI/CD pipelines automate deployments using Helm with GitOps-style promotion. Override values for each will be denoted, as will several "weight configurations" for a given ubiquia component (e.g., "featherweight", "lightweight", "heavyweight", etc.)
 
 ---
 
@@ -421,8 +421,8 @@ helm/
 
 **Cons:**
 - Significant coordination overhead across diverse runtimes.
-- Testing and debugging multi-type agents is more complex.
-- Requires detailed domain schema validation to maintain type safety across agents.
+- Testing and debugging multi-type components is more complex.
+- Requires detailed domain schema validation to maintain type safety across components.
 
 ---
 
@@ -431,12 +431,12 @@ helm/
 **Pros:**
 - Helm provides repeatable, environment-specific deployments.
 - Kubernetes supports horizontal scaling and resilient runtime orchestration.
-- Helm values system enables “agent weight” tuning for flexible resource targeting.
+- Helm values system enables “component weight” tuning for flexible resource targeting.
 
 **Cons:**
 - Helm charts can become hard to manage at scale, especially across highly dynamic DAGs.
 - Kubernetes environments vary widely (e.g., KIND vs EKS), making edge deployments tricky.
-- Requires deeper Kubernetes expertise for agent developers and ops teams.
+- Requires deeper Kubernetes expertise for component developers and ops teams.
 
 ---
 
@@ -458,7 +458,7 @@ helm/
 
 **Pros:**
 - Lightweight and fast approximate nearest-neighbor search engine.
-- Simple integration with LLM agents for memory, search, and context caching.
+- Simple integration with LLM components for memory, search, and context caching.
 - Useful for RLHF and prompt optimization strategies.
 
 **Cons:**
@@ -472,7 +472,7 @@ helm/
 
 **Pros:**
 - DAGs can be authored and deployed at runtime without needing redeploys.
-- Enables dynamic agent and adapter instantiation based on load and mission profile.
+- Enables dynamic component and adapter instantiation based on load and mission profile.
 - Backpressure system allows compute-aware routing and rebalancing.
 
 **Cons:**

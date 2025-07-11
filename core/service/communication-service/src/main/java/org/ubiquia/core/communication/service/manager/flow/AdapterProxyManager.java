@@ -36,11 +36,11 @@ public class AdapterProxyManager {
 
         for (var adapter : adaptersToProxy) {
 
-            var adapterName = adapter.getAdapterName().toLowerCase();
+            var adapterName = adapter.getName().toLowerCase();
             if (!this.proxiedAdapterEndpoints.containsKey(adapterName)) {
-                logger.info("Registering proxy for adapter: {}", adapter.getAdapterName());
+                logger.info("Registering proxy for adapter: {}", adapter.getName());
                 var endpoint = this.adapterEndpointRecordBuilder.getBasePathFor(
-                    graph.getGraphName(),
+                    graph.getName(),
                     adapterName);
                 logger.info("...proxying base url: {}", endpoint);
                 this.proxiedAdapterEndpoints.put(
@@ -61,10 +61,10 @@ public class AdapterProxyManager {
 
         for (var adapter : adaptersToUnproxy) {
 
-            if (this.proxiedAdapterEndpoints.containsKey(adapter.getAdapterName())) {
+            if (this.proxiedAdapterEndpoints.containsKey(adapter.getName())) {
                 logger.info("...unproxying endpoints for adapter {}...",
-                    adapter.getAdapterName());
-                this.proxiedAdapterEndpoints.remove(adapter.getAdapterName());
+                    adapter.getName());
+                this.proxiedAdapterEndpoints.remove(adapter.getName());
             }
         }
     }

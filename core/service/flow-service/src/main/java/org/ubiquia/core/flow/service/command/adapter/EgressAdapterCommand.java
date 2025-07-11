@@ -31,10 +31,10 @@ public class EgressAdapterCommand implements InterfaceLogger {
     private static final Logger logger = LoggerFactory.getLogger(EgressAdapterCommand.class);
 
     @Autowired
-    private AdapterPutToAgentCommand adapterPutToAgentCommand;
+    private AdapterPutToComponentCommand adapterPutToComponentCommand;
 
     @Autowired
-    private AdapterPostToAgentCommand adapterPostToAgentCommand;
+    private AdapterPostToComponentCommand adapterPostToComponentCommand;
 
     @Autowired
     private AdapterPayloadOrchestrator adapterPayloadOrchestrator;
@@ -100,7 +100,7 @@ public class EgressAdapterCommand implements InterfaceLogger {
         switch (adapter.getAdapterContext().getEgressSettings().getHttpOutputType()) {
 
             case PUT: {
-                this.adapterPutToAgentCommand.tryPutPayloadToAgentSynchronously(
+                this.adapterPutToComponentCommand.tryPutPayloadToComponentSynchronously(
                     flowEventEntity,
                     adapter,
                     inputPayload);
@@ -108,7 +108,7 @@ public class EgressAdapterCommand implements InterfaceLogger {
             break;
 
             case POST: {
-                this.adapterPostToAgentCommand.tryPostPayloadToAgentSynchronously(
+                this.adapterPostToComponentCommand.tryPostPayloadToComponentSynchronously(
                     flowEventEntity,
                     adapter,
                     inputPayload);

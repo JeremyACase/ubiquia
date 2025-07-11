@@ -110,7 +110,7 @@ public class PayloadModelValidator {
                     throw new RuntimeException("ERROR: Cannot find subschema named  '"
                         + adapterEntity.getOutputSubSchema().getModelName()
                         + "' in domain ontology named '"
-                        + adapterEntity.getAgent().getGraph().getAgentCommunicationLanguage().getDomain()
+                        + adapterEntity.getComponent().getGraph().getAgentCommunicationLanguage().getDomain()
                         + "'!");
                 }
                 var jsonSubSchema = schema.getSubSchemas().get(match.get());
@@ -167,7 +167,7 @@ public class PayloadModelValidator {
                 throw new RuntimeException("ERROR: Cannot find subschema named  '"
                     + entity.getOutputSubSchema().getModelName()
                     + "' in domain ontology named '"
-                    + entity.getAgent().getGraph().getAgentCommunicationLanguage().getDomain()
+                    + entity.getComponent().getGraph().getAgentCommunicationLanguage().getDomain()
                     + "'!");
             }
 

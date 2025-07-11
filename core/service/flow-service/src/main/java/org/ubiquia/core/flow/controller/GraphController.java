@@ -21,18 +21,17 @@ import org.ubiquia.common.library.dao.component.EntityDao;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
-import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.common.library.config.UbiquiaAgentConfig;
 import org.ubiquia.core.flow.repository.AdapterRepository;
-import org.ubiquia.core.flow.repository.AgentRepository;
+import org.ubiquia.core.flow.repository.ComponentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.repository.UbiquiaAgentRepository;
 import org.ubiquia.core.flow.service.finder.GraphFinder;
 import org.ubiquia.core.flow.service.finder.UbiquiaAgentFinder;
-import org.ubiquia.core.flow.service.k8s.AgentOperator;
+import org.ubiquia.core.flow.service.k8s.ComponentOperator;
 import org.ubiquia.core.flow.service.manager.AdapterManager;
-import org.ubiquia.core.flow.service.manager.AgentManager;
+import org.ubiquia.core.flow.service.manager.ComponentManager;
 import org.ubiquia.core.flow.service.mapper.GraphDtoMapper;
 import org.ubiquia.core.flow.service.registrar.GraphRegistrar;
 
@@ -46,16 +45,16 @@ public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Gr
     private AdapterManager adapterManager;
 
     @Autowired(required = false)
-    private AgentOperator agentOperator;
+    private ComponentOperator componentOperator;
 
     @Autowired
     private AdapterRepository adapterRepository;
 
     @Autowired
-    private AgentManager agentManager;
+    private ComponentManager componentManager;
 
     @Autowired
-    private AgentRepository agentRepository;
+    private ComponentRepository componentRepository;
 
     @Autowired
     private EntityDao<GraphEntity> entityDao;
@@ -113,7 +112,7 @@ public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Gr
         } else {
             response = ResponseEntity.status(HttpStatus.OK).body(record.get().getId());
             this.adapterRepository.deleteAll(record.get().getAdapters());
-            this.agentRepository.deleteAll(record.get().getAgents());
+            this.componentRepository.deleteAll(record.get().getComponents());
             this.graphRepository.delete(record.get());
         }
         return response;
@@ -166,7 +165,7 @@ public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Gr
 
         var version = deployment.getVersion();
         var record = this.graphRepository
-            .findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatchAndUbiquiaAgentsDeployingGraphId(
+            .findByNameAndVersionMajorAndVersionMinorAndVersionPatchAndUbiquiaAgentsDeployingGraphId(
                 deployment.getName(),
                 version.getMajor(),
                 version.getMinor(),
@@ -200,7 +199,7 @@ public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Gr
         ubiquiaAgentEntity.getDeployedGraphs().add(graphRecord.get());
         this.ubiquiaAgentRepository.save(ubiquiaAgentEntity);
 
-        this.agentManager.tryDeployAgentsFor(deployment);
+        this.componentManager.tryDeployComponentsFor(deployment);
         this.adapterManager.tryDeployAdaptersFor(deployment);
     }
 
@@ -224,10 +223,10 @@ public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Gr
         } else {
             this.adapterManager.tearDownAdaptersFor(deployment);
 
-            if (Objects.nonNull(this.agentOperator)) {
+            if (Objects.nonNull(this.componentOperator)) {
                 this.getLogger().info("...running in kubernetes; attempting to tear down any of the graph's "
                     + " resources deployed in Kubernetes...");
-                this.agentOperator.deleteGraphResources(deployment.getName());
+                this.componentOperator.deleteGraphResources(deployment.getName());
             }
 
             var ubiquiaAgentRecord = this.ubiquiaAgentFinder.findAgentFor(deployment);

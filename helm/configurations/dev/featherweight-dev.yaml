@@ -1,3 +1,6 @@
+logging:
+  ubiquia: DEBUG
+
 ubiquia:
   cluster:
   agent:

@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
-import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.repository.GraphRepository;
@@ -49,7 +48,7 @@ public class AdapterManager {
 
         var graphRecord = this
             .graphRepository
-            .findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatch(
+            .findByNameAndVersionMajorAndVersionMinorAndVersionPatch(
                 graphDeployment.getName(),
                 graphDeployment.getVersion().getMajor(),
                 graphDeployment.getVersion().getMinor(),
@@ -60,11 +59,11 @@ public class AdapterManager {
         }
         var graphEntity = graphRecord.get();
 
-        this.tryDeployAdaptersAttachedToAgentsFor(graphEntity, graphDeployment);
-        this.tryDeployAgentlessAdaptersFor(graphEntity, graphDeployment);
+        this.tryDeployAdaptersAttachedToComponentsFor(graphEntity, graphDeployment);
+        this.tryDeployComponentlessAdaptersFor(graphEntity, graphDeployment);
 
         logger.info("...completed deploying adapters for graph named {}.",
-            graphEntity.getGraphName());
+            graphEntity.getName());
     }
 
     /**
@@ -91,7 +90,7 @@ public class AdapterManager {
             deployment.getVersion());
 
         var graphRecord = this.graphRepository
-            .findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatch(
+            .findByNameAndVersionMajorAndVersionMinorAndVersionPatch(
                 deployment.getName(),
                 deployment.getVersion().getMajor(),
                 deployment.getVersion().getMinor(),
@@ -102,11 +101,11 @@ public class AdapterManager {
                 var graphEntity = graphRecord.get();
                 for (var adapterEntity : graphEntity.getAdapters()) {
                     var adapter = this.adapterMap
-                        .get(graphEntity.getGraphName())
+                        .get(graphEntity.getName())
                         .get(adapterEntity.getId());
 
                     this.adapterMap
-                        .get(graphEntity.getGraphName())
+                        .get(graphEntity.getName())
                         .remove(adapterEntity.getId());
 
                     this.adapterManagerCommand.tearDown(adapter);
@@ -129,28 +128,28 @@ public class AdapterManager {
     }
 
     /**
-     * A method that will deploy adapters for a graph that are attached to agents.
+     * A method that will deploy adapters for a graph that are attached to components.
      *
      * @param graphEntity The graph to deploy adapters for.
      * @throws Exception Any exceptions from attempting to deploy adapters.
      */
-    private void tryDeployAdaptersAttachedToAgentsFor(
+    private void tryDeployAdaptersAttachedToComponentsFor(
         final GraphEntity graphEntity,
         final GraphDeployment graphDeployment)
         throws Exception {
-        logger.info("...deploying adapters attached to agents...");
-        var graphName = graphEntity.getGraphName();
-        for (var agentEntity : graphEntity.getAgents()) {
-            if (Objects.nonNull(agentEntity.getAdapter())) {
+        logger.info("...deploying adapters attached to components...");
+        var graphName = graphEntity.getName();
+        for (var componentEntity : graphEntity.getComponents()) {
+            if (Objects.nonNull(componentEntity.getAdapter())) {
                 if (this.adapterMap.containsKey(graphName)
                     && this.adapterMap.get(graphName).containsKey(
-                    agentEntity.getAdapter().getId())) {
-                    logger.warn("WARNING: Adapter for graph {} and agent {} is "
+                    componentEntity.getAdapter().getId())) {
+                    logger.warn("WARNING: Adapter for graph {} and component {} is "
                             + "already deployed; not deploying another adapter...",
                         graphName,
-                        agentEntity.getAgentName());
+                        componentEntity.getName());
                 } else {
-                    var adapter = this.adapterFactory.makeAdapterFor(agentEntity, graphDeployment);
+                    var adapter = this.adapterFactory.makeAdapterFor(componentEntity, graphDeployment);
                     if (!this.adapterMap.containsKey(graphName)) {
                         this.adapterMap.put(graphName, new HashMap<>());
                     }
@@ -159,9 +158,9 @@ public class AdapterManager {
                         .put(adapter.getAdapterContext().getAdapterId(), adapter);
                 }
             } else {
-                logger.info("...agent {} is a disjointed agent; "
+                logger.info("...component {} is a disjointed component; "
                         + "not deploying an adapter...",
-                    agentEntity.getAgentName());
+                    componentEntity.getName());
             }
         }
     }
@@ -172,22 +171,22 @@ public class AdapterManager {
      * @param graphEntity The graph to deploy adapters for.
      * @throws Exception Exceptions from attempting to deploy the adapters.
      */
-    private void tryDeployAgentlessAdaptersFor(
+    private void tryDeployComponentlessAdaptersFor(
         final GraphEntity graphEntity,
         final GraphDeployment graphDeployment)
         throws Exception {
-        logger.info("...deploying adapters that are not attached to agents...");
+        logger.info("...deploying adapters that are not attached to components...");
 
         for (var adapterEntity : graphEntity.getAdapters()) {
 
-            if (Objects.isNull(adapterEntity.getAgent())) {
-                if (this.adapterMap.containsKey(graphEntity.getGraphName())
-                    && this.adapterMap.get(graphEntity.getGraphName())
+            if (Objects.isNull(adapterEntity.getComponent())) {
+                if (this.adapterMap.containsKey(graphEntity.getName())
+                    && this.adapterMap.get(graphEntity.getName())
                     .containsKey(adapterEntity.getId())) {
                     logger.warn("WARNING: {} for graph {} is "
                             + "already deployed; not deploying another adapter...",
-                        adapterEntity.getAdapterName(),
-                        graphEntity.getGraphName());
+                        adapterEntity.getName(),
+                        graphEntity.getName());
                 } else {
 
                     var adapter = this.adapterFactory.makeAdapterFor(
@@ -195,12 +194,12 @@ public class AdapterManager {
                         graphEntity,
                         graphDeployment);
 
-                    if (!this.adapterMap.containsKey(graphEntity.getGraphName())) {
-                        this.adapterMap.put(graphEntity.getGraphName(), new HashMap<>());
+                    if (!this.adapterMap.containsKey(graphEntity.getName())) {
+                        this.adapterMap.put(graphEntity.getName(), new HashMap<>());
                     }
 
                     this.adapterMap
-                        .get(graphEntity.getGraphName())
+                        .get(graphEntity.getName())
                         .put(adapter.getAdapterContext().getAdapterId(), adapter);
                 }
             }

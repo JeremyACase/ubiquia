@@ -8,7 +8,7 @@ import org.ubiquia.common.model.ubiquia.enums.AdapterType;
 
 public class Adapter extends AbstractModel {
 
-    private String adapterName;
+    private String name;
 
     private AdapterSettings adapterSettings;
 
@@ -18,7 +18,7 @@ public class Adapter extends AbstractModel {
 
     private BrokerSettings brokerSettings;
 
-    private Agent agent;
+    private Component component;
 
     private CommunicationServiceSettings communicationServiceSettings;
 
@@ -42,12 +42,12 @@ public class Adapter extends AbstractModel {
 
     private List<Adapter> downstreamAdapters;
 
-    public Agent getAgent() {
-        return agent;
+    public Component getComponent() {
+        return component;
     }
 
-    public void setAgent(Agent agent) {
-        this.agent = agent;
+    public void setComponent(Component component) {
+        this.component = component;
     }
 
     public String getDescription() {
@@ -132,12 +132,12 @@ public class Adapter extends AbstractModel {
     }
 
     @NotNull
-    public String getAdapterName() {
-        return adapterName;
+    public String getName() {
+        return name;
     }
 
-    public void setAdapterName(String adapterName) {
-        this.adapterName = adapterName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public AdapterSettings getAdapterSettings() {

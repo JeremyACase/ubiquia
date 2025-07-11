@@ -55,8 +55,8 @@ public class PollAdapterTest {
     public void assertPollsEndpoint_isValid() throws Exception {
         var graph = this.dummyFactory.generateGraph();
 
-        var pollAgent = this.dummyFactory.generateAgent();
-        graph.getAgents().add(pollAgent);
+        var pollComponent = this.dummyFactory.generateComponent();
+        graph.getComponents().add(pollComponent);
 
         var pollAdapter = this.dummyFactory.generateAdapter();
         pollAdapter.setAdapterType(AdapterType.POLL);
@@ -66,11 +66,11 @@ public class PollAdapterTest {
         pollAdapter.setPollSettings(new PollSettings());
         pollAdapter.getPollSettings().setPollFrequencyInMilliseconds(1000L);
         pollAdapter.getPollSettings().setPollEndpoint("http://localhost:8080/test");
-        pollAgent.setAdapter(pollAdapter);
+        pollComponent.setAdapter(pollAdapter);
 
         this.graphController.register(graph);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getGraphName());
+        deployment.setName(graph.getName());
         deployment.setVersion(graph.getVersion());
         this.graphController.tryDeployGraph(deployment);
 

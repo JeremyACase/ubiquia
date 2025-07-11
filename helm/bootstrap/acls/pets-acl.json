@@ -39,11 +39,10 @@
         "description": "A base model.",
         "type": "object",
         "properties": {
-          "modelVersion": {
+          "info": {
             "type": "string",
-            "pattern": "^([0-9]+\\.){2}(\\*|[0-9]+)(-.*)?",
-            "default": "1.2.3",
-            "readOnly": true
+            "maxLength": 100,
+            "default": "Just some info about this model."
           }
         }
       },

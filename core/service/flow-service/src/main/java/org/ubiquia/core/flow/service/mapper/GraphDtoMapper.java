@@ -17,7 +17,7 @@ public class GraphDtoMapper extends GenericDtoMapper<GraphEntity, Graph> {
     private AdapterDtoMapper adapterDtoMapper;
 
     @Autowired
-    private AgentDtoMapper agentDtoMapper;
+    private ComponentDtoMapper componentDtoMapper;
 
     @Override
     public Graph map(final GraphEntity from) throws JsonProcessingException {
@@ -30,14 +30,14 @@ public class GraphDtoMapper extends GenericDtoMapper<GraphEntity, Graph> {
             to.setAuthor(from.getAuthor());
             to.setCapabilities(from.getCapabilities());
             to.setDescription(from.getDescription());
-            to.setGraphName(from.getGraphName());
+            to.setName(from.getName());
             to.setVersion(from.getVersion());
 
             to.setAgentCommunicationLanguage(new NameAndVersionPair());
             to.getAgentCommunicationLanguage().setName(from.getAgentCommunicationLanguage().getDomain());
             to.getAgentCommunicationLanguage().setVersion(from.getAgentCommunicationLanguage().getVersion());
 
-            to.setAgents(this.agentDtoMapper.map(from.getAgents()));
+            to.setComponents(this.componentDtoMapper.map(from.getComponents()));
             to.setAdapters(this.adapterDtoMapper.map(from.getAdapters()));
         }
 

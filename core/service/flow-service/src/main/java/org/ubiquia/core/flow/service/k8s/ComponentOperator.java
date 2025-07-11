@@ -20,11 +20,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.Agent;
-import org.ubiquia.core.flow.service.builder.AgentDeploymentBuilder;
+import org.ubiquia.common.model.ubiquia.dto.Component;
+import org.ubiquia.core.flow.service.builder.ComponentDeploymentBuilder;
 
 /**
- * This is a service that will deploy and tear down agents by communicating with the
+ * This is a service that will deploy and tear down componnets by communicating with the
  * Kubernetes API server.
  */
 @ConditionalOnProperty(
@@ -33,15 +33,15 @@ import org.ubiquia.core.flow.service.builder.AgentDeploymentBuilder;
     matchIfMissing = false
 )
 @Service
-public class AgentOperator {
+public class ComponentOperator {
 
-    private static final Logger logger = LoggerFactory.getLogger(AgentOperator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ComponentOperator.class);
     private final Integer maxDeploymentRetries = 10;
     private V1Deployment ubiquiaDeployment;
     private ApiClient apiClient;
     private GenericKubernetesApi<V1ConfigMap, V1ConfigMapList> configMapClient;
     @Autowired
-    private AgentDeploymentBuilder agentDeploymentBuilder;
+    private ComponentDeploymentBuilder componentDeploymentBuilder;
     private GenericKubernetesApi<V1Deployment, V1DeploymentList> deploymentClient;
     private Integer deploymentRetries = 0;
     @Value("${ubiquia.kubernetes.namespace}")
@@ -80,7 +80,7 @@ public class AgentOperator {
             "services",
             apiClient);
         this.tryCacheUbiquiaDeploymentFromKubernetes();
-        this.agentDeploymentBuilder.setUbiquiaDeployment(this.ubiquiaDeployment);
+        this.componentDeploymentBuilder.setUbiquiaDeployment(this.ubiquiaDeployment);
         this.initializeDeploymentUpdateInformer();
         logger.info("...Kubernetes client connection initialized.");
     }
@@ -176,23 +176,23 @@ public class AgentOperator {
         factory.startAllRegisteredInformers();
     }
 
-    public void tryDeployAgent(final Agent agent)
+    public void tryDeployComponent(final Component component)
         throws JsonProcessingException {
 
-        logger.info("Trying to deploy an agent for with name {} for graph {}...",
-            agent.getAgentName(),
-            agent.getGraph().getGraphName());
+        logger.info("Trying to deploy an component for with name {} for graph {}...",
+            component.getName(),
+            component.getGraph().getName());
 
         var currentDeployment = this.deploymentClient.get(
             this.namespace,
-            agent.getAgentName().toLowerCase());
+            component.getName().toLowerCase());
 
         if (Objects.isNull(currentDeployment.getObject())) {
             logger.info("...no current deployment exists, attempting to deploy...");
 
             var deployment = this
-                .agentDeploymentBuilder
-                .buildDeploymentFrom(agent);
+                .componentDeploymentBuilder
+                .buildDeploymentFrom(component);
             logger.debug("...deploying deployment: {}...",
                 this.objectMapper.writeValueAsString(deployment));
             var deploymentResponse = this.deploymentClient.create(
@@ -209,7 +209,7 @@ public class AgentOperator {
                     deploymentResponse.getHttpStatusCode());
             }
 
-            var service = this.agentDeploymentBuilder.buildServiceFrom(agent);
+            var service = this.componentDeploymentBuilder.buildServiceFrom(component);
             logger.debug("...deploying service: {}...",
                 this.objectMapper.writeValueAsString(service));
             var serviceResponse = this.serviceClient.create(
@@ -226,10 +226,10 @@ public class AgentOperator {
             }
 
             var configMap = this
-                .agentDeploymentBuilder
-                .tryBuildConfigMapFrom(agent);
+                .componentDeploymentBuilder
+                .tryBuildConfigMapFrom(component);
             if (Objects.nonNull(configMap)) {
-                logger.info("...found a configmap for agent; attempting to deploy...");
+                logger.info("...found a configmap for component; attempting to deploy...");
                 var configMapResponse = this.configMapClient.create(
                     this.namespace,
                     configMap,
@@ -246,7 +246,7 @@ public class AgentOperator {
 
             logger.info("...completed deployment...");
         } else {
-            logger.info("...deployment found for that agent and graph; not deploying...");
+            logger.info("...deployment found for that component and graph; not deploying...");
         }
     }
 

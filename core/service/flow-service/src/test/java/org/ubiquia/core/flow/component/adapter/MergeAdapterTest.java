@@ -20,7 +20,7 @@ import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.AdapterType;
-import org.ubiquia.common.model.ubiquia.enums.AgentType;
+import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.common.model.ubiquia.enums.HttpOutputType;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.controller.GraphController;
@@ -67,16 +67,16 @@ public class MergeAdapterTest {
     public void assertPOSTsPayload_isValid() throws Exception {
         var graph = this.dummyFactory.generateGraph();
 
-        var ingressAgent = this.dummyFactory.generateAgent();
-        var hiddenAgentOne = this.dummyFactory.generateAgent();
-        var mergeAgent = this.dummyFactory.generateAgent();
-        mergeAgent.setAgentType(AgentType.NONE);
-        graph.getAgents().add(ingressAgent);
-        graph.getAgents().add(hiddenAgentOne);
+        var ingressComponent = this.dummyFactory.generateComponent();
+        var hiddenComponentOne = this.dummyFactory.generateComponent();
+        var mergeComponent = this.dummyFactory.generateComponent();
+        mergeComponent.setComponentType(ComponentType.NONE);
+        graph.getComponents().add(ingressComponent);
+        graph.getComponents().add(hiddenComponentOne);
 
-        var hiddenAgentTwo = this.dummyFactory.generateAgent();
-        graph.getAgents().add(hiddenAgentTwo);
-        graph.getAgents().add(mergeAgent);
+        var hiddenComponentTwo = this.dummyFactory.generateComponent();
+        graph.getComponents().add(hiddenComponentTwo);
+        graph.getComponents().add(mergeComponent);
 
         var ingressAdapter = this.dummyFactory.generateAdapter();
         ingressAdapter.setAdapterType(AdapterType.PUSH);
@@ -102,44 +102,44 @@ public class MergeAdapterTest {
         mergeAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Person"));
         mergeAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("AdoptionTransaction"));
 
-        ingressAgent.setAdapter(ingressAdapter);
-        hiddenAgentOne.setAdapter(hiddenAdapterOne);
-        hiddenAgentTwo.setAdapter(hiddenAdapterTwo);
-        mergeAgent.setAdapter(mergeAdapter);
+        ingressComponent.setAdapter(ingressAdapter);
+        hiddenComponentOne.setAdapter(hiddenAdapterOne);
+        hiddenComponentTwo.setAdapter(hiddenAdapterTwo);
+        mergeComponent.setAdapter(mergeAdapter);
 
         var edgeOne = new GraphEdge();
-        edgeOne.setLeftAdapterName(ingressAdapter.getAdapterName());
+        edgeOne.setLeftAdapterName(ingressAdapter.getName());
         edgeOne.setRightAdapterNames(new ArrayList<>());
-        edgeOne.getRightAdapterNames().add(hiddenAdapterOne.getAdapterName());
-        edgeOne.getRightAdapterNames().add(hiddenAdapterTwo.getAdapterName());
+        edgeOne.getRightAdapterNames().add(hiddenAdapterOne.getName());
+        edgeOne.getRightAdapterNames().add(hiddenAdapterTwo.getName());
         graph.getEdges().add(edgeOne);
 
         var edgeTwo = new GraphEdge();
-        edgeTwo.setLeftAdapterName(hiddenAdapterOne.getAdapterName());
+        edgeTwo.setLeftAdapterName(hiddenAdapterOne.getName());
         edgeTwo.setRightAdapterNames(new ArrayList<>());
-        edgeTwo.getRightAdapterNames().add(mergeAdapter.getAdapterName());
+        edgeTwo.getRightAdapterNames().add(mergeAdapter.getName());
         graph.getEdges().add(edgeTwo);
 
         var edgeThree = new GraphEdge();
-        edgeThree.setLeftAdapterName(hiddenAdapterTwo.getAdapterName());
+        edgeThree.setLeftAdapterName(hiddenAdapterTwo.getName());
         edgeThree.setRightAdapterNames(new ArrayList<>());
-        edgeThree.getRightAdapterNames().add(mergeAdapter.getAdapterName());
+        edgeThree.getRightAdapterNames().add(mergeAdapter.getName());
         graph.getEdges().add(edgeThree);
 
         this.graphController.register(graph);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getGraphName());
+        deployment.setName(graph.getName());
         deployment.setVersion(graph.getVersion());
         this.graphController.tryDeployGraph(deployment);
 
         var pushAdapter = (PushAdapter) this
             .testHelper
-            .findAdapter(ingressAdapter.getAdapterName(), graph.getGraphName());
+            .findAdapter(ingressAdapter.getName(), graph.getName());
         pushAdapter.push("test");
 
         var testAdapter = (MergeAdapter) this
             .testHelper
-            .findAdapter(mergeAdapter.getAdapterName(), graph.getGraphName());
+            .findAdapter(mergeAdapter.getName(), graph.getName());
 
         var adapterContext = testAdapter.getAdapterContext();
         var mockServer = MockRestServiceServer.createServer(this.restTemplate);

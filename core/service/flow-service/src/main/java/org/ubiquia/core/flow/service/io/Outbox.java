@@ -34,17 +34,17 @@ public class Outbox {
     private ObjectMapper objectMapper;
 
     /**
-     * Queue up a response from an agent so that a downstream adapter may
+     * Queue up a response from an component so that a downstream adapter may
      * consume it.
      *
-     * @param flowEventEntity     The event associated with the response.
-     * @param agentResponse The response from the agent.
+     * @param flowEventEntity   The event associated with the response.
+     * @param componentResponse The response from the agent.
      * @throws JsonProcessingException Exceptions from processing payloads.
      */
     @Transactional
-    public void tryQueueAgentResponse(
+    public void tryQueueComponentResponse(
         FlowEventEntity flowEventEntity,
-        final String agentResponse) {
+        final String componentResponse) {
 
         logger.debug("Received an event with ID {} to queue up for outbox...",
             flowEventEntity.getId());
@@ -57,10 +57,10 @@ public class Outbox {
             for (var adapter : targetAdapterRecord.get().getDownstreamAdapters()) {
                 logger.debug("Creating an outbox message for event id {} for target adapter {}",
                     flowEventEntity.getId(),
-                    adapter.getAdapterName());
+                    adapter.getName());
                 var message = new FlowMessageEntity();
                 message.setFlowEvent(flowEventEntity);
-                message.setPayload(agentResponse);
+                message.setPayload(componentResponse);
                 message.setTags(new HashSet<>());
                 message.setTargetAdapter(adapter);
                 message = this.flowMessageRepository.save(message);

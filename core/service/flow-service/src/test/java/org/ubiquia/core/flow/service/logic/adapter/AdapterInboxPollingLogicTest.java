@@ -60,7 +60,7 @@ public class AdapterInboxPollingLogicTest {
         var adapterContext = new AdapterContext();
         adapter.setAdapterContext(adapterContext);
         adapterContext.setAdapterType(AdapterType.HIDDEN);
-        adapterContext.setTemplateAgent(true);
+        adapterContext.setTemplateComponent(true);
 
         var valid = this.adapterInboxPollingLogic.isValidToPollInbox(adapter);
         Assertions.assertTrue(valid);
@@ -73,7 +73,7 @@ public class AdapterInboxPollingLogicTest {
         adapter.setAdapterContext(adapterContext);
         adapterContext.setEgressSettings(new EgressSettings());
         adapterContext.setAdapterType(AdapterType.EGRESS);
-        adapterContext.setTemplateAgent(false);
+        adapterContext.setTemplateComponent(false);
 
         var valid = this.adapterInboxPollingLogic.isValidToPollInbox(adapter);
         Assertions.assertTrue(valid);
@@ -86,7 +86,7 @@ public class AdapterInboxPollingLogicTest {
         adapter.setAdapterContext(adapterContext);
         adapterContext.setEgressSettings(new EgressSettings());
         adapterContext.setAdapterType(AdapterType.EGRESS);
-        adapterContext.setTemplateAgent(false);
+        adapterContext.setTemplateComponent(false);
         ReflectionTestUtils.setField(adapterContext, "openMessages", 100);
 
         var valid = this.adapterInboxPollingLogic.isValidToPollInbox(adapter);
@@ -98,10 +98,10 @@ public class AdapterInboxPollingLogicTest {
 
         var graph = this.dummyFactory.generateGraph();
 
-        var ingressAgent = this.dummyFactory.generateAgent();
-        var hiddenAgent = this.dummyFactory.generateAgent();
-        graph.getAgents().add(ingressAgent);
-        graph.getAgents().add(hiddenAgent);
+        var ingressComponent = this.dummyFactory.generateComponent();
+        var hiddenComponent = this.dummyFactory.generateComponent();
+        graph.getComponents().add(ingressComponent);
+        graph.getComponents().add(hiddenComponent);
 
         var ingressAdapter = this.dummyFactory.generateAdapter();
         ingressAdapter.setAdapterType(AdapterType.PUSH);
@@ -109,31 +109,31 @@ public class AdapterInboxPollingLogicTest {
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressAdapter.getInputSubSchemas().add(subSchema);
         ingressAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-        ingressAgent.setAdapter(ingressAdapter);
+        ingressComponent.setAdapter(ingressAdapter);
 
         var hiddenAdapter = this.dummyFactory.generateAdapter();
         hiddenAdapter.setAdapterType(AdapterType.HIDDEN);
         hiddenAdapter.setEndpoint("http://localhost:8080/test");
         hiddenAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
-        hiddenAgent.setAdapter(hiddenAdapter);
+        hiddenComponent.setAdapter(hiddenAdapter);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getAdapterName());
+        edge.setLeftAdapterName(ingressAdapter.getName());
         edge.setRightAdapterNames(new ArrayList<>());
-        edge.getRightAdapterNames().add(hiddenAdapter.getAdapterName());
+        edge.getRightAdapterNames().add(hiddenAdapter.getName());
         graph.getEdges().add(edge);
 
         this.graphController.register(graph);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getGraphName());
+        deployment.setName(graph.getName());
         deployment.setVersion(graph.getVersion());
         this.graphController.tryDeployGraph(deployment);
 
         var adapter = this.testHelper.findAdapter(
-            hiddenAdapter.getAdapterName(),
-            graph.getGraphName());
+            hiddenAdapter.getName(),
+            graph.getName());
 
-        adapter.getAdapterContext().setTemplateAgent(false);
+        adapter.getAdapterContext().setTemplateComponent(false);
 
         var valid = this.adapterInboxPollingLogic.isValidToPollInbox(adapter);
         Assertions.assertTrue(valid);
@@ -144,42 +144,42 @@ public class AdapterInboxPollingLogicTest {
 
         var graph = this.dummyFactory.generateGraph();
 
-        var ingressAgent = this.dummyFactory.generateAgent();
-        var hiddenAgent = this.dummyFactory.generateAgent();
-        graph.getAgents().add(ingressAgent);
-        graph.getAgents().add(hiddenAgent);
+        var ingressComponent = this.dummyFactory.generateComponent();
+        var hiddenComponent = this.dummyFactory.generateComponent();
+        graph.getComponents().add(ingressComponent);
+        graph.getComponents().add(hiddenComponent);
 
         var ingressAdapter = this.dummyFactory.generateAdapter();
         ingressAdapter.setAdapterType(AdapterType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressAdapter.getInputSubSchemas().add(subSchema);
         ingressAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-        ingressAgent.setAdapter(ingressAdapter);
+        ingressComponent.setAdapter(ingressAdapter);
 
         var hiddenAdapter = this.dummyFactory.generateAdapter();
         hiddenAdapter.setAdapterType(AdapterType.HIDDEN);
         hiddenAdapter.setEndpoint("http://localhost:8080/test");
         hiddenAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
-        hiddenAgent.setAdapter(hiddenAdapter);
+        hiddenComponent.setAdapter(hiddenAdapter);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getAdapterName());
+        edge.setLeftAdapterName(ingressAdapter.getName());
         edge.setRightAdapterNames(new ArrayList<>());
-        edge.getRightAdapterNames().add(hiddenAdapter.getAdapterName());
+        edge.getRightAdapterNames().add(hiddenAdapter.getName());
         graph.getEdges().add(edge);
 
         this.graphController.register(graph);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getGraphName());
+        deployment.setName(graph.getName());
         deployment.setVersion(graph.getVersion());
         this.graphController.tryDeployGraph(deployment);
 
         var adapter = this.testHelper.findAdapter(
-            hiddenAdapter.getAdapterName(),
-            graph.getGraphName());
+            hiddenAdapter.getName(),
+            graph.getName());
 
         var adapterContext = adapter.getAdapterContext();
-        adapterContext.setTemplateAgent(false);
+        adapterContext.setTemplateComponent(false);
         ReflectionTestUtils.setField(adapterContext, "openMessages", 100);
 
         var valid = this.adapterInboxPollingLogic.isValidToPollInbox(adapter);

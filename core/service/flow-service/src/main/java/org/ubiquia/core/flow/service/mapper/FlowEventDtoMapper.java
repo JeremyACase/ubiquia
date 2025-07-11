@@ -89,7 +89,7 @@ public class FlowEventDtoMapper extends GenericDtoMapper<FlowEventEntity, FlowEv
                 to.getOutputPayloadStamps().add(kvp);
             }
             var adapter = new Adapter();
-            adapter.setAdapterName(from.getAdapter().getAdapterName());
+            adapter.setName(from.getAdapter().getName());
             adapter.setAdapterType(from.getAdapter().getAdapterType());
 
             to.setAdapter(adapter);
@@ -107,8 +107,8 @@ public class FlowEventDtoMapper extends GenericDtoMapper<FlowEventEntity, FlowEv
     private void setFlowEventTimes(final FlowEventEntity from, FlowEvent to) {
         var toFlowEventTimes = new FlowEventTimes();
         var fromFlowEventTimes = from.getFlowEventTimes();
-        toFlowEventTimes.setAgentResponseTime(
-            fromFlowEventTimes.getAgentResponseTime());
+        toFlowEventTimes.setComponentResponseTime(
+            fromFlowEventTimes.getComponentResponseTime());
         toFlowEventTimes.setEgressResponseReceivedTime(
             fromFlowEventTimes.getEgressResponseReceivedTime());
         toFlowEventTimes.setPayloadEgressedTime(

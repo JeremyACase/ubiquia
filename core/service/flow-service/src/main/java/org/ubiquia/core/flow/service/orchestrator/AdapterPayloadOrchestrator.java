@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
-import org.ubiquia.core.flow.service.command.adapter.AdapterPostToAgentCommand;
-import org.ubiquia.core.flow.service.command.adapter.AdapterPutToAgentCommand;
+import org.ubiquia.core.flow.service.command.adapter.AdapterPostToComponentCommand;
+import org.ubiquia.core.flow.service.command.adapter.AdapterPutToComponentCommand;
 import org.ubiquia.core.flow.service.io.Outbox;
-import org.ubiquia.core.flow.service.proxy.TemplateAgentProxy;
+import org.ubiquia.core.flow.service.proxy.TemplateComponentProxy;
 
 /**
  * A service that exposes various methods common to all adapters.
@@ -26,16 +26,16 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
     private static final Logger logger = LoggerFactory.getLogger(AdapterPayloadOrchestrator.class);
 
     @Autowired
-    private AdapterPostToAgentCommand adapterPostToAgentCommand;
+    private AdapterPostToComponentCommand adapterPostToComponentCommand;
 
     @Autowired
-    private AdapterPutToAgentCommand adapterPutToAgentCommand;
+    private AdapterPutToComponentCommand adapterPutToComponentCommand;
 
     @Autowired
     private Outbox outbox;
 
     @Autowired
-    private TemplateAgentProxy templateAgentProxy;
+    private TemplateComponentProxy templateComponentProxy;
 
     public Logger getLogger() {
         return logger;
@@ -52,20 +52,20 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
 
         var adapterContext = adapter.getAdapterContext();
         if (adapterContext.getAdapterSettings().getIsPassthrough()) {
-            this.outbox.tryQueueAgentResponse(
+            this.outbox.tryQueueComponentResponse(
                 flowEventEntity,
                 payload);
-        } else if (adapterContext.getTemplateAgent()) {
-            this.templateAgentProxy.proxyAsAgentFor(flowEventEntity);
+        } else if (adapterContext.getTemplateComponent()) {
+            this.templateComponentProxy.proxyAsComponentFor(flowEventEntity);
         } else {
-            this.trySendInputPayloadToAgent(
+            this.trySendInputPayloadToComponent(
                 flowEventEntity,
                 adapter,
                 payload);
         }
     }
 
-    private void tryPostInputPayloadToAgent(
+    private void tryPostInputPayloadToComponent(
         FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final Object inputPayload)
@@ -79,7 +79,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
         switch (egressSettings.getEgressType()) {
 
             case ASYNCHRONOUS: {
-                this.adapterPostToAgentCommand.tryPostInputToAgentAsynchronously(
+                this.adapterPostToComponentCommand.tryPostInputToComponentAsynchronously(
                     flowEventEntity,
                     adapter,
                     inputPayload);
@@ -87,7 +87,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
             break;
 
             case SYNCHRONOUS: {
-                this.adapterPostToAgentCommand.tryPostPayloadToAgentSynchronously(
+                this.adapterPostToComponentCommand.tryPostPayloadToComponentSynchronously(
                     flowEventEntity,
                     adapter,
                     inputPayload);
@@ -101,7 +101,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
         }
     }
 
-    private void tryPutInputPayloadToAgent(
+    private void tryPutInputPayloadToComponent(
         FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final Object inputPayload)
@@ -114,7 +114,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
         switch (egressSettings.getEgressType()) {
 
             case ASYNCHRONOUS: {
-                this.adapterPutToAgentCommand.tryPutInputToAgentAsynchronously(
+                this.adapterPutToComponentCommand.tryPutInputToComponentAsynchronously(
                     flowEventEntity,
                     adapter,
                     inputPayload);
@@ -122,7 +122,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
             break;
 
             case SYNCHRONOUS: {
-                this.adapterPutToAgentCommand.tryPutPayloadToAgentSynchronously(
+                this.adapterPutToComponentCommand.tryPutPayloadToComponentSynchronously(
                     flowEventEntity,
                     adapter,
                     inputPayload);
@@ -136,7 +136,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
         }
     }
 
-    private void trySendInputPayloadToAgent(
+    private void trySendInputPayloadToComponent(
         FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final Object inputPayload)
@@ -148,12 +148,12 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
         switch (egressSettings.getHttpOutputType()) {
 
             case PUT: {
-                this.tryPutInputPayloadToAgent(flowEventEntity, adapter, inputPayload);
+                this.tryPutInputPayloadToComponent(flowEventEntity, adapter, inputPayload);
             }
             break;
 
             case POST: {
-                this.tryPostInputPayloadToAgent(flowEventEntity, adapter, inputPayload);
+                this.tryPostInputPayloadToComponent(flowEventEntity, adapter, inputPayload);
             }
             break;
 

@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
-import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
+import org.ubiquia.common.model.ubiquia.entity.ComponentEntity;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.common.model.ubiquia.enums.AdapterType;
 import org.ubiquia.core.flow.component.adapter.*;
@@ -43,50 +43,50 @@ public class AdapterFactory {
         throws Exception {
 
         logger.info("...building an adapter named {} for graph {}...",
-            adapterEntity.getAdapterName(),
-            graphEntity.getGraphName());
+            adapterEntity.getName(),
+            graphEntity.getName());
 
         var adapter = this.makeAdapterByType(adapterEntity.getAdapterType());
         this.adapterBuilder.buildAdapter(adapter, adapterEntity, graphEntity, graphDeployment);
 
         logger.info("...completed building adapter {} for graph {}...",
-            adapterEntity.getAdapterName(),
-            adapterEntity.getGraph().getGraphName());
+            adapterEntity.getName(),
+            adapterEntity.getGraph().getName());
         return adapter;
     }
 
     /**
-     * Make an adapter for an agent.
+     * Make an adapter for a component.
      *
-     * @param agentEntity     The agent to make an adapter for.
+     * @param componentEntity The component to make an adapter for.
      * @param graphDeployment The graph deployment requesting the adapter.
      * @return An adapter.
      * @throws Exception Exceptions from building the adapter.
      */
     public AbstractAdapter makeAdapterFor(
-        final AgentEntity agentEntity,
+        final ComponentEntity componentEntity,
         final GraphDeployment graphDeployment)
         throws Exception {
 
-        logger.info("...building an adapter for graph {} and agent {}...",
-            agentEntity.getGraph().getGraphName(),
-            agentEntity.getAgentName());
+        logger.info("...building an adapter for graph {} and component {}...",
+            componentEntity.getGraph().getName(),
+            componentEntity.getName());
 
-        if (Objects.isNull(agentEntity.getAdapter())) {
-            throw new Exception("ERROR: Cannot build an adapter from an agent with "
+        if (Objects.isNull(componentEntity.getAdapter())) {
+            throw new Exception("ERROR: Cannot build an adapter from an component with "
                 + "a null adapter!");
         }
 
-        var adapter = this.makeAdapterByType(agentEntity.getAdapter().getAdapterType());
+        var adapter = this.makeAdapterByType(componentEntity.getAdapter().getAdapterType());
         this.adapterBuilder.buildAdapter(
             adapter,
-            agentEntity.getAdapter(),
-            agentEntity.getGraph(),
+            componentEntity.getAdapter(),
+            componentEntity.getGraph(),
             graphDeployment);
 
-        logger.info("...completed building adapter for graph {} and agent named {}...",
-            agentEntity.getGraph().getGraphName(),
-            agentEntity.getAgentName());
+        logger.info("...completed building adapter for graph {} and component named {}...",
+            componentEntity.getGraph().getName(),
+            componentEntity.getName());
 
         return adapter;
     }

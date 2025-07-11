@@ -42,10 +42,10 @@ public class BackpressureTest {
 
         var graph = this.dummyFactory.generateGraph();
 
-        var ingressAgent = this.dummyFactory.generateAgent();
-        var hiddenAgent = this.dummyFactory.generateAgent();
-        graph.getAgents().add(ingressAgent);
-        graph.getAgents().add(hiddenAgent);
+        var ingressComponent = this.dummyFactory.generateComponent();
+        var hiddenComponent = this.dummyFactory.generateComponent();
+        graph.getComponents().add(ingressComponent);
+        graph.getComponents().add(hiddenComponent);
 
         var ingressAdapter = this.dummyFactory.generateAdapter();
         ingressAdapter.setAdapterType(AdapterType.PUSH);
@@ -57,24 +57,24 @@ public class BackpressureTest {
         hiddenAdapter.setAdapterType(AdapterType.HIDDEN);
         hiddenAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
 
-        ingressAgent.setAdapter(ingressAdapter);
-        hiddenAgent.setAdapter(hiddenAdapter);
+        ingressComponent.setAdapter(ingressAdapter);
+        hiddenComponent.setAdapter(hiddenAdapter);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getAdapterName());
+        edge.setLeftAdapterName(ingressAdapter.getName());
         edge.setRightAdapterNames(new ArrayList<>());
-        edge.getRightAdapterNames().add(hiddenAdapter.getAdapterName());
+        edge.getRightAdapterNames().add(hiddenAdapter.getName());
         graph.getEdges().add(edge);
 
         this.graphController.register(graph);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getGraphName());
+        deployment.setName(graph.getName());
         deployment.setVersion(graph.getVersion());
         this.graphController.tryDeployGraph(deployment);
 
         var adapter = (HiddenAdapter) this
             .testHelper
-            .findAdapter(hiddenAdapter.getAdapterName(), graph.getGraphName());
+            .findAdapter(hiddenAdapter.getName(), graph.getName());
 
         var backPressure = adapter.tryGetBackPressure();
         Assertions.assertTrue(backPressure.getStatusCode().is2xxSuccessful());
@@ -86,10 +86,10 @@ public class BackpressureTest {
 
         var graph = this.dummyFactory.generateGraph();
 
-        var ingressAgent = this.dummyFactory.generateAgent();
-        var hiddenAgent = this.dummyFactory.generateAgent();
-        graph.getAgents().add(ingressAgent);
-        graph.getAgents().add(hiddenAgent);
+        var ingressComponent = this.dummyFactory.generateComponent();
+        var hiddenComponent = this.dummyFactory.generateComponent();
+        graph.getComponents().add(ingressComponent);
+        graph.getComponents().add(hiddenComponent);
 
         var ingressAdapter = this.dummyFactory.generateAdapter();
         ingressAdapter.setAdapterType(AdapterType.PUSH);
@@ -101,24 +101,24 @@ public class BackpressureTest {
         hiddenAdapter.setAdapterType(AdapterType.HIDDEN);
         hiddenAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
 
-        ingressAgent.setAdapter(ingressAdapter);
-        hiddenAgent.setAdapter(hiddenAdapter);
+        ingressComponent.setAdapter(ingressAdapter);
+        hiddenComponent.setAdapter(hiddenAdapter);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getAdapterName());
+        edge.setLeftAdapterName(ingressAdapter.getName());
         edge.setRightAdapterNames(new ArrayList<>());
-        edge.getRightAdapterNames().add(hiddenAdapter.getAdapterName());
+        edge.getRightAdapterNames().add(hiddenAdapter.getName());
         graph.getEdges().add(edge);
 
         this.graphController.register(graph);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getGraphName());
+        deployment.setName(graph.getName());
         deployment.setVersion(graph.getVersion());
         this.graphController.tryDeployGraph(deployment);
 
         var adapter = (HiddenAdapter) this
             .testHelper
-            .findAdapter(hiddenAdapter.getAdapterName(), graph.getGraphName());
+            .findAdapter(hiddenAdapter.getName(), graph.getName());
 
         var backPressure = adapter.tryGetBackPressure();
         Assertions.assertEquals(backPressure.getBody().getIngress().getQueuedRecords(), 0);

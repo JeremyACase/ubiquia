@@ -32,9 +32,9 @@ import org.ubiquia.core.flow.service.visitor.StamperVisitor;
  * receive garbage data from this service.
  */
 @Service
-public class TemplateAgentProxy {
+public class TemplateComponentProxy {
 
-    private static final Logger logger = LoggerFactory.getLogger(TemplateAgentProxy.class);
+    private static final Logger logger = LoggerFactory.getLogger(TemplateComponentProxy.class);
 
     @Autowired
     private AdapterRepository adapterRepository;
@@ -53,7 +53,7 @@ public class TemplateAgentProxy {
     /**
      * Constructor time.
      */
-    public TemplateAgentProxy() {
+    public TemplateComponentProxy() {
         this.cachedAdapterSchemas = new HashMap<>();
         this.jsonSchemaGeneratorConfiguration = DefaultConfig.build()
             .setGenerateMinimal(false)
@@ -71,7 +71,7 @@ public class TemplateAgentProxy {
      * @throws ClassNotFoundException  Exceptions from being unable to find a valid class.
      */
     @Transactional
-    public void proxyAsAgentFor(FlowEventEntity flowEventEntity)
+    public void proxyAsComponentFor(FlowEventEntity flowEventEntity)
         throws JsonProcessingException,
         GenerationException,
         JsonGeneratorException {
@@ -88,12 +88,12 @@ public class TemplateAgentProxy {
         var fuzzyData = generator.generate(jsonSchema, 10);
         var stringifiedPayload = this.objectMapper.writeValueAsString(fuzzyData);
         logger.debug("Generated dummy data: {}", stringifiedPayload);
-        eventTimes.setAgentResponseTime(OffsetDateTime.now());
+        eventTimes.setComponentResponseTime(OffsetDateTime.now());
         this.stamperVisitor.tryStampOutputs(flowEventEntity, stringifiedPayload);
         if (flowEventEntity.getAdapter().getAdapterSettings().getPersistOutputPayload()) {
             flowEventEntity.setOutputPayload(stringifiedPayload);
         }
-        this.outbox.tryQueueAgentResponse(flowEventEntity, stringifiedPayload);
+        this.outbox.tryQueueComponentResponse(flowEventEntity, stringifiedPayload);
     }
 
     /**
@@ -112,7 +112,7 @@ public class TemplateAgentProxy {
 
             var entity = record.get();
             var jsonSchema = entity
-                .getAgent()
+                .getComponent()
                 .getGraph()
                 .getAgentCommunicationLanguage()
                 .getJsonSchema();
@@ -131,7 +131,7 @@ public class TemplateAgentProxy {
                 throw new RuntimeException("ERROR: Cannot find subschema named  '"
                     + entity.getOutputSubSchema().getModelName()
                     + "' in agent communication language named '"
-                    + entity.getAgent().getGraph().getAgentCommunicationLanguage().getDomain()
+                    + entity.getComponent().getGraph().getAgentCommunicationLanguage().getDomain()
                     + "'!");
             }
             var jsonSubSchema = schema.getSubSchemas().get(match.get());

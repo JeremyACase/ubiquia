@@ -13,7 +13,7 @@ import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.AdapterType;
-import org.ubiquia.common.model.ubiquia.enums.AgentType;
+import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.common.model.ubiquia.enums.HttpOutputType;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.controller.GraphController;
@@ -23,10 +23,10 @@ import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class AgentManagerTest {
+public class ComponentManagerTest {
 
     @Autowired
-    private AgentManager agentManager;
+    private ComponentManager componentManager;
 
     @Autowired
     private GraphController graphController;
@@ -49,12 +49,12 @@ public class AgentManagerTest {
 
         var graph = this.dummyFactory.generateGraph();
 
-        var ingressAgent = this.dummyFactory.generateAgent();
-        ingressAgent.setAgentType(AgentType.POD);
-        var hiddenAgent = this.dummyFactory.generateAgent();
-        hiddenAgent.setAgentType(AgentType.POD);
-        graph.getAgents().add(ingressAgent);
-        graph.getAgents().add(hiddenAgent);
+        var ingressAgent = this.dummyFactory.generateComponent();
+        ingressAgent.setComponentType(ComponentType.POD);
+        var hiddenAgent = this.dummyFactory.generateComponent();
+        hiddenAgent.setComponentType(ComponentType.POD);
+        graph.getComponents().add(ingressAgent);
+        graph.getComponents().add(hiddenAgent);
 
         var ingressAdapter = this.dummyFactory.generateAdapter();
         ingressAdapter.setAdapterType(AdapterType.PUSH);
@@ -73,19 +73,19 @@ public class AgentManagerTest {
         hiddenAgent.setAdapter(hiddenAdapter);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getAdapterName());
+        edge.setLeftAdapterName(ingressAdapter.getName());
         edge.setRightAdapterNames(new ArrayList<>());
-        edge.getRightAdapterNames().add(hiddenAdapter.getAdapterName());
+        edge.getRightAdapterNames().add(hiddenAdapter.getName());
         graph.getEdges().add(edge);
 
         this.graphController.register(graph);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getGraphName());
+        deployment.setName(graph.getName());
         deployment.setVersion(graph.getVersion());
 
         // Should throw exception since K8s is not enabled.
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            this.agentManager.tryDeployAgentsFor(
+            this.componentManager.tryDeployComponentsFor(
                 deployment);
         });
     }
@@ -95,12 +95,12 @@ public class AgentManagerTest {
     public void assertDeploysAgents_isValid() throws Exception {
         var graph = this.dummyFactory.generateGraph();
 
-        var ingressAgent = this.dummyFactory.generateAgent();
-        ingressAgent.setAgentType(AgentType.TEMPLATE);
-        var hiddenAgent = this.dummyFactory.generateAgent();
-        hiddenAgent.setAgentType(AgentType.TEMPLATE);
-        graph.getAgents().add(ingressAgent);
-        graph.getAgents().add(hiddenAgent);
+        var ingressAgent = this.dummyFactory.generateComponent();
+        ingressAgent.setComponentType(ComponentType.TEMPLATE);
+        var hiddenAgent = this.dummyFactory.generateComponent();
+        hiddenAgent.setComponentType(ComponentType.TEMPLATE);
+        graph.getComponents().add(ingressAgent);
+        graph.getComponents().add(hiddenAgent);
 
         var ingressAdapter = this.dummyFactory.generateAdapter();
         ingressAdapter.setAdapterType(AdapterType.PUSH);
@@ -119,19 +119,19 @@ public class AgentManagerTest {
         hiddenAgent.setAdapter(hiddenAdapter);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getAdapterName());
+        edge.setLeftAdapterName(ingressAdapter.getName());
         edge.setRightAdapterNames(new ArrayList<>());
-        edge.getRightAdapterNames().add(hiddenAdapter.getAdapterName());
+        edge.getRightAdapterNames().add(hiddenAdapter.getName());
         graph.getEdges().add(edge);
 
         this.graphController.register(graph);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getGraphName());
+        deployment.setName(graph.getName());
         deployment.setVersion(graph.getVersion());
 
         // Should throw exception since K8s is not enabled.
         Assertions.assertDoesNotThrow(() -> {
-            this.agentManager.tryDeployAgentsFor(
+            this.componentManager.tryDeployComponentsFor(
                 deployment);
         });
     }

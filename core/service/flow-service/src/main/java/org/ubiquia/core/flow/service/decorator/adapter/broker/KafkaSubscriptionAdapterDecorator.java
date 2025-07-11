@@ -103,7 +103,7 @@ public class KafkaSubscriptionAdapterDecorator {
         var id = context
             .getGraphName()
             + "-"
-            + context.getAgentName()
+            + context.getComponentName()
             + "-"
             + endpointIdIndex.getAndIncrement();
         return id;

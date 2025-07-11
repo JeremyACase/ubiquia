@@ -6,23 +6,23 @@ import java.util.ArrayList;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.service.mapper.GenericDtoMapper;
-import org.ubiquia.common.model.ubiquia.dto.Agent;
+import org.ubiquia.common.model.ubiquia.dto.Component;
 import org.ubiquia.common.model.ubiquia.dto.Config;
 import org.ubiquia.common.model.ubiquia.embeddable.OverrideSettings;
-import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
+import org.ubiquia.common.model.ubiquia.entity.ComponentEntity;
 
 
 @Service
-public class AgentDtoMapper extends GenericDtoMapper<
-    AgentEntity,
-    Agent> {
+public class ComponentDtoMapper extends GenericDtoMapper<
+    ComponentEntity,
+    Component> {
 
     @Override
-    public Agent map(final AgentEntity from) throws JsonProcessingException {
+    public Component map(final ComponentEntity from) throws JsonProcessingException {
 
-        Agent to = null;
+        Component to = null;
         if (Objects.nonNull(from)) {
-            to = new Agent();
+            to = new Component();
             super.setAbstractEntityFields(from, to);
 
             if (Objects.nonNull(from.getConfig())) {
@@ -35,7 +35,7 @@ public class AgentDtoMapper extends GenericDtoMapper<
                 to.setConfig(config);
             }
 
-            to.setAgentName(from.getAgentName());
+            to.setName(from.getName());
             to.setDescription(from.getDescription());
             to.setImage(from.getImage());
             to.setLivenessProbe(from.getLivenessProbe());
@@ -44,7 +44,7 @@ public class AgentDtoMapper extends GenericDtoMapper<
             to.setEnvironmentVariables(from.getEnvironmentVariables().stream().toList());
             to.setPort(from.getPort());
             to.setScaleSettings(from.getScaleSettings());
-            to.setAgentType(from.getType());
+            to.setComponentType(from.getType());
             to.setCommunicationServiceSettings(from.getCommunicationServiceSettings());
 
             if (Objects.nonNull(from.getOverrideSettings())) {

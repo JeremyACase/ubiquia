@@ -3,7 +3,7 @@
 
 > **A lightweight, schema-aware query construction engine for dynamic persistence in Ubiquia.**
 
-The `dao` module provides the core building blocks for type-safe, runtime-driven query construction in Ubiquia. It offers declarative tools for building **dynamic predicates**, deriving **entity and class metadata**, and mapping **query filters and parameters** — all in support of runtime-compiled belief state services and adaptive agents.
+The `dao` module provides the core building blocks for type-safe, runtime-driven query construction in Ubiquia. It offers declarative tools for building **dynamic predicates**, deriving **entity and class metadata**, and mapping **query filters and parameters** — all in support of runtime-compiled belief state services and adaptive components.
 
 ---
 
@@ -59,7 +59,7 @@ This module is heavily used by:
 
 - `belief-state-libraries`: to parse filter expressions and support dynamic REST API queries  
 - `belief-state-generator-service`: during schema-to-service compilation to bind queries to models  
-- `flow-service`: indirectly via compiled agents that expose queryable endpoints as well as by Flow Service controllers
+- `flow-service`: indirectly via compiled components that expose queryable endpoints as well as by Flow Service controllers
 
 ---
 

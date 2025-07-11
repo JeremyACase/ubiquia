@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow;
 
-import jakarta.transaction.Transactional;
 import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ public class TestHelper {
     private AdapterRepository adapterRepository;
 
     @Autowired
-    private AgentRepository agentRepository;
+    private ComponentRepository componentRepository;
 
     @Autowired
     private FlowEventRepository flowEventRepository;
@@ -61,7 +60,7 @@ public class TestHelper {
 
         var adapterEntity = this
             .adapterRepository
-            .findByGraphGraphNameAndAdapterName(
+            .findByGraphNameAndName(
                 graphName,
                 adapterName)
             .get();

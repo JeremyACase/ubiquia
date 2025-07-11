@@ -26,9 +26,9 @@ public class AdapterTagBuilder {
         tags.add(new KeyValuePair("graphName", context.getGraphName()));
         tags.add(new KeyValuePair("adapterName", context.getAdapterName()));
 
-        if (Objects.nonNull(context.getAgentName())) {
-            tags.add(new KeyValuePair("agentName",
-                context.getAgentName()));
+        if (Objects.nonNull(context.getComponentName())) {
+            tags.add(new KeyValuePair("componentName",
+                context.getComponentName()));
         }
 
         return tags;

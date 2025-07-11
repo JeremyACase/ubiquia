@@ -18,7 +18,7 @@ public class AdapterDtoMapper extends GenericDtoMapper<
     Adapter> {
 
     @Autowired
-    private AgentDtoMapper agentDtoMapper;
+    private ComponentDtoMapper componentDtoMapper;
 
     @Autowired
     private OverrideSettingsMapper overrideSettingsMapper;
@@ -31,12 +31,12 @@ public class AdapterDtoMapper extends GenericDtoMapper<
             to = new Adapter();
             super.setAbstractEntityFields(from, to);
 
-            to.setAdapterName(from.getAdapterName());
+            to.setName(from.getName());
             to.setAdapterSettings(from.getAdapterSettings());
             to.setAdapterType(from.getAdapterType());
             to.setFlowEvents(new ArrayList<>());
             to.setBrokerSettings(from.getBrokerSettings());
-            to.setAgent(this.agentDtoMapper.map(from.getAgent()));
+            to.setComponent(this.componentDtoMapper.map(from.getComponent()));
             to.setDownstreamAdapters(this.mapUpstreamOrDownstreamAdapters(
                 from.getDownstreamAdapters()));
             to.setDescription(from.getDescription());
@@ -78,9 +78,9 @@ public class AdapterDtoMapper extends GenericDtoMapper<
         for (var from : froms) {
             var to = new Adapter();
             super.setAbstractEntityFields(from, to);
-            to.setAdapterName(from.getAdapterName());
+            to.setName(from.getName());
             to.setAdapterType(from.getAdapterType());
-            to.setAgent(this.agentDtoMapper.map(from.getAgent()));
+            to.setComponent(this.componentDtoMapper.map(from.getComponent()));
             to.setDescription(from.getDescription());
             to.setEgressSettings(from.getEgressSettings());
             to.setEndpoint(from.getEndpoint());

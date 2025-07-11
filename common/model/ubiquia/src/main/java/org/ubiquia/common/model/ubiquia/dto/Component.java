@@ -3,15 +3,15 @@ package org.ubiquia.common.model.ubiquia.dto;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import org.ubiquia.common.model.ubiquia.embeddable.*;
-import org.ubiquia.common.model.ubiquia.enums.AgentType;
+import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 
-public class Agent extends AbstractModel {
+public class Component extends AbstractModel {
 
-    private AgentType agentType;
+    private ComponentType componentType;
 
     private Config config;
 
-    private String agentName;
+    private String name;
 
     private CommunicationServiceSettings communicationServiceSettings;
 
@@ -40,17 +40,17 @@ public class Agent extends AbstractModel {
     private ScaleSettings scaleSettings;
 
     @NotNull
-    public String getAgentName() {
-        return agentName;
+    public String getName() {
+        return name;
     }
 
-    public void setAgentName(String agentName) {
-        this.agentName = agentName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
     public String getModelType() {
-        return "Agent";
+        return "Component";
     }
 
     @NotNull
@@ -120,12 +120,12 @@ public class Agent extends AbstractModel {
     }
 
     @NotNull
-    public AgentType getAgentType() {
-        return agentType;
+    public ComponentType getComponentType() {
+        return componentType;
     }
 
-    public void setAgentType(AgentType agentType) {
-        this.agentType = agentType;
+    public void setComponentType(ComponentType componentType) {
+        this.componentType = componentType;
     }
 
     public Config getConfig() {

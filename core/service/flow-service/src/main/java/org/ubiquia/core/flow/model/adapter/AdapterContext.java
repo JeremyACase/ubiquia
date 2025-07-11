@@ -25,7 +25,7 @@ public class AdapterContext {
 
     private BrokerSettings brokerSettings;
 
-    private String agentName;
+    private String componentName;
 
     private GraphSettings graphSettings;
 
@@ -33,7 +33,7 @@ public class AdapterContext {
 
     private String graphName;
     private String adapterId;
-    private Boolean isTemplateAgent;
+    private Boolean isTemplateComponent;
     private PollSettings pollSettings;
     private List<RequestMappingInfo> registeredMappingInfos = new ArrayList<>();
     private List<KeyValuePair> tags = new ArrayList<>();
@@ -89,12 +89,12 @@ public class AdapterContext {
         this.brokerSettings = brokerSettings;
     }
 
-    public String getAgentName() {
-        return agentName;
+    public String getComponentName() {
+        return componentName;
     }
 
-    public void setAgentName(String agentName) {
-        this.agentName = agentName;
+    public void setComponentName(String componentName) {
+        this.componentName = componentName;
     }
 
     public GraphSettings getGraphSettings() {
@@ -129,12 +129,12 @@ public class AdapterContext {
         this.adapterId = adapterId;
     }
 
-    public Boolean getTemplateAgent() {
-        return isTemplateAgent;
+    public Boolean getTemplateComponent() {
+        return isTemplateComponent;
     }
 
-    public void setTemplateAgent(Boolean templateAgent) {
-        isTemplateAgent = templateAgent;
+    public void setTemplateComponent(Boolean templateComponent) {
+        isTemplateComponent = templateComponent;
     }
 
     public PollSettings getPollSettings() {

@@ -66,11 +66,12 @@ agents:
       configMountPath: /example/mountpath
 
     # This is a list of settings to use to override the baseline values should the graph be 
-    # deployed with any "flags."
+    # deployed with any "flags." Flags are passed to Ubiquia when deploying graphs via the GraphController 
+    # RESTful interface.
     overrideSettings:
 
       # Any example override setting. It will override the baseline image values defined when the 
-      # graph is deployed with a "prod" flag.
+      # graph is deployed with a "exampleOverride" flag.
       - flag: exampleOverride
         key: image
         value:
@@ -79,7 +80,7 @@ agents:
           tag: latest
 
       # Another example override setting. It will override the template agent boolean when the graph
-      # is deployed with the "prod" flag.
+      # is deployed with the "demo" flag.
       - flag: demo
         key: agentType
         value: POD
