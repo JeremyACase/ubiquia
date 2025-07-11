@@ -138,7 +138,7 @@ public class AdapterDecorator {
             this.stimulatedPayloadBuilder.initializeSchema(adapterContext.getAdapterId());
             var executor = new ScheduledThreadPoolExecutor(1);
             var task = executor.scheduleAtFixedRate(
-                adapter::stimulateAgent,
+                adapter::stimulateComponent,
                 adapterContext.getAdapterSettings().getStimulateFrequencyMilliseconds(),
                 adapterContext.getAdapterSettings().getStimulateFrequencyMilliseconds(),
                 TimeUnit.MILLISECONDS);

@@ -10,7 +10,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 @Entity
 public class GraphEntity extends AbstractModelEntity {
 
-    private String graphName;
+    private String name;
 
     private String author;
 
@@ -28,7 +28,7 @@ public class GraphEntity extends AbstractModelEntity {
     private List<AdapterEntity> adapters;
 
     @OneToMany(mappedBy = "graph", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-    private List<AgentEntity> agents;
+    private List<ComponentEntity> components;
 
     @ManyToMany(mappedBy = "deployedGraphs", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<UbiquiaAgentEntity> ubiquiaAgentsDeployingGraph;
@@ -39,12 +39,12 @@ public class GraphEntity extends AbstractModelEntity {
     }
 
     @NotNull
-    public String getGraphName() {
-        return graphName;
+    public String getName() {
+        return name;
     }
 
-    public void setGraphName(String graphName) {
-        this.graphName = graphName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @NotNull
@@ -84,12 +84,12 @@ public class GraphEntity extends AbstractModelEntity {
     }
 
     @NotNull
-    public List<AgentEntity> getAgents() {
-        return agents;
+    public List<ComponentEntity> getComponents() {
+        return components;
     }
 
-    public void setAgents(List<AgentEntity> agents) {
-        this.agents = agents;
+    public void setComponents(List<ComponentEntity> components) {
+        this.components = components;
     }
 
     @NotNull

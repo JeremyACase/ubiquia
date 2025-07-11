@@ -8,7 +8,10 @@ import net.jimblackler.jsonschemafriend.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -24,12 +27,12 @@ import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
  * A service that exposes various methods common to all adapters.
  */
 @Service
-public class AdapterPutToAgentCommand implements InterfaceLogger {
+public class AdapterPostToComponentCommand implements InterfaceLogger {
 
-    private static final Logger logger = LoggerFactory.getLogger(AdapterPutToAgentCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdapterPostToComponentCommand.class);
 
     @Autowired
-    private AdapterAgentResponseCommand adapterAgentResponseCommand;
+    private AdapterComponentResponseCommand adapterComponentResponseCommand;
 
     @Autowired
     private AdapterOpenMessageVisitor adapterOpenMessageVisitor;
@@ -51,7 +54,7 @@ public class AdapterPutToAgentCommand implements InterfaceLogger {
     }
 
     @Transactional
-    public ResponseEntity<Object> tryPutPayloadToAgentSynchronously(
+    public void tryPostPayloadToComponentSynchronously(
         FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final Object inputPayload)
@@ -63,7 +66,7 @@ public class AdapterPutToAgentCommand implements InterfaceLogger {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         var adapterContext = adapter.getAdapterContext();
-        logger.info("PUTting synchronous payload to URI: {}...", adapterContext.getEndpointUri());
+        logger.info("POSTing synchronous payload to URI: {}...", adapterContext.getEndpointUri());
 
         var flowEventTimes = flowEventEntity.getFlowEventTimes();
         flowEventTimes.setPayloadSentToAgentTime(OffsetDateTime.now());
@@ -71,10 +74,8 @@ public class AdapterPutToAgentCommand implements InterfaceLogger {
         var request = new HttpEntity<>(inputPayload, headers);
         ResponseEntity<Object> response = null;
         try {
-            flowEventTimes.setPayloadSentToAgentTime(OffsetDateTime.now());
-            response = this.restTemplate.exchange(
+            response = this.restTemplate.postForEntity(
                 adapterContext.getEndpointUri(),
-                HttpMethod.PUT,
                 request,
                 Object.class);
         } catch (HttpStatusCodeException e) {
@@ -83,14 +84,13 @@ public class AdapterPutToAgentCommand implements InterfaceLogger {
                 e.getResponseHeaders(),
                 e.getStatusCode());
         }
-        flowEventTimes.setAgentResponseTime(OffsetDateTime.now());
+        flowEventTimes.setComponentResponseTime(OffsetDateTime.now());
         flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
-        this.adapterAgentResponseCommand.processAgentResponse(flowEventEntity, adapter, response);
-        return response;
+        this.adapterComponentResponseCommand.processComponentResponse(flowEventEntity, adapter, response);
     }
 
     @Transactional
-    public void tryPutInputToAgentAsynchronously(
+    public void tryPostInputToComponentAsynchronously(
         FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final Object inputPayload) {
@@ -102,7 +102,7 @@ public class AdapterPutToAgentCommand implements InterfaceLogger {
         this.adapterOpenMessageVisitor.incrementOpenMessagesFor(adapter);
         var eventTimes = flowEventEntity.getFlowEventTimes();
         this.webClient
-            .put()
+            .post()
             .uri(adapterContext.getEndpointUri())
             .bodyValue(inputPayload)
             .retrieve()
@@ -110,14 +110,13 @@ public class AdapterPutToAgentCommand implements InterfaceLogger {
             .subscribe(
                 response -> {
                     this.adapterOpenMessageVisitor.decrementOpenMessagesFor(adapter);
-                    eventTimes.setAgentResponseTime(OffsetDateTime.now());
-                    eventTimes.setEventCompleteTime(OffsetDateTime.now());
+                    eventTimes.setComponentResponseTime(OffsetDateTime.now());
                     flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
                     logger.info("...got response code {} from agent for batch id {}...",
                         response.getStatusCode(),
                         flowEventEntity.getBatchId());
                     try {
-                        this.adapterAgentResponseCommand.processAgentResponse(
+                        this.adapterComponentResponseCommand.processComponentResponse(
                             flowEventEntity,
                             adapter,
                             response);
@@ -131,7 +130,7 @@ public class AdapterPutToAgentCommand implements InterfaceLogger {
                     } else {
                         logger.error("ERROR response: {} ", error.getMessage());
                     }
-                    eventTimes.setAgentResponseTime(OffsetDateTime.now());
+                    eventTimes.setComponentResponseTime(OffsetDateTime.now());
                     eventTimes.setEventCompleteTime(OffsetDateTime.now());
                     this.adapterOpenMessageVisitor.decrementOpenMessagesFor(adapter);
                     this.flowEventRepository.save(flowEventEntity);

@@ -59,42 +59,42 @@ public class QueueAdapterTest {
 
         var graph = this.dummyFactory.generateGraph();
 
-        var ingressAgent = this.dummyFactory.generateAgent();
-        graph.getAgents().add(ingressAgent);
+        var ingressComponent = this.dummyFactory.generateComponent();
+        graph.getComponents().add(ingressComponent);
 
         var ingressAdapter = this.dummyFactory.generateAdapter();
         ingressAdapter.setAdapterType(AdapterType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressAdapter.getInputSubSchemas().add(subSchema);
         ingressAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-        ingressAgent.setAdapter(ingressAdapter);
+        ingressComponent.setAdapter(ingressAdapter);
 
         var queueAdapter = this.dummyFactory.generateAdapter();
         queueAdapter.setAdapterType(AdapterType.QUEUE);
         queueAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
-        graph.getAgentlessAdapters().add(queueAdapter);
+        graph.getComponentlessAdapters().add(queueAdapter);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getAdapterName());
+        edge.setLeftAdapterName(ingressAdapter.getName());
         edge.setRightAdapterNames(new ArrayList<>());
-        edge.getRightAdapterNames().add(queueAdapter.getAdapterName());
+        edge.getRightAdapterNames().add(queueAdapter.getName());
         graph.getEdges().add(edge);
 
         this.graphController.register(graph);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getGraphName());
+        deployment.setName(graph.getName());
         deployment.setVersion(graph.getVersion());
         this.graphController.tryDeployGraph(deployment);
 
         var targetUrl = "http://localhost:8080/graph/"
-            + graph.getGraphName().toLowerCase()
+            + graph.getName().toLowerCase()
             + "/adapter/"
-            + queueAdapter.getAdapterName().toLowerCase()
+            + queueAdapter.getName().toLowerCase()
             + "/queue/peek";
 
         var adapter = (PushAdapter) this
             .testHelper
-            .findAdapter(ingressAdapter.getAdapterName(), graph.getGraphName());
+            .findAdapter(ingressAdapter.getName(), graph.getName());
 
         var event = adapter.push("test").getBody();
 
@@ -121,8 +121,8 @@ public class QueueAdapterTest {
 
         var graph = this.dummyFactory.generateGraph();
 
-        var ingressAgent = this.dummyFactory.generateAgent();
-        graph.getAgents().add(ingressAgent);
+        var ingressAgent = this.dummyFactory.generateComponent();
+        graph.getComponents().add(ingressAgent);
 
         var ingressAdapter = this.dummyFactory.generateAdapter();
         ingressAdapter.setAdapterType(AdapterType.PUSH);
@@ -134,29 +134,29 @@ public class QueueAdapterTest {
         var queueAdapter = this.dummyFactory.generateAdapter();
         queueAdapter.setAdapterType(AdapterType.QUEUE);
         queueAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
-        graph.getAgentlessAdapters().add(queueAdapter);
+        graph.getComponentlessAdapters().add(queueAdapter);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getAdapterName());
+        edge.setLeftAdapterName(ingressAdapter.getName());
         edge.setRightAdapterNames(new ArrayList<>());
-        edge.getRightAdapterNames().add(queueAdapter.getAdapterName());
+        edge.getRightAdapterNames().add(queueAdapter.getName());
         graph.getEdges().add(edge);
 
         this.graphController.register(graph);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getGraphName());
+        deployment.setName(graph.getName());
         deployment.setVersion(graph.getVersion());
         this.graphController.tryDeployGraph(deployment);
 
         var targetUrl = "http://localhost:8080/graph/"
-            + graph.getGraphName().toLowerCase()
+            + graph.getName().toLowerCase()
             + "/adapter/"
-            + queueAdapter.getAdapterName().toLowerCase()
+            + queueAdapter.getName().toLowerCase()
             + "/queue/pop";
 
         var adapter = (PushAdapter) this
             .testHelper
-            .findAdapter(ingressAdapter.getAdapterName(), graph.getGraphName());
+            .findAdapter(ingressAdapter.getName(), graph.getName());
 
         var event = adapter.push("test").getBody();
 

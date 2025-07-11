@@ -14,7 +14,7 @@ import org.ubiquia.core.flow.model.adapter.AdapterContext;
 import org.ubiquia.common.model.ubiquia.dto.Adapter;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
-import org.ubiquia.common.model.ubiquia.enums.AgentType;
+import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.core.flow.service.logic.adapter.AdapterTypeLogic;
 
 @Service
@@ -36,7 +36,7 @@ public class AdapterContextBuilder {
 
         var context = new AdapterContext();
 
-        context.setAdapterName(adapterData.getAdapterName());
+        context.setAdapterName(adapterData.getName());
         context.setAdapterId(adapterData.getId());
         context.setAdapterType(adapterData.getAdapterType());
         context.setAdapterSettings(adapterData.getAdapterSettings());
@@ -44,19 +44,19 @@ public class AdapterContextBuilder {
             this.getBackPressurePollRatePerMinute(adapterData));
         context.setBrokerSettings(adapterData.getBrokerSettings());
         context.setEgressSettings(adapterData.getEgressSettings());
-        context.setGraphName(graphEntity.getGraphName());
+        context.setGraphName(graphEntity.getName());
         context.setGraphSettings(graphDeployment.getGraphSettings());
         context.setPollSettings(adapterData.getPollSettings());
 
-        if (Objects.nonNull(adapterData.getAgent())
-            && adapterData.getAgent().getAgentType().equals(AgentType.TEMPLATE)) {
-            context.setTemplateAgent(true);
+        if (Objects.nonNull(adapterData.getComponent())
+            && adapterData.getComponent().getComponentType().equals(ComponentType.TEMPLATE)) {
+            context.setTemplateComponent(true);
         } else {
-            context.setTemplateAgent(false);
+            context.setTemplateComponent(false);
         }
 
-        if (Objects.nonNull(adapterData.getAgent())) {
-            context.setAgentName(adapterData.getAgent().getAgentName());
+        if (Objects.nonNull(adapterData.getComponent())) {
+            context.setComponentName(adapterData.getComponent().getName());
         }
 
         this.trySetAdapterContextEndpoint(context, adapterData);
@@ -79,11 +79,11 @@ public class AdapterContextBuilder {
 
         if (!adapterData.getAdapterSettings().getIsPassthrough()) {
 
-            if (this.adapterTypeLogic.adapterTypeRequiresAgent(
+            if (this.adapterTypeLogic.adapterTypeRequiresComponent(
                 adapterData.getAdapterType())) {
 
 
-                switch (adapterData.getAgent().getAgentType()) {
+                switch (adapterData.getComponent().getComponentType()) {
 
                     // If we have a Kubernetes service to use...
                     case POD: {

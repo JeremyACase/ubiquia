@@ -122,7 +122,7 @@ public class MergeAdapterCommand implements InterfaceLogger {
 
         var mergedMap = new HashMap<String, Object>();
         for (var message : messages) {
-            var sourceAdapterName = message.getFlowEvent().getAdapter().getAdapterName();
+            var sourceAdapterName = message.getFlowEvent().getAdapter().getName();
             mergedMap.put(sourceAdapterName, message.getPayload());
         }
 

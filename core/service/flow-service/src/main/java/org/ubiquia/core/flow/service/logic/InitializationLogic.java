@@ -8,7 +8,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.service.io.Bootstrapper;
-import org.ubiquia.core.flow.service.k8s.AgentOperator;
+import org.ubiquia.core.flow.service.k8s.ComponentOperator;
 import org.ubiquia.core.flow.service.logic.ubiquia.UbiquiaAgentLogic;
 
 
@@ -24,7 +24,7 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
     private Bootstrapper bootstrapper;
 
     @Autowired(required = false)
-    private AgentOperator agentOperator;
+    private ComponentOperator componentOperator;
 
     @Autowired
     private UbiquiaAgentLogic ubiquiaAgentLogic;
@@ -35,9 +35,9 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
 
         this.ubiquiaAgentLogic.tryInitializeAgentInDatabase();
 
-        if (Objects.nonNull(this.agentOperator)) {
+        if (Objects.nonNull(this.componentOperator)) {
             try {
-                this.agentOperator.init();
+                this.componentOperator.init();
             } catch (Exception e) {
                 logger.error("ERROR - could not initialize: {}", e.getMessage());
             }

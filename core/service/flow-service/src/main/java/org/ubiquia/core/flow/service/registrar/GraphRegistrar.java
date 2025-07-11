@@ -16,7 +16,7 @@ import org.ubiquia.core.flow.repository.AgentCommunicationLanguageRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.service.visitor.validator.GraphValidator;
 import org.ubiquia.core.flow.service.manager.AdapterManager;
-import org.ubiquia.core.flow.service.manager.AgentManager;
+import org.ubiquia.core.flow.service.manager.ComponentManager;
 
 /**
  * A service dedicated to registering graphs in Ubiquia.
@@ -30,9 +30,9 @@ public class GraphRegistrar {
     @Autowired
     private AdapterRegistrar adapterRegistrar;
     @Autowired
-    private AgentRegistrar agentRegistrar;
+    private ComponentRegistrar componentRegistrar;
     @Autowired
-    private AgentManager agentManager;
+    private ComponentManager componentManager;
     @Autowired
     private AgentCommunicationLanguageRepository agentCommunicationLanguageRepository;
     @Autowired
@@ -51,7 +51,7 @@ public class GraphRegistrar {
     public GraphEntity tryRegister(final Graph graphRegistration) throws Exception {
 
         logger.info("...registering graph {} with version {} for domain {}...",
-            graphRegistration.getGraphName(),
+            graphRegistration.getName(),
             graphRegistration.getVersion(),
             graphRegistration.getAgentCommunicationLanguage().getName());
 
@@ -60,10 +60,10 @@ public class GraphRegistrar {
         var graphEntity = this.tryGetGraphEntityFrom(graphRegistration);
         graphEntity = this.persistGraph(domainOntologyEntity, graphEntity);
 
-        var agentEntities = this.agentRegistrar.registerAgentsFor(
+        var componentEntities = this.componentRegistrar.registerComponentsFor(
             graphEntity,
             graphRegistration);
-        graphEntity.setAgents(agentEntities);
+        graphEntity.setComponents(componentEntities);
 
         var adapterEntities = this.adapterRegistrar.registerAdaptersFor(
             graphEntity,
@@ -72,7 +72,7 @@ public class GraphRegistrar {
         this.graphValidator.tryValidate(graphEntity, graphRegistration);
 
         graphEntity = this.graphRepository.save(graphEntity);
-        logger.info("...registered graph {}.", graphRegistration.getGraphName());
+        logger.info("...registered graph {}.", graphRegistration.getName());
 
         return graphEntity;
     }
@@ -84,8 +84,8 @@ public class GraphRegistrar {
      */
     private void cleanGraphRegistration(Graph graph) {
 
-        if (Objects.isNull(graph.getAgentlessAdapters())) {
-            graph.setAgentlessAdapters(new ArrayList<>());
+        if (Objects.isNull(graph.getComponentlessAdapters())) {
+            graph.setComponentlessAdapters(new ArrayList<>());
         }
 
         if (Objects.isNull(graph.getEdges())) {
@@ -96,8 +96,8 @@ public class GraphRegistrar {
             graph.setCapabilities(new ArrayList<>());
         }
 
-        if (Objects.isNull(graph.getAgents())) {
-            graph.setAgents(new ArrayList<>());
+        if (Objects.isNull(graph.getComponents())) {
+            graph.setComponents(new ArrayList<>());
         }
 
         if (Objects.isNull(graph.getTags())) {
@@ -140,8 +140,8 @@ public class GraphRegistrar {
     private GraphEntity tryGetGraphEntityFrom(final Graph graphRegistration) {
 
         var record = this.graphRepository
-            .findByGraphNameAndVersionMajorAndVersionMinorAndVersionPatch(
-                graphRegistration.getGraphName(),
+            .findByNameAndVersionMajorAndVersionMinorAndVersionPatch(
+                graphRegistration.getName(),
                 graphRegistration.getVersion().getMajor(),
                 graphRegistration.getVersion().getMinor(),
                 graphRegistration.getVersion().getPatch()
@@ -149,7 +149,7 @@ public class GraphRegistrar {
 
         if (record.isPresent()) {
             throw new IllegalArgumentException("ERROR: A graph with name "
-                + graphRegistration.getGraphName()
+                + graphRegistration.getName()
                 + " and version "
                 + graphRegistration.getVersion()
                 + " has already been registered!");
@@ -159,9 +159,9 @@ public class GraphRegistrar {
         graphEntity.setAuthor(graphRegistration.getAuthor());
         graphEntity.setCapabilities(graphRegistration.getCapabilities());
         graphEntity.setDescription(graphRegistration.getDescription());
-        graphEntity.setGraphName(graphRegistration.getGraphName());
+        graphEntity.setName(graphRegistration.getName());
         graphEntity.setVersion(graphRegistration.getVersion());
-        graphEntity.setAgents(new ArrayList<>());
+        graphEntity.setComponents(new ArrayList<>());
         graphEntity.setAdapters(new ArrayList<>());
         graphEntity.setUbiquiaAgentsDeployingGraph(new ArrayList<>());
 

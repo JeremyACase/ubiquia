@@ -25,12 +25,12 @@ public class AdapterTypeLogic {
     }
 
     /**
-     * Return whether or not this type of adapter requires an agent.
+     * Return whether or not this type of adapter requires a component.
      *
      * @param adapterType The type of adapter to verify.
-     * @return Whether or not the adapter requires an agent.
+     * @return Whether or not the adapter requires an component.
      */
-    public Boolean adapterTypeRequiresAgent(final AdapterType adapterType) {
+    public Boolean adapterTypeRequiresComponent(final AdapterType adapterType) {
 
         return adapterType.equals(AdapterType.PUSH)
             || adapterType.equals(AdapterType.HIDDEN)

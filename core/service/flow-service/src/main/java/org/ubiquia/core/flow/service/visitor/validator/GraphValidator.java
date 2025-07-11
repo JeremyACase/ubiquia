@@ -35,16 +35,16 @@ public class GraphValidator {
         final Graph graphRegistration)
         throws Exception {
         logger.info("...validating graph with name {} and version {}... ",
-            graphEntity.getGraphName(),
+            graphEntity.getName(),
             graphEntity.getVersion());
 
         this.adapterValidator.tryValidate(graphEntity.getAdapters());
         this.tryValidateMatchingAdapterSchemasFor(graphRegistration);
-        logger.info("...{} validated...", graphEntity.getGraphName());
+        logger.info("...{} validated...", graphEntity.getName());
     }
 
     /**
-     * Attempt to validate if all of a graph's agents have matching output/input
+     * Attempt to validate if all of a graph's components have matching output/input
      * schemas.
      *
      * @param graphRegistration The graph to validate.
@@ -58,28 +58,28 @@ public class GraphValidator {
             logger.info("...validating edge: {}", edge);
 
             var leftAdapterRecord = this.adapterRepository
-                .findByGraphGraphNameAndAdapterName(
-                    graphRegistration.getGraphName(),
+                .findByGraphNameAndName(
+                    graphRegistration.getName(),
                     edge.getLeftAdapterName());
 
             if (leftAdapterRecord.isEmpty()) {
                 throw new IllegalArgumentException("ERROR: Could not find adapter "
                     + edge.getLeftAdapterName()
                     + " for graph "
-                    + graphRegistration.getGraphName());
+                    + graphRegistration.getName());
             }
 
             for (var right : edge.getRightAdapterNames()) {
                 var rightAdapterRecord = this.adapterRepository
-                    .findByGraphGraphNameAndAdapterName(
-                        graphRegistration.getGraphName(),
+                    .findByGraphNameAndName(
+                        graphRegistration.getName(),
                         right);
 
                 if (rightAdapterRecord.isEmpty()) {
                     throw new IllegalArgumentException("ERROR: Could not find adapter "
                         + right
                         + " for graph "
-                        + graphRegistration.getGraphName());
+                        + graphRegistration.getName());
                 }
 
                 var matchingInputOutput = this.adapterValidator

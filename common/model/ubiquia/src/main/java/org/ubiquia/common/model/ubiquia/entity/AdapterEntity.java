@@ -24,8 +24,8 @@ public class AdapterEntity extends AbstractModelEntity {
     private BrokerSettings brokerSettings;
 
     @OneToOne
-    @JoinColumn(name = "agent_adapter_join_id", nullable = true)
-    private AgentEntity agent;
+    @JoinColumn(name = "component_adapter_join_id", nullable = true)
+    private ComponentEntity component;
 
     private String description;
 
@@ -42,7 +42,7 @@ public class AdapterEntity extends AbstractModelEntity {
 
     private SubSchema outputSubSchema;
 
-    private String adapterName;
+    private String name;
 
     @ElementCollection
     private Set<OverrideSettingsStringified> overrideSettings;
@@ -62,12 +62,12 @@ public class AdapterEntity extends AbstractModelEntity {
     @OneToMany(mappedBy = "targetAdapter", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private List<FlowMessageEntity> outboxMessages;
 
-    public AgentEntity getAgent() {
-        return agent;
+    public ComponentEntity getComponent() {
+        return component;
     }
 
-    public void setAgent(AgentEntity agent) {
-        this.agent = agent;
+    public void setComponent(ComponentEntity component) {
+        this.component = component;
     }
 
     public String getDescription() {
@@ -161,12 +161,12 @@ public class AdapterEntity extends AbstractModelEntity {
     }
 
     @NotNull
-    public String getAdapterName() {
-        return adapterName;
+    public String getName() {
+        return name;
     }
 
-    public void setAdapterName(String adapterName) {
-        this.adapterName = adapterName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @NotNull

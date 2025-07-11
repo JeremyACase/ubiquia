@@ -20,7 +20,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
 import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.core.flow.repository.AdapterRepository;
-import org.ubiquia.core.flow.repository.AgentRepository;
+import org.ubiquia.core.flow.repository.ComponentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.service.logic.adapter.AdapterTypeLogic;
 import org.ubiquia.core.flow.service.mapper.OverrideSettingsMapper;
@@ -40,7 +40,7 @@ public class AdapterRegistrar {
     private AdapterTypeLogic adapterTypeLogic;
 
     @Autowired
-    private AgentRepository agentRepository;
+    private ComponentRepository componentRepository;
 
     @Autowired
     private GraphRepository graphRepository;
@@ -66,18 +66,18 @@ public class AdapterRegistrar {
 
         var adapterEntities = new ArrayList<AdapterEntity>();
 
-        var adaptersAttachedToAgents =
-            this.tryRegisterAdaptersAttachedToAgents(
+        var adaptersAttachedToComponents =
+            this.tryRegisterAdaptersAttachedToComponents(
                 graphEntity,
                 graphRegistration);
 
-        var adaptersWithoutAgents =
-            this.tryRegisterAdaptersWithoutAgents(
+        var adaptersWithoutComponents =
+            this.tryRegisterAdaptersWithoutComponents(
                 graphEntity,
                 graphRegistration);
 
-        adapterEntities.addAll(adaptersAttachedToAgents);
-        adapterEntities.addAll(adaptersWithoutAgents);
+        adapterEntities.addAll(adaptersAttachedToComponents);
+        adapterEntities.addAll(adaptersWithoutComponents);
 
         this.tryConnectGraphAdapters(graphRegistration);
 
@@ -175,8 +175,8 @@ public class AdapterRegistrar {
             for (var edge : graphRegistration.getEdges()) {
                 var leftAdapterRecord = this
                     .adapterRepository
-                    .findByGraphGraphNameAndAdapterName(
-                        graphRegistration.getGraphName(),
+                    .findByGraphNameAndName(
+                        graphRegistration.getName(),
                         edge.getLeftAdapterName());
 
                 if (leftAdapterRecord.isEmpty()) {
@@ -189,8 +189,8 @@ public class AdapterRegistrar {
                 for (var rightAdapterName : edge.getRightAdapterNames()) {
                     var rightAdapterRecord = this
                         .adapterRepository
-                        .findByGraphGraphNameAndAdapterName(
-                            graphRegistration.getGraphName(),
+                        .findByGraphNameAndName(
+                            graphRegistration.getName(),
                             rightAdapterName);
 
                     if (rightAdapterRecord.isEmpty()) {
@@ -241,7 +241,7 @@ public class AdapterRegistrar {
         adapterEntity.setGraph(graphEntity);
         adapterEntity.setCommunicationServiceSettings(adapterRegistration.getCommunicationServiceSettings());
         adapterEntity.setAdapterType(adapterRegistration.getAdapterType());
-        adapterEntity.setAdapterName(adapterRegistration.getAdapterName());
+        adapterEntity.setName(adapterRegistration.getName());
         adapterEntity.setAdapterSettings(adapterRegistration.getAdapterSettings());
         adapterEntity.setBrokerSettings(adapterRegistration.getBrokerSettings());
         adapterEntity.setDescription(adapterRegistration.getDescription());
@@ -276,48 +276,48 @@ public class AdapterRegistrar {
     }
 
     /**
-     * Attempt to register any adapters for a graph that are explicitly attached to agents.
+     * Attempt to register any adapters for a graph that are explicitly attached to components.
      *
      * @param graphEntity       The graph to register adapters for.
      * @param graphRegistration The object representing the graph registration.
      * @return A list of newly-registered adapters.
      */
-    private List<AdapterEntity> tryRegisterAdaptersAttachedToAgents(
+    private List<AdapterEntity> tryRegisterAdaptersAttachedToComponents(
         GraphEntity graphEntity,
         final Graph graphRegistration)
         throws JsonProcessingException {
-        logger.info("...registering adapters attached to agents...");
+        logger.info("...registering adapters attached to components...");
 
         var adapterEntities = new ArrayList<AdapterEntity>();
 
-        for (var agent : graphRegistration.getAgents()) {
-            logger.info("...registering adapter for agent {}...",
-                agent.getAgentName());
-            if (Objects.nonNull(agent.getAdapter())) {
+        for (var component : graphRegistration.getComponents()) {
+            logger.info("...registering adapter for component {}...",
+                component.getName());
+            if (Objects.nonNull(component.getAdapter())) {
 
-                var agentMatch = graphEntity.getAgents()
+                var match = graphEntity.getComponents()
                     .stream()
                     .filter(x -> x
-                        .getAgentName()
-                        .equals(agent.getAgentName()))
+                        .getName()
+                        .equals(component.getName()))
                     .findFirst();
 
-                if (agentMatch.isEmpty()) {
+                if (match.isEmpty()) {
                     throw new IllegalArgumentException("ERROR: Could not find a registered "
-                        + "agent with name "
-                        + agent.getAgentName());
+                        + "component with name "
+                        + component.getName());
                 }
 
-                var agentEntity = agentMatch.get();
+                var componentEntity = match.get();
                 var adapterEntity = this.tryGetAdapterEntityFrom(
                     graphEntity,
-                    agent.getAdapter());
-                adapterEntity.setAgent(agentEntity);
+                    component.getAdapter());
+                adapterEntity.setComponent(componentEntity);
                 adapterEntity = this.adapterRepository.save(adapterEntity);
-                agentEntity.setAdapter(adapterEntity);
-                this.agentRepository.save(agentEntity);
-                logger.info("...registered adapter for agent {}...",
-                    agent.getAgentName());
+                componentEntity.setAdapter(adapterEntity);
+                this.componentRepository.save(componentEntity);
+                logger.info("...registered adapter for component {}...",
+                    component.getName());
                 adapterEntities.add(adapterEntity);
             }
         }
@@ -325,20 +325,20 @@ public class AdapterRegistrar {
     }
 
     /**
-     * Attempt to register adapters for a graph that are not attached to agents.
+     * Attempt to register adapters for a graph that are not attached to components.
      *
      * @param graphEntity       The graph to register adapters for.
      * @param graphRegistration The object representing the graph registration.
      * @return A list of newly-registered adapters.
      */
-    private List<AdapterEntity> tryRegisterAdaptersWithoutAgents(
+    private List<AdapterEntity> tryRegisterAdaptersWithoutComponents(
         final GraphEntity graphEntity,
         final Graph graphRegistration) throws JsonProcessingException {
-        logger.info("...registering adapters without agents...");
+        logger.info("...registering adapters without components...");
 
         var adapterEntities = new ArrayList<AdapterEntity>();
 
-        for (var adapterRegistration : graphRegistration.getAgentlessAdapters()) {
+        for (var adapterRegistration : graphRegistration.getComponentlessAdapters()) {
             logger.info("...registering adapter of type {}...",
                 adapterRegistration.getAdapterType());
             var adapterEntity = this.tryGetAdapterEntityFrom(

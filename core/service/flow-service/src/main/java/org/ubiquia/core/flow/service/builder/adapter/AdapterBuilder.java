@@ -59,8 +59,8 @@ public class AdapterBuilder {
 
         logger.info("...building {} adapter named {} for graph {} with settings {}...",
             adapterEntity.getAdapterType(),
-            adapterEntity.getAdapterName(),
-            graphEntity.getGraphName(),
+            adapterEntity.getName(),
+            graphEntity.getName(),
             graphDeployment.getGraphSettings());
 
         var adapterData = this.adapterDtoMapper.map(adapterEntity);
@@ -96,14 +96,14 @@ public class AdapterBuilder {
     private void trySetAdapterEndpoint(AbstractAdapter adapter, final Adapter adapterData)
         throws URISyntaxException {
 
-        var agentData = adapterData.getAgent();
+        var componentData = adapterData.getComponent();
         var adapterContext = adapter.getAdapterContext();
         if (!adapterData.getAdapterSettings().getIsPassthrough()) {
 
-            if (this.adapterTypeLogic.adapterTypeRequiresAgent(
+            if (this.adapterTypeLogic.adapterTypeRequiresComponent(
                 adapterData.getAdapterType())) {
 
-                switch (agentData.getAgentType()) {
+                switch (componentData.getComponentType()) {
 
                     // If we have a Kubernetes service to use...
                     case POD: {

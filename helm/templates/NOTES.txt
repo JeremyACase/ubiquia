@@ -12,7 +12,7 @@ The best way to use Ubiquia is by accessing the Ubiquia Communications Service. 
 1. $ kubectl port-forward svc/ubiquia-core-communication-service -n {{ .Release.Namespace }} {{ .Values.convenience.variables.spring.port }}:{{ .Values.convenience.variables.spring.port }}
 2. Navigate to "http://localhost:{{ .Values.convenience.variables.spring.port }}{{ .Values.convenience.variables.spring.swaggerDocs }}"
 
-{{ if .Values.ubiquia.agent.database.h2.enabled }}
+{{ if .Values.ubiquia.component.database.h2.enabled }}
 **************************************************
 Ubiquia Flow Service:
 
@@ -23,7 +23,7 @@ Ubiquia is currently configured to run with in-memory databases. After port-forw
 3. Replace the connection URL with "jdbc:h2:mem:myDb" 
 4. Input "sa" for both username and password.
 5. Select "connect."
-{{ else if .Values.ubiquia.agent.database.yugabyte.enabled }}
+{{ else if .Values.ubiquia.component.database.yugabyte.enabled }}
 **************************************************
 YugabyteDB:
 
@@ -55,11 +55,11 @@ Attempting to register Directed Acyclic Graph (DAG) with Flow Service:
 {{- end }}
 **************************************************
 {{- end }}
-{{- if .Values.ubiquia.agent.flowService.graph.deployments }}
+{{- if .Values.ubiquia.component.flowService.graph.deployments }}
 **************************************************
 Attempting to deploy Directed Acyclic Graphs (DAG's):
 
-{{- range $i, $v := .Values.ubiquia.agent.flowService.graph.deployments }}
+{{- range $i, $v := .Values.ubiquia.component.flowService.graph.deployments }}
 - Name: {{ $v.name }}
   Version: {{ $v.version.major }}.{{ $v.version.minor }}.{{ $v.version.patch }}
   {{- if $v.graphSettings }}

@@ -3,7 +3,6 @@ package org.ubiquia.core.flow.service.command.adapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.OffsetDateTime;
-import net.jimblackler.jsonschemafriend.GenerationException;
 import net.jimblackler.jsonschemafriend.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,7 @@ import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
  * A service that exposes various methods common to all adapters.
  */
 @Service
-public class AdapterAgentResponseCommand {
+public class AdapterComponentResponseCommand {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -32,11 +31,11 @@ public class AdapterAgentResponseCommand {
     @Autowired
     private StamperVisitor stamperVisitor;
 
-    public void processAgentResponse(
+    public void processComponentResponse(
         final FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final ResponseEntity<Object> response)
-        throws JsonProcessingException, ValidationException, GenerationException {
+        throws JsonProcessingException, ValidationException {
 
         var stringifiedPayload = this.objectMapper.writeValueAsString(response.getBody());
         this.payloadModelValidator.tryValidateOutputPayloadFor(stringifiedPayload, adapter);
@@ -46,6 +45,6 @@ public class AdapterAgentResponseCommand {
             flowEventEntity.setOutputPayload(stringifiedPayload);
         }
         flowEventEntity.getFlowEventTimes().setEventCompleteTime(OffsetDateTime.now());
-        this.outbox.tryQueueAgentResponse(flowEventEntity, stringifiedPayload);
+        this.outbox.tryQueueComponentResponse(flowEventEntity, stringifiedPayload);
     }
 }

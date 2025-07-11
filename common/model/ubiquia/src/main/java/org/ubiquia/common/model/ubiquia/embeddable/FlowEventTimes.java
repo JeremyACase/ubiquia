@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 @Embeddable
 public class FlowEventTimes {
 
-    private OffsetDateTime agentResponseTime;
+    private OffsetDateTime componentResponseTime;
 
     private OffsetDateTime payloadSentToAgentTime;
 
@@ -55,12 +55,12 @@ public class FlowEventTimes {
         this.egressResponseReceivedTime = egressResponseReceivedTime;
     }
 
-    public OffsetDateTime getAgentResponseTime() {
-        return agentResponseTime;
+    public OffsetDateTime getComponentResponseTime() {
+        return componentResponseTime;
     }
 
-    public void setAgentResponseTime(OffsetDateTime agentResponseTime) {
-        this.agentResponseTime = agentResponseTime;
+    public void setComponentResponseTime(OffsetDateTime componentResponseTime) {
+        this.componentResponseTime = componentResponseTime;
     }
 
     public OffsetDateTime getSentToOutboxTime() {

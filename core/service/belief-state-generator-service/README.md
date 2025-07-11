@@ -5,13 +5,13 @@
 
 The `belief-state-generator-service` is a **code generation microservice** in Ubiquia. It transforms declaratively defined schemas — along with optional inheritance rules, decorators, and DAG metadata — into **runtime-compiled Java services** that expose **typed RESTful belief state endpoints**.
 
-This service automates the lifecycle of belief state logic — from raw schema to live, type-safe API — enabling distributed agents to share structured knowledge across DAGs without boilerplate or manual coding.
+This service automates the lifecycle of belief state logic — from raw schema to live, type-safe API — enabling distributed components to share structured knowledge across DAGs without boilerplate or manual coding.
 
 ---
 
 ## 🚀 Responsibilities
 
-- 🧬 Transform agent communication schemas into Java model classes and services  
+- 🧬 Transform component communication schemas into Java model classes and services  
 - 🔧 Compile and register generated belief-state services at runtime  
 - 🪄 Apply decorators (e.g., inheritance, metadata injection) before codegen  
 - 🔁 Support dynamic re-generation and recompilation of belief-state APIs  

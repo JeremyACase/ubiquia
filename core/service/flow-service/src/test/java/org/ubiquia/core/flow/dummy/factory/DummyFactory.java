@@ -2,7 +2,6 @@ package org.ubiquia.core.flow.dummy.factory;
 
 import static org.instancio.Select.field;
 
-import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.instancio.Instancio;
@@ -10,13 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
 import org.ubiquia.common.model.ubiquia.dto.Adapter;
-import org.ubiquia.common.model.ubiquia.dto.Agent;
+import org.ubiquia.common.model.ubiquia.dto.Component;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.NameAndVersionPair;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.model.ubiquia.embeddable.SubSchema;
-import org.ubiquia.common.model.ubiquia.enums.AgentType;
+import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.core.flow.mock.MockRegistrar;
 
 
@@ -51,7 +50,7 @@ public class DummyFactory {
             .ignore(field(AbstractModel::getUpdatedAt))
             .ignore(field(Adapter::getGraph))
             .ignore(field(Adapter::getBrokerSettings))
-            .ignore(field(Adapter::getAgent))
+            .ignore(field(Adapter::getComponent))
             .ignore(field(Adapter::getDownstreamAdapters))
             .ignore(field(Adapter::getEgressSettings))
             .ignore(field(Adapter::getOutputSubSchema))
@@ -67,23 +66,23 @@ public class DummyFactory {
     }
 
     /**
-     * Generate an agent for testing.
+     * Generate a component for testing.
      *
-     * @return An agent.
+     * @return A component.
      */
-    public Agent generateAgent() {
+    public Component generateComponent() {
         var agent = Instancio
-            .of(Agent.class)
+            .of(Component.class)
             .ignore(field(AbstractModel::getId))
             .ignore(field(AbstractModel::getCreatedAt))
             .ignore(field(AbstractModel::getUpdatedAt))
-            .ignore(field(Agent::getAdapter))
-            .ignore(field(Agent::getConfig))
-            .ignore(field(Agent::getEnvironmentVariables))
-            .ignore(field(Agent::getGraph))
-            .ignore(field(Agent::getOverrideSettings))
-            .set(field(AbstractModel::getModelType), "Agent")
-            .set(field(Agent::getAgentType), AgentType.TEMPLATE)
+            .ignore(field(Component::getAdapter))
+            .ignore(field(Component::getConfig))
+            .ignore(field(Component::getEnvironmentVariables))
+            .ignore(field(Component::getGraph))
+            .ignore(field(Component::getOverrideSettings))
+            .set(field(AbstractModel::getModelType), "Component")
+            .set(field(Component::getComponentType), ComponentType.TEMPLATE)
             .create();
         return agent;
     }
@@ -107,8 +106,8 @@ public class DummyFactory {
             .ignore(field(AbstractModel::getCreatedAt))
             .ignore(field(AbstractModel::getUpdatedAt))
             .set(field(Graph::getAdapters), new ArrayList<>())
-            .set(field(Graph::getAgents), new ArrayList<>())
-            .set(field(Graph::getAgentlessAdapters), new ArrayList<>())
+            .set(field(Graph::getComponents), new ArrayList<>())
+            .set(field(Graph::getComponentlessAdapters), new ArrayList<>())
             .set(field(Graph::getEdges), new ArrayList<>())
             .set(field(Graph::getVersion), this.getSemanticVersion())
             .set(field(Graph::getAgentCommunicationLanguage), nameAndVersionPair)

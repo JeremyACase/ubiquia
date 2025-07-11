@@ -18,7 +18,7 @@ import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
 import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
-import org.ubiquia.core.communication.service.manager.flow.AgentProxyManager;
+import org.ubiquia.core.communication.service.manager.flow.ComponentProxyManager;
 
 @Service
 public class DeployedGraphPoller {
@@ -34,7 +34,7 @@ public class DeployedGraphPoller {
     private AdapterProxyManager adapterProxyManager;
 
     @Autowired
-    private AgentProxyManager agentProxyManager;
+    private ComponentProxyManager componentProxyManager;
 
     @Autowired
     private UbiquiaAgentConfig ubiquiaAgentConfig;

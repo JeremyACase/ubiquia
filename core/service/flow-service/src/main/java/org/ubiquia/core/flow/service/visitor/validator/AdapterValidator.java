@@ -117,8 +117,8 @@ public class AdapterValidator {
             if (matchingInputSubSchema.isEmpty()) {
                 logger.info("Could not find a matching sub schema between output adapter {}"
                         + " and input  {}",
-                    outputAdapterEntity.getAdapterName(),
-                    inputAdapterEntity.getAdapterName());
+                    outputAdapterEntity.getName(),
+                    inputAdapterEntity.getName());
             } else {
                 hasMatchingInputOutput = this.subSchemaValidator.areEquivalent(
                     matchingInputSubSchema.get(),
@@ -136,7 +136,7 @@ public class AdapterValidator {
      */
     public void tryValidateEgressAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
-        this.validateAdapterHasNoAgent(adapterEntity);
+        this.validateAdapterHasNoComponent(adapterEntity);
         this.validateAdapterHasNoDownstreamAdapters(adapterEntity);
         this.validateAdapterHasASingleUpstreamAdapter(adapterEntity);
         this.validateAdapterHasEgressSettings(adapterEntity);
@@ -151,7 +151,7 @@ public class AdapterValidator {
      */
     public void tryValidateMergeAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
-        this.validateAdapterIsNotPassthroughWithAnAgent(adapterEntity);
+        this.validateAdapterIsNotPassthroughWithAComponent(adapterEntity);
         this.validateAdapterHasEgressSettings(adapterEntity);
         this.validateAdapterIsNotPassthroughWithoutDownstreamAdapters(adapterEntity);
         logger.info("...validated...");
@@ -164,7 +164,7 @@ public class AdapterValidator {
      */
     public void tryValidatePollAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
-        this.validateAdapterIsNotPassthroughWithAnAgent(adapterEntity);
+        this.validateAdapterIsNotPassthroughWithAComponent(adapterEntity);
         this.validateAdapterHasNoUpstreamAdapters(adapterEntity);
         this.validateAdapterHasPollSettings(adapterEntity);
         this.validateAdapterHasASingleInputSubSchema(adapterEntity);
@@ -179,7 +179,7 @@ public class AdapterValidator {
      */
     public void tryValidatePublishAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
-        this.validateAdapterHasNoAgent(adapterEntity);
+        this.validateAdapterHasNoComponent(adapterEntity);
         this.validateAdapterHasASingleUpstreamAdapter(adapterEntity);
         this.validateAdapterHasNoDownstreamAdapters(adapterEntity);
         this.validateAdapterHasNoEgressSettings(adapterEntity);
@@ -195,7 +195,7 @@ public class AdapterValidator {
      */
     public void tryValidatePushAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
-        this.validateAdapterIsNotPassthroughWithAnAgent(adapterEntity);
+        this.validateAdapterIsNotPassthroughWithAComponent(adapterEntity);
         this.validateAdapterHasNoUpstreamAdapters(adapterEntity);
         this.validateAdapterHasEgressSettings(adapterEntity);
         this.validateAdapterHasASingleInputSubSchema(adapterEntity);
@@ -210,7 +210,7 @@ public class AdapterValidator {
      */
     public void tryValidateQueueAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
-        this.validateAdapterHasNoAgent(adapterEntity);
+        this.validateAdapterHasNoComponent(adapterEntity);
         this.validateAdapterHasASingleUpstreamAdapter(adapterEntity);
         this.validateAdapterHasNoDownstreamAdapters(adapterEntity);
         this.validateAdapterHasNoEgressSettings(adapterEntity);
@@ -226,7 +226,7 @@ public class AdapterValidator {
      */
     public void tryValidateHiddenAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
-        this.validateAdapterIsNotPassthroughWithAnAgent(adapterEntity);
+        this.validateAdapterIsNotPassthroughWithAComponent(adapterEntity);
         this.validateAdapterHasASingleUpstreamAdapter(adapterEntity);
         this.validateAdapterHasEgressSettings(adapterEntity);
         this.validateAdapterHasASingleInputSubSchema(adapterEntity);
@@ -241,7 +241,7 @@ public class AdapterValidator {
      */
     public void tryValidateSubscribeAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
-        this.validateAdapterIsNotPassthroughWithAnAgent(adapterEntity);
+        this.validateAdapterIsNotPassthroughWithAComponent(adapterEntity);
         this.validateAdapterHasEgressSettings(adapterEntity);
         this.validateAdapterHasNoUpstreamAdapters(adapterEntity);
         this.validateAdapterHasASingleInputSubSchema(adapterEntity);
@@ -277,8 +277,8 @@ public class AdapterValidator {
     private void tryValidateAdapterSettings(final AdapterEntity adapterEntity) {
         logger.info("Validating {} adapter for graph {} named {}...",
             adapterEntity.getAdapterType(),
-            adapterEntity.getGraph().getGraphName(),
-            adapterEntity.getAdapterName());
+            adapterEntity.getGraph().getName(),
+            adapterEntity.getName());
 
         var adapterSettings = adapterEntity.getAdapterSettings();
         if (Objects.nonNull(adapterSettings.getBackpressurePollFrequencyMilliseconds())
@@ -298,8 +298,8 @@ public class AdapterValidator {
 
         logger.info("...validating adapter for graph {} named {} has "
                 + "valid egress settings...",
-            adapterEntity.getGraph().getGraphName(),
-            adapterEntity.getAdapterName());
+            adapterEntity.getGraph().getName(),
+            adapterEntity.getName());
 
         var egressSettings = adapterEntity.getEgressSettings();
         if (Objects.isNull(egressSettings)) {
@@ -343,8 +343,8 @@ public class AdapterValidator {
 
         logger.info("...validating adapter for graph {} named {} has "
                 + "valid egress settings...",
-            adapterEntity.getGraph().getGraphName(),
-            adapterEntity.getAdapterName());
+            adapterEntity.getGraph().getName(),
+            adapterEntity.getName());
 
         if (Objects.isNull(adapterEntity.getPollSettings())) {
             throw new IllegalArgumentException("ERROR: "
@@ -377,8 +377,8 @@ public class AdapterValidator {
 
         logger.info("...validating adapter named {} for graph {} has "
                 + "no egress settings...",
-            adapterEntity.getAdapterName(),
-            adapterEntity.getGraph().getGraphName());
+            adapterEntity.getName(),
+            adapterEntity.getGraph().getName());
 
         if (Objects.nonNull(adapterEntity.getEgressSettings())) {
             throw new IllegalArgumentException("ERROR: "
@@ -397,8 +397,8 @@ public class AdapterValidator {
 
         logger.info("...validating adapter named {} for graph {} has "
                 + "only a single upstream adapter...",
-            adapterEntity.getAdapterName(),
-            adapterEntity.getGraph().getGraphName());
+            adapterEntity.getName(),
+            adapterEntity.getGraph().getName());
 
         if (adapterEntity.getUpstreamAdapters().size() != 1) {
             throw new IllegalArgumentException("ERROR: "
@@ -416,8 +416,8 @@ public class AdapterValidator {
 
         logger.info("...validating adapter named {} for graph {} has "
                 + "no downstream adapters...",
-            adapterEntity.getAdapterName(),
-            adapterEntity.getGraph().getGraphName());
+            adapterEntity.getName(),
+            adapterEntity.getGraph().getName());
 
         if (!adapterEntity.getDownstreamAdapters().isEmpty()) {
             throw new IllegalArgumentException("ERROR: "
@@ -435,8 +435,8 @@ public class AdapterValidator {
     private void validateAdapterHasASingleInputSubSchema(final AdapterEntity adapterEntity) {
         logger.info("...validating adapter for graph {} named {} has "
                 + "only a single input sub schema...",
-            adapterEntity.getGraph().getGraphName(),
-            adapterEntity.getAdapterName());
+            adapterEntity.getGraph().getName(),
+            adapterEntity.getName());
 
         if (adapterEntity.getInputSubSchemas().size() != 1) {
             throw new IllegalArgumentException("ERROR: "
@@ -447,47 +447,47 @@ public class AdapterValidator {
     }
 
     /**
-     * Validate than at adapter has no agent.
+     * Validate than at adapter has no component.
      *
      * @param adapterEntity The adapter to validate for.
      */
-    private void validateAdapterHasNoAgent(final AdapterEntity adapterEntity) {
+    private void validateAdapterHasNoComponent(final AdapterEntity adapterEntity) {
 
         logger.info("...validating adapter for graph {} has "
-                + "no agent...",
-            adapterEntity.getGraph().getGraphName());
+                + "no component...",
+            adapterEntity.getGraph().getName());
 
-        if (Objects.nonNull(adapterEntity.getAgent())) {
+        if (Objects.nonNull(adapterEntity.getComponent())) {
             throw new IllegalArgumentException("ERROR: "
                 + adapterEntity.getAdapterType()
                 + " type adapter is not allowed to "
-                + "have an agent!");
+                + "have a component!");
         }
     }
 
     /**
-     * Validate that an adapter only a single agent.
+     * Validate that an adapter only a single component.
      *
      * @param adapterEntity The adapter to validate.
      */
-    private void validateAdapterIsNotPassthroughWithAnAgent(final AdapterEntity adapterEntity) {
+    private void validateAdapterIsNotPassthroughWithAComponent(final AdapterEntity adapterEntity) {
 
         if (adapterEntity.getAdapterSettings().getIsPassthrough()) {
             logger.info("...adapter named {} for graph {} has "
-                    + " is configured as passthrough, not verifying downstream agent...",
-                adapterEntity.getAdapterName(),
-                adapterEntity.getGraph().getGraphName());
+                    + " is configured as passthrough, not verifying downstream component...",
+                adapterEntity.getName(),
+                adapterEntity.getGraph().getName());
         } else {
             logger.info("...validating adapter named {} for graph {} has "
-                    + "an agent...",
-                adapterEntity.getAdapterName(),
-                adapterEntity.getGraph().getGraphName());
+                    + "a component...",
+                adapterEntity.getName(),
+                adapterEntity.getGraph().getName());
 
-            if (Objects.isNull(adapterEntity.getAgent())) {
+            if (Objects.isNull(adapterEntity.getComponent())) {
                 throw new IllegalArgumentException("ERROR: "
                     + adapterEntity.getAdapterType()
                     + " type adapter has to have "
-                    + "an agent!");
+                    + "a component!");
             }
         }
     }
@@ -501,8 +501,8 @@ public class AdapterValidator {
 
         logger.info("...validating adapter named {} for graph {} has "
                 + "no upstream adapters...",
-            adapterEntity.getAdapterName(),
-            adapterEntity.getGraph().getGraphName());
+            adapterEntity.getName(),
+            adapterEntity.getGraph().getName());
 
         if (!adapterEntity.getUpstreamAdapters().isEmpty()) {
             throw new IllegalArgumentException("ERROR: "
@@ -520,8 +520,8 @@ public class AdapterValidator {
     private void validateAdapterIsNotPassthrough(final AdapterEntity adapterEntity) {
         logger.info("...validating adapter named {} for graph {} has "
                 + "is not configured as a passthrough adapter...",
-            adapterEntity.getAdapterName(),
-            adapterEntity.getGraph().getGraphName());
+            adapterEntity.getName(),
+            adapterEntity.getGraph().getName());
 
         if (adapterEntity.getAdapterSettings().getIsPassthrough()) {
             throw new IllegalArgumentException("ERROR: "
@@ -537,8 +537,8 @@ public class AdapterValidator {
     private void validateAdapterIsNotPassthroughWithoutDownstreamAdapters(final AdapterEntity adapterEntity) {
         logger.info("...validating adapter named {} for graph {} is not a passthrough "
                 + " without downstream adapters...",
-            adapterEntity.getAdapterName(),
-            adapterEntity.getGraph().getGraphName());
+            adapterEntity.getName(),
+            adapterEntity.getGraph().getName());
 
 
         if (adapterEntity.getAdapterSettings().getIsPassthrough()

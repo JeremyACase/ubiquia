@@ -15,8 +15,8 @@ public class AdapterEndpointRecordBuilder {
         return new URI(
             "http",
             null,
-            adapter.getAgent().getAgentName().toLowerCase(),
-            adapter.getAgent().getPort(),
+            adapter.getComponent().getName().toLowerCase(),
+            adapter.getComponent().getPort(),
             adapter.getEndpoint(),
             null,
             null

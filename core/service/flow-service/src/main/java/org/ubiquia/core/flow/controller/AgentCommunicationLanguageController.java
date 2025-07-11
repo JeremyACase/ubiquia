@@ -20,7 +20,7 @@ import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguageEntity;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.AgentCommunicationLanguageRepository;
-import org.ubiquia.core.flow.repository.AgentRepository;
+import org.ubiquia.core.flow.repository.ComponentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.service.mapper.AgentCommunicationLanguageDtoMapper;
 import org.ubiquia.core.flow.service.registrar.AgentCommunicationLanguageRegistrar;
@@ -47,7 +47,7 @@ public class AgentCommunicationLanguageController extends GenericUbiquiaDaoContr
     private AdapterRepository adapterRepository;
 
     @Autowired
-    private AgentRepository agentRepository;
+    private ComponentRepository componentRepository;
 
     @Autowired
     private AgentCommunicationLanguageRepository aclRepository;
@@ -93,7 +93,7 @@ public class AgentCommunicationLanguageController extends GenericUbiquiaDaoContr
             response = ResponseEntity.status(HttpStatus.OK).body(record.get().getId());
             for (var graph : record.get().getGraphs()) {
                 this.adapterRepository.deleteAll(graph.getAdapters());
-                this.agentRepository.deleteAll(graph.getAgents());
+                this.componentRepository.deleteAll(graph.getComponents());
                 this.graphRepository.delete(graph);
             }
             this.aclRepository.delete(record.get());

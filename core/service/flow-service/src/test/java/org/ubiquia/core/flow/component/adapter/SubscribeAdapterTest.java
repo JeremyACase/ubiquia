@@ -12,7 +12,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.ubiquia.common.model.ubiquia.embeddable.BrokerSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.AdapterType;
-import org.ubiquia.common.model.ubiquia.enums.AgentType;
+import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.common.model.ubiquia.enums.BrokerType;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.controller.GraphController;
@@ -56,9 +56,9 @@ public class SubscribeAdapterTest {
     public void assertSubscribesToData_isValid() throws Exception {
         var graph = this.dummyFactory.generateGraph();
 
-        var subscribeAgent = this.dummyFactory.generateAgent();
-        subscribeAgent.setAgentType(AgentType.NONE);
-        graph.getAgents().add(subscribeAgent);
+        var subscribeComponent = this.dummyFactory.generateComponent();
+        subscribeComponent.setComponentType(ComponentType.NONE);
+        graph.getComponents().add(subscribeComponent);
 
         var subscribeAdapter = this.dummyFactory.generateAdapter();
         subscribeAdapter.setAdapterType(AdapterType.SUBSCRIBE);
@@ -69,17 +69,17 @@ public class SubscribeAdapterTest {
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         subscribeAdapter.getInputSubSchemas().add(subSchema);
         subscribeAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-        subscribeAgent.setAdapter(subscribeAdapter);
+        subscribeComponent.setAdapter(subscribeAdapter);
 
         this.graphController.register(graph);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getGraphName());
+        deployment.setName(graph.getName());
         deployment.setVersion(graph.getVersion());
         this.graphController.tryDeployGraph(deployment);
 
         var adapter = (SubscribeAdapter) this
             .testHelper
-            .findAdapter(subscribeAdapter.getAdapterName(), graph.getGraphName());
+            .findAdapter(subscribeAdapter.getName(), graph.getName());
 
         var mockWebServer = new MockWebServer();
         mockWebServer.url(adapter.getAdapterContext().getEndpointUri().toString());

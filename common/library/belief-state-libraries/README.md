@@ -3,7 +3,7 @@
 
 > **Shared library components for typed, schema-driven belief state services in Ubiquia.**
 
-The `belief-state-libraries` module provides foundational building blocks for belief-state services in Ubiquia. It contains reusable components for **typed data handling**, **RESTful controller scaffolding**, **DTO transformation**, **JPA persistence**, and **entity relationship management** — all optimized for schema-generated, runtime-compiled agent belief systems.
+The `belief-state-libraries` module provides foundational building blocks for belief-state services in Ubiquia. It contains reusable components for **typed data handling**, **RESTful controller scaffolding**, **DTO transformation**, **JPA persistence**, and **entity relationship management** — all optimized for schema-generated, runtime-compiled component belief systems.
 
 ---
 
@@ -33,7 +33,7 @@ The `belief-state-libraries` module provides foundational building blocks for be
   Provides contract-based persistence patterns via `EntityRepository`
 
 - **Telemetry Integration**  
-  Micrometer support via builders and commands for standardized observability across agents
+  Micrometer support via builders and commands for standardized observability across components
 
 ---
 

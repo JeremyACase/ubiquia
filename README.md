@@ -1,8 +1,8 @@
 # Ubiquia
 
-> **A runtime-compiled, DAG-orchestrated, schema-driven platform for building intelligent agent ecosystems — at production scale.**
+> **A runtime-compiled, DAG-orchestrated, schema-driven platform for building intelligent component ecosystems — at production scale.**
 
-Ubiquia is a **domain-agnostic, production-grade Multi-Agent Orchestration System**. It lets you declaratively define agent communication protocols and workflows, then compiles and deploys them into a **live, resilient, and self-validating distributed system** — all from JSON schemas and YAML-ized Directed Acyclic Graphs (DAG's).
+Ubiquia is a **domain-agnostic, production-grade Multi-Agent Orchestration System**. It lets you declaratively define component communication protocols and workflows, then compiles and deploys them into a **live, resilient, and self-validating distributed system** — all from JSON schemas and YAML-ized Directed Acyclic Graphs (DAG's).
 
 ---
 
@@ -10,13 +10,13 @@ Ubiquia is a **domain-agnostic, production-grade Multi-Agent Orchestration Syste
 
 Ubiquia is not another workflow engine or LLM wrapper. It's a **foundational infrastructure layer** designed to support:
 
-- **Typed agent communication** (via JSON Schema)
+- **Typed Agent communication** (via JSON Schema)
 - **Runtime deployment** of distributed, RESTful belief states
-- **Persistent, self-evolving DAGs** of intelligent agents
+- **Persistent, self-evolving DAGs** of intelligent components
 - **Schema-validated I/O contracts between services**
 - **Distributed system messaging with SQL-level guarantees**
 
-Ubiquia enables a future where **LLMs**, **symbolic agents**, and **software systems** can collaborate in validated, evolving ecosystems — with no glue code.
+Ubiquia enables a future where **LLMs**, **symbolic components**, and **software systems** can collaborate in validated, evolving ecosystems — with no glue code.
 
 ---
 
@@ -26,12 +26,12 @@ Ubiquia enables a future where **LLMs**, **symbolic agents**, and **software sys
   Generate and deploy fully-typed REST APIs from JSON Schema definitions. No scaffolding. No boilerplate. Just the schema.
 
 - 🗺️ **Declarative DAGs → Kubernetes Agents**  
-  Define a multi-agent system with a single YAML file. Ubiquia reads the DAG and deploys it to Kubernetes — each node a live, stateful microservice.
+  Define a multi-component system with a single YAML file. Ubiquia reads the DAG and deploys it to Kubernetes — each node a live, stateful microservice.
 
 - 🌍 **Cross-Cluster DAG Communication**  
-  DAGs can span **multiple Kubernetes clusters**, enabling agents to operate across physical or cloud boundaries. This supports:
+  DAGs can span **multiple Kubernetes clusters**, enabling components to operate across physical or cloud boundaries. This supports:
   - **Resilient compute**: workloads can route around degraded or partitioned clusters  
-  - **Topology-aware orchestration**: agents and DAG nodes can execute **close to data, users, or compute availability zones**
+  - **Topology-aware orchestration**: components and DAG nodes can execute **close to data, users, or compute availability zones**
 
 - 🧬 **Distributed Belief State via Configurable SQL Backend**  
   Agents share a global belief state backed by a **relational SQL database**, with support for either:
@@ -39,10 +39,10 @@ Ubiquia enables a future where **LLMs**, **symbolic agents**, and **software sys
   - **H2** for lightweight, in-memory or single-node scenarios such as local dev, testing, or compute-constrained environments
 
 - 🧾 **Runtime Schema Enforcement**  
-  Every I/O channel between agents is validated in real time. No brittle prompt logic, no undefined behavior — just contract-based communication.
+  Every I/O channel between components is validated in real time. No brittle prompt logic, no undefined behavior — just contract-based communication.
 
 - 🔄 **Recursive System Evolution** *(Experimental)*  
-  DAGs and belief schemas can be evolved by agents themselves, opening the door to recursive intelligence: **AutoGPT, but type-safe and production-ready.**
+  DAGs and belief schemas can be evolved by components themselves, opening the door to recursive intelligence: **AutoGPT, but type-safe and production-ready.**
 
 - 🧰 **Spring Boot + Helm + Gradle**  
   Built on rock-solid Java infrastructure and Kubernetes-native deployment patterns. DevOps-friendly and cloud-ready.
@@ -97,13 +97,13 @@ These scripts need to be run whenever you want to do a fresh install of Ubiquia 
 $ ./scripts/devs/install-ubiquia-into-kind.sh
 ```
 
-After invoking the script and a successful installation, Helm will output to console how to interface with the newly-installed Ubiquia agent.
+After invoking the script and a successful installation, Helm will output to console how to interface with the newly-installed Ubiquia component.
 
 ### Quickstart: Deleting Ubiquia Cluster
 If you ran the above script to install Ubiquia into KIND and want a completely fresh start, you can delete the KIND Kubernetes cluster
 
 ```bash
-$ kind delete clusters ubiquia-agent-0
+$ kind delete clusters ubiquia-component-0
 ```
 
 Now you can re-run the installation script with a fresh Kubernetes cluster!
@@ -140,7 +140,7 @@ $ helm install ubiquia ubiquia-helm --values helm/configurations/featherwweight.
 ```
 
 ### Getting Started: Project Overview
-Ubiquia is a modular multi-agent orchestration platform designed for scalable, belief-driven AI systems running on Kubernetes.
+Ubiquia is a modular multi-component orchestration platform designed for scalable, belief-driven AI systems running on Kubernetes.
 
 To ensure modularity, clarity, and maintainability, the codebase is divided into subprojects. Each will eventually have its own README and design documents — some already do, and others are coming soon.
 
@@ -185,7 +185,7 @@ $ ./gradlew :core:service:flow-service:build
 
 ## Who Is This For?
 
-- **ML engineers** who want LLM agents with schema validation  
+- **ML engineers** who want LLM components with schema validation  
 - **Backend developers** who want to design systems with declarative intent and runtime validation  
 - **Systems engineers** building distributed or autonomous orchestration platforms  
 - **Scientists & researchers** modeling intelligent ecosystems or recursive planners  
@@ -197,21 +197,21 @@ $ ./gradlew :core:service:flow-service:build
 
 | Term | Definition |
 |------|------------|
-| **ACL (Agent Communication Language)** | A JSON Schema-based contract that defines the types of messages agents can send or receive. Enforces runtime validation of agent I/O. |
+| **ACL (Agent Communication Language)** | A JSON Schema-based contract that defines the types of messages components can send or receive. Enforces runtime validation of component I/O. |
 | **Adapter** | A software component that connects nodes in a DAG and defines how messages are transported or transformed (e.g., `publish`, `merge`, `poll`). |
-| **Agent** | A stateful microservice deployed as part of a DAG, capable of sending, receiving, and acting on messages according to ACLs. |
-| **Agentless Adapter** | An adapter node in a DAG that performs flow control (e.g., routing, polling, merging) but does not host an agent implementation. |
+| **Component** | A stateful microservice deployed as part of a DAG, capable of sending, receiving, and acting on messages according to ACLs. |
+| **Componentless Adapter** | An adapter node in a DAG that performs flow control (e.g., routing, polling, merging) but does not host an component implementation. |
 | **Belief State** | A shared, distributed, and SQL-backed representation of the system’s current knowledge. Agents can read from and write to it, supporting coordination and memory across the system. |
-| **Belief-State Generator** | A codegen service that transforms ACLs into typed Java classes and Spring Boot REST services, enabling agents to interact with the belief state in a schema-safe way. |
-| **Communication Service** | A reverse proxy and routing gateway that dynamically exposes core services and agent/adapters based on DAG configuration. |
+| **Belief State Generator** | A codegen service that transforms ACLs into typed Java classes and Spring Boot REST services, enabling components to interact with the belief state in a schema-safe way. |
+| **Communication Service** | A reverse proxy and routing gateway that dynamically exposes core services and component/adapters based on DAG configuration. |
 | **DAO (Data Access Object)** | A component that abstracts and encapsulates database interactions, commonly used to query or persist belief state entities. |
-| **DAG (Directed Acyclic Graph)** | A directed graph with no cycles, used to define agent topologies and message flow in Ubiquia. DAGs are authored in YAML and compiled into orchestrated services. |
-| **DAG Manifest** | A YAML configuration file that declares how a DAG and its agents/adapters should be deployed, configured, and interconnected. |
+| **DAG (Directed Acyclic Graph)** | A directed graph with no cycles, used to define component topologies and message flow in Ubiquia. DAGs are authored in YAML and compiled into orchestrated services. |
+| **DAG Manifest** | A YAML configuration file that declares how a DAG and its components/adapters should be deployed, configured, and interconnected. |
 | **DTO (Data Transfer Object)** | A simple object used to encapsulate data transferred between layers or services in Ubiquia. Used heavily in REST APIs. |
-| **Flow Service** | A core Ubiquia microservice responsible for materializing DAGs into running agents and adapters. Manages lifecycle, registration, and event querying. |
-| **MAO (Multi-Agent Orchestration)** | The process of managing and coordinating interactions among agents in a MAS. Ubiquia handles MAO through DAG deployment and adapter coordination. |
-| **MAS (Multi-Agent System)** | A system composed of multiple intelligent agents that interact or work together to perform tasks or solve problems. Ubiquia provides runtime infrastructure for these systems. |
-| **Schema Registry** | A repository of JSON Schemas (ACLs) that define I/O contracts for agents and services. Used for validation, code generation, and schema evolution. |
+| **Flow Service** | A core Ubiquia microservice responsible for materializing DAGs into running components and adapters. Manages lifecycle, registration, and event querying. |
+| **MAO (Multi-Agent Orchestration)** | The process of managing and coordinating interactions among components in a MAS. Ubiquia handles MAO through DAG deployment and adapter coordination. |
+| **MAS (Multi-Agent System)** | A system composed of multiple intelligent components that interact or work together to perform tasks or solve problems. Ubiquia provides runtime infrastructure for these systems. |
+| **Schema Registry** | A repository of JSON Schemas (ACLs) that define I/O contracts for components and services. Used for validation, code generation, and schema evolution. |
 ---
 
 ## Contributors

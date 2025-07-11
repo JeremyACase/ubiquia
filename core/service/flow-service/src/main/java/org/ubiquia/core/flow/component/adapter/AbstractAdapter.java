@@ -30,7 +30,7 @@ import org.ubiquia.core.flow.service.visitor.StamperVisitor;
 import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
 
 /**
- * An abstract class that can be used to adapt to Agents in Ubiquia. There are different
+ * An abstract class that can be used to adapt to Components in Ubiquia. There are different
  * types of adapters; each inherits from this abstract base class.
  * Adapters are built at runtime using data from the database. They can be torn down or deployed
  * dynamically when a graph is similarly torn down or deployed.
@@ -120,7 +120,7 @@ public abstract class AbstractAdapter implements InterfaceLogger {
             sample = this.microMeterHelper.startSample();
         }
 
-        this.getLogger().info("Received a payload to push to agent...");
+        this.getLogger().info("Received a payload to push to component...");
         this.payloadModelValidator.tryValidateInputPayloadFor(inputPayload, this);
         var event = this.flowEventBuilder.makeEventFrom(inputPayload, this);
 
@@ -136,21 +136,21 @@ public abstract class AbstractAdapter implements InterfaceLogger {
         return response;
     }
 
-    public void stimulateAgent() {
+    public void stimulateComponent() {
 
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterHelper)) {
             sample = this.microMeterHelper.startSample();
         }
 
-        this.getLogger().info("Stimulating agent with dummy input payload...");
+        this.getLogger().info("Stimulating component with dummy input payload...");
 
         try {
             var stimulatePayload = this.stimulatedPayloadBuilder.buildStimulatedPayloadFor(this);
             var event = this.flowEventBuilder.makeEventFrom(stimulatePayload, this);
             this.adapterPayloadOrchestrator.forwardPayload(event, this, stimulatePayload);
         } catch (Exception e) {
-            this.getLogger().error("ERROR: Error while stimulating agent: ", e);
+            this.getLogger().error("ERROR: Error while stimulating component: ", e);
         }
 
         if (Objects.nonNull(sample)) {
@@ -176,7 +176,7 @@ public abstract class AbstractAdapter implements InterfaceLogger {
         return response;
     }
 
-    protected void tryProcessInboxMessages(List<FlowMessage> messages) {
+    protected void tryProcessInboxMessages(final List<FlowMessage> messages) {
         for (var message : messages) {
             this.adapterInboxMessageCommand.tryProcessInboxMessageFor(message, this);
         }

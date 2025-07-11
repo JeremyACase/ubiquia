@@ -4,18 +4,18 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 import org.ubiquia.common.model.ubiquia.embeddable.*;
-import org.ubiquia.common.model.ubiquia.enums.AgentType;
+import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 
 @Entity
-public class AgentEntity extends AbstractModelEntity {
+public class ComponentEntity extends AbstractModelEntity {
 
-    private AgentType type;
+    private ComponentType type;
 
     private CommunicationServiceSettings communicationServiceSettings;
 
     private Config config;
 
-    private String agentName;
+    private String name;
 
     private String description;
 
@@ -45,11 +45,11 @@ public class AgentEntity extends AbstractModelEntity {
 
     private LivenessProbe livenessProbe;
 
-    @OneToOne(mappedBy = "agent", optional = true)
+    @OneToOne(mappedBy = "component", optional = true)
     private AdapterEntity adapter;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "graph_agent_join_id", nullable = false)
+    @JoinColumn(name = "graph_component_join_id", nullable = false)
     private GraphEntity graph;
 
     @ElementCollection
@@ -64,12 +64,12 @@ public class AgentEntity extends AbstractModelEntity {
     }
 
     @NotNull
-    public String getAgentName() {
-        return agentName;
+    public String getName() {
+        return name;
     }
 
-    public void setAgentName(String agentName) {
-        this.agentName = agentName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @NotNull
@@ -83,7 +83,7 @@ public class AgentEntity extends AbstractModelEntity {
 
     @Override
     public String getModelType() {
-        return "Agent";
+        return "Component";
     }
 
     public AdapterEntity getAdapter() {
@@ -142,11 +142,11 @@ public class AgentEntity extends AbstractModelEntity {
         this.overrideSettings = overrideSettings;
     }
 
-    public AgentType getType() {
+    public ComponentType getType() {
         return type;
     }
 
-    public void setType(AgentType type) {
+    public void setType(ComponentType type) {
         this.type = type;
     }
 

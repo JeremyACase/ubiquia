@@ -4,7 +4,7 @@ package org.ubiquia.common.model.ubiquia.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum AgentType {
+public enum ComponentType {
 
     NONE("NONE"),
 
@@ -14,7 +14,7 @@ public enum AgentType {
 
     private String value;
 
-    AgentType(String value) {
+    ComponentType(String value) {
         this.value = value;
     }
 
@@ -25,10 +25,10 @@ public enum AgentType {
      * @return The enum value of the string.
      */
     @JsonCreator
-    public static AgentType fromValue(String text) {
-        for (AgentType b : AgentType.values()) {
-            if (String.valueOf(b.value).equals(text)) {
-                return b;
+    public static ComponentType fromValue(String text) {
+        for (var type : ComponentType.values()) {
+            if (String.valueOf(type.value).equals(text)) {
+                return type;
             }
         }
         return null;

@@ -8,7 +8,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 
 public class Graph extends AbstractModel {
 
-    private String graphName;
+    private String name;
 
     private String author;
 
@@ -24,9 +24,9 @@ public class Graph extends AbstractModel {
 
     private List<Adapter> adapters;
 
-    private List<Adapter> agentlessAdapters;
+    private List<Adapter> componentlessAdapters;
 
-    private List<Agent> agents;
+    private List<Component> components;
 
     @Override
     public String getModelType() {
@@ -34,12 +34,12 @@ public class Graph extends AbstractModel {
     }
 
     @NotNull
-    public String getGraphName() {
-        return graphName;
+    public String getName() {
+        return name;
     }
 
-    public void setGraphName(String graphName) {
-        this.graphName = graphName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @NotNull
@@ -77,12 +77,12 @@ public class Graph extends AbstractModel {
         this.adapters = adapters;
     }
 
-    public List<Agent> getAgents() {
-        return agents;
+    public List<Component> getComponents() {
+        return components;
     }
 
-    public void setAgents(List<Agent> agents) {
-        this.agents = agents;
+    public void setComponents(List<Component> components) {
+        this.components = components;
     }
 
     public List<String> getCapabilities() {
@@ -101,12 +101,12 @@ public class Graph extends AbstractModel {
         this.edges = edges;
     }
 
-    public List<Adapter> getAgentlessAdapters() {
-        return agentlessAdapters;
+    public List<Adapter> getComponentlessAdapters() {
+        return componentlessAdapters;
     }
 
-    public void setAgentlessAdapters(List<Adapter> agentlessAdapters) {
-        this.agentlessAdapters = agentlessAdapters;
+    public void setComponentlessAdapters(List<Adapter> componentlessAdapters) {
+        this.componentlessAdapters = componentlessAdapters;
     }
 
     @NotNull
