@@ -49,6 +49,9 @@ data:
     ubiquia:
       agent:
         id: {{ .Values.ubiquia.agent.id }}
+        storage:
+          minio:
+            enabled: {{ .Values.ubiquia.agent.storage.minio.enabled }}
       beliefStateGeneratorService:
         libraries:
           directory:
@@ -67,4 +70,4 @@ data:
       jdkVersion: 21 # TODO: Make sure this is controlled by the top-level gradle.properties variable
       kubernetes:
         enabled: true
-        namespace: {{ .Release.Namespace }}
+        namespace: {{ .Release.Namespace }}      

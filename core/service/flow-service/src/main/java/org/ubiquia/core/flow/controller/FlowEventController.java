@@ -5,12 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.ubiquia.common.library.api.controller.GenericUbiquiaDaoController;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.dao.component.EntityDao;
+import org.ubiquia.common.library.implementation.controller.GenericUbiquiaDaoController;
+import org.ubiquia.common.library.implementation.service.mapper.FlowEventDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
-import org.ubiquia.core.flow.service.mapper.FlowEventDtoMapper;
 
 @RestController
 @RequestMapping("/ubiquia/event")

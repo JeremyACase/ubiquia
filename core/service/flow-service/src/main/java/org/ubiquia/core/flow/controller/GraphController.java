@@ -15,24 +15,24 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.ubiquia.common.library.api.controller.GenericUbiquiaDaoController;
+import org.ubiquia.common.library.api.config.UbiquiaAgentConfig;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
+import org.ubiquia.common.library.api.repository.UbiquiaAgentRepository;
 import org.ubiquia.common.library.dao.component.EntityDao;
+import org.ubiquia.common.library.implementation.controller.GenericUbiquiaDaoController;
+import org.ubiquia.common.library.implementation.service.mapper.GraphDtoMapper;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
-import org.ubiquia.common.library.config.UbiquiaAgentConfig;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.ComponentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
-import org.ubiquia.core.flow.repository.UbiquiaAgentRepository;
 import org.ubiquia.core.flow.service.finder.GraphFinder;
 import org.ubiquia.core.flow.service.finder.UbiquiaAgentFinder;
 import org.ubiquia.core.flow.service.k8s.ComponentOperator;
 import org.ubiquia.core.flow.service.manager.AdapterManager;
 import org.ubiquia.core.flow.service.manager.ComponentManager;
-import org.ubiquia.core.flow.service.mapper.GraphDtoMapper;
 import org.ubiquia.core.flow.service.registrar.GraphRegistrar;
 
 @RestController

@@ -8,6 +8,7 @@
 echo Running one-time setup for Ubiquia installation...
 echo ...adding Helm repos...
 
+helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo add yugabyte https://charts.yugabyte.com
 
 echo ...done.

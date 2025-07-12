@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
@@ -17,8 +18,15 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  * @author <a href="jeremycase@odysseyconsult.com">Jeremy Case</a>
  */
 @SpringBootApplication
-@ComponentScan(basePackages = {"org.ubiquia.core", "org.ubiquia.common"})
-@EntityScan(basePackages = {"org.ubiquia.core", "org.ubiquia.common.model.ubiquia"})
+@EnableJpaRepositories(basePackages = {
+    "org.ubiquia.common.library.api.repository",
+    "org.ubiquia.core.flow.repository"})
+@ComponentScan(basePackages = {
+    "org.ubiquia.core",
+    "org.ubiquia.common"})
+@EntityScan(basePackages = {
+    "org.ubiquia.core",
+    "org.ubiquia.common.model.ubiquia"})
 public class Application {
 
     @Autowired

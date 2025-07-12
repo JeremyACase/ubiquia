@@ -11,13 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.library.implementation.service.mapper.FlowMessageDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.component.adapter.QueueAdapter;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.calculator.AdapterConcurrencyCalculator;
-import org.ubiquia.core.flow.service.mapper.FlowMessageDtoMapper;
 
 /**
  * A serviced dedicated to polling for incoming messages from the database on behalf

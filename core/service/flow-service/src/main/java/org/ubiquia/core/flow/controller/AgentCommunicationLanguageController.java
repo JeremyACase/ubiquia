@@ -12,9 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.ubiquia.common.library.api.controller.GenericUbiquiaDaoController;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.dao.component.EntityDao;
+import org.ubiquia.common.library.implementation.controller.GenericUbiquiaDaoController;
+import org.ubiquia.common.library.implementation.service.mapper.AgentCommunicationLanguageDtoMapper;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguageEntity;
@@ -22,7 +23,6 @@ import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.AgentCommunicationLanguageRepository;
 import org.ubiquia.core.flow.repository.ComponentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
-import org.ubiquia.core.flow.service.mapper.AgentCommunicationLanguageDtoMapper;
 import org.ubiquia.core.flow.service.registrar.AgentCommunicationLanguageRegistrar;
 
 /**

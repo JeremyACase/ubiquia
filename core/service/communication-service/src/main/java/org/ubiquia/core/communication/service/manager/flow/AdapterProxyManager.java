@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.ubiquia.common.library.logic.service.builder.AdapterEndpointRecordBuilder;
+import org.ubiquia.common.library.implementation.service.builder.AdapterEndpointRecordBuilder;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.core.communication.config.FlowServiceConfig;
 

@@ -14,7 +14,7 @@ plugins {
 
 allprojects {
     group = 'org.ubiquia'
-    version = '0.3.0'
+    version = '0.4.0'
 
     repositories {
         mavenCentral()
@@ -35,9 +35,8 @@ subprojects {
     dependencies {
         testImplementation "org.springframework.boot:spring-boot-starter-test"
         testImplementation "org.junit.jupiter:junit-jupiter-api:${JUNIT_JUPITER_VERSION}"
-        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${JUNIT_JUPITER_VERSION}"
+        testImplementation "org.junit.jupiter:junit-jupiter-engine:${JUNIT_JUPITER_VERSION}"
         testRuntimeOnly "org.junit.platform:junit-platform-launcher:${JUNIT_PLATFORM_VERSION}"
-        testRuntimeOnly "org.junit.platform:junit-platform-engine:${JUNIT_PLATFORM_VERSION}"
         testRuntimeOnly "org.junit.platform:junit-platform-commons:${JUNIT_PLATFORM_VERSION}"
     }
 }

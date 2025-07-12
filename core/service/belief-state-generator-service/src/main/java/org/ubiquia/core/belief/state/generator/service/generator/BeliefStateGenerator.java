@@ -90,7 +90,7 @@ public class BeliefStateGenerator {
         this.openApiDtoGenerator.generateOpenApiDtosFrom(openApiDtoYaml);
 
         this.generationCleanupProcessor.removeBlacklistedFiles(Paths.get("generated"));
-        this.generationSupportProcessor.postProcess();
+        this.generationSupportProcessor.postProcess(acl);
 
         var beliefStateLibraries = this.getJarPaths(this.beliefStateLibsDirectory);
 

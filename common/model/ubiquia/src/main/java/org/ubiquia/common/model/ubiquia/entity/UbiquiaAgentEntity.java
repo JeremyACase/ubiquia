@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -22,6 +23,9 @@ public class UbiquiaAgentEntity {
 
     @Transient
     private String modelType = "UbiquiaAgent";
+
+    @OneToMany(mappedBy = "ubiquiaAgent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    private Set<ObjectMetadataEntity> objectMetadata;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -74,5 +78,13 @@ public class UbiquiaAgentEntity {
 
     public String getModelType() {
         return modelType;
+    }
+
+    public Set<ObjectMetadataEntity> getObjectMetadata() {
+        return objectMetadata;
+    }
+
+    public void setObjectMetadata(Set<ObjectMetadataEntity> objectMetadata) {
+        this.objectMetadata = objectMetadata;
     }
 }

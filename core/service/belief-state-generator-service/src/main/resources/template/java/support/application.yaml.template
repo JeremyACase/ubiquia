@@ -1,7 +1,7 @@
 
 logging:
   level:
-    org.ubiquia: DEBUG
+    org.ubiquia: INFO
 
 management:
   endpoint:
@@ -59,8 +59,13 @@ spring:
         format_sql: true
 
 ubiquia:
+  beliefState:
+    domainName: {DOMAIN_NAME}
   page:
     max-size: 100
+  storage:
+    minio:
+      enabled: {MINIO_ENABLED}
 
 springdoc:
   swagger-ui:

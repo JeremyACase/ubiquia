@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
+import org.ubiquia.common.library.implementation.service.mapper.FlowEventDtoMapper;
 import org.ubiquia.common.model.ubiquia.adapter.QueueAdapterEgress;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.component.adapter.QueueAdapter;
@@ -17,7 +18,6 @@ import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.io.Inbox;
-import org.ubiquia.core.flow.service.mapper.FlowEventDtoMapper;
 import org.ubiquia.core.flow.service.telemetry.MicroMeterHelper;
 import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
 

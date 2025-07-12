@@ -1,3 +1,5 @@
+devMode: true
+
 convenience:
   variables:
     spring:
@@ -28,6 +30,9 @@ ubiquia:
       # ANSI Database Level Isolation (https://en.wikipedia.org/wiki/Isolation_(database_systems))
       # values are: TRANSACTION_READ_UNCOMMITTED (0), TRANSACTION_READ_COMMITTED (1), TRANSACTION_REPEATABLE_READ (2), TRANSACTION_SERIALIZABLE (3)
       transactionIsolation: TRANSACTION_READ_COMMITTED 
+    storage:
+      minio:
+        enabled: true
     flowService:
       bootstrap:
         enabled: true

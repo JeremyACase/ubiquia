@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Set;
+import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;
 
 public class UbiquiaAgent {
 
@@ -17,6 +19,8 @@ public class UbiquiaAgent {
     private OffsetDateTime updatedAt = null;
 
     private List<Graph> deployedGraphs;
+
+    private Set<ObjectMetadataEntity> objectMetadata;
 
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
     public String getId() {
@@ -54,5 +58,13 @@ public class UbiquiaAgent {
 
     public String getModelType() {
         return modelType;
+    }
+
+    public Set<ObjectMetadataEntity> getObjectMetadata() {
+        return objectMetadata;
+    }
+
+    public void setObjectMetadata(Set<ObjectMetadataEntity> objectMetadata) {
+        this.objectMetadata = objectMetadata;
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+import org.ubiquia.common.library.implementation.service.mapper.FlowMessageDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
@@ -27,7 +28,6 @@ import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 import org.ubiquia.core.flow.mock.MockRegistrar;
 import org.ubiquia.core.flow.service.command.adapter.MergeAdapterCommand;
-import org.ubiquia.core.flow.service.mapper.FlowMessageDtoMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc

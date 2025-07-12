@@ -1,6 +1,9 @@
 dependencies:
+- name: minio
+  repository: https://charts.bitnami.com/bitnami
+  version: 17.0.11
 - name: yugabyte
   repository: https://charts.yugabyte.com
   version: 2024.1.3
-digest: sha256:260f6c3b3f7883370832d2577f13a9c3d5a190f80efe1b455106708400d02bbc
-generated: "2025-06-30T13:21:53.6340541-10:00"
+digest: sha256:ae6b4b39960cec72405d733dbcba8546c7464f546a8c6ee0788d9f7a9831961a
+generated: "2025-07-11T09:23:18.843094-10:00"

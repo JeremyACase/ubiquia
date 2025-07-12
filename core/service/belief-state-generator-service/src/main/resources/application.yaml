@@ -42,6 +42,9 @@ ubiquia:
   agent:
     # This is a default UUID for development purposes
     id: 0328ca73-4d50-409f-85a8-7168ce80bd96
+    storage:
+      minio:
+        enabled: false
   beliefStateGeneratorService:
     libraries:
       directory:
@@ -59,4 +62,3 @@ ubiquia:
       url: http://ubiquia-core-flow-service
       pollFrequencyMilliseconds: 5000
   jdkVersion: @OPENJDK_VERSION@
-

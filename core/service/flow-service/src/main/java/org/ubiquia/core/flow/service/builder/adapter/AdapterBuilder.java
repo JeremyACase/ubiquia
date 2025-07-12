@@ -10,7 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.library.logic.service.builder.AdapterEndpointRecordBuilder;
+import org.ubiquia.common.library.implementation.service.builder.AdapterEndpointRecordBuilder;
+import org.ubiquia.common.library.implementation.service.mapper.AdapterDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.Adapter;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
@@ -18,7 +19,6 @@ import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.service.decorator.adapter.override.AdapterOverrideDecorator;
 import org.ubiquia.core.flow.service.logic.adapter.AdapterTypeLogic;
-import org.ubiquia.core.flow.service.mapper.AdapterDtoMapper;
 
 @Service
 public class AdapterBuilder {
@@ -108,7 +108,7 @@ public class AdapterBuilder {
                     // If we have a Kubernetes service to use...
                     case POD: {
                         adapterContext.setEndpointUri(
-                            this.adapterEndpointRecordBuilder.getAgentUriFrom(adapterData));
+                            this.adapterEndpointRecordBuilder.getComponentUriFrom(adapterData));
                     }
                     break;
 

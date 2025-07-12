@@ -31,7 +31,7 @@ dependencies {
 
     implementation project(':common:model:ubiquia')
     implementation project(':common:library:advice')
-    implementation project(':common:library:config')
+    implementation project(':common:library:api')
 
     implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
     implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
@@ -102,9 +102,8 @@ task copyRuntimeLibs(type: Copy) {
         ':common:library:advice',
         ':common:library:api',
         ':common:library:belief-state-libraries',
-        ':common:library:config',
         ':common:library:dao',
-        ':common:library:logic'
+        ':common:library:implementation'
     ]
 
     projectJars.each { path ->

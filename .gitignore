@@ -22,3 +22,6 @@ jacocohtml/
 jacoco.xml
 
 .gradle
+
+# Helm charts
+helm/charts

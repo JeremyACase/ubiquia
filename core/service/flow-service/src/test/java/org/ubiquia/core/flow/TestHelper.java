@@ -4,6 +4,7 @@ import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.ubiquia.common.library.api.repository.UbiquiaAgentRepository;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.repository.*;
 import org.ubiquia.core.flow.service.logic.ubiquia.UbiquiaAgentLogic;

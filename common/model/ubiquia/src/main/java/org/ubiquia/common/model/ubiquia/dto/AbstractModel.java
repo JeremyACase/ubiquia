@@ -4,6 +4,7 @@ package org.ubiquia.common.model.ubiquia.dto;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.time.OffsetDateTime;
@@ -23,6 +24,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
     @JsonSubTypes.Type(value = FlowMessage.class, name = "FlowMessage"),
     @JsonSubTypes.Type(value = Component.class, name = "Component"),
     @JsonSubTypes.Type(value = AgentCommunicationLanguage.class, name = "AgentCommunicationLanguage"),
+    @JsonSubTypes.Type(value = ObjectMetadata.class, name = "ObjectMetadata"),
     @JsonSubTypes.Type(value = Graph.class, name = "Graph"),
 })
 public abstract class AbstractModel {
@@ -35,6 +37,7 @@ public abstract class AbstractModel {
 
     private List<KeyValuePair> tags = null;
 
+    @Transient
     private String modelType;
 
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")

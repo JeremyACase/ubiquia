@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
+import org.ubiquia.common.library.api.config.UbiquiaAgentConfig;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
+import org.ubiquia.common.library.api.repository.UbiquiaAgentRepository;
 import org.ubiquia.common.library.dao.component.EntityDao;
+import org.ubiquia.common.library.implementation.service.mapper.UbiquiaAgentDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.UbiquiaAgent;
 import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgentEntity;
-import org.ubiquia.common.library.config.UbiquiaAgentConfig;
-import org.ubiquia.core.flow.repository.UbiquiaAgentRepository;
-import org.ubiquia.core.flow.service.mapper.UbiquiaAgentDtoMapper;
 
 /**
  * A controller that exposes a RESTful interface for agents.

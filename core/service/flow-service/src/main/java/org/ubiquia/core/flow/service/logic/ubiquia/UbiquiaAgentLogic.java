@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgentEntity;
-import org.ubiquia.common.library.config.UbiquiaAgentConfig;
-import org.ubiquia.core.flow.repository.UbiquiaAgentRepository;
+import org.ubiquia.common.library.api.config.UbiquiaAgentConfig;
+import org.ubiquia.common.library.api.repository.UbiquiaAgentRepository;
 
 
 /**

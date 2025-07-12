@@ -4,6 +4,7 @@ package org.ubiquia.common.library.api.interfaces;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
+import org.ubiquia.common.model.ubiquia.entity.AbstractModelEntity;
 
 /**
  * An interface that can be used to map from database entities to their Data Transfer Object
@@ -13,7 +14,7 @@ import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
  * @param <T> The DTO class we're mapping to.
  */
 public interface InterfaceEntityToDtoMapper<
-    F extends org.ubiquia.common.model.ubiquia.entity.AbstractModelEntity,
+    F extends AbstractModelEntity,
     T extends AbstractModel> {
 
     /**

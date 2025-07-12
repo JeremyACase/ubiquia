@@ -23,7 +23,7 @@ import org.ubiquia.core.flow.repository.AdapterRepository;
 import org.ubiquia.core.flow.repository.ComponentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.service.logic.adapter.AdapterTypeLogic;
-import org.ubiquia.core.flow.service.mapper.OverrideSettingsMapper;
+import org.ubiquia.common.library.implementation.service.mapper.OverrideSettingsMapper;
 
 /**
  * This is a service that can be used to register adapters with Ubiquia.

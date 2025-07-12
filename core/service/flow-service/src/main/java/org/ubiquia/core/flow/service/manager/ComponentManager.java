@@ -8,13 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.ubiquia.common.library.implementation.service.mapper.ComponentDtoMapper;
+import org.ubiquia.common.library.implementation.service.mapper.GraphDtoMapper;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.service.decorator.override.ComponentOverrideDecorator;
 import org.ubiquia.core.flow.service.k8s.ComponentOperator;
-import org.ubiquia.core.flow.service.mapper.ComponentDtoMapper;
-import org.ubiquia.core.flow.service.mapper.GraphDtoMapper;
 
 /**
  * This is a service that will manage agents for Ubiquia at runtime.

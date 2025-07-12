@@ -26,6 +26,11 @@ management:
     tags:
       application: ${spring.application.name}
 
+minio:
+  url: http://localhost:9000
+  username: testUsername
+  password: testPassword
+
 spring:
   server:
   port: 8080
@@ -60,11 +65,14 @@ springdoc:
     enabled: true
 
 ubiquia:
+  agent:
+    # This is a default UUID for development purposes
+    id: 0328ca73-4d50-409f-85a8-7168ce80bd96
+    storage:
+      minio:
+        enabled: true
   kubernetes:
     enabled: false
     namespace: ubiquia
   page:
     max-size: 100
-  agent:
-    # This is a default UUID for development purposes
-    id: 0328ca73-4d50-409f-85a8-7168ce80bd96

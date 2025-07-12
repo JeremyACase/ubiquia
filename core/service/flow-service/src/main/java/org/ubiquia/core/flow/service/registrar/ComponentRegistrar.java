@@ -22,7 +22,7 @@ import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.core.flow.repository.ComponentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
-import org.ubiquia.core.flow.service.mapper.OverrideSettingsMapper;
+import org.ubiquia.common.library.implementation.service.mapper.OverrideSettingsMapper;
 
 /**
  * A service dedicated to registering components in Ubiquia.
