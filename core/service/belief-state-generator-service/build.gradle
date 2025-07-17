@@ -42,6 +42,7 @@ dependencies {
     implementation "org.openapitools:openapi-generator:${OPENAPI_GENERATOR_VERSION}"
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${SPRING_DOC_VERSION}"
 
+    runtimeOnly "com.h2database:h2:${H2_VERSION}"
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${MICROMETER_VERSION}"
 
     testImplementation "org.instancio:instancio-junit:${INSTANCIO_VERSION}"
