@@ -33,7 +33,7 @@ public class ObjectController extends GenericUbiquiaDaoController<
     @Value("${ubiquia.beliefState.domainName}")
     private String domainName;
 
-    @Autowired
+    @Autowired(required = false)
     private ObjectMetadataService objectMetadataService;
 
     @Autowired

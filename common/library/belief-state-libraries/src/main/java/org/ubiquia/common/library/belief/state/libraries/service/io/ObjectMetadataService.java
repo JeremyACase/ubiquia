@@ -6,12 +6,11 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.ubiquia.common.library.api.config.UbiquiaAgentConfig;
 import org.ubiquia.common.library.api.repository.UbiquiaAgentRepository;
 import org.ubiquia.common.library.belief.state.libraries.repository.ObjectMetadataEntityRepository;
-import org.ubiquia.common.library.api.config.UbiquiaAgentConfig;
 import org.ubiquia.common.library.implementation.service.mapper.ObjectMetadataDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
 import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;
@@ -19,11 +18,6 @@ import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgentEntity;
 
 
 @Service
-@ConditionalOnProperty(
-    value = "ubiquia.storage.minio.enabled",
-    havingValue = "true",
-    matchIfMissing = false
-)
 public class ObjectMetadataService {
 
     private static final Logger logger = LoggerFactory.getLogger(ObjectMetadataService.class);
@@ -46,8 +40,8 @@ public class ObjectMetadataService {
         final MultipartFile file) throws JsonProcessingException {
 
         logger.info("Received a request to persist object data for "
-            + "\nFilename: {}"
-            + "\nBucket Name: {}",
+                + "\nFilename: {}"
+                + "\nBucket Name: {}",
             file.getName(),
             bucketName);
 
