@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.dao.component.EntityDao;
-import org.ubiquia.common.library.implementation.controller.GenericUbiquiaDaoController;
 import org.ubiquia.common.library.implementation.service.mapper.AdapterDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.Adapter;
 import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;

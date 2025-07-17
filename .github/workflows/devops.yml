@@ -14,6 +14,7 @@ env:
     core/service/belief-state-generator-service
     core/service/communication-service
     core/service/flow-service
+    test/service/belief-state-generator-test
 
 jobs:
 

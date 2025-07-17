@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.ArrayList;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.library.api.service.mapper.GenericDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.Component;
 import org.ubiquia.common.model.ubiquia.dto.Config;
 import org.ubiquia.common.model.ubiquia.embeddable.OverrideSettings;

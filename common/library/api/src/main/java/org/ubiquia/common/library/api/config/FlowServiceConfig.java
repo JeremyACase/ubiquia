@@ -1,15 +1,17 @@
-package org.ubiquia.core.communication.config;
+package org.ubiquia.common.library.api.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConfigurationProperties(prefix = "ubiquia.belief.state.generator.service")
-public class BeliefStateGeneratorServiceConfig {
+@ConfigurationProperties(prefix = "ubiquia.flow.service")
+public class FlowServiceConfig {
 
     private String url;
 
     private Integer port;
+
+    private Long pollFrequencyMilliseconds;
 
     public String getUrl() {
         return url;
@@ -25,5 +27,13 @@ public class BeliefStateGeneratorServiceConfig {
 
     public void setPort(Integer port) {
         this.port = port;
+    }
+
+    public Long getPollFrequencyMilliseconds() {
+        return pollFrequencyMilliseconds;
+    }
+
+    public void setPollFrequencyMilliseconds(Long pollFrequencyMilliseconds) {
+        this.pollFrequencyMilliseconds = pollFrequencyMilliseconds;
     }
 }

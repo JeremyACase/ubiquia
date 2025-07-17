@@ -9,7 +9,12 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-@ComponentScan(basePackages = {"org.ubiquia.core", "org.ubiquia.common"})
+@ComponentScan(basePackages = {
+    "org.ubiquia.core.belief.state.generator",
+    "org.ubiquia.common.library.advice",
+    "org.ubiquia.common.library.api",
+    "org.ubiquia.common.library.implementation"
+})
 @EnableScheduling
 public class Application {
 

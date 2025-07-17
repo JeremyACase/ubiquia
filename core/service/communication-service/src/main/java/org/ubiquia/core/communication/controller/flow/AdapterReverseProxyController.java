@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.ubiquia.core.communication.config.FlowServiceConfig;
+import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
 
 @RestController

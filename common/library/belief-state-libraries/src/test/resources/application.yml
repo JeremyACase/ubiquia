@@ -36,7 +36,7 @@ spring:
   port: 8080
 
   application:
-    name: belief-state-test-service
+    name: belief-state-libraries-test
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1

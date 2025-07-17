@@ -1,4 +1,4 @@
-package org.ubiquia.common.library.implementation.controller;
+package org.ubiquia.core.flow.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
-import org.ubiquia.core.communication.config.FlowServiceConfig;
+import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import reactor.core.publisher.Mono;
 
 @RestController

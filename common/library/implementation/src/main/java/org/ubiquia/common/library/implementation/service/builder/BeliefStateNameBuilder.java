@@ -1,4 +1,4 @@
-package org.ubiquia.core.belief.state.generator.service.builder;
+package org.ubiquia.common.library.implementation.service.builder;
 
 
 import org.slf4j.Logger;

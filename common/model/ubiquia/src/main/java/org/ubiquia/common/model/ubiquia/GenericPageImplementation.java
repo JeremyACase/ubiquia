@@ -67,6 +67,11 @@ public class GenericPageImplementation<T> extends PageImpl<T> {
         this.totalElements = totalElements;
     }
 
+    @Override
+    public List<T> getContent() {
+        return super.getContent();
+    }
+
     /**
      * Constructor.
      *

@@ -22,11 +22,12 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
     "org.ubiquia.common.library.api.repository",
     "org.ubiquia.core.flow.repository"})
 @ComponentScan(basePackages = {
-    "org.ubiquia.core",
-    "org.ubiquia.common"})
-@EntityScan(basePackages = {
-    "org.ubiquia.core",
-    "org.ubiquia.common.model.ubiquia"})
+    "org.ubiquia.core.flow",
+    "org.ubiquia.common.library.advice",
+    "org.ubiquia.common.library.api",
+    "org.ubiquia.common.library.dao",
+    "org.ubiquia.common.library.implementation"})
+@EntityScan(basePackages = {"org.ubiquia.common.model.ubiquia"})
 public class Application {
 
     @Autowired

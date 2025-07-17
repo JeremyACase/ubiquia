@@ -16,7 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.library.api.config.UbiquiaAgentConfig;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
-import org.ubiquia.core.communication.config.FlowServiceConfig;
+import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
 import org.ubiquia.core.communication.service.manager.flow.ComponentProxyManager;
 

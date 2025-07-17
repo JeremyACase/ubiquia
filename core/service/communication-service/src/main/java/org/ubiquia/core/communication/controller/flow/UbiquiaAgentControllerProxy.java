@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.UbiquiaAgent;
-import org.ubiquia.core.communication.config.FlowServiceConfig;
+import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.core.communication.interfaces.InterfaceUbiquiaDaoControllerProxy;
 import reactor.core.publisher.Mono;
 

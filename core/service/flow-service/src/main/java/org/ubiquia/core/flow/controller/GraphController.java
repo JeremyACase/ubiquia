@@ -19,7 +19,6 @@ import org.ubiquia.common.library.api.config.UbiquiaAgentConfig;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.api.repository.UbiquiaAgentRepository;
 import org.ubiquia.common.library.dao.component.EntityDao;
-import org.ubiquia.common.library.implementation.controller.GenericUbiquiaDaoController;
 import org.ubiquia.common.library.implementation.service.mapper.GraphDtoMapper;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 import org.ubiquia.common.model.ubiquia.dto.Graph;

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
-import org.ubiquia.core.communication.config.BeliefStateGeneratorServiceConfig;
+import org.ubiquia.common.library.api.config.BeliefStateGeneratorServiceConfig;
 import reactor.core.publisher.Mono;
 
 @RestController

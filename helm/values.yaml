@@ -57,6 +57,12 @@ ubiquia:
           registry: ubiquia
           repository: core-flow-service
           tag: latest
+    test:
+      beliefStateGeneratorService:
+        image:
+          registry: ubiquia
+          repository: test-belief-state-generator-service
+          tag: latest
 
 k8s:
   serviceAccount:

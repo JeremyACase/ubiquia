@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PageValidator {
 
-    @Value("${ubiquia.page.max-size}")
+    @Value("${ubiquia.page.max-size:100}")
     protected Integer maxPageSize;
 
     public void validatePageAndSize(final Integer page, final Integer size) {

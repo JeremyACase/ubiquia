@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.ubiquia.common.library.implementation.service.builder.AdapterEndpointRecordBuilder;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
-import org.ubiquia.core.communication.config.FlowServiceConfig;
+import org.ubiquia.common.library.api.config.FlowServiceConfig;
 
 @Service
 public class AdapterProxyManager {

@@ -2,7 +2,6 @@ package org.ubiquia.core.belief.state.generator.service.builder;
 
 
 import io.kubernetes.client.openapi.models.*;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.library.implementation.service.builder.BeliefStateNameBuilder;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 
 @ConditionalOnProperty(
@@ -39,7 +39,6 @@ public class BeliefStateDeploymentBuilder {
         this.ubiquiaDeployment = ubiquiaDeployment;
     }
 
-    @Transactional
     public V1Service buildServiceFrom(final AgentCommunicationLanguage acl) {
         var service = new V1Service();
         service.setApiVersion("v1");
@@ -82,7 +81,6 @@ public class BeliefStateDeploymentBuilder {
         return service;
     }
 
-    @Transactional
     public V1Deployment buildDeploymentFrom(final AgentCommunicationLanguage acl) {
 
         var deployment = new V1Deployment();
@@ -98,7 +96,6 @@ public class BeliefStateDeploymentBuilder {
         return deployment;
     }
 
-    @Transactional
     private V1ObjectMeta getMetadataFrom(final AgentCommunicationLanguage acl) {
         var metadata = new V1ObjectMeta();
 
@@ -121,7 +118,6 @@ public class BeliefStateDeploymentBuilder {
         return metadata;
     }
 
-    @Transactional
     private V1DeploymentSpec getDeploymentSpecFrom(final AgentCommunicationLanguage acl) {
 
         var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(acl);
@@ -142,7 +138,6 @@ public class BeliefStateDeploymentBuilder {
         return spec;
     }
 
-    @Transactional
     private V1PodTemplateSpec getPodTemplateSpec(final AgentCommunicationLanguage acl) {
 
         var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(acl);
@@ -173,7 +168,7 @@ public class BeliefStateDeploymentBuilder {
         var jarVolume = new V1Volume()
             .name("belief-state-jar-volume")
             .persistentVolumeClaim(new V1PersistentVolumeClaimVolumeSource()
-                .claimName("ubiquia-core-belief-state-generator-service-belief-state-jars-pvc")); 
+                .claimName("ubiquia-core-belief-state-generator-service-belief-state-jars-pvc"));
         podSpec.setVolumes(List.of(jarVolume));
 
         template.setSpec(podSpec);

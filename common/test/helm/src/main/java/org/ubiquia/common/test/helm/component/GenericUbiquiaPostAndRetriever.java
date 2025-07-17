@@ -1,0 +1,61 @@
+package org.ubiquia.common.test.helm.component;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
+import org.ubiquia.common.model.ubiquia.IngressResponse;
+import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
+
+@Service
+public class GenericUbiquiaPostAndRetriever<T extends AbstractModel> implements InterfaceLogger {
+
+    private static final Logger logger = LoggerFactory.getLogger(GenericUbiquiaPostAndRetriever.class);
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Override
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public T postAndRetrieve(
+        final String postUrl,
+        final String getUrl,
+        final T object) throws JsonProcessingException {
+
+        logger.debug("Posting object: {}",
+            this.objectMapper.writeValueAsString(object));
+
+        logger.info("POSTing to URL: {}", postUrl);
+
+        var postResponse = this.restTemplate.postForEntity(
+            postUrl,
+            object,
+            IngressResponse.class);
+
+        var queryUrl = getUrl + postResponse.getBody().getId();
+        var typeReference = new ParameterizedTypeReference<T>() {
+        };
+
+        logger.info("GETting from URL: {}", queryUrl);
+        var response = this.restTemplate.exchange(
+            queryUrl,
+            HttpMethod.GET,
+            null,
+            typeReference
+        );
+
+        return response.getBody();
+    }
+}

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.dao.component.EntityDao;
-import org.ubiquia.common.library.implementation.controller.GenericUbiquiaDaoController;
 import org.ubiquia.common.library.implementation.service.mapper.AgentCommunicationLanguageDtoMapper;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
