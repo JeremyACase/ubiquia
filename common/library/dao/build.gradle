@@ -17,6 +17,7 @@ dependencies {
     implementation group: 'org.reflections', name: 'reflections', version: "${REFLECTIONS_VERSION}"
 
     implementation project(':common:library:api')
+    implementation project(':common:library:implementation')
     implementation project(':common:model:ubiquia')
 
     testImplementation "com.h2database:h2:${H2_VERSION}"

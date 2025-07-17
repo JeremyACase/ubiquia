@@ -16,7 +16,7 @@ import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.belief.state.libraries.service.io.MinioService;
 import org.ubiquia.common.library.belief.state.libraries.service.io.ObjectMetadataService;
 import org.ubiquia.common.library.dao.component.EntityDao;
-import org.ubiquia.core.flow.controller.GenericUbiquiaDaoController;
+import org.ubiquia.common.library.dao.controller.GenericUbiquiaDaoController;
 import org.ubiquia.common.library.implementation.service.mapper.ObjectMetadataDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
 import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;

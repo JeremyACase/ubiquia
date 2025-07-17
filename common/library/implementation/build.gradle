@@ -16,5 +16,4 @@ dependencies {
     implementation project(':common:model:acl')
     implementation project(':common:model:ubiquia')
     implementation project(':common:library:api')
-    implementation project(':common:library:dao')
 }
