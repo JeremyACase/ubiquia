@@ -32,6 +32,10 @@ public class GenerationSupportProcessor {
             "template/java/support/ObjectController.java.template",
             "generated/src/main/java/org/ubiquia/acl/generated/ObjectController.java");
 
+        this.copyResourceFromClasspath(
+            "template/java/support/ObjectMetadataEntityRepository.java.template",
+            "generated/src/main/java/org/ubiquia/acl/generated/ObjectMetadataEntityRepository.java");
+
         var tokenMap = new HashMap<String, String>();
         tokenMap.put("{DOMAIN_NAME}", acl.getDomain());
         tokenMap.put("{MINIO_ENABLED}", this.minioEnabled.toString());
