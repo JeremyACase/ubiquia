@@ -26,6 +26,9 @@ management:
     tags:
       application: ${spring.application.name}
 
+minio:
+  url: http://ubiquia-minio:9000
+
 spring:
   server:
   port: 8080

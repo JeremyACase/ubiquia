@@ -182,6 +182,24 @@ public class BeliefStateDeploymentBuilder {
         container.setImagePullPolicy("IfNotPresent");
         container.setImage("eclipse-temurin:" + this.jdkVersion);
 
+        container.setEnv(List.of(
+            new V1EnvVar()
+                .name("MINIO_URL")
+                .value("http://ubiquia-minio:9000"),
+            new V1EnvVar()
+                .name("MINIO_ROOT_USER")
+                .valueFrom(new V1EnvVarSource()
+                    .secretKeyRef(new V1SecretKeySelector()
+                        .name("ubiquia-minio")
+                        .key("root-user"))),
+            new V1EnvVar()
+                .name("MINIO_ROOT_PASSWORD")
+                .valueFrom(new V1EnvVarSource()
+                    .secretKeyRef(new V1SecretKeySelector()
+                        .name("ubiquia-minio")
+                        .key("root-password")))
+        ));
+
         // Port setup
         var port = new V1ContainerPort()
             .containerPort(8080)
