@@ -3,6 +3,7 @@ package org.ubiquia.acl.generated;
 import io.minio.errors.MinioException;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class ObjectController extends GenericUbiquiaDaoController<
     ObjectMetadataEntity,
     ObjectMetadata> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ObjectController.class);
+private static final Logger logger = LoggerFactory.getLogger(ObjectController.class);
 
     @Value("${ubiquia.beliefState.domainName}")
     private String domainName;
@@ -76,23 +77,28 @@ public class ObjectController extends GenericUbiquiaDaoController<
         }
 
         var metadata = this.objectMetadataService.persistObjectMetadata(this.domainName, file);
-        var response = this.minioService.uploadFile(this.domainName, metadata.getId(), file);
+        this.minioService.uploadFile(this.domainName, metadata.getId(), file);
         this.getLogger().info("...object stored: {}",
-            this.objectMapper.writeValueAsString(response));
+            this.objectMapper.writeValueAsString(metadata));
 
         return metadata;
     }
 
     @GetMapping("/download/{filename}")
     public ResponseEntity<byte[]> downloadFile(
-        @PathVariable String filename)
+        @PathVariable("filename") String filename)
         throws MinioException, IOException {
 
         this.getLogger().info("Received a request to download file {} from bucket {}...",
             filename,
             this.domainName);
 
-        var data = this.minioService.downloadFile(this.domainName, filename);
+        InputStream data = null;
+        try {
+            data = this.minioService.downloadFile(this.domainName, filename);
+        } catch (MinioException e) {
+            logger.info("MinioException: {}", e.getMessage());
+        }
 
         ResponseEntity<byte[]> response = null;
         if (Objects.isNull(data)) {
