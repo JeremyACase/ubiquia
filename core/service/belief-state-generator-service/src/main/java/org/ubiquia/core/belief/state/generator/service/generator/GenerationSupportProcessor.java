@@ -29,6 +29,10 @@ public class GenerationSupportProcessor {
             "generated/src/main/java/org/ubiquia/acl/generated/GlobalExceptionHandler.java");
 
         this.copyResourceFromClasspath(
+            "template/java/support/MinioClientConfig.java.template",
+            "generated/src/main/java/org/ubiquia/acl/generated/MinioClientConfig.java");
+
+        this.copyResourceFromClasspath(
             "template/java/support/ObjectController.java.template",
             "generated/src/main/java/org/ubiquia/acl/generated/ObjectController.java");
 
