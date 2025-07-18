@@ -9,8 +9,10 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.library.api.config.UbiquiaAgentConfig;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 
 @Service
@@ -18,6 +20,9 @@ public class GenerationSupportProcessor {
 
     @Value("${ubiquia.agent.storage.minio.enabled}")
     private Boolean minioEnabled;
+
+    @Autowired
+    private UbiquiaAgentConfig ubiquiaAgentConfig;
 
     public void postProcess(final AgentCommunicationLanguage acl) throws IOException {
         this.copyResourceFromClasspath(
@@ -39,6 +44,8 @@ public class GenerationSupportProcessor {
         var tokenMap = new HashMap<String, String>();
         tokenMap.put("{DOMAIN_NAME}", acl.getDomain());
         tokenMap.put("{MINIO_ENABLED}", this.minioEnabled.toString());
+        tokenMap.put("{UBIQUIA_AGENT_ID}", this.ubiquiaAgentConfig.getId());
+
         this.copyAndReplacePlaceholders(
             "template/java/support/application.yaml.template",
             "generated/src/main/resources/application.yaml",

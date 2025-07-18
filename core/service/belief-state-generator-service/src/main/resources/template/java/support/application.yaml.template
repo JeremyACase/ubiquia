@@ -63,6 +63,7 @@ spring:
 
 ubiquia:
   agent:
+    id: {UBIQUIA_AGENT_ID}
     storage:
       minio:
         enabled: {MINIO_ENABLED}
