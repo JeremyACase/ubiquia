@@ -52,6 +52,7 @@ public class ObjectMetadataService {
         return dto;
     }
 
+    @Transactional
     private ObjectMetadataEntity buildMetadataEntityFrom(
         final MultipartFile file,
         final String bucketName,
@@ -63,6 +64,7 @@ public class ObjectMetadataService {
         metadataEntity.setContentType(file.getContentType());
         metadataEntity.setOriginalFilename(file.getOriginalFilename());
         metadataEntity.setUbiquiaAgent(agent);
+        metadataEntity = this.objectMetadataEntityRepository.save(metadataEntity);
 
         return metadataEntity;
     }
