@@ -27,7 +27,7 @@ public class MinioService {
     @Autowired
     private MinioClient minioClient;
 
-    public ObjectWriteResponse uploadFile(
+    public void uploadFile(
         final String bucketName,
         final String objectName,
         final MultipartFile file) throws MinioException {
@@ -49,14 +49,12 @@ public class MinioService {
                 .contentType(file.getContentType())
                 .build();
 
-            response = this.minioClient.putObject(args);
+            this.minioClient.putObject(args);
 
         } catch (Exception e) {
             throw new MinioException("ERROR uploading file: " + e.getMessage());
         }
         logger.info("...upload successfully.");
-
-        return response;
     }
 
     public InputStream downloadFile(

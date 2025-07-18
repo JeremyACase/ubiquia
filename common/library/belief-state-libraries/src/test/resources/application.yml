@@ -71,6 +71,8 @@ ubiquia:
     storage:
       minio:
         enabled: true
+  beliefState:
+    domainName: test
   kubernetes:
     enabled: false
     namespace: ubiquia

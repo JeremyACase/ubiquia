@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import io.minio.errors.MinioException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +24,14 @@ import org.ubiquia.common.library.api.config.MinioConfig;
 @ExtendWith(SpringExtension.class)
 public class MinioServiceTest {
 
-    @Autowired
-    private MinioService minioService;
-    @Autowired
-    private MinioConfig minioConfig;
     @Container
     public static MinIOContainer minioContainer = new MinIOContainer("minio/minio:RELEASE.2023-09-04T19-57-37Z")
         .withUserName("testUsername")
         .withPassword("testPassword");
+    @Autowired
+    private MinioService minioService;
+    @Autowired
+    private MinioConfig minioConfig;
 
     @DynamicPropertySource
     static void configureMinio(DynamicPropertyRegistry registry) {
@@ -47,11 +48,11 @@ public class MinioServiceTest {
         // Prepare file to upload
         var mockFile = new MockMultipartFile("file", "test-object.txt", "text/plain", inputStream);
 
-        // Test the upload method
-        var response = this.minioService.uploadFile("test-bucket", "test-object.txt", mockFile);
-
-        assertNotNull(response);
-        assertTrue(response.object().contains("test-object.txt"));
+        Assertions.assertDoesNotThrow(()
+            -> this.minioService.uploadFile(
+            "test-bucket",
+            "test-object.txt",
+            mockFile));
     }
 
     @Test
