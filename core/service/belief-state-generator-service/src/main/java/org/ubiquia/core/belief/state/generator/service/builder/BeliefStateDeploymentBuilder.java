@@ -187,13 +187,13 @@ public class BeliefStateDeploymentBuilder {
                 .name("MINIO_URL")
                 .value("http://ubiquia-minio:9000"),
             new V1EnvVar()
-                .name("MINIO_ROOT_USER")
+                .name("MINIO_ACCESS_KEY")
                 .valueFrom(new V1EnvVarSource()
                     .secretKeyRef(new V1SecretKeySelector()
                         .name("ubiquia-minio")
                         .key("root-user"))),
             new V1EnvVar()
-                .name("MINIO_ROOT_PASSWORD")
+                .name("MINIO_SECRET_KEY")
                 .valueFrom(new V1EnvVarSource()
                     .secretKeyRef(new V1SecretKeySelector()
                         .name("ubiquia-minio")
