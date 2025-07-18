@@ -59,13 +59,14 @@ spring:
         format_sql: true
 
 ubiquia:
+  agent:
+    storage:
+      minio:
+        enabled: {MINIO_ENABLED}
   beliefState:
     domainName: {DOMAIN_NAME}
   page:
     max-size: 100
-  storage:
-    minio:
-      enabled: {MINIO_ENABLED}
 
 springdoc:
   swagger-ui:
