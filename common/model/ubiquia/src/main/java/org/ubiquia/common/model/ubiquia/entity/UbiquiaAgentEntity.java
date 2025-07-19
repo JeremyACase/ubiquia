@@ -25,7 +25,7 @@ public class UbiquiaAgentEntity {
     private String modelType = "UbiquiaAgent";
 
     @OneToMany(mappedBy = "ubiquiaAgent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-    private Set<ObjectMetadataEntity> objectMetadata;
+    private Set<ObjectMetadataEntity> objectMetadatas;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -80,11 +80,11 @@ public class UbiquiaAgentEntity {
         return modelType;
     }
 
-    public Set<ObjectMetadataEntity> getObjectMetadata() {
-        return objectMetadata;
+    public Set<ObjectMetadataEntity> getObjectMetadatas() {
+        return objectMetadatas;
     }
 
-    public void setObjectMetadata(Set<ObjectMetadataEntity> objectMetadata) {
-        this.objectMetadata = objectMetadata;
+    public void setObjectMetadatas(Set<ObjectMetadataEntity> objectMetadatas) {
+        this.objectMetadatas = objectMetadatas;
     }
 }

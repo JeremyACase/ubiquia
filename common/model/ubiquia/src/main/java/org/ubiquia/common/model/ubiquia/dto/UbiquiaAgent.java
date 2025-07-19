@@ -20,7 +20,7 @@ public class UbiquiaAgent {
 
     private List<Graph> deployedGraphs;
 
-    private Set<ObjectMetadataEntity> objectMetadata;
+    private Set<ObjectMetadataEntity> objectMetadatas;
 
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
     public String getId() {
@@ -60,11 +60,11 @@ public class UbiquiaAgent {
         return modelType;
     }
 
-    public Set<ObjectMetadataEntity> getObjectMetadata() {
-        return objectMetadata;
+    public Set<ObjectMetadataEntity> getObjectMetadatas() {
+        return objectMetadatas;
     }
 
-    public void setObjectMetadata(Set<ObjectMetadataEntity> objectMetadata) {
-        this.objectMetadata = objectMetadata;
+    public void setObjectMetadatas(Set<ObjectMetadataEntity> objectMetadatas) {
+        this.objectMetadatas = objectMetadatas;
     }
 }
