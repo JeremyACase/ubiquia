@@ -4,6 +4,7 @@ import io.minio.errors.MinioException;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,10 @@ public class ObjectController extends GenericUbiquiaDaoController<
 
     @PostMapping("/upload")
     public ObjectMetadata uploadFile(
-        @RequestParam("file") MultipartFile file) throws IOException, MinioException {
+        @RequestParam("file") MultipartFile file)
+        throws IOException,
+        MinioException,
+        SQLException {
 
         this.getLogger().info("Received a request to upload file {} to bucket {}...",
             file.getName(),
