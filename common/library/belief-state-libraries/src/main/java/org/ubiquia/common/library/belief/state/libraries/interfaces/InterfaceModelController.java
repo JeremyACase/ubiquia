@@ -34,12 +34,12 @@ public interface InterfaceModelController<
     IngressResponse add(
         @RequestBody D ingress,
         @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource)
-        throws Exception;
+        throws Throwable;
 
     List<IngressResponse> addList(
         @RequestBody List<D> ingresses,
         @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource)
-        throws Exception;
+        throws Throwable;
 
     IngressResponse addTag(
         @PathVariable("id") final String id,
@@ -49,7 +49,7 @@ public interface InterfaceModelController<
     IngressResponse associate(
         @RequestBody @Validated Association association,
         @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource)
-        throws Exception;
+        throws Throwable;
 
     IngressResponse removeTag(
         @PathVariable("id") final String id,

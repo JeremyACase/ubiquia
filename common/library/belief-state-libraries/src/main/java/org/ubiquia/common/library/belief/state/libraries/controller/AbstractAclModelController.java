@@ -91,7 +91,7 @@ public abstract class AbstractAclModelController<
     public IngressResponse add(
         @RequestBody D ingress,
         @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource)
-        throws Exception {
+        throws Throwable {
 
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterCommand)) {
@@ -120,7 +120,7 @@ public abstract class AbstractAclModelController<
     public List<IngressResponse> addList(
         @RequestBody List<D> ingresses,
         @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource)
-        throws Exception {
+        throws Throwable {
 
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterCommand)) {
@@ -160,7 +160,7 @@ public abstract class AbstractAclModelController<
     public IngressResponse associate(
         @RequestBody @Validated Association association,
         @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource)
-        throws Exception {
+        throws Throwable {
 
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterCommand)) {

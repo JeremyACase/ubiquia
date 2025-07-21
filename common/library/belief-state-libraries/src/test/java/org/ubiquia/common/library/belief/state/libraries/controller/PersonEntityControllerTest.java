@@ -130,7 +130,7 @@ public class PersonEntityControllerTest {
     }
 
     @Test
-    public void assertAssociateModels_isValid() throws Exception {
+    public void assertAssociateModels_isValid() throws Throwable {
         var association = new Association();
         association.setChildAssociation(new ChildAssociation());
         association.setParentAssociation(new ParentAssociation());
@@ -177,7 +177,7 @@ public class PersonEntityControllerTest {
     }
 
     @Test
-    public void assertGetUniqueTagKeys_isValid() throws Exception {
+    public void assertGetUniqueTagKeys_isValid() throws Throwable {
 
         var model = this.mockFactory.generatePerson();
         var ingressResponse = this.personController.add(model, "test");
@@ -213,7 +213,7 @@ public class PersonEntityControllerTest {
     }
 
     @Test
-    public void assertGetValuesByKey_isValid() throws Exception {
+    public void assertGetValuesByKey_isValid() throws Throwable {
 
         var model = this.mockFactory.generatePerson();
         var ingressResponse = this.personController.add(model, "test");
@@ -249,7 +249,7 @@ public class PersonEntityControllerTest {
     }
 
     @Test
-    public void assertAddTags_isValid() throws Exception {
+    public void assertAddTags_isValid() throws Throwable {
 
         var model = this.mockFactory.generatePerson();
         var ingressResponse = this.personController.add(model, "test");
@@ -297,7 +297,7 @@ public class PersonEntityControllerTest {
     }
 
     @Test
-    public void assertRemovesTag_isValid() throws Exception {
+    public void assertRemovesTag_isValid() throws Throwable {
 
         var model = this.mockFactory.generatePerson();
         var ingressResponse = this.personController.add(model, "test");
@@ -375,7 +375,7 @@ public class PersonEntityControllerTest {
     }
 
     @Test
-    public void assertEmbedsModel_isValid() throws Exception {
+    public void assertEmbedsModel_isValid() throws Throwable {
 
         var ween = this.mockFactory.generateWienerDog();
         var person = this.mockFactory.generatePerson();
@@ -412,7 +412,7 @@ public class PersonEntityControllerTest {
     }
 
     @Test
-    public void assertQueriesCountWithParams_isValid() throws Exception {
+    public void assertQueriesCountWithParams_isValid() throws Throwable {
 
         var model = this.mockFactory.generatePerson();
         var ingressResponse = this.personController.add(model, "test");
@@ -435,7 +435,7 @@ public class PersonEntityControllerTest {
     }
 
     @Test
-    public void assertQueriesMultiSelectWithParams_isValid() throws Exception {
+    public void assertQueriesMultiSelectWithParams_isValid() throws Throwable {
 
         var model = this.mockFactory.generatePerson();
         var ingressResponse = this.personController.add(model, "test");

@@ -23,7 +23,6 @@ This is a design document for Ubiquia, a Multi-Agent-System orchestration tool a
   * [Communication Service](#communication-service)
   * [Executive Service](#executive-service)
   * [Learning Service](#learning-service)
-  * [Vectorization Service](#vectorization-service)
 * [Data Model](#data-model)
   * [Flow Service](#flow-service)
 * [Scalability and Resilience](#scalability-and-resilience)
@@ -71,7 +70,7 @@ Ubiquia can be used to orchestrate a collection of SDA assets--human, LLM, hardw
 ## Tech Stack
 
 - **Languages**: Java (Spring Boot 3), Python
-- **Database**: YugabyteDB (H2 for testing), QDrant (for LLM's.)
+- **Database**: YugabyteDB (or H2 for testing, or resource-constrained environments)
 - **Messaging**: Uses distributed database as "message broker" via inbox/outbox pattern
 - **Containerization**: Docker + Kubernetes
 - **Deployment**: Helm
@@ -88,15 +87,13 @@ TODO
 - **Learning Service**: Responsible for updating model weights within components or even reinforcement learning across LLM components
 - **Mission Logic Service**: TODO: Chat with Justin
 - **Communication Service**: Exposes internal service APIs externally - dynamically (such as API's exposed in Flow Service DAG's.)
-- **Vectorization Service**: Translates tokenized input into vectors for any LLM Agents on behalf of Flow Service
 
 ### Message Broker
 - **Database**: The database will be used as a "broker" via the inbox/outbox pattern, allowing for distributed transactions with built-in "queues."
 
 ### Databases
-- **YugabyteDB (Production)**: Distributed NewSQL database with eventual consistency. Works across Kubernetes clusters.
-- **H2 (Testing)**: In-memory database for testing.
-- **QDrant**: Vector database for storing LLM history. Intra-cluster; cannot be distributed across Kuberentes clusters.
+- **YugabyteDB**: Distributed NewSQL database with eventual consistency. Works across Kubernetes clusters.
+- **H2**: In-memory database for testing primarily, but also useful for short-lived belief states or resource-constrained environments.
 
 ### Observability
 - **Prometheus**: Time-series database that allows for services to emit key-value-pair metadata.
@@ -114,7 +111,6 @@ TODO
   - **Direct Acylic Graph Registration**: The Flow Service will be able to allow registration of Directed Acyclic Graph workflows comprised of components and adapters.
   - **Direct Acylic Graph Orchestration**: The Flow Service will double as a Kubernetes operator capable of orchestrating DAG's across Kubernetes clusters dynamically and at runtime.
   - **Schema Validation**: The Flow Service will be able to verify input/output of components based on an ACL. This is especially important for LLM-based components.
-  - **Vector Database Interface**: For components that are Large Language Models (LLM's), Flow Service will be able to interface with a vector database on behalf of the LLM.
   - **Back Pressure**: Leveraging queues and the inbox/outbox pattern, Flow Service will provide a "back pressure" endpoint allowing for the Executive Service to be able to actuate Flow Service DAG's across ubiquia Agents to alleviate pressure.
   - **DAG Dataflow**: Flow Service will persist data into the distributed database via a queueing mechanism via the inbox/outbox pattern.
 - **API**:
@@ -124,7 +120,6 @@ TODO
   - **Back Pressure**: The ability to query for back pressure for any given adapter.
 - **Dependencies**
   - **SQL Database**: Either H2 (for testing) or YugabyteDB.
-  - **Vector Database**: A vector database to store vector embeddings for any LLM components.
 
 ### Communications Service
 - **Responsibilies**
@@ -141,12 +136,6 @@ TODO
 ### Learning Service
 - **Responsibilities**
   - **Update Model Weights**: Allows for an API to update model weights for any LLM components existing in the ubiquia component
-
-### Vectorization Service
-- **Responsibilities**
-  - **Vectorize Tokens**: Turn tokenized inputs into Vectors for Flow Service using the LLM models vectorization APIs
-- **API**
-  - **Vectorize**: Provided a list of tokens and an LLM model, return a list of vectors
 
 ## Data Model
 
@@ -340,7 +329,7 @@ Grafana is the central dashboarding and observability platform for this service.
 
 **Grafana Dashboards:**
 - API Latency & Throughput
-- Database Query Performance (both Vector database and NewSQL)
+- Database Query Performance
 - JVM Memory & GC Metrics (if Java)
 - Custom per-service KPI panels
 
@@ -389,8 +378,7 @@ helm/
 │   │       ├── flow-service/
 │   │       ├── communications-service/
 │   │       ├── executive-service/
-│   │       ├── learning-service/
-│   │       └── vectorization-service/
+│   │       └── learning-service/
 |   └── other/
 |
 ```
@@ -454,17 +442,17 @@ helm/
 
 ---
 
-### Vector DB (QDrant) for LLM History and Embeddings
+### Use of H2 for Core State and Messaging
 
 **Pros:**
-- Lightweight and fast approximate nearest-neighbor search engine.
-- Simple integration with LLM components for memory, search, and context caching.
-- Useful for RLHF and prompt optimization strategies.
+- Simple, lightweight in-memory database.
+- Still suports inbox/outbox-based workflows
+- Loses all data when pod is torn down
 
 **Cons:**
-- QDrant is not fully distributed across Kubernetes clusters (intra-cluster only).
-- Adds another stateful dependency that must be maintained separately.
-- Embedding consistency depends on the vectorizer used at ingestion time.
+- Loses all data when pod is torn down
+- Cannot scale past 1 pod
+- Cannot be distributed across Kubernetes clusters
 
 ---
 
@@ -481,18 +469,6 @@ helm/
 - Distributed failures in a DAG may be harder to diagnose than in statically defined pipelines.
 
 ---
-
-### Vectorization-as-a-Service
-
-**Pros:**
-- Centralized vectorization abstracts away model internals and supports multiple LLMs.
-- Standardizes vector generation for use in QDrant, logging, or downstream planning.
-- Can be scaled and optimized independently of the Flow Service pipeline.
-
-**Cons:**
-- Adds latency if called synchronously during event processing.
-- Introduces a single point of failure in LLM-dependent workflows.
-- Versioning and embedding drift must be tracked and reconciled over time.
 
 ## Contributors
 * __Jeremy Case__: jeremycase@odysseyconsult.com
