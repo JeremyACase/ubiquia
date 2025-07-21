@@ -1,4 +1,4 @@
-# Architecture Decision Record: Ye of Little Belief State
+# Architecture Decision Record: Belief State Generation - Ye of Little Belief State
 
 ## Decision
 Ubiquia will support the ability to generate RESTful, statically-typed, JSON-validating, distributed "Belief States" and deploy them into a Kubernetes environment from only a single ***Agent Communication Language*** input.

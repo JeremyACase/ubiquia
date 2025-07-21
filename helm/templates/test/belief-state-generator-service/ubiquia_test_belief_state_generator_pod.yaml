@@ -17,3 +17,7 @@ spec:
       volumeMounts:
         - name: config
           mountPath: /app/etc
+  volumes:
+    - name: config
+      configMap:
+        name: ubiquia-test-belief-state-generator-config

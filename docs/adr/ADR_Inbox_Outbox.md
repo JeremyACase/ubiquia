@@ -1,7 +1,7 @@
 # Architecture Decision Record: Inbox/Outbox Pattern
 
 ## Decision
-Ubiquia's will use an inbox/outbox microservice pattern for its Flow Service.
+Ubiquia will use an inbox/outbox microservice pattern for its Flow Service.
 
 ## Status 
 

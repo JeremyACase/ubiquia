@@ -1,4 +1,4 @@
-# Architecture Decision Record: Agent Communication Language
+# Architecture Decision Record: Agent Communication Language - One Input to Rule Them All
 
 ## Decision
 Ubiquia will have the concept of ***Agent Communication Languages*** that will reverberate through any implementation of Ubiquia.
@@ -37,7 +37,7 @@ With the advent of LLM's, an old topic in Multi Agent Systems (MAS) has gained n
 
 As a software engineer, the author has spent too many long nights and early mornings debugging production software issues that could have been prevented with robust schemas (and--by extension--their enforcement.) The author knows too well how errors compound as they propagate over a distributed system - and these were issues caused by other humans (with all of the quality assurance implied.) Presumably, these sorts of errors will approach Lovecraftian-levels of horror unless an autonomous MAS takes a "schema-first" approach. Therefore, the author believes that ***_the_*** key enabler of any (actual) production-worthy MAS are cohesive, robust, _and enforced_ schemas. These schemas are typically known  as ***Agent Communication Languages*** (ACLs) in MAS parlance.
 
-As MAS system designed to ensure successful integration of agents into production, Ubiquia will start with an "***ACL-first***, ***ACL-always***" approach. Provided an ACL (really, a minimal amount of Ubiquia metadata around a [JSON Schema](https://json-schema.org/)), Ubiquia can orchestrate entire workflows (represented as yaml-based Directed Acyclic Graphs), and even entire distributed Belief States. Through these belief states and DAG's, Ubiquia can ensure data integrity with JSON validation and SQL data verification.
+As an MAS system designed to ensure successful integration of agents into production, Ubiquia will start with an "***ACL-first***, ***ACL-always***" approach. Provided an ACL (really, a minimal amount of Ubiquia metadata around a [JSON Schema](https://json-schema.org/)), Ubiquia can orchestrate entire workflows (represented as yaml-based Directed Acyclic Graphs), and even entire distributed Belief States. Through these belief states and DAG's, Ubiquia can ensure data integrity with JSON validation and SQL data verification.
 
 Because Ubiquia assumes ACL's as the root of all truth, Ubiquia is free to make other downstream assumptions. Namely, that it can deploy workflows (DAGs) from these schemas, ensure data flowing over these DAGs is valid per the schema, generate entire belief states per these schemas, and do all of this at runtime ***a posteriori*** to Ubiquia's installation.
 

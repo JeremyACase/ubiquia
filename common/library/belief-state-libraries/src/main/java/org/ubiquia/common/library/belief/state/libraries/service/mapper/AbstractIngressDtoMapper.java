@@ -31,7 +31,7 @@ public abstract class AbstractIngressDtoMapper<
     private ObjectMapper objectMapper;
 
     /**
-     * Translate from an ingress Data Transfer Object to a MACHINA model.
+     * Translate from an ingress Data Transfer Object to a Ubiquia model.
      *
      * @param from The DTO we're translating from.
      * @return The translated, typed class.
@@ -57,7 +57,7 @@ public abstract class AbstractIngressDtoMapper<
      * order to avoid any potential overwriting issues.
      *
      * @param to The model we're converting from a DTO to an entity.
-     * @throws ClassNotFoundException Exception from not being able to find a MACHINA class.
+     * @throws ClassNotFoundException Exception from not being able to find a Ubiquia class.
      * @throws IllegalAccessException Reflection exceptions.
      */
     @Transactional

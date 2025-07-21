@@ -47,7 +47,6 @@ public class TestManager extends AbstractTestManager {
         this.testRegistrar.registerModule(this.animalPostTestModule);
         this.testRegistrar.registerModule(this.animalQueryTestModule);
         this.testRegistrar.registerModule(this.beliefStateTeardownTestModule);
-
     }
 
     @EventListener(ApplicationReadyEvent.class)
