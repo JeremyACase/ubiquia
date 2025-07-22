@@ -8,9 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
+import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.test.helm.component.GenericUbiquiaPostAndRetriever;
@@ -76,39 +80,90 @@ public class AclRegistrationTestModule extends AbstractHelmTestModule {
 
     @Override
     public void doTests() {
-        logger.info("Proceeding to register ACL with Ubiquia...");
 
-        String json = null;
-        try {
-            json = this.objectMapper.writeValueAsString(this.cache.getAcl());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        var registered = this.aclHasBeenRegistered();
+        if (!registered) {
+            logger.info("Proceeding to register ACL with Ubiquia...");
+            String json = null;
+            try {
+                json = this.objectMapper.writeValueAsString(this.cache.getAcl());
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                var getUrl = this.flowServiceConfig.getUrl()
+                    + ":"
+                    + this.flowServiceConfig.getPort()
+                    + "/agent-communication-language/query";
+
+                var postUrl = this.flowServiceConfig.getUrl()
+                    + ":"
+                    + this.flowServiceConfig.getPort()
+                    + "/agent-communication-language/register/post";
+
+                var persistedAcl = this.postAndRetriever.postAndRetrieve(
+                    postUrl,
+                    getUrl,
+                    this.cache.getAcl());
+
+                this.cache.setAcl(persistedAcl);
+
+            } catch (Exception e) {
+                logger.error("ERROR: ", e);
+                this.testState.addFailure("Failed to register ACL with Flow Service: "
+                    + e.getMessage());
+            }
+            logger.info("...completed.");
+        } else {
+            logger.info("...ACL has already been registered; skipping registration...");
         }
+    }
 
-        try {
-            var postUrl = this.flowServiceConfig.getUrl()
-                + ":"
-                + this.flowServiceConfig.getPort()
-                + "/agent-communication-language/register/post";
+    private Boolean aclHasBeenRegistered() {
+        var aclIsRegistered = false;
 
-            var getUrl = this.flowServiceConfig.getUrl()
-                + ":"
-                + this.flowServiceConfig.getPort()
-                + "/agent-communication-language/query";
+        var acl = this.cache.getAcl();
 
-            var persistedAcl = this.postAndRetriever.postAndRetrieve(
-                postUrl,
-                getUrl,
-                this.cache.getAcl());
+        var uri = UriComponentsBuilder.fromHttpUrl(
+                this.flowServiceConfig.getUrl()
+                    + ":"
+                    + this.flowServiceConfig.getPort())
+            .path("/agent-communication-language/query/params")
+            .queryParam("page", "0")
+            .queryParam("size", "1")
+            .queryParam("domain", acl.getDomain())
+            .queryParam("version.major", acl.getVersion().getMajor())
+            .queryParam("version.minor", acl.getVersion().getMinor())
+            .queryParam("version.patch", acl.getVersion().getPatch())
+            .build()
+            .toUri();
 
+        var typeReference = new ParameterizedTypeReference<
+            GenericPageImplementation<
+                AgentCommunicationLanguage>>() {};
+
+        var response = this.restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            null,
+            typeReference
+        );
+
+        if (response.getBody().getTotalElements() > 0) {
+            var persistedAcl = response.getBody().getContent().get(0);
+
+            try {
+                logger.info("...ACL has been registered: {}",
+                    this.objectMapper.writeValueAsString(persistedAcl));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
             this.cache.setAcl(persistedAcl);
-
-        } catch (Exception e) {
-            logger.error("ERROR: ", e);
-            this.testState.addFailure("Failed to register ACL with Flow Service: "
-                + e.getMessage());
+            aclIsRegistered = true;
         }
-        logger.info("...completed.");
+
+        return aclIsRegistered;
     }
 }
 

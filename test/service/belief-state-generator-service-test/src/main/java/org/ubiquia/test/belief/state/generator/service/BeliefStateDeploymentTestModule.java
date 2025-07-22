@@ -90,7 +90,7 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
         var postUrl = this.beliefStateGeneratorServiceConfig.getUrl()
             + ":"
             + this.beliefStateGeneratorServiceConfig.getPort()
-            + "/generate/belief-state";
+            + "/belief-state-generator/generate/belief-state";
 
         var response = this.restTemplate.postForEntity(
             postUrl,

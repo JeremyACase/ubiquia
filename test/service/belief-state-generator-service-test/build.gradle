@@ -22,6 +22,9 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-web"
 
+    // Import the Page implementation stuff without having to have a database
+    implementation "org.springframework.data:spring-data-commons"
+
     implementation project(':common:model:acl')
     implementation project(':common:model:ubiquia')
     implementation project(':common:library:advice')
