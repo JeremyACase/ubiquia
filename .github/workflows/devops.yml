@@ -118,6 +118,12 @@ jobs:
             kind load docker-image --name ubiquia-agent-0 $IMAGE_NAME:temp
           done
 
+      - name: Add Helm repositories
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add yugabytedb https://charts.yugabyte.com
+          helm repo update
+
       - name: Build Helm chart dependencies
         run: |
           helm dependency build helm/
