@@ -55,16 +55,24 @@ jobs:
 
       - name: Build Docker images
         run: |
+          mkdir -p docker-images
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
             IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
             echo "Building image for $dir -> $IMAGE_NAME:${{ steps.image_tag.outputs.tag }}"
-
             docker build \
               --build-arg OPENJDK_VERSION=${OPENJDK_VERSION} \
               -t $IMAGE_NAME:${{ steps.image_tag.outputs.tag }} $dir
+            docker save -o docker-images/${project_name}.tar $IMAGE_NAME:${{ steps.image_tag.outputs.tag }}
           done
+
+      - name: Upload Docker images as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-images
+          path: docker-images
+
 
   helm-test:
     needs: build
@@ -89,13 +97,20 @@ jobs:
           kubectl apply -f config/dev/ubiquia_dev_service_account.yaml -n ubiquia
           kubectl apply -f config/dev/ubiquia_dev_kind_pv.yaml -n ubiquia
 
-      - name: Pull and load Docker images into KinD
+      - name: Download Docker image artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+          path: docker-images
+
+      - name: Load Docker images into Docker and KinD
         run: |
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
             IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
-            echo "Tagging and loading image: $IMAGE_NAME:${{ needs.build.outputs.image_tag }}"
+            echo "Loading docker image from docker-images/${project_name}.tar"
+            docker load -i docker-images/${project_name}.tar
             docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} $IMAGE_NAME:temp
             kind load docker-image $IMAGE_NAME:temp
           done
@@ -113,7 +128,7 @@ jobs:
 
 
   push-images:
-    needs: helm-test
+    needs: [build, helm-test]
     runs-on: ubuntu-latest
 
     steps:
@@ -126,13 +141,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Push Docker images
+      - name: Download Docker image artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+          path: docker-images
+
+      - name: Load and push Docker images
         run: |
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
             IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
-            echo "Pushing image $IMAGE_NAME:${{ needs.build.outputs.image_tag }}"
+            echo "Loading and pushing image: $IMAGE_NAME:${{ needs.build.outputs.image_tag }}"
+            docker load -i docker-images/${project_name}.tar
             docker push $IMAGE_NAME:${{ needs.build.outputs.image_tag }}
 
             if [[ "${{ needs.build.outputs.image_tag }}" != "latest" ]]; then
