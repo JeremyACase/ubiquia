@@ -233,7 +233,7 @@ response:
 Ubiquia Belief States support querying for relational data, out of the box:
 
 ```http
-ubiquia/belief-state-service/animal/query/params?page=0&size=25&sort-descending=true&created-at>=2022-08-30T21:00:00.000Z&owner.name=Mark
+GET /ubiquia/belief-state-service/animal/query/params?page=0&size=25&sort-descending=true&created-at>=2022-08-30T21:00:00.000Z&owner.name=Mark
 ```
 
 response:
@@ -292,7 +292,7 @@ Belief States support "multiselect" endpoints that allow clients to define ONLY 
 Multiselect syntax:
 
 ```http
-ubiquia/belief-state-service/animal/query/multiselect/params?page=0&size=1&multiselect-fields=createdAt,updatedAt
+GET /ubiquia/belief-state-service/animal/query/multiselect/params?page=0&size=1&multiselect-fields=createdAt,updatedAt
 ```
 
 Multiselect Response:
