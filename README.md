@@ -50,7 +50,6 @@ Unlike most MAS (Multi-Agent System) frameworks, **Ubiquia is designed from the 
 * [Agent Communication Language](#agent-communication-language)
   * [Agent Communication Language: Defining ACLs](#agent-communication-language-defining-acls)
 * [DAGs](#dags)
-  * [DAGs: Defining DAGs](#dags-defining-dags)
 * [Belief States](#belief-states)
   * [Belief States: Querying Data](#belief-states-querying-data)
 * [For Devs](#for-devs)
@@ -464,23 +463,23 @@ agentCommunicationLanguage:
     minor: 2
     patch: 3
 
-# These are a list of agents that comprise this graph.
-agents:
+# These are a list of components that comprise this graph.
+components:
 
-  - agentName: Pet-Store-Image-Classifier-Agent
+  - componenttName: Pet-Store-Image-Classifier-Component
 
-    # Setting a agent as a template will instruct Ubiquia to not instantiate it as a 
+    # Setting a component as a template will instruct Ubiquia to not instantiate it as a 
     # Kubernetes pod, but instead to generate a "proxy" for it which will act on its behalf with 
     # dummy data.
-    agentType: TEMPLATE
-    modelType: Agent
-    description: This is a an example agent that will classify an animal from an image.
+    componentName: TEMPLATE
+    modelType: Component
+    description: This is a an example component that will classify an animal from an image.
 
     communicationServiceSettings:
-      # Ensure the Communication Service exposes this agent's endpoints  
+      # Ensure the Communication Service exposes this component's endpoints  
       exposeViaCommService: true
 
-    # This is the port that will be exposed for this agent when it is deployed.
+    # This is the port that will be exposed for this component when it is deployed.
     port: 5000
 
     # Data pertaining to the image so that it can be deployed as pods/containers.
@@ -489,7 +488,7 @@ agents:
       repository: pet-store-image-classiffier
       tag: latest
 
-    # An optional configmap to pass to the agent.
+    # An optional configmap to pass to the component.
     config:
       configMap:
         application.yml: |
@@ -513,10 +512,10 @@ agents:
           repository: exampleOverrideRepository
           tag: latest
 
-      # Another example override setting. It will override the template agent boolean when the graph
+      # Another example override setting. It will override the template component boolean when the graph
       # is deployed with the "demo" flag.
       - flag: demo
-        key: agentType
+        key: componentType
         value: POD
 
       # Yet another example to show that even nested configuration values can be overridden.
@@ -531,8 +530,8 @@ agents:
                 value: demo-value
           configMountPath: /example/mountpath
 
-    # This is an "adapter" for the agent; Ubiquia will use this to manage DAG network 
-    # traffic to/from the agent.
+    # This is an "adapter" for the component; Ubiquia will use this to manage DAG network 
+    # traffic to/from the component.
     adapter:
       modelType: Adapter
       adapterType: PUSH
@@ -543,7 +542,7 @@ agents:
         # Ensure the Communication Service exposes this adapter's endpoints  
         exposeViaCommService: true
 
-      # This is the endpoint of the agent that the adapter will interact with when it 
+      # This is the endpoint of the component that the adapter will interact with when it 
       # receives upstream traffic.
       endpoint: /upload-image
 
@@ -563,7 +562,7 @@ agents:
         validateOutputPayload: false
         validateInputPayload: false
 
-      # Like agents, Adapters can have overridesettings.
+      # Like components, Adapters can have overridesettings.
       overrideSettings:
         - flag: demo
           key: adapterSettings
@@ -572,11 +571,11 @@ agents:
             persistOutputPayload: false
             validateOutputPayload: true
 
-  - agentName: Pet-Generator-Agent
+  - componentName: Pet-Generator-Component
 
-    agentType: TEMPLATE
-    modelType: Agent
-    description: This is a an example agent that will generate new Pets given a name.
+    componentType: TEMPLATE
+    modelType: Component
+    description: This is a an example component that will generate new Pets given a name.
     port: 8080
     image:
       registry: ubiquia
@@ -585,7 +584,7 @@ agents:
 
     overrideSettings:
       - flag: demo
-        key: agentType
+        key: componentType
         value: POD
 
     adapter:
@@ -621,8 +620,8 @@ agents:
             stimulateInputPayload: true
 
 # This is a list of adapters that should be deployed with the graph that are not to be associated
-# with agents. These are typically useful as ingress/egress components to a DAG.
-agentlessAdapters:
+# with components. These are typically useful as ingress/egress components to a DAG.
+componentlessAdapters:
 
   - modelType: Adapter
     adapterType: EGRESS
@@ -656,7 +655,7 @@ agentlessAdapters:
 
 # This is how Ubiquia knows how to connect adapters together into a Directed Acyclic Graph. Conceptually, 
 # data flows from left-to-right. As adapters receive payloads, they will send them to their respective 
-# agents (if they have them), package up the agent response (if applicable), and send
+# components (if they have them), package up the component response (if applicable), and send
 # the payload "downstream" (i.e., to any adapters "immediately on the right.")
 edges:
   - leftAdapterName: Pet-Store-Image-Classifier-Adapter
