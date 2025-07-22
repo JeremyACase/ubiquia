@@ -120,10 +120,7 @@ jobs:
 
       - name: Deploy Helm chart
         run: |
-          helm upgrade --install ubiquia ./charts/ubiquia \
-            --set image.tag=temp \
-            --wait --timeout 300s \
-            -n ubiquia
+          helm install ubiquia helm/ --values helm/configurations/dev/featherweight-dev.yaml -n ubiquia
 
       - name: Run Helm tests
         run: |
