@@ -5,8 +5,10 @@ ENV PORT=8080
 ENV JAR_FILE=ubiquia-test-belief-state-generator-service.jar
 ENV TARGET_DIR=/app
 
+RUN mkdir -p ${TARGET_DIR}/etc
+
 COPY build/libs/ubiquia-test-belief-state-generator-service.jar ${TARGET_DIR}/${JAR_FILE}
-COPY service/belief-state-generator-service-test/src/main/resources/pets-acl-json-schema.json ${TARGET_DIR}/etc/pets-acl-json-schema.json
+COPY src/main/resources/pets-acl-json-schema.json ${TARGET_DIR}/etc/pets-acl-json-schema.json
 
 EXPOSE ${PORT}
 
