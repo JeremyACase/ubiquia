@@ -73,7 +73,6 @@ jobs:
           name: docker-images
           path: docker-images
 
-
   helm-test:
     needs: build
     runs-on: ubuntu-latest
@@ -84,6 +83,10 @@ jobs:
 
       - name: Set up Kubernetes with KinD
         uses: helm/kind-action@v1.5.0
+
+      - name: Ensure KinD cluster exists
+        run: |
+          kind get clusters | grep -q "^ubiquia-agent-0$" || kind create cluster --name ubiquia-agent-0
 
       - name: Set up Helm
         uses: azure/setup-helm@v3
@@ -125,7 +128,6 @@ jobs:
       - name: Run Helm tests
         run: |
           helm test ubiquia --logs -n ubiquia
-
 
   push-images:
     needs: [build, helm-test]
