@@ -44,7 +44,7 @@ jobs:
       - name: Determine image tag
         id: image_tag
         run: |
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           else
             echo "tag=latest" >> $GITHUB_OUTPUT
@@ -80,12 +80,22 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v3
 
+      - name: Create namespace
+        run: |
+          kubectl create namespace ubiquia || echo "Namespace 'ubiquia' already exists"
+
+      - name: Apply supporting manifests (RBAC and PV)
+        run: |
+          kubectl apply -f config/dev/ubiquia_dev_service_account.yaml -n ubiquia
+          kubectl apply -f config/dev/ubiquia_dev_kind_pv.yaml -n ubiquia
+
       - name: Pull and load Docker images into KinD
         run: |
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
             IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
+            echo "Tagging and loading image: $IMAGE_NAME:${{ needs.build.outputs.image_tag }}"
             docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} $IMAGE_NAME:temp
             kind load docker-image $IMAGE_NAME:temp
           done
@@ -94,11 +104,13 @@ jobs:
         run: |
           helm upgrade --install ubiquia ./charts/ubiquia \
             --set image.tag=temp \
-            --wait --timeout 300s
+            --wait --timeout 300s \
+            -n ubiquia
 
       - name: Run Helm tests
         run: |
-          helm test ubiquia --logs
+          helm test ubiquia --logs -n ubiquia
+
 
   push-images:
     needs: helm-test
@@ -120,6 +132,7 @@ jobs:
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
             IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
+            echo "Pushing image $IMAGE_NAME:${{ needs.build.outputs.image_tag }}"
             docker push $IMAGE_NAME:${{ needs.build.outputs.image_tag }}
 
             if [[ "${{ needs.build.outputs.image_tag }}" != "latest" ]]; then
