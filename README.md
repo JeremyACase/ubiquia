@@ -1,51 +1,38 @@
 # Ubiquia
 
-> **A runtime-compiled, DAG-orchestrated, schema-driven platform for building intelligent component ecosystems — at production scale.**
-
-Ubiquia is a **domain-agnostic, production-grade Multi-Agent Orchestration System**. It lets you declaratively define component communication protocols and workflows, then compiles and deploys them into a **live, resilient, and self-validating distributed system** — all from JSON schemas and YAML-ized Directed Acyclic Graphs (DAG's).
+> **Ubiquia is a distributed, schema-driven multi-agent orchestration system. Define agent DAGs declaratively, and Ubiquia automatically deploys and wires them into a live Kubernetes ecosystem—with optional belief state services for distributed, persistent, queryable shared context. All data is governed by schemas, ensuring reliable structure across all agents anc components--including LLMs.**
 
 ---
 
 ## 🌟 Why Ubiquia?
 
-Ubiquia is not another workflow engine or LLM wrapper. It's a **foundational infrastructure layer** designed to support:
+Modern agent-based systems often rely on brittle glue code: ad-hoc APIs, hand-rolled orchestration, and inconsistent state handling. **Ubiquia replaces that mess with clean, declarative infrastructure**:
 
-- **Typed Agent communication** (via JSON Schema)
-- **Runtime deployment** of distributed, RESTful belief states
-- **Persistent, self-evolving DAGs** of intelligent components
-- **Schema-validated I/O contracts between services**
-- **Distributed system messaging with SQL-level guarantees**
+- 🔁 **Composable DAGs**  
+  Describe workflows as YAML-based DAGs. Ubiquia spins up agents, components, adapters, belief states, and communication services on demand.
 
-Ubiquia enables a future where **LLMs**, **symbolic components**, and **software systems** can collaborate in validated, evolving ecosystems — with no glue code.
+- 📦 **Schema-to-Belief Pipelines**  
+  Provide an Agent Communication Language (i.e., JSON Schema), and Ubiquia will deploy a **RESTful Belief State service** with:  
+  - Distributed persistence  
+  - A fully-typed REST API generated from your schema  
+  - A relational back-end  
+  - An expressive, intuitive query API with paginated results
+  - Real-time ingestion of normalized relational data
+
+- 🧬 **Schema-Driven Stability**  
+  Prevent long-term degeneration in multi-agent systems. Every I/O channel is bound to a contract defined in JSON Schema, keeping agents—including LLMs—grounded in clean, structured, machine-validated data.
+
+- ⚙️ **Kubernetes-Native by Design**  
+  Helm-first deployments, Prometheus & Micrometer observability baked in. Built for production from day one.
+
+- 🌍 **Cross-Cluster DAG Communication**  
+  DAGs can span **multiple Kubernetes clusters**, enabling components to operate across physical and cloud boundaries:  
+  - **Resilient Compute**: workloads can route around degraded or partitioned clusters  
+  - **Topology-Aware Execution**: deploy agents near data, users, or available compute zones
 
 ---
 
-## 🔥 Key Innovations
-
-- 🧠 **Schema-to-Service Compilation**  
-  Generate and deploy fully-typed REST APIs from JSON Schema definitions. No scaffolding. No boilerplate. Just the schema.
-
-- 🗺️ **Declarative DAGs → Kubernetes Agents**  
-  Define a multi-component system with a single YAML file. Ubiquia reads the DAG and deploys it to Kubernetes — each node a live, stateful microservice.
-
-- 🌍 **Cross-Cluster DAG Communication**  
-  DAGs can span **multiple Kubernetes clusters**, enabling components to operate across physical or cloud boundaries. This supports:
-  - **Resilient compute**: workloads can route around degraded or partitioned clusters  
-  - **Topology-aware orchestration**: components and DAG nodes can execute **close to data, users, or compute availability zones**
-
-- 🧬 **Distributed Belief State via Configurable SQL Backend**  
-  Agents share a global belief state backed by a **relational SQL database**, with support for either:
-  - **YugabyteDB** for distributed, horizontally scalable, highly available environments  
-  - **H2** for lightweight, in-memory or single-node scenarios such as local dev, testing, or compute-constrained environments
-
-- 🧾 **Runtime Schema Enforcement**  
-  Every I/O channel between components is validated in real time. No brittle prompt logic, no undefined behavior — just contract-based communication.
-
-- 🔄 **Recursive System Evolution** *(Experimental)*  
-  DAGs and belief schemas can be evolved by components themselves, opening the door to recursive intelligence: **AutoGPT, but type-safe and production-ready.**
-
-- 🧰 **Spring Boot + Helm + Gradle**  
-  Built on rock-solid Java infrastructure and Kubernetes-native deployment patterns. DevOps-friendly and cloud-ready.
+Unlike most MAS (Multi-Agent System) frameworks, **Ubiquia is designed from the ground up for real-world, production-grade integration**. It combines formal schema enforcement with robust deployment tooling, dynamic service generation, and cross-cluster communication—bridging the gap between research prototypes and hardened operational systems.
 
 ---
 
@@ -60,6 +47,8 @@ Ubiquia enables a future where **LLMs**, **symbolic components**, and **software
   * [Getting Started: Helm Repo](#getting-started-helm-repo)
   * [Getting Started: Installation](#getting-started-installation)
   * [Getting Started: Project Overview](#getting-started-project-overview)
+* [Belief States](#belief-states)
+  * [Belief States: Querying Data](#belief-states-querying-data)
 * [For Devs](#for-devs)
   * [For Devs: Building Ubiquia](#for-devs-building-ubiquia)
   * [For Devs: Building Subprojects](#for-devs-building-subprojects)
@@ -159,6 +148,189 @@ root/
 ├── core/
 │   └── service/            # Core services that will run as as K8s microservices
 └──
+```
+
+## Belief States
+
+Ubiquia allows clients to deploy fully RESTful, schema-validating, queryable **Belief State** services directly from an Agent Communication Language (ACL — really just JSON Schema). These services are automatically deployed into Kubernetes and support both ingestion and querying of relational data out of the box.
+
+---
+
+### Belief States: Querying Data
+
+Belief State services expose dynamic query capabilities via the `/query/params/` endpoint. These endpoints validate all fields at runtime—invalid or unknown fields will result in HTTP errors.
+
+Query endpoints are also **polymorphic**: querying a base model (e.g., `Animal`) may return instances of all subtypes (e.g., `Cat`, `Dachshund`).
+
+---
+
+#### Supported Operators
+
+In addition to `equals`, the following operators are available directly in a GET request:
+
+| Operator              | Syntax   |
+|-----------------------|----------|
+| less than or equal    | `<=`     |
+| greater than or equal | `>=`     |
+| equals null           | `=null`  |
+| not null              | `=!null` |
+| string match (like)   | `*=`     |
+
+---
+
+#### Example: Query by Parameters
+Ubiquia's generated Belief States support querying data via URL GET endpoints:
+
+```http
+GET /ubiquia/belief-state-service/animal/query/params?page=0&size=25&sort-descending=true&created-at>=2022-08-30T21:00:00.000Z&name=!null
+```
+
+response:
+
+```json
+{
+  "content": [
+    {
+      "id": "daad6ddd-c060-4f52-ada3-f81e099948f2",
+      "name": "Fang",
+      "modelType": "Cat",
+      "createdAt": "2022-11-02T14:26:45.244Z",
+      "updatedAt": "2022-11-02T14:26:45.244Z",
+      "whiskers": 10,
+      "owner": {
+        "name": "Mark",
+        "id": "cbad6ddd-c060-4f52-ada3-f81e099948f2",
+        "modelType": "Person"
+      }
+    },
+    {
+      "id": "baad6ddd-c060-4f52-ada3-f81e099948f2",
+      "name": "Max",
+      "modelType": "Dachshund",
+      "createdAt": "2023-11-02T14:26:45.244Z",
+      "updatedAt": "2023-11-02T14:26:45.244Z",
+      "ApexPredator": true,
+      "owner": {
+        "name": "Sally",
+        "id": "xyad6ddd-c060-4f52-ada3-f81e099948f2",
+        "modelType": "Person"
+      }
+    }
+  ],
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 25
+  },
+  "totalElements": 2,
+  "totalPages": 1,
+  "numberOfElements": 2,
+  "first": true,
+  "last": true
+}
+```
+
+#### Example: Relational Queries
+Ubiquia Belief States support querying for relational data, out of the box:
+
+```http
+ubiquia/belief-state-service/animal/query/params?page=0&size=25&sort-descending=true&created-at>=2022-08-30T21:00:00.000Z&owner.name=Mark
+```
+
+response:
+
+```json
+{
+    "content": [
+        {
+            "id": "daad6ddd-c060-4f52-ada3-f81e099948f2",
+            "name": "Fang",
+            "modelType": "Cat",
+            "createdAt": "2022-11-02T14:26:45.244Z",
+            "updatedAt": "2022-11-02T14:26:45.244Z",
+            "whiskers": 10,
+            "owner": {
+                "name": "Mark",
+                "id": "cbad6ddd-c060-4f52-ada3-f81e099948f2",
+                "modelType": "Person",
+                "createdAt": "2022-11-02T14:26:45.244Z",
+                "updatedAt": "2022-11-02T14:26:45.244Z"
+            }
+        }
+    ],
+    "pageable": {
+        "sort": {
+            "empty": true,
+            "sorted": false,
+            "unsorted": true
+        },
+        "offset": 0,
+        "pageSize": 25,
+        "pageNumber": 0,
+        "paged": true,
+        "unpaged": false
+    },
+    "last": true,
+    "totalElements": 1,
+    "totalPages": 1,
+    "size": 25,
+    "number": 0,
+    "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
+    },
+    "first": true,
+    "numberOfElements": 1,
+    "empty": false
+}
+```
+
+### Querying Data: Multiselect
+
+Belief States support "multiselect" endpoints that allow clients to define ONLY the fields that they would like back from a RESTful query for performance-minded queries. These endpoints support pagination, sorting, and the sort. 
+
+Multiselect syntax:
+
+```http
+ubiquia/belief-state-service/animal/query/multiselect/params?page=0&size=1&multiselect-fields=createdAt,updatedAt
+```
+
+Multiselect Response:
+
+```json
+{
+  "content": [
+    [
+      "2024-04-26T19:54:30.158154Z",
+      "2024-04-26T19:54:31.103444Z"
+    ]
+  ],
+  "number": 0,
+  "size": 1,
+  "totalElements": 5,
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 1,
+    "sort": {
+      "empty": true,
+      "sorted": false,
+      "unsorted": true
+    },
+    "offset": 0,
+    "unpaged": false,
+    "paged": true
+  },
+  "last": false,
+  "totalPages": 5,
+  "sort": {
+    "empty": true,
+    "sorted": false,
+    "unsorted": true
+  },
+  "first": true,
+  "numberOfElements": 1,
+  "empty": false
+}
 ```
 
 ## For Devs
