@@ -47,6 +47,10 @@ Unlike most MAS (Multi-Agent System) frameworks, **Ubiquia is designed from the 
   * [Getting Started: Helm Repo](#getting-started-helm-repo)
   * [Getting Started: Installation](#getting-started-installation)
   * [Getting Started: Project Overview](#getting-started-project-overview)
+* [Agent Communication Language](#agent-communication-language)
+  * [Agent Communication Language: Defining ACLs](#agent-communication-language-defining-acls)
+* [DAGs](#dags)
+  * [DAGs: Defining DAGs](#dags-defining-dags)
 * [Belief States](#belief-states)
   * [Belief States: Querying Data](#belief-states-querying-data)
 * [For Devs](#for-devs)
@@ -148,6 +152,520 @@ root/
 ├── core/
 │   └── service/            # Core services that will run as as K8s microservices
 └──
+```
+
+## Agent Communication Language
+Ubiquia revolves around the the idea that schemas are necessary to prevent Multi-Agent systems from collapsing under their own weight. To battle entropy at scale, Ubiquia requires an Agent Communication Language (ACL) before orchestrating any DAGs or Belief States. ACLs are themselves really minimal metadata around the [JSON Schema](https://json-schema.org/) specification.
+
+### Agent Communication Language: Defining ACLs
+Here's an example ACL:
+
+```json
+{
+  "domain": "pets",
+  "version": {
+    "major": 1,
+    "minor": 2,
+    "patch": 3
+  },
+  "modelType": "AgentCommunicationLanguage",
+  "jsonSchema": {
+    "type": "object",
+    "definitions": {
+      "ColorType": {
+        "type": "string",
+        "enum": [
+          "BLUE",
+          "GREEN",
+          "BROWN",
+          "BLACK",
+          "WHITE",
+          "GRAY"
+        ]
+      },
+      "Name": {
+        "description": "A model with some name information.",
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "firstName"
+        ]
+      },
+      "BaseModel": {
+        "description": "A base model.",
+        "type": "object",
+        "properties": {
+          "info": {
+            "type": "string",
+            "maxLength": 100,
+            "default": "Just some info about this model."
+          }
+        }
+      },
+      "AdoptionTransaction": {
+        "description": "A transaction of an adoption.",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/definitions/BaseModel"
+          }
+        ],
+        "properties": {
+          "owner": {
+            "$ref": "#/definitions/Person"
+          },
+          "pet": {
+            "$ref": "#/definitions/Animal"
+          }
+        }
+      },
+      "ClassificationResult": {
+        "description": "The result of our ML model making a classification inference.",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/definitions/BaseModel"
+          }
+        ],
+        "properties": {
+          "class": {
+            "type": "string",
+            "description": "The class label predicted by the model."
+          },
+          "confidence": {
+            "type": "number",
+            "format": "float",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "The confidence score (between 0 and 1) for the predicted class."
+          }
+        },
+        "required": ["class", "confidence"]
+      },
+      "Person": {
+        "description": "A model of a person.",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/definitions/BaseModel"
+          }
+        ],
+        "properties": {
+          "hairColor": {
+            "$ref": "#/definitions/ColorType"
+          },
+          "name": {
+            "$ref": "#/definitions/Name"
+          },
+          "pets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Animal"
+            }
+          }
+        }
+      },
+      "Animal": {
+        "description": "The model of an animal.",
+        "allOf": [
+          {
+            "$ref": "#/definitions/BaseModel"
+          }
+        ],
+        "properties": {
+          "color": {
+            "$ref": "#/definitions/ColorType"
+          },
+          "owner": {
+            "$ref": "#/definitions/Person"
+          },
+          "name": {
+            "$ref": "#/definitions/Name"
+          },
+          "height": {
+            "type": "number",
+            "format": "float",
+            "example": 1.2,
+            "minimum": 0
+          },
+          "weight": {
+            "type": "number",
+            "format": "float",
+            "example": 1.2,
+            "minimum": 0
+          }
+        }
+      },
+      "Dog": {
+        "description": "The model of a dog.",
+        "allOf": [
+          {
+            "$ref": "#/definitions/Animal"
+          }
+        ],
+        "properties": {
+          "barkDecibels": {
+            "type": "number",
+            "format": "float",
+            "example": 1.2,
+            "minimum": 0
+          }
+        }
+      },
+      "Dachschund": {
+        "description": "The model of a wiener dog.",
+        "allOf": [
+          {
+            "$ref": "#/definitions/Dog"
+          }
+        ],
+        "properties": {
+          "apexPredator": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "apexPredator"
+        ]
+      },
+      "Poodle": {
+        "description": "The model of a poodle.",
+        "allOf": [
+          {
+            "$ref": "#/definitions/Dog"
+          }
+        ],
+        "properties": {
+          "dogShowsWon": {
+            "type": "number",
+            "format": "int64",
+            "default": 0,
+            "minimum": 0
+          }
+        }
+      },
+      "Cat": {
+        "description": "The model of a cat.",
+        "allOf": [
+          {
+            "$ref": "#/definitions/Animal"
+          }
+        ],
+        "properties": {
+          "meowDecibels": {
+            "type": "number",
+            "format": "float",
+            "example": 1.2,
+            "minimum": 0
+          }
+        }
+      },
+      "Shark": {
+        "description": "The model of a shark.",
+        "allOf": [
+          {
+            "$ref": "#/definitions/Animal"
+          }
+        ],
+        "properties": {
+          "peopleBitten": {
+            "type": "number",
+            "format": "int64",
+            "default": 0,
+            "minimum": 0
+          },
+          "friendly": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    },
+    "properties": {
+      "ColorType": {
+        "$ref": "#/definitions/ColorType"
+      },
+      "Name": {
+        "$ref": "#/definitions/Name"
+      },
+      "BaseModel": {
+        "$ref": "#/definitions/BaseModel"
+      },
+      "AdoptionTransaction": {
+        "$ref": "#/definitions/AdoptionTransaction"
+      },
+      "Person": {
+        "$ref": "#/definitions/Person"
+      },
+      "Animal": {
+        "$ref": "#/definitions/Animal"
+      },
+      "Dog": {
+        "$ref": "#/definitions/Dog"
+      },
+      "Dachschund": {
+        "$ref": "#/definitions/Dachschund"
+      },
+      "Poodle": {
+        "$ref": "#/definitions/Poodle"
+      },
+      "Cat": {
+        "$ref": "#/definitions/Cat"
+      },
+      "Shark": {
+        "$ref": "#/definitions/Shark"
+      }
+    }
+  }
+}
+```
+
+## DAGs
+Ubiquia can orchestrate Directed Acyclic Graphs--DAGs--provided a yaml definition that references an ACL.
+
+```yaml
+graphName: Pets
+modelType: Graph
+author: Jeremy Case
+description: The "Hello World" of Directed Acyclic Graphs (DAG's) in Ubiquia, but with Pets!
+
+# Graphs require semantic versions
+version:
+  major: 1
+  minor: 2
+  patch: 3
+
+# These are any tags a developer would like attached to their DAG
+tags:
+  - key: testTagKey1
+    value: testTagValue1
+  - key: testTagKey2
+    value: testTagValue2
+  - key: testTagKey3
+    value: testTagValue3
+
+# These are capabilities that the graph implements. These will eventually be used by Ubiquia's Executive Service.
+capabilities:
+  - ImACapability!
+
+# This is the "Agent Communication Language" that this graph is associated with.
+agentCommunicationLanguage:
+  name: pets
+  version:
+    major: 1
+    minor: 2
+    patch: 3
+
+# These are a list of agents that comprise this graph.
+agents:
+
+  - agentName: Pet-Store-Image-Classifier-Agent
+
+    # Setting a agent as a template will instruct Ubiquia to not instantiate it as a 
+    # Kubernetes pod, but instead to generate a "proxy" for it which will act on its behalf with 
+    # dummy data.
+    agentType: TEMPLATE
+    modelType: Agent
+    description: This is a an example agent that will classify an animal from an image.
+
+    communicationServiceSettings:
+      # Ensure the Communication Service exposes this agent's endpoints  
+      exposeViaCommService: true
+
+    # This is the port that will be exposed for this agent when it is deployed.
+    port: 5000
+
+    # Data pertaining to the image so that it can be deployed as pods/containers.
+    image:
+      registry: ubiquia
+      repository: pet-store-image-classiffier
+      tag: latest
+
+    # An optional configmap to pass to the agent.
+    config:
+      configMap:
+        application.yml: |
+          config_0:
+            value: true
+          config_1:
+            value: demo-value
+      configMountPath: /example/mountpath
+
+    # This is a list of settings to use to override the baseline values should the graph be 
+    # deployed with any "flags." Flags are passed to Ubiquia when deploying graphs via the GraphController 
+    # RESTful interface.
+    overrideSettings:
+
+      # Any example override setting. It will override the baseline image values defined when the 
+      # graph is deployed with a "exampleOverride" flag.
+      - flag: exampleOverride
+        key: image
+        value:
+          registry: exampleOverrideRegistry
+          repository: exampleOverrideRepository
+          tag: latest
+
+      # Another example override setting. It will override the template agent boolean when the graph
+      # is deployed with the "demo" flag.
+      - flag: demo
+        key: agentType
+        value: POD
+
+      # Yet another example to show that even nested configuration values can be overridden.
+      - flag: exampleOverride
+        key: config
+        value:
+          configMap:
+            application.yml: |
+              config_0:
+                value: false
+              config_99:
+                value: demo-value
+          configMountPath: /example/mountpath
+
+    # This is an "adapter" for the agent; Ubiquia will use this to manage DAG network 
+    # traffic to/from the agent.
+    adapter:
+      modelType: Adapter
+      adapterType: PUSH
+      adapterName: Pet-Store-Image-Classifier-Adapter
+      description: This is an example adapter.
+
+      communicationServiceSettings:
+        # Ensure the Communication Service exposes this adapter's endpoints  
+        exposeViaCommService: true
+
+      # This is the endpoint of the agent that the adapter will interact with when it 
+      # receives upstream traffic.
+      endpoint: /upload-image
+
+      # An example input schema that references a model of the domain ontology.
+      inputSubSchemas:
+        - modelName: BinaryFile
+
+      # An example input schema that references a model of the domain ontology.
+      outputSubSchema:
+        modelName: ClassificationResult
+      
+      # Various configuration for the adapter, such as whether to persist payload traffic in the 
+      # Ubiquia database for later diagnostics/analysis.
+      adapterSettings:
+        persistInputPayload: true
+        persistOutputPayload: true
+        validateOutputPayload: false
+        validateInputPayload: false
+
+      # Like agents, Adapters can have overridesettings.
+      overrideSettings:
+        - flag: demo
+          key: adapterSettings
+          value:
+            persistInputPayload: false
+            persistOutputPayload: false
+            validateOutputPayload: true
+
+  - agentName: Pet-Generator-Agent
+
+    agentType: TEMPLATE
+    modelType: Agent
+    description: This is a an example agent that will generate new Pets given a name.
+    port: 8080
+    image:
+      registry: ubiquia
+      repository: pet-store-data-transform
+      tag: latest
+
+    overrideSettings:
+      - flag: demo
+        key: agentType
+        value: POD
+
+    adapter:
+      modelType: Adapter
+      adapterType: HIDDEN
+      adapterName: Pet-Generator-Adapter
+      description: This is an example adapter.
+
+      communicationServiceSettings:
+        exposeViaCommService: true
+
+      endpoint: /pet/store/create-pet
+
+      inputSubSchemas:
+        - modelName: ClassificationResult
+
+      outputSubSchema:
+        modelName: Animal
+      adapterSettings:
+        persistInputPayload: true
+        persistOutputPayload: true
+        validateOutputPayload: false
+        validateInputPayload: false
+
+      overrideSettings:
+        - flag: demo
+          key: adapterSettings
+          value:
+            persistInputPayload: true
+            persistOutputPayload: true
+            validateInputPayload: true
+            validateOutputPayload: true
+            stimulateInputPayload: true
+
+# This is a list of adapters that should be deployed with the graph that are not to be associated
+# with agents. These are typically useful as ingress/egress components to a DAG.
+agentlessAdapters:
+
+  - modelType: Adapter
+    adapterType: EGRESS
+    adapterName: Pet-Egress-Adapter
+    description: This is an example adapter that POSTs incoming payloads to a belief state.
+
+    endpoint: http://pets-belief-state-1-2-3:8080/ubiquia/Animal/add
+
+    inputSubSchemas:
+      - modelName: Animal
+
+    egressSettings:
+      httpOutputType: POST
+      egressType: SYNCHRONOUS
+      egressConcurrency: 1
+
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: false
+
+    overrideSettings:
+      - flag: demo
+        key: adapterSettings
+        value:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: true
+          validateOutputPayload: true
+
+# This is how Ubiquia knows how to connect adapters together into a Directed Acyclic Graph. Conceptually, 
+# data flows from left-to-right. As adapters receive payloads, they will send them to their respective 
+# agents (if they have them), package up the agent response (if applicable), and send
+# the payload "downstream" (i.e., to any adapters "immediately on the right.")
+edges:
+  - leftAdapterName: Pet-Store-Image-Classifier-Adapter
+    rightAdapterNames:
+      - Pet-Generator-Adapter
+  - leftAdapterName: Pet-Generator-Adapter
+    rightAdapterNames:
+      - Pet-Egress-Adapter
+
 ```
 
 ## Belief States
