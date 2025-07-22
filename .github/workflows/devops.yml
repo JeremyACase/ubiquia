@@ -118,6 +118,10 @@ jobs:
             kind load docker-image --name ubiquia-agent-0 $IMAGE_NAME:temp
           done
 
+      - name: Build Helm chart dependencies
+        run: |
+          helm dependency build helm/
+
       - name: Deploy Helm chart
         run: |
           helm install ubiquia helm/ --values helm/configurations/dev/featherweight-dev.yaml -n ubiquia
