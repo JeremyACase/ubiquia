@@ -4,7 +4,7 @@ metadata:
   name: ubiquia-core-belief-state-generator-service-test
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+    "helm.sh/hook-delete-policy": hook-succeeded
   labels:
     # Prevent Istio from injecting the sidecar to avoid the test hanging after running.
     sidecar.istio.io/inject: "false"

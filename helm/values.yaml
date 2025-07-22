@@ -61,7 +61,7 @@ ubiquia:
       beliefStateGeneratorService:
         image:
           registry: ubiquia
-          repository: test-belief-state-generator-service
+          repository: core-belief-state-generator-service-test
           tag: latest
 
 k8s:
