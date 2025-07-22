@@ -76,3 +76,37 @@ jobs:
               docker push $IMAGE_NAME:latest
             fi
           done
+
+  helm-test:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Kubernetes with KinD
+        uses: helm/kind-action@v1.5.0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+
+      - name: Pull and load Docker images into KinD
+        run: |
+          IFS=$'\n'
+          for dir in $SUBPROJECTS; do
+            project_name=core-$(basename $dir)
+            IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
+            docker pull $IMAGE_NAME:${IMAGE_TAG}
+            kind load docker-image $IMAGE_NAME:${IMAGE_TAG}
+          done
+
+      - name: Deploy Helm chart
+        run: |
+          helm upgrade --install ubiquia ./charts/ubiquia \
+            --set image.tag=${IMAGE_TAG} \
+            --wait --timeout 300s
+
+      - name: Run Helm tests
+        run: |
+          helm test ubiquia --logs

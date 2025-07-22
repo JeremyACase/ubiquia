@@ -63,3 +63,7 @@ data:
       kubernetes:
         enabled: true
         namespace: {{ .Release.Namespace }}      
+      test:
+        acl:
+          schema:
+            filepath: /app/etc/pets-acl-json-schema.json

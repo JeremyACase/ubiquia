@@ -9,7 +9,8 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = {
     "org.ubiquia.core",
     "org.ubiquia.common",
-    "org.ubiquia.test"})
+    "org.ubiquia.test"
+})
 public class Application {
 
     /**
