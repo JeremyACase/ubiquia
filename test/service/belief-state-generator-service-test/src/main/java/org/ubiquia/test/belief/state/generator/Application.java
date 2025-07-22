@@ -6,7 +6,10 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-@ComponentScan(basePackages = {"org.ubiquia.core", "org.ubiquia.common"})
+@ComponentScan(basePackages = {
+    "org.ubiquia.core",
+    "org.ubiquia.common",
+    "org.ubiquia.test"})
 public class Application {
 
     /**
