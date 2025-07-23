@@ -90,13 +90,13 @@ public class AnimalPostTestModule extends AbstractHelmTestModule {
 
         try {
             var postUrl = this.cache.getAcl().getDomain()
-                + "belief-state-"
+                + "-belief-state-"
                 + this.cache.getAcl().getVersion().toString().replace(".", "-")
                 + ":"
                 + "8080/Animal/add";
 
             var getUrl = this.cache.getAcl().getDomain()
-                + "belief-state-"
+                + "-belief-state-"
                 + this.cache.getAcl().getVersion().toString().replace(".", "-")
                 + ":"
                 + "8080/query/";
