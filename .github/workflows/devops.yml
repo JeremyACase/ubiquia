@@ -20,7 +20,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ steps.image_tag.outputs.tag }}
+      chart_version: ${{ steps.chart.outputs.version }}
 
     steps:
       - name: Checkout repository
@@ -35,36 +35,29 @@ jobs:
       - name: Set Gradle permissions
         run: chmod +x ./gradlew
 
-      - name: Load versions
-        id: versions
+      - name: Load OPENJDK_VERSION and CHART_VERSION
+        id: chart
         run: |
           OPENJDK_VERSION=$(grep '^OPENJDK_VERSION=' gradle.properties | cut -d'=' -f2)
+          CHART_VERSION=$(grep '^version:' helm/Chart.yaml | head -n1 | awk '{print $2}')
           echo "OPENJDK_VERSION=$OPENJDK_VERSION" >> $GITHUB_ENV
-
-      - name: Determine image tag
-        id: image_tag
-        run: |
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          else
-            echo "tag=latest" >> $GITHUB_OUTPUT
-          fi
+          echo "version=$CHART_VERSION" >> $GITHUB_OUTPUT
 
       - name: Build all JARs
         run: ./gradlew clean build
 
-      - name: Build Docker images
+      - name: Build Docker images (tagged as latest)
         run: |
           mkdir -p docker-images
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
             IMAGE_NAME=${DOCKER_REPO}/${project_name}
-            echo "Building image for $dir -> $IMAGE_NAME:${{ steps.image_tag.outputs.tag }}"
+            echo "Building image for $dir -> $IMAGE_NAME:latest"
             docker build \
               --build-arg OPENJDK_VERSION=${OPENJDK_VERSION} \
-              -t $IMAGE_NAME:${{ steps.image_tag.outputs.tag }} $dir
-            docker save -o docker-images/${project_name}.tar $IMAGE_NAME:${{ steps.image_tag.outputs.tag }}
+              -t $IMAGE_NAME:latest $dir
+            docker save -o docker-images/${project_name}.tar $IMAGE_NAME:latest
           done
 
       - name: Upload Docker images as artifacts
@@ -97,8 +90,8 @@ jobs:
 
       - name: Apply supporting manifests (RBAC and PV)
         run: |
-          kubectl apply -f config/dev/ubiquia_dev_service_account.yaml -n ubiquia
-          kubectl apply -f config/dev/ubiquia_dev_kind_pv.yaml -n ubiquia
+          kubectl apply -f config/test/ubiquia_test_service_account.yaml -n ubiquia
+          kubectl apply -f config/test/ubiquia_test_kind_pv.yaml -n ubiquia
 
       - name: Download Docker image artifacts
         uses: actions/download-artifact@v4
@@ -106,7 +99,7 @@ jobs:
           name: docker-images
           path: docker-images
 
-      - name: Load Docker images into Docker and KinD
+      - name: Load Docker images into Docker and KinD (tagged as latest)
         run: |
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
@@ -114,19 +107,8 @@ jobs:
             IMAGE_NAME=${DOCKER_REPO}/${project_name}
             echo "Loading docker image from docker-images/${project_name}.tar"
             docker load -i docker-images/${project_name}.tar
-            docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} $IMAGE_NAME
-            kind load docker-image --name ubiquia-agent-0 $IMAGE_NAME:${{ needs.build.outputs.image_tag }}
+            kind load docker-image --name ubiquia-agent-0 $IMAGE_NAME:latest
           done
-
-      - name: List local Docker images
-        run: |
-          echo "=== Local Docker images ==="
-          docker images
-
-      - name: List Docker images loaded into KinD node
-        run: |
-          echo "=== Docker images in KinD node ==="
-          docker exec "$(docker ps -q -f name=ubiquia-agent-0-control-plane)" crictl images
 
       - name: Add Helm repositories
         run: |
@@ -138,7 +120,7 @@ jobs:
         run: |
           helm dependency build helm/
 
-      - name: Deploy Helm chart
+      - name: Deploy Helm chart (images tagged as latest)
         run: |
           helm install ubiquia helm/ --values helm/configurations/test/build-pipeline.yaml -n ubiquia
 
@@ -180,21 +162,21 @@ jobs:
           name: docker-images
           path: docker-images
 
-      - name: Load and push Docker images
+      - name: Load and push Docker images (tagged as latest + chart version)
         run: |
+          VERSION=${{ needs.build.outputs.chart_version }}
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
             IMAGE_NAME=${DOCKER_REPO}/${project_name}
-            echo "Loading and pushing image: docker.io/$IMAGE_NAME:${{ needs.build.outputs.image_tag }}"
+
+            echo "Loading image from docker-images/${project_name}.tar"
             docker load -i docker-images/${project_name}.tar
 
-            # Tag and push with explicit docker.io prefix
-            docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} docker.io/$IMAGE_NAME:${{ needs.build.outputs.image_tag }}
-            docker push docker.io/$IMAGE_NAME:${{ needs.build.outputs.image_tag }}
+            echo "Tagging and pushing $IMAGE_NAME:$VERSION and $IMAGE_NAME:latest"
+            docker tag $IMAGE_NAME:latest docker.io/$IMAGE_NAME:$VERSION
+            docker push docker.io/$IMAGE_NAME:$VERSION
 
-            if [[ "${{ needs.build.outputs.image_tag }}" != "latest" ]]; then
-              docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} docker.io/$IMAGE_NAME:latest
-              docker push docker.io/$IMAGE_NAME:latest
-            fi
+            docker tag $IMAGE_NAME:latest docker.io/$IMAGE_NAME:latest
+            docker push docker.io/$IMAGE_NAME:latest
           done

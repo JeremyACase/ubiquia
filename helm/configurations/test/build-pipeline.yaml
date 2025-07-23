@@ -27,20 +27,20 @@ ubiquia:
         image:
           registry: docker.io/ubiquia
           repository: core-belief-state-generator-service
-          tag: {{ .Chart.Version }}
+          tag: latest
       communicationService:
         image:
           registry: docker.io/ubiquia
           repository: core-communication-service
-          tag: {{ .Chart.Version }}
+          tag: latest
       flowService:
         image:
           registry: docker.io/ubiquia
           repository: core-flow-service
-          tag: {{ .Chart.Version }}
+          tag: latest
     test:
       beliefStateGeneratorService:
         image:
           registry: docker.io/ubiquia
           repository: core-belief-state-generator-service-test
-          tag: {{ .Chart.Version }}
+          tag: latest
