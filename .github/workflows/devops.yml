@@ -59,7 +59,7 @@ jobs:
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
-            IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
+            IMAGE_NAME=${DOCKER_REPO}/${project_name} 
             echo "Building image for $dir -> $IMAGE_NAME:${{ steps.image_tag.outputs.tag }}"
             docker build \
               --build-arg OPENJDK_VERSION=${OPENJDK_VERSION} \
