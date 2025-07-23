@@ -4,12 +4,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
@@ -88,6 +93,44 @@ public abstract class GenericUbiquiaDaoController<
             sortByFields,
             httpServletRequest);
         return records;
+    }
+
+    /**
+     * Query for a model provided only an ID in the path.
+     * @param id The ID to use to query the model.
+     * @return The model if available, else a 204.
+     * @throws NoSuchFieldException Exception from reflection.
+     * @throws JsonProcessingException Exception from egressing model.
+     */
+    @GetMapping("/query/{id}")
+    public ResponseEntity<D> queryModelWithId(@PathVariable("id") final String id)
+        throws NoSuchFieldException, JsonProcessingException {
+
+        this.getLogger().info("Received a GET request for ID: {}", id);
+
+        var parameterMap = new HashMap<String, String[]>();
+        var array = new String[1];
+        array[0] = id;
+        parameterMap.put("id", array);
+
+        var records = this.getDataAccessObject().getPage(
+            parameterMap,
+            0,
+            1,
+            true,
+            new ArrayList<>(),
+            this.persistedEntityClass);
+
+        ResponseEntity<D> response = null;
+
+        if (records.isEmpty()) {
+            response = ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } else {
+            var egress = this.convertPageHelper(records, this.getDataTransferObjectMapper());
+            response = ResponseEntity.status(HttpStatus.OK).body(egress.getContent().get(0));
+        }
+
+        return response;
     }
 
     /**

@@ -49,6 +49,7 @@ public class GenericUbiquiaPostAndRetriever<T extends AbstractModel> implements 
         var queryUrl = getUrl
             + "/"
             + postResponse.getBody().getId();
+
         var typeReference = new ParameterizedTypeReference<T>() {
         };
 
