@@ -118,6 +118,16 @@ jobs:
             kind load docker-image --name ubiquia-agent-0 $IMAGE_NAME:latest
           done
 
+      - name: List local Docker images
+        run: |
+          echo "=== Local Docker images ==="
+          docker images
+
+      - name: List Docker images loaded into KinD node
+        run: |
+          echo "=== Docker images in KinD node ==="
+          docker exec "$(docker ps -q -f name=ubiquia-agent-0-control-plane)" crictl images
+
       - name: Add Helm repositories
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
