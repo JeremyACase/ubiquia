@@ -105,7 +105,7 @@ jobs:
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
-            IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
+            IMAGE_NAME=${DOCKER_REPO}/${project_name}
             echo "Loading docker image from docker-images/${project_name}.tar"
             docker load -i docker-images/${project_name}.tar
             docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} $IMAGE_NAME:latest
@@ -179,7 +179,7 @@ jobs:
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
-            IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
+            IMAGE_NAME=${DOCKER_REPO}/${project_name}
             echo "Loading and pushing image: $IMAGE_NAME:${{ needs.build.outputs.image_tag }}"
             docker load -i docker-images/${project_name}.tar
             docker push $IMAGE_NAME:${{ needs.build.outputs.image_tag }}
