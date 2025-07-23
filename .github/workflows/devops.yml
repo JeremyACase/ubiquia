@@ -129,6 +129,17 @@ jobs:
         run: |
           helm install ubiquia helm/ --values helm/configurations/test/build-pipeline.yaml -n ubiquia
 
+      - name: Inspect resources before Helm test
+        run: |
+          echo "Sleeping to allow resources to settle..."
+          sleep 15
+          echo "=== Pods ==="
+          kubectl get pods -n ubiquia -o wide
+          echo "=== Services ==="
+          kubectl get svc -n ubiquia
+          echo "=== ConfigMaps ==="
+          kubectl get configmaps -n ubiquia
+
       - name: Wait for Flow Service to become ready
         run: |
           echo "Waiting for ubiquia-core-flow-service to be ready..."
