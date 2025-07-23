@@ -114,8 +114,8 @@ jobs:
             IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
             echo "Loading docker image from docker-images/${project_name}.tar"
             docker load -i docker-images/${project_name}.tar
-            docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} $IMAGE_NAME:temp
-            kind load docker-image --name ubiquia-agent-0 $IMAGE_NAME:temp
+            docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} $IMAGE_NAME:latest
+            kind load docker-image --name ubiquia-agent-0 $IMAGE_NAME:latest
           done
 
       - name: Add Helm repositories
