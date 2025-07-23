@@ -44,7 +44,11 @@ public class GenericUbiquiaPostAndRetriever<T extends AbstractModel> implements 
             object,
             IngressResponse.class);
 
-        var queryUrl = getUrl + postResponse.getBody().getId();
+        logger.info("...response: {}", postResponse.getStatusCode());
+
+        var queryUrl = getUrl
+            + "/"
+            + postResponse.getBody().getId();
         var typeReference = new ParameterizedTypeReference<T>() {
         };
 
