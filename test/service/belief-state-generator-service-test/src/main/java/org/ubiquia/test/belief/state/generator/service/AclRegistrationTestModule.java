@@ -123,6 +123,8 @@ public class AclRegistrationTestModule extends AbstractHelmTestModule {
     private Boolean aclHasBeenRegistered() {
         var aclIsRegistered = false;
 
+        logger.info("...determining if ACL has already been registered...");
+
         var acl = this.cache.getAcl();
 
         var uri = UriComponentsBuilder.fromHttpUrl(
@@ -138,6 +140,7 @@ public class AclRegistrationTestModule extends AbstractHelmTestModule {
             .queryParam("version.patch", acl.getVersion().getPatch())
             .build()
             .toUri();
+        logger.info("...querying URI {}...", uri);
 
         var typeReference = new ParameterizedTypeReference<
             GenericPageImplementation<
@@ -157,6 +160,7 @@ public class AclRegistrationTestModule extends AbstractHelmTestModule {
                 logger.info("...ACL has been registered: {}",
                     this.objectMapper.writeValueAsString(persistedAcl));
             } catch (JsonProcessingException e) {
+                logger.error("ERROR: {}", e.getMessage());
                 throw new RuntimeException(e);
             }
             this.cache.setAcl(persistedAcl);
