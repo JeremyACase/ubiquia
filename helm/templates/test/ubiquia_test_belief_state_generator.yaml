@@ -84,6 +84,7 @@ metadata:
   labels:
     sidecar.istio.io/inject: "false"
 spec:
+  serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
   restartPolicy: Never
   containers:
     - name: ubiquia-core-belief-state-generator-service-test-runner
