@@ -8,7 +8,6 @@ on:
       - 'v*'
 
 env:
-  DOCKER_REGISTRY: docker.io
   DOCKER_REPO: ubiquia
   SUBPROJECTS: |
     core/service/belief-state-generator-service
@@ -40,9 +39,7 @@ jobs:
         id: versions
         run: |
           OPENJDK_VERSION=$(grep '^OPENJDK_VERSION=' gradle.properties | cut -d'=' -f2)
-          UBIQUIA_VERSION=$(grep '^version:' helm/Chart.yaml | head -n 1 | awk '{print $2}')
           echo "OPENJDK_VERSION=$OPENJDK_VERSION" >> $GITHUB_ENV
-          echo "ubiquia_version=$UBIQUIA_VERSION" >> $GITHUB_OUTPUT
 
       - name: Determine image tag
         id: image_tag
@@ -62,7 +59,7 @@ jobs:
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
-            IMAGE_NAME=${DOCKER_REPO}/${project_name} 
+            IMAGE_NAME=${DOCKER_REPO}/${project_name}
             echo "Building image for $dir -> $IMAGE_NAME:${{ steps.image_tag.outputs.tag }}"
             docker build \
               --build-arg OPENJDK_VERSION=${OPENJDK_VERSION} \
@@ -114,11 +111,11 @@ jobs:
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
-            IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
+            IMAGE_NAME=${DOCKER_REPO}/${project_name}
             echo "Loading docker image from docker-images/${project_name}.tar"
             docker load -i docker-images/${project_name}.tar
-            docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} $IMAGE_NAME:latest
-            kind load docker-image --name ubiquia-agent-0 $IMAGE_NAME:latest
+            docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} $IMAGE_NAME
+            kind load docker-image --name ubiquia-agent-0 $IMAGE_NAME:${{ needs.build.outputs.image_tag }}
           done
 
       - name: List local Docker images
@@ -143,7 +140,7 @@ jobs:
 
       - name: Deploy Helm chart
         run: |
-          helm install ubiquia helm/ --values helm/configurations/dev/featherweight-dev.yaml -n ubiquia
+          helm install ubiquia helm/ --values helm/configurations/test/build-pipeline.yaml -n ubiquia
 
       - name: Wait for Flow Service to become ready
         run: |
@@ -188,13 +185,16 @@ jobs:
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
-            IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
-            echo "Loading and pushing image: $IMAGE_NAME:${{ needs.build.outputs.image_tag }}"
+            IMAGE_NAME=${DOCKER_REPO}/${project_name}
+            echo "Loading and pushing image: docker.io/$IMAGE_NAME:${{ needs.build.outputs.image_tag }}"
             docker load -i docker-images/${project_name}.tar
-            docker push $IMAGE_NAME:${{ needs.build.outputs.image_tag }}
+
+            # Tag and push with explicit docker.io prefix
+            docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} docker.io/$IMAGE_NAME:${{ needs.build.outputs.image_tag }}
+            docker push docker.io/$IMAGE_NAME:${{ needs.build.outputs.image_tag }}
 
             if [[ "${{ needs.build.outputs.image_tag }}" != "latest" ]]; then
-              docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} $IMAGE_NAME:latest
-              docker push $IMAGE_NAME:latest
+              docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} docker.io/$IMAGE_NAME:latest
+              docker push docker.io/$IMAGE_NAME:latest
             fi
           done
