@@ -129,6 +129,23 @@ jobs:
         run: |
           helm install ubiquia helm/ --values helm/configurations/test/build-pipeline.yaml -n ubiquia
 
+      - name: Wait for flow-service to be healthy
+        run: |
+          echo "Waiting for flow-service health endpoint to return UP..."
+          for i in {1..30}; do
+            STATUS=$(kubectl exec "$(kubectl get pod -n ubiquia -l app.kubernetes.io/component=ubiquia-core-flow-service -o jsonpath='{.items[0].metadata.name}')" -n ubiquia -- curl -s http://localhost:8080/actuator/health | jq -r .status)
+            echo "Attempt $i: flow-service status is $STATUS"
+            if [ "$STATUS" = "UP" ]; then
+              echo "Flow service is healthy."
+              break
+            fi
+            sleep 5
+            if [ "$i" -eq 30 ]; then
+              echo "Flow service did not become healthy in time." >&2
+              exit 1
+            fi
+          done
+
       - name: Inspect resources before Helm test
         run: |
           echo "Sleeping to allow resources to settle..."

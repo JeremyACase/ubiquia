@@ -79,14 +79,7 @@ public class AnimalPostTestModule extends AbstractHelmTestModule {
 
     @Override
     public void doTests() {
-        logger.info("Proceeding to POST a post with with Ubiquia belief state...");
-
-        String json = null;
-        try {
-            json = this.objectMapper.writeValueAsString(this.cache.getAcl());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        logger.info("Proceeding to POST a model with the generated belief state...");
 
         try {
             var postUrl = "http://"

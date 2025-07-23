@@ -84,12 +84,6 @@ public class AclRegistrationTestModule extends AbstractHelmTestModule {
         var registered = this.aclHasBeenRegistered();
         if (!registered) {
             logger.info("Proceeding to register ACL with Ubiquia...");
-            String json = null;
-            try {
-                json = this.objectMapper.writeValueAsString(this.cache.getAcl());
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
 
             try {
                 var getUrl = this.flowServiceConfig.getUrl()
