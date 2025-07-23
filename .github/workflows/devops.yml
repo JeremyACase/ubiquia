@@ -132,6 +132,20 @@ jobs:
         run: |
           helm install ubiquia helm/ --values helm/configurations/dev/featherweight-dev.yaml -n ubiquia
 
+      - name: Wait for Flow Service to become ready
+        run: |
+          echo "Waiting for ubiquia-core-flow-service to be ready..."
+          for i in {1..30}; do
+            if kubectl get pods -n ubiquia -l app.kubernetes.io/component=core-flow-service | grep -q Running; then
+              echo "Flow service pod is running."
+              break
+            fi
+            echo "Still waiting... ($i)"
+            sleep 5
+          done
+          echo "Giving it a few extra seconds just in case..."
+          sleep 10
+
       - name: Run Helm tests
         run: |
           helm test ubiquia --logs -n ubiquia
