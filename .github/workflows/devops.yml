@@ -21,7 +21,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ steps.versions.outputs.ubiquia_version }}
+      image_tag: ${{ steps.image_tag.outputs.tag }}
 
     steps:
       - name: Checkout repository
@@ -44,6 +44,15 @@ jobs:
           echo "OPENJDK_VERSION=$OPENJDK_VERSION" >> $GITHUB_ENV
           echo "ubiquia_version=$UBIQUIA_VERSION" >> $GITHUB_OUTPUT
 
+      - name: Determine image tag
+        id: image_tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build all JARs
         run: ./gradlew clean build
 
@@ -53,12 +62,12 @@ jobs:
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
-            IMAGE_NAME=${DOCKER_REPO}/${project_name}
-            echo "Building image for $dir -> $IMAGE_NAME:${{ steps.versions.outputs.ubiquia_version }}"
+            IMAGE_NAME=${DOCKER_REPO}/${project_name} 
+            echo "Building image for $dir -> $IMAGE_NAME:${{ steps.image_tag.outputs.tag }}"
             docker build \
               --build-arg OPENJDK_VERSION=${OPENJDK_VERSION} \
-              -t $IMAGE_NAME:${{ steps.versions.outputs.ubiquia_version }} $dir
-            docker save -o docker-images/${project_name}.tar $IMAGE_NAME:${{ steps.versions.outputs.ubiquia_version }}
+              -t $IMAGE_NAME:${{ steps.image_tag.outputs.tag }} $dir
+            docker save -o docker-images/${project_name}.tar $IMAGE_NAME:${{ steps.image_tag.outputs.tag }}
           done
 
       - name: Upload Docker images as artifacts
@@ -105,11 +114,11 @@ jobs:
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
-            IMAGE_NAME=${DOCKER_REPO}/${project_name}
+            IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
             echo "Loading docker image from docker-images/${project_name}.tar"
             docker load -i docker-images/${project_name}.tar
             docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} $IMAGE_NAME:latest
-            kind load docker-image --name ubiquia-agent-0 $IMAGE_NAME:${{ needs.build.outputs.image_tag }}
+            kind load docker-image --name ubiquia-agent-0 $IMAGE_NAME:latest
           done
 
       - name: List local Docker images
@@ -179,11 +188,13 @@ jobs:
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
             project_name=core-$(basename $dir)
-            IMAGE_NAME=${DOCKER_REPO}/${project_name}
+            IMAGE_NAME=${DOCKER_REGISTRY}/${DOCKER_REPO}/${project_name}
             echo "Loading and pushing image: $IMAGE_NAME:${{ needs.build.outputs.image_tag }}"
             docker load -i docker-images/${project_name}.tar
             docker push $IMAGE_NAME:${{ needs.build.outputs.image_tag }}
 
-            # Optional: also push 'latest' tag
-            docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} $IMAGE_NAME:latest
-            docker push $IMAGE_NAME:latest
+            if [[ "${{ needs.build.outputs.image_tag }}" != "latest" ]]; then
+              docker tag $IMAGE_NAME:${{ needs.build.outputs.image_tag }} $IMAGE_NAME:latest
+              docker push $IMAGE_NAME:latest
+            fi
+          done

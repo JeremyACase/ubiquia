@@ -1,0 +1,46 @@
+logging:
+  ubiquia: DEBUG
+
+ubiquia:
+  cluster:
+  agent:
+    database: 
+      h2:
+        enabled: true
+      yugabyte:
+        enabled: false
+    flowService:
+      bootstrap:
+        enabled: true
+      graph:
+        deployments:
+          - name: Pets
+            version:
+              major: 1
+              minor: 2
+              patch: 3
+            graphSettings:
+              flag: demo
+  components:
+    core:
+      beliefStateGeneratorService:
+        image:
+          registry: docker.io/ubiquia
+          repository: core-belief-state-generator-service
+          tag: {{ .Chart.Version }}
+      communicationService:
+        image:
+          registry: docker.io/ubiquia
+          repository: core-communication-service
+          tag: {{ .Chart.Version }}
+      flowService:
+        image:
+          registry: docker.io/ubiquia
+          repository: core-flow-service
+          tag: {{ .Chart.Version }}
+    test:
+      beliefStateGeneratorService:
+        image:
+          registry: docker.io/ubiquia
+          repository: core-belief-state-generator-service-test
+          tag: {{ .Chart.Version }}
