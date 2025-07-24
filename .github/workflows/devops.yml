@@ -144,6 +144,15 @@ jobs:
         run: |
           helm test ubiquia --logs -n ubiquia
 
+      - name: Inspect resources after Helm test
+        run: |
+          echo "=== Pods ==="
+          kubectl get pods -n ubiquia -o wide
+          echo "=== Services ==="
+          kubectl get svc -n ubiquia
+          echo "=== ConfigMaps ==="
+          kubectl get configmaps -n ubiquia
+
   push-images:
     needs: [build, helm-test]
     runs-on: ubuntu-latest
