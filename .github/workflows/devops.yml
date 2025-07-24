@@ -157,6 +157,18 @@ jobs:
           echo "=== ConfigMaps ==="
           kubectl get configmaps -n ubiquia
 
+      - name: Dump logs from all pods in ubiquia namespace
+        if: always()
+        run: |
+          echo "Getting logs from all pods in namespace 'ubiquia'..."
+          for pod in $(kubectl get pods -n ubiquia --no-headers -o custom-columns=":metadata.name"); do
+            echo "=============================="
+            echo "Logs for pod: $pod"
+            echo "=============================="
+            kubectl logs -n ubiquia "$pod" || echo "Failed to get logs for $pod"
+            echo ""
+          done
+
   push-images:
     needs: [build, helm-test]
     runs-on: ubuntu-latest
