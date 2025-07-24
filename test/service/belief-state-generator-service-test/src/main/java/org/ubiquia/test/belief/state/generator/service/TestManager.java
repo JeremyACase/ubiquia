@@ -21,16 +21,10 @@ public class TestManager extends AbstractTestManager {
     private BeliefStateDeploymentTestModule beliefStateDeploymentTestModule;
 
     @Autowired
-    private PersonPostTestModule personPostTestModule;
+    private PersonTestModule personTestModule;
 
     @Autowired
-    private PersonQueryTestModule personQueryTestModule;
-
-    @Autowired
-    private AnimalPostTestModule animalPostTestModule;
-
-    @Autowired
-    private AnimalQueryTestModule animalQueryTestModule;
+    private AnimalTestModule animalTestModule;
 
     @Autowired
     private BeliefStateTeardownTestModule beliefStateTeardownTestModule;
@@ -42,10 +36,8 @@ public class TestManager extends AbstractTestManager {
     public void registerTests() {
         this.testRegistrar.registerModule(this.aclRegistrationTestModule);
         this.testRegistrar.registerModule(this.beliefStateDeploymentTestModule);
-        this.testRegistrar.registerModule(this.personPostTestModule);
-        this.testRegistrar.registerModule(this.personQueryTestModule);
-        this.testRegistrar.registerModule(this.animalPostTestModule);
-        this.testRegistrar.registerModule(this.animalQueryTestModule);
+        this.testRegistrar.registerModule(this.animalTestModule);
+        this.testRegistrar.registerModule(this.personTestModule);
         this.testRegistrar.registerModule(this.beliefStateTeardownTestModule);
     }
 

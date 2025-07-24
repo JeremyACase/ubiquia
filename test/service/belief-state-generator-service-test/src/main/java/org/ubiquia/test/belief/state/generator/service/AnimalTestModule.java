@@ -4,10 +4,6 @@ import static org.instancio.Select.field;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.jar.Attributes;
 import org.instancio.Instancio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,21 +12,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.common.model.acl.dto.AbstractAclModel;
-import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
-import org.ubiquia.common.model.ubiquia.dto.Adapter;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
-import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
-import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.test.helm.component.GenericAclPostAndRetriever;
-import org.ubiquia.common.test.helm.component.GenericUbiquiaPostAndRetriever;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
 import org.ubiquia.test.belief.state.generator.model.Animal;
 import org.ubiquia.test.belief.state.generator.model.Name;
 
 @Service
-public class AnimalPostTestModule extends AbstractHelmTestModule {
+public class AnimalTestModule extends AbstractHelmTestModule {
 
-    private static final Logger logger = LoggerFactory.getLogger(AnimalPostTestModule.class);
+    private static final Logger logger = LoggerFactory.getLogger(AnimalTestModule.class);
 
     @Autowired
     private Cache cache;

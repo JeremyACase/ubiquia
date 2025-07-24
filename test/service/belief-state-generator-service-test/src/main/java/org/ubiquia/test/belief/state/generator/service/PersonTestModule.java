@@ -18,14 +18,13 @@ import org.ubiquia.common.model.acl.dto.AbstractAclModel;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.test.helm.component.GenericAclPostAndRetriever;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
-import org.ubiquia.test.belief.state.generator.model.Animal;
 import org.ubiquia.test.belief.state.generator.model.Name;
 import org.ubiquia.test.belief.state.generator.model.Person;
 
 @Service
-public class PersonPostTestModule extends AbstractHelmTestModule {
+public class PersonTestModule extends AbstractHelmTestModule {
 
-    private static final Logger logger = LoggerFactory.getLogger(PersonPostTestModule.class);
+    private static final Logger logger = LoggerFactory.getLogger(PersonTestModule.class);
 
     @Autowired
     private Cache cache;
