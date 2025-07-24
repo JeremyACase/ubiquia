@@ -1,5 +1,6 @@
 package org.ubiquia.test.belief.state.generator.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kubernetes.client.informer.ResourceEventHandler;
 import io.kubernetes.client.informer.SharedInformerFactory;
@@ -35,6 +36,9 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
 
     @Autowired
     private Cache cache;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -98,7 +102,8 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
             BeliefStateGeneration.class);
 
         try {
-            Thread.sleep(10000);
+            logger.info("...sleeping to give generated Belief State a chance to come alive...");
+            Thread.sleep(60000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -108,6 +113,13 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
                 .beliefStateNameBuilder
                 .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
             this.testState.addFailure("A belief state was never created with name: " + name);
+        }
+
+        try {
+            logger.info("...generated a belief state for : {}",
+                this.objectMapper.writeValueAsString(generation));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
 
         logger.info("...completed.");

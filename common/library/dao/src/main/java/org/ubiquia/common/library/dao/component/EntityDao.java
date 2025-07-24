@@ -67,8 +67,8 @@ public class EntityDao<T> {
     @Transactional
     public Page<T> getPage(
         final QueryFilter queryFilter,
-        final int page,
-        final int size,
+        final Integer page,
+        final Integer size,
         final Class<T> clazz) throws NoSuchFieldException {
 
         var pageResponse = this.filterDataAccessObject.getPage(
@@ -95,8 +95,8 @@ public class EntityDao<T> {
     @Transactional
     public Page<T> getPage(
         final Map<String, String[]> parameters,
-        final int page,
-        final int size,
+        final Integer page,
+        final Integer size,
         final Boolean sortDescending,
         final List<String> sortByFields,
         final Class<T> clazz) throws NoSuchFieldException {
@@ -128,8 +128,8 @@ public class EntityDao<T> {
     @Transactional
     public Page<Object[]> getPageMultiselect(
         final Map<String, String[]> parameters,
-        final int page,
-        final int size,
+        final Integer page,
+        final Integer size,
         final Boolean sortDescending,
         final List<String> sortByFields,
         final List<String> multiselectFields,
