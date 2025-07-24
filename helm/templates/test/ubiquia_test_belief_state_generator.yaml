@@ -71,8 +71,7 @@ data:
         namespace: {{ .Release.Namespace }}      
       test:
         acl:
-          schema:
-            filepath: /app/etc/pets-acl.json
+          filepath: /app/etc/pets-acl.json
 ---
 apiVersion: v1
 kind: Pod

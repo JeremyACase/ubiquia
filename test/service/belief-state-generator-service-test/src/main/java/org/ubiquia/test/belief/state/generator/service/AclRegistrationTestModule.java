@@ -40,7 +40,7 @@ public class AclRegistrationTestModule extends AbstractHelmTestModule {
     @Autowired
     private GenericUbiquiaPostAndRetriever<AgentCommunicationLanguage> postAndRetriever;
 
-    @Value("${ubiquia.test.acl.schema.filepath}")
+    @Value("${ubiquia.test.acl.filepath}")
     private String schemaFilepath;
 
     @Override
@@ -52,26 +52,16 @@ public class AclRegistrationTestModule extends AbstractHelmTestModule {
     public void doSetup() {
         logger.info("Proceeding to read in an ACL...");
 
-        var schemaPath = Paths.get(this.schemaFilepath);
-        Object jsonSchema = null;
+        var aclPath = Paths.get(this.schemaFilepath);
+        AgentCommunicationLanguage acl = null;
 
         try {
-            jsonSchema = this.objectMapper.readValue(
-                schemaPath.toFile(),
-                Object.class);
+            acl = this.objectMapper.readValue(
+                aclPath.toFile(),
+                AgentCommunicationLanguage.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        var acl = new AgentCommunicationLanguage();
-        acl.setJsonSchema(jsonSchema);
-        acl.setDomain("pets");
-
-        var version = new SemanticVersion();
-        version.setMajor(1);
-        version.setMinor(2);
-        version.setPatch(3);
-        acl.setVersion(version);
 
         this.cache.setAcl(acl);
 
