@@ -48,6 +48,9 @@ public class AnimalTestModule extends AbstractHelmTestModule {
 
         var name = Instancio
             .of(Name.class)
+            .ignore(field(AbstractAclModel::getId))
+            .ignore(field(AbstractAclModel::getCreatedAt))
+            .ignore(field(AbstractAclModel::getUpdatedAt))
             .create();
 
         var animal = Instancio
