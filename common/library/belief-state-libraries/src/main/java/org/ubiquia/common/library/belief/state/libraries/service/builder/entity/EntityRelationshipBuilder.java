@@ -14,6 +14,7 @@ import org.ubiquia.common.library.belief.state.libraries.service.finder.EntityRe
 import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
 
 @Service
+@Transactional
 public abstract class EntityRelationshipBuilder<T extends AbstractAclModelEntity> implements InterfaceLogger {
 
     protected final Map<Field, Field> cachedEntityFieldMap = new HashMap<>();
