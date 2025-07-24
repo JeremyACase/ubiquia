@@ -1,5 +1,6 @@
 package org.ubiquia.test.belief.state.generator.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kubernetes.client.informer.ResourceEventHandler;
 import io.kubernetes.client.informer.SharedInformerFactory;
@@ -17,12 +18,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.ubiquia.common.library.api.config.BeliefStateGeneratorServiceConfig;
+import org.ubiquia.common.library.implementation.service.builder.BeliefStateNameBuilder;
+import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
 
 @Service
 public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
 
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateTeardownTestModule.class);
+
+    @Autowired
+    private BeliefStateGeneratorServiceConfig beliefStateGeneratorServiceConfig;
+
+    @Autowired
+    private BeliefStateNameBuilder beliefStateNameBuilder;
+
+    private Boolean beliefStateDeploymentTornDown = false;
 
     @Autowired
     private Cache cache;
@@ -72,7 +84,45 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
 
     @Override
     public void doTests() {
+        logger.info("Proceeding with tests...");
 
+        var generation = new BeliefStateGeneration();
+        generation.setDomainName(this.cache.getAcl().getDomain());
+        generation.setVersion(this.cache.getAcl().getVersion());
+
+        var postUrl = this.beliefStateGeneratorServiceConfig.getUrl()
+            + ":"
+            + this.beliefStateGeneratorServiceConfig.getPort()
+            + "/belief-state-generator/teardown/belief-state";
+
+        var response = this.restTemplate.postForEntity(
+            postUrl,
+            generation,
+            BeliefStateGeneration.class);
+
+        try {
+            logger.info("...sleeping to allow for tear down process...");
+            Thread.sleep(60000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (!this.beliefStateDeploymentTornDown) {
+            var name = this
+                .beliefStateNameBuilder
+                .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
+            this.testState.addFailure("A belief state was never torn down with name: "
+                + name);
+        }
+
+        try {
+            logger.info("...tore down a belief state for : {}",
+                this.objectMapper.writeValueAsString(generation));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        logger.info("...completed.");
     }
 
     /**
@@ -88,6 +138,10 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
             60000L,
             this.namespace);
 
+        var beliefStateName = this
+            .beliefStateNameBuilder
+            .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
+
         // Receive updates from Kubernetes when Deployments change
         informer.addEventHandler(new ResourceEventHandler<>() {
             @Override
@@ -102,7 +156,9 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
 
             @Override
             public void onDelete(V1Deployment deployment, boolean b) {
-
+                if (deployment.getMetadata().getName().equals(beliefStateName)) {
+                    beliefStateDeploymentTornDown = true;
+                }
             }
         });
 

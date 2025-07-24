@@ -149,6 +149,7 @@ jobs:
           helm test ubiquia --logs -n ubiquia
 
       - name: Inspect resources after Helm test
+        if: always()
         run: |
           echo "=== Pods ==="
           kubectl get pods -n ubiquia -o wide
