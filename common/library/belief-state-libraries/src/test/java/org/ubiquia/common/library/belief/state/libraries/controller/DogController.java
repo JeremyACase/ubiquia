@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ubiquia.acl.generated.Dog;
 import org.ubiquia.acl.generated.DogEntity;
-import org.ubiquia.common.library.belief.state.libraries.repository.DogRepository;
-import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.DogRelationshipBuilder;
+import org.ubiquia.common.library.belief.state.libraries.repository.DogEntityRepository;
+import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.DogEntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractIngressDtoMapper;
 
@@ -19,11 +19,11 @@ public class DogController extends AbstractAclModelController<DogEntity, Dog> {
 
     private static final Logger logger = LoggerFactory.getLogger(DogController.class);
     @Autowired
-    protected DogRelationshipBuilder entityRelationshipBuilder;
+    protected DogEntityRelationshipBuilder entityRelationshipBuilder;
     @Autowired
     private AbstractIngressDtoMapper<Dog, DogEntity> ingressMapper;
     @Autowired
-    private DogRepository entityRepository;
+    private DogEntityRepository entityRepository;
 
     @Override
     public Logger getLogger() {
@@ -41,7 +41,7 @@ public class DogController extends AbstractAclModelController<DogEntity, Dog> {
     }
 
     @Override
-    public DogRepository getEntityRepository() {
+    public DogEntityRepository getEntityRepository() {
         return this.entityRepository;
     }
 }

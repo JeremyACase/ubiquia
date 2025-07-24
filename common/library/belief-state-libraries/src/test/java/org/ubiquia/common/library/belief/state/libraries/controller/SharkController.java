@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ubiquia.acl.generated.Shark;
 import org.ubiquia.acl.generated.SharkEntity;
-import org.ubiquia.common.library.belief.state.libraries.repository.SharkRepository;
+import org.ubiquia.common.library.belief.state.libraries.repository.SharkEntityRepository;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
-import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.SharkRelationshipBuilder;
+import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.SharkEntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractIngressDtoMapper;
 
 @RestController
@@ -19,11 +19,11 @@ public class SharkController extends AbstractAclModelController<SharkEntity, Sha
 
     private static final Logger logger = LoggerFactory.getLogger(SharkController.class);
     @Autowired
-    protected SharkRelationshipBuilder entityRelationshipBuilder;
+    protected SharkEntityRelationshipBuilder entityRelationshipBuilder;
     @Autowired
     private AbstractIngressDtoMapper<Shark, SharkEntity> ingressMapper;
     @Autowired
-    private SharkRepository entityRepository;
+    private SharkEntityRepository entityRepository;
 
     @Override
     public Logger getLogger() {
@@ -41,7 +41,7 @@ public class SharkController extends AbstractAclModelController<SharkEntity, Sha
     }
 
     @Override
-    public SharkRepository getEntityRepository() {
+    public SharkEntityRepository getEntityRepository() {
         return this.entityRepository;
     }
 }

@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ubiquia.acl.generated.Person;
 import org.ubiquia.acl.generated.PersonEntity;
-import org.ubiquia.common.library.belief.state.libraries.repository.PersonRepository;
+import org.ubiquia.common.library.belief.state.libraries.repository.PersonEntityRepository;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
-import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.PersonRelationshipBuilder;
+import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.PersonEntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractIngressDtoMapper;
 
 @RestController
@@ -19,11 +19,11 @@ public class PersonController extends AbstractAclModelController<PersonEntity, P
 
     private static final Logger logger = LoggerFactory.getLogger(PersonController.class);
     @Autowired
-    protected PersonRelationshipBuilder entityRelationshipBuilder;
+    protected PersonEntityRelationshipBuilder entityRelationshipBuilder;
     @Autowired
     private AbstractIngressDtoMapper<Person, PersonEntity> ingressMapper;
     @Autowired
-    private PersonRepository entityRepository;
+    private PersonEntityRepository entityRepository;
 
     @Override
     public Logger getLogger() {
@@ -41,7 +41,7 @@ public class PersonController extends AbstractAclModelController<PersonEntity, P
     }
 
     @Override
-    public PersonRepository getEntityRepository() {
+    public PersonEntityRepository getEntityRepository() {
         return this.entityRepository;
     }
 }

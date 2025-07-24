@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.acl.generated.AnimalEntity;
 
 @Service
-public class AnimalRelationshipBuilder extends EntityRelationshipBuilder<AnimalEntity> {
+public class AnimalEntityRelationshipBuilder extends EntityRelationshipBuilder<AnimalEntity> {
 
-    protected static final Logger logger = LoggerFactory.getLogger(AnimalRelationshipBuilder.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AnimalEntityRelationshipBuilder.class);
 
     @Override
     public Logger getLogger() {
