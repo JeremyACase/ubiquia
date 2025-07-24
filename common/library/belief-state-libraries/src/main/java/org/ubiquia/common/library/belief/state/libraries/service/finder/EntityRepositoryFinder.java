@@ -52,8 +52,7 @@ public class EntityRepositoryFinder implements InterfaceLogger {
     @SuppressWarnings("rawtypes")
     public EntityRepository findRepositoryFor(final String className) {
 
-        var entityName = className.replace("Entity", "");
-        var beanName = entityName + "Repository";
+        var beanName = className + "Repository";
 
         this.getLogger().debug("...finding repository for bean name: {}",
             beanName);
@@ -63,9 +62,9 @@ public class EntityRepositoryFinder implements InterfaceLogger {
             entityRepository = (EntityRepository) this.applicationContext.getBean(beanName);
         } else {
 
-            var lowerCase = Character.toLowerCase(entityName.charAt(0));
+            var lowerCase = Character.toLowerCase(className.charAt(0));
             beanName = lowerCase
-                + entityName.substring(1)
+                + className.substring(1)
                 + "Repository";
 
             this.getLogger().debug("...could not find original bean name, attempting lower "
