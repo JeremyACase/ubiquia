@@ -84,6 +84,10 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v3
 
+      - name: Create shared belief state mount inside KinD node
+        run: |
+          docker exec ubiquia-agent-0-control-plane mkdir -p /mnt/data/belief-state-jars
+
       - name: Create namespace
         run: |
           kubectl create namespace ubiquia || echo "Namespace 'ubiquia' already exists"
