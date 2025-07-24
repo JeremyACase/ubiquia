@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
+import org.ubiquia.common.model.acl.dto.AbstractAclModel;
 import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
 import org.ubiquia.common.model.ubiquia.dto.Adapter;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
@@ -61,7 +62,11 @@ public class AnimalPostTestModule extends AbstractHelmTestModule {
 
         var animal = Instancio
             .of(Animal.class)
+            .ignore(field(AbstractAclModel::getId))
+            .ignore(field(AbstractAclModel::getCreatedAt))
+            .ignore(field(AbstractAclModel::getUpdatedAt))
             .ignore(field(Animal::getOwner))
+            .set(field(AbstractAclModel::getModelType), "Animal")
             .set(field(Animal::getName), name)
             .create();
 

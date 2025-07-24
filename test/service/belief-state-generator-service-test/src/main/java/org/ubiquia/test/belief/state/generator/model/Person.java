@@ -25,4 +25,27 @@ public class Person extends BaseModel {
     private Name name;
     private List<Animal> pets = new ArrayList<>();
 
+    public ColorType getHairColor() {
+        return hairColor;
+    }
+
+    public void setHairColor(ColorType hairColor) {
+        this.hairColor = hairColor;
+    }
+
+    public Name getName() {
+        return name;
+    }
+
+    public void setName(Name name) {
+        this.name = name;
+    }
+
+    public List<Animal> getPets() {
+        return pets;
+    }
+
+    public void setPets(List<Animal> pets) {
+        this.pets = pets;
+    }
 }

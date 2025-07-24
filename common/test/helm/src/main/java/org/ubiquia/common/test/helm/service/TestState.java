@@ -28,6 +28,7 @@ public class TestState {
             logger.info("Setting state of testing passed to FALSE...");
             this.passed = false;
         }
+        logger.error("ERROR: {}", failureReason);
         this.failures.add(failureReason);
     }
 

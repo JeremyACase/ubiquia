@@ -12,6 +12,8 @@ public class Cache {
 
     private Animal animal;
 
+    private Person person;
+
     public AgentCommunicationLanguage getAcl() {
         return acl;
     }
@@ -26,6 +28,14 @@ public class Cache {
 
     public void setAnimal(Animal animal) {
         this.animal = animal;
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
     }
 }
 
