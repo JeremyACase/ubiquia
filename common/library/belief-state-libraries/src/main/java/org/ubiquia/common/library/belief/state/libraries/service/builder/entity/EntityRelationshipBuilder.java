@@ -6,6 +6,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.function.Supplier;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
@@ -15,7 +16,8 @@ import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
 
 @Service
 @Transactional
-public abstract class EntityRelationshipBuilder<T extends AbstractAclModelEntity> implements InterfaceLogger {
+public abstract class EntityRelationshipBuilder<T extends AbstractAclModelEntity>
+    implements InterfaceLogger {
 
     protected final Map<Field, Field> cachedEntityFieldMap = new HashMap<>();
     protected final Map<Field, Field> cachedEntityListFieldMap = new HashMap<>();
@@ -66,7 +68,11 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclModelEntity
     @Transactional
     private void trySetRelationships(T model) throws Exception {
         for (var key : cachedEntityFieldMap.keySet()) {
-            handleBidirectionalRelationship(model, key, key.get(model), cachedEntityFieldMap.get(key));
+            handleBidirectionalRelationship(
+                model,
+                key,
+                key.get(model),
+                cachedEntityFieldMap.get(key));
         }
 
         for (var key : cachedEntityListFieldMap.keySet()) {
@@ -74,7 +80,11 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclModelEntity
             key.set(model, new ArrayList<>()); // reset to collect updated objects
             if (values != null) {
                 for (var value : values) {
-                    handleBidirectionalRelationship(model, key, value, cachedEntityListFieldMap.get(key));
+                    handleBidirectionalRelationship(
+                        model,
+                        key,
+                        value,
+                        cachedEntityListFieldMap.get(key));
                 }
             }
         }
@@ -98,23 +108,30 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclModelEntity
         throws Exception {
 
         if (Objects.nonNull(child)) {
-            var repository = repositoryFinder.findRepositoryFor(child);
-            var idOpt = getIdValue(child);
+
+            var unproxiedChild = Hibernate.unproxy(child);
+
+            this.getLogger().debug("...handling bidirectional child entity: {} ",
+                unproxiedChild.getClass().getSimpleName());
+
+            var repository = repositoryFinder.findRepositoryFor(unproxiedChild);
+            var idOpt = getIdValue(unproxiedChild);
 
             Object persistedChild;
             if (idOpt.isPresent()) {
                 Object fetched = null;
                 try {
-                    fetched = repository.findById(idOpt.get()).orElseThrow(() -> new IllegalArgumentException("No entity with ID: " + idOpt.get()));
+                    fetched = repository.findById(idOpt.get()).orElseThrow(()
+                        -> new IllegalArgumentException("No entity with ID: " + idOpt.get()));
                 } catch (Throwable e) {
                     throw new RuntimeException(e);
                 }
                 linkParentToChild(fetched, parent, childBackRefField);
                 persistedChild = repository.save(fetched);
             } else {
-                tryBuildNestedRelationshipsIfNeeded(child);
-                linkParentToChild(child, parent, childBackRefField);
-                persistedChild = repository.save(child);
+                tryBuildNestedRelationshipsIfNeeded(unproxiedChild);
+                linkParentToChild(unproxiedChild, parent, childBackRefField);
+                persistedChild = repository.save(unproxiedChild);
             }
 
             updateParentFieldWithChild(parent, parentField, persistedChild);

@@ -43,7 +43,8 @@ public class EntityRepositoryFinder implements InterfaceLogger {
             throw new RuntimeException("ERROR: Cannot find repository for null entity!");
         }
 
-        this.getLogger().debug("Unproxying: {}", entity.getClass().getSimpleName());
+        this.getLogger().debug("Unproxying: {}",
+            entity.getClass().getSimpleName());
         var unproxied = Hibernate.unproxy(entity);
         entityRepository = this.findRepositoryFor(unproxied.getClass().getSimpleName());
         return entityRepository;
