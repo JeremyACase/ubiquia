@@ -1,7 +1,7 @@
 
 logging:
   level:
-    org.ubiquia: DEBUG
+    org.ubiquia: INFO
 
 management:
   endpoint:

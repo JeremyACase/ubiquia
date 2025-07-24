@@ -25,6 +25,11 @@ public class Person extends BaseModel {
     private Name name;
     private List<Animal> pets = new ArrayList<>();
 
+    @Override
+    public String getModelType() {
+        return "Person";
+    }
+
     public ColorType getHairColor() {
         return hairColor;
     }

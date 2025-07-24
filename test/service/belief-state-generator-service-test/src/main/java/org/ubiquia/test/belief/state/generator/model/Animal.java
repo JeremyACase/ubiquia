@@ -16,7 +16,6 @@ public class Animal extends BaseModel {
         return "Animal";
     }
 
-
     public ColorType getColor() {
         return color;
     }
