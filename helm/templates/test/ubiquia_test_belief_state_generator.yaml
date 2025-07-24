@@ -80,7 +80,6 @@ metadata:
   name: ubiquia-core-belief-state-generator-service-test
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": hook-succeeded
   labels:
     sidecar.istio.io/inject: "false"
 spec:
