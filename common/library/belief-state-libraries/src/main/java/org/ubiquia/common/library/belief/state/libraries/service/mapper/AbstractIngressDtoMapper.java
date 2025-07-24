@@ -9,9 +9,12 @@ import java.util.*;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.belief.state.libraries.service.finder.EntityRepositoryFinder;
 import org.ubiquia.common.model.acl.dto.AbstractAclModel;
 import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
@@ -19,7 +22,10 @@ import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
 @Service
 public abstract class AbstractIngressDtoMapper<
     F extends AbstractAclModel,
-    T extends AbstractAclModelEntity> {
+    T extends AbstractAclModelEntity>
+    implements InterfaceLogger {
+
+    private static final Logger logger = LoggerFactory.getLogger(EntityRepositoryFinder.class);
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -29,6 +35,11 @@ public abstract class AbstractIngressDtoMapper<
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Override
+    public Logger getLogger() {
+        return logger;
+    }
 
     /**
      * Translate from an ingress Data Transfer Object to a Ubiquia model.
@@ -105,18 +116,26 @@ public abstract class AbstractIngressDtoMapper<
 
         var elementType = (ParameterizedType) field.getGenericType();
         var elementClass = (Class<?>) elementType.getActualTypeArguments()[0];
+        var elementList = field.get(to);
 
         if (AbstractAclModelEntity.class.isAssignableFrom(elementClass)
-            && Objects.nonNull(field.get(to))) {
+            && Objects.nonNull(elementList)) {
+
+            this.getLogger().debug("...iterating through field '{}' for model type '{}'",
+                field.getName(),
+                to.getModelType());
 
             var hydratedList = new ArrayList<AbstractAclModelEntity>();
-            for (var element : (List<?>) field.get(to)) {
+            for (var element : (List<?>) elementList) {
+
+                var entity = (AbstractAclModelEntity)
+                    Hibernate.unproxy(element);
+
+                this.getLogger().debug("...processing entity: {}", entity);
 
                 var repository = this
                     .entityRepositoryFinder
-                    .findRepositoryFor(element);
-
-                var entity = (AbstractAclModelEntity) element;
+                    .findRepositoryFor(entity);
 
                 // ...use any provided ID's to create our database relationships.
                 if (Objects.nonNull(entity.getId())) {
