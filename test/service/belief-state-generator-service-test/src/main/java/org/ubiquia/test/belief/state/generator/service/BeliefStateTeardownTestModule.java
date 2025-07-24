@@ -84,45 +84,50 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
 
     @Override
     public void doTests() {
-        logger.info("Proceeding with tests...");
+        if (this.testState.getPassed()) {
 
-        var generation = new BeliefStateGeneration();
-        generation.setDomainName(this.cache.getAcl().getDomain());
-        generation.setVersion(this.cache.getAcl().getVersion());
+            logger.info("Proceeding with tests...");
 
-        var postUrl = this.beliefStateGeneratorServiceConfig.getUrl()
-            + ":"
-            + this.beliefStateGeneratorServiceConfig.getPort()
-            + "/belief-state-generator/teardown/belief-state";
+            var generation = new BeliefStateGeneration();
+            generation.setDomainName(this.cache.getAcl().getDomain());
+            generation.setVersion(this.cache.getAcl().getVersion());
 
-        var response = this.restTemplate.postForEntity(
-            postUrl,
-            generation,
-            BeliefStateGeneration.class);
+            var postUrl = this.beliefStateGeneratorServiceConfig.getUrl()
+                + ":"
+                + this.beliefStateGeneratorServiceConfig.getPort()
+                + "/belief-state-generator/teardown/belief-state";
 
-        try {
-            logger.info("...sleeping to allow for tear down process...");
-            Thread.sleep(60000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            var response = this.restTemplate.postForEntity(
+                postUrl,
+                generation,
+                BeliefStateGeneration.class);
+
+            try {
+                logger.info("...sleeping to allow for tear down process...");
+                Thread.sleep(60000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (!this.beliefStateDeploymentTornDown) {
+                var name = this
+                    .beliefStateNameBuilder
+                    .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
+                this.testState.addFailure("A belief state was never torn down with name: "
+                    + name);
+            }
+
+            try {
+                logger.info("...tore down a belief state for : {}",
+                    this.objectMapper.writeValueAsString(generation));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+
+            logger.info("...completed.");
+        } else {
+            logger.info("Tests FAILED; not tearing down belief state so it can be diagnosed...");
         }
-
-        if (!this.beliefStateDeploymentTornDown) {
-            var name = this
-                .beliefStateNameBuilder
-                .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
-            this.testState.addFailure("A belief state was never torn down with name: "
-                + name);
-        }
-
-        try {
-            logger.info("...tore down a belief state for : {}",
-                this.objectMapper.writeValueAsString(generation));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-        logger.info("...completed.");
     }
 
     /**
