@@ -42,11 +42,11 @@ public class TestManager extends AbstractTestManager {
     public void registerTests() {
         this.testRegistrar.registerModule(this.aclRegistrationTestModule);
         this.testRegistrar.registerModule(this.beliefStateDeploymentTestModule);
-        // this.testRegistrar.registerModule(this.personPostTestModule);
-        // this.testRegistrar.registerModule(this.personQueryTestModule);
-        // this.testRegistrar.registerModule(this.animalPostTestModule);
-        // this.testRegistrar.registerModule(this.animalQueryTestModule);
-        // this.testRegistrar.registerModule(this.beliefStateTeardownTestModule);
+        this.testRegistrar.registerModule(this.personPostTestModule);
+        this.testRegistrar.registerModule(this.personQueryTestModule);
+        this.testRegistrar.registerModule(this.animalPostTestModule);
+        this.testRegistrar.registerModule(this.animalQueryTestModule);
+        this.testRegistrar.registerModule(this.beliefStateTeardownTestModule);
     }
 
     @EventListener(ApplicationReadyEvent.class)

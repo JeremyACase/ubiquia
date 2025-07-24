@@ -57,14 +57,14 @@ public class UbiquiaAgentController implements InterfaceLogger {
 
     @GetMapping("/{id}/get-deployed-graph-ids")
     public Page<String> getDeployedGraphIdsByUbiquiaAgent(
-        @PathVariable("id") final String agentId,
+        @PathVariable("id") final String id,
         @RequestParam(value = "page", defaultValue = "0") final Integer page,
         @RequestParam(value = "size", defaultValue = "10") final Integer size) {
 
         logger.debug("Received request to return deployed graphs for agent ID: {}...",
-            agentId);
+            id);
         var pageable = PageRequest.of(page, size);
-        return this.ubiquiaAgentRepository.findDeployedGraphIdsById(agentId, pageable);
+        return this.ubiquiaAgentRepository.findDeployedGraphIdsById(id, pageable);
     }
 }
 
