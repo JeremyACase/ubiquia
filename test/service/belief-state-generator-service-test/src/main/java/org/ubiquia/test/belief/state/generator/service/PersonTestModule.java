@@ -98,7 +98,8 @@ public class PersonTestModule extends AbstractHelmTestModule {
             var persistedModel = this.postAndRetriever.postAndRetrieve(
                 postUrl,
                 getUrl,
-                this.cache.getPerson());
+                this.cache.getPerson(),
+                Person.class);
 
             this.cache.setPerson(persistedModel);
 

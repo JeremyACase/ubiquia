@@ -94,7 +94,8 @@ public class AnimalTestModule extends AbstractHelmTestModule {
             var persistedModel = this.postAndRetriever.postAndRetrieve(
                 postUrl,
                 getUrl,
-                this.cache.getAnimal());
+                this.cache.getAnimal(),
+                Animal.class);
 
             this.cache.setAnimal(persistedModel);
 

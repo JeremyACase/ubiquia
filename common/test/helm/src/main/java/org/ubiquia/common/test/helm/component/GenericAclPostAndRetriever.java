@@ -32,7 +32,9 @@ public class GenericAclPostAndRetriever<T> implements InterfaceLogger {
     public T postAndRetrieve(
         final String postUrl,
         final String getUrl,
-        final T object) throws JsonProcessingException {
+        final T object,
+        final Class<T> clazz)
+        throws JsonProcessingException {
 
         logger.debug("Posting object: {}",
             this.objectMapper.writeValueAsString(object));
@@ -45,16 +47,8 @@ public class GenericAclPostAndRetriever<T> implements InterfaceLogger {
             IngressResponse.class);
 
         var queryUrl = getUrl + postResponse.getBody().getId();
-        var typeReference = new ParameterizedTypeReference<T>() {
-        };
-
         logger.info("GETting from URL: {}", queryUrl);
-        var response = this.restTemplate.exchange(
-            queryUrl,
-            HttpMethod.GET,
-            null,
-            typeReference
-        );
+        var response = this.restTemplate.getForEntity(queryUrl, clazz);
 
         return response.getBody();
     }
