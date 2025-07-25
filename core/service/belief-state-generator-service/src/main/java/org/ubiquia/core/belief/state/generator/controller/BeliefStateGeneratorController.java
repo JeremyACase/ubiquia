@@ -91,6 +91,8 @@ public class BeliefStateGeneratorController {
         var acl = response.getBody().getContent().get(0);
         this.beliefStateGenerator.generateBeliefStateFrom(acl);
 
+        logger.info("..generated belief state.");
+
         return beliefStateGeneration;
     }
 

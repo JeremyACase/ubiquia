@@ -90,6 +90,13 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
     public void doTests() {
         if (this.testState.getPassed()) {
 
+            try {
+                logger.info("...sleeping to give resources time to settle...");
+                Thread.sleep(60000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
             logger.info("Proceeding with tests...");
 
             var generation = new BeliefStateGeneration();
