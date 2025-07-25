@@ -60,9 +60,14 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
      *
      * @throws IOException Exceptions from not being able to connect to Kubernetes.
      */
-    public void init() throws IOException {
+    @Override
+    public void doSetup() {
         logger.info("Initializing Kubernetes client connection...");
-        this.apiClient = ClientBuilder.standard().build();
+        try {
+            this.apiClient = ClientBuilder.standard().build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         this.deploymentClient = new GenericKubernetesApi<>(
             V1Deployment.class,
             V1DeploymentList.class,
@@ -96,6 +101,8 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
                 + this.beliefStateGeneratorServiceConfig.getPort()
                 + "/belief-state-generator/teardown/belief-state";
 
+            logger.info("...POSTing to teardown at: {}", postUrl);
+
             var response = this.restTemplate.postForEntity(
                 postUrl,
                 generation,
@@ -105,7 +112,7 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
                 .beliefStateNameBuilder
                 .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
 
-            this.waitForBeliefStateTearDown(name, Duration.ofSeconds(120));
+            this.waitForBeliefStateTearDown(name, Duration.ofSeconds(60));
 
             logger.info("...completed.");
         } else {
