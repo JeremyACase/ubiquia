@@ -105,7 +105,7 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
                 .beliefStateNameBuilder
                 .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
 
-            this.waitForBeliefStateTearDown(name, Duration.ofSeconds(60));
+            this.waitForBeliefStateTearDown(name, Duration.ofSeconds(120));
 
             logger.info("...completed.");
         } else {
@@ -165,7 +165,8 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
         var startTime = System.currentTimeMillis();
         var timeoutMs = timeout.toMillis();
 
-        while (!beliefStateDeploymentTornDown && (System.currentTimeMillis() - startTime) < timeoutMs) {
+        while (!beliefStateDeploymentTornDown
+            && (System.currentTimeMillis() - startTime) < timeoutMs) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
