@@ -59,7 +59,6 @@ public class AnimalTestModule extends AbstractHelmTestModule {
             .ignore(field(AbstractAclModel::getCreatedAt))
             .ignore(field(AbstractAclModel::getUpdatedAt))
             .ignore(field(Animal::getOwner))
-            .set(field(AbstractAclModel::getModelType), "Animal")
             .set(field(Animal::getName), name)
             .create();
 
@@ -90,7 +89,7 @@ public class AnimalTestModule extends AbstractHelmTestModule {
                 + this.cache.getAcl().getDomain()
                 + "-belief-state-"
                 + this.cache.getAcl().getVersion().toString().replace(".", "-")
-                + ":8080/ubiquia/belief-state-service/Animal/query/params";
+                + ":8080/ubiquia/belief-state-service/Animal/query/";
 
             var persistedModel = this.postAndRetriever.postAndRetrieve(
                 postUrl,
