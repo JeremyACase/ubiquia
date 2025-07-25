@@ -28,6 +28,7 @@ import org.ubiquia.common.model.acl.dto.AbstractAclModel;
     visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = Animal.class, name = "Animal"),
+    @JsonSubTypes.Type(value = Person.class, name = "Person"),
 })
 
 public class BaseModel extends AbstractAclModel {
