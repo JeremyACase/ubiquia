@@ -14,7 +14,7 @@ import org.ubiquia.common.model.acl.dto.AbstractAclModel;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 
 @Service
-public class GenericAclPostAndRetriever<T extends AbstractAclModel> implements InterfaceLogger {
+public class GenericAclPostAndRetriever<T> implements InterfaceLogger {
 
     private static final Logger logger = LoggerFactory.getLogger(GenericAclPostAndRetriever.class);
 
