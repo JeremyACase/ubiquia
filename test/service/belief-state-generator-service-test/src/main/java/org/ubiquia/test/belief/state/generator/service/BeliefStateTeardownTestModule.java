@@ -1,6 +1,5 @@
 package org.ubiquia.test.belief.state.generator.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kubernetes.client.informer.ResourceEventHandler;
 import io.kubernetes.client.informer.SharedInformerFactory;
@@ -12,6 +11,7 @@ import io.kubernetes.client.openapi.models.V1ServiceList;
 import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.generic.GenericKubernetesApi;
 import java.io.IOException;
+import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,17 +44,16 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
 
     @Autowired
     private RestTemplate restTemplate;
-
-    @Override
-    public Logger getLogger() {
-        return logger;
-    }
-
     private ApiClient apiClient;
     private GenericKubernetesApi<V1Deployment, V1DeploymentList> deploymentClient;
     @Value("${ubiquia.kubernetes.namespace}")
     private String namespace;
     private GenericKubernetesApi<V1Service, V1ServiceList> serviceClient;
+
+    @Override
+    public Logger getLogger() {
+        return logger;
+    }
 
     /**
      * Initialize this operator with connections to the Kubernetes API server.
@@ -102,27 +101,11 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
                 generation,
                 BeliefStateGeneration.class);
 
-            try {
-                logger.info("...sleeping to allow for tear down process...");
-                Thread.sleep(60000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            var name = this
+                .beliefStateNameBuilder
+                .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
 
-            if (!this.beliefStateDeploymentTornDown) {
-                var name = this
-                    .beliefStateNameBuilder
-                    .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
-                this.testState.addFailure("A belief state was never torn down with name: "
-                    + name);
-            }
-
-            try {
-                logger.info("...tore down a belief state for : {}",
-                    this.objectMapper.writeValueAsString(generation));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            this.waitForBeliefStateTearDown(name, Duration.ofSeconds(60));
 
             logger.info("...completed.");
         } else {
@@ -168,6 +151,35 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
         });
 
         factory.startAllRegisteredInformers();
+    }
+
+    /**
+     * Because threads are fun.
+     *
+     * @param beliefStateName The belief state we're checking for.
+     * @param timeout         The timeout before we simply give up.
+     */
+    private void waitForBeliefStateTearDown(
+        final String beliefStateName,
+        final Duration timeout) {
+        var startTime = System.currentTimeMillis();
+        var timeoutMs = timeout.toMillis();
+
+        while (!beliefStateDeploymentTornDown && (System.currentTimeMillis() - startTime) < timeoutMs) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Interrupted while waiting for belief state teardown");
+            }
+        }
+
+        if (!beliefStateDeploymentTornDown) {
+            this.testState.addFailure("A belief state was never torn down with name: "
+                + beliefStateName);
+        } else {
+            logger.info("...tore down a belief state for : {}", beliefStateName);
+        }
     }
 }
 
