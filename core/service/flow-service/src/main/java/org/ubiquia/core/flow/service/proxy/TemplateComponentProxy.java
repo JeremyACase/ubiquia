@@ -77,7 +77,7 @@ public class TemplateComponentProxy {
         JsonGeneratorException {
 
         var eventTimes = flowEventEntity.getFlowEventTimes();
-        eventTimes.setPayloadSentToAgentTime(OffsetDateTime.now());
+        eventTimes.setPayloadSentToComponentTime(OffsetDateTime.now());
         this.tryInitializeSchema(flowEventEntity.getAdapter().getId());
         var jsonSchema = this.cachedAdapterSchemas.get(flowEventEntity.getAdapter().getId());
         var schemaStore = new SchemaStore(true);

@@ -53,7 +53,7 @@ public class BaseModel extends AbstractAclModel {
 
     @Override
     public String getModelType() {
-        return "BaseModelDto";
+        return "BaseModel";
     }
 
 

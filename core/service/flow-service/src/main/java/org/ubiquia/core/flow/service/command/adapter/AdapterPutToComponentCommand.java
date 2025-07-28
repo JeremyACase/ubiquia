@@ -66,12 +66,12 @@ public class AdapterPutToComponentCommand implements InterfaceLogger {
         logger.info("PUTting synchronous payload to URI: {}...", adapterContext.getEndpointUri());
 
         var flowEventTimes = flowEventEntity.getFlowEventTimes();
-        flowEventTimes.setPayloadSentToAgentTime(OffsetDateTime.now());
+        flowEventTimes.setPayloadSentToComponentTime(OffsetDateTime.now());
 
         var request = new HttpEntity<>(inputPayload, headers);
         ResponseEntity<Object> response = null;
         try {
-            flowEventTimes.setPayloadSentToAgentTime(OffsetDateTime.now());
+            flowEventTimes.setPayloadSentToComponentTime(OffsetDateTime.now());
             response = this.restTemplate.exchange(
                 adapterContext.getEndpointUri(),
                 HttpMethod.PUT,

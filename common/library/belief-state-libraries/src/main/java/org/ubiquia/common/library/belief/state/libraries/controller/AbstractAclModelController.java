@@ -100,7 +100,7 @@ public abstract class AbstractAclModelController<
 
         this.getLogger().info("Received a model to persist of type {}...",
             ingress.getModelType());
-        if (Objects.nonNull(ingress.getId())) {
+        if (Objects.nonNull(ingress.getUbiquiaId())) {
             throw new IllegalArgumentException("ERROR: Payload has an id during an add; "
                 + " id's must be null for adds!");
         }
@@ -133,7 +133,7 @@ public abstract class AbstractAclModelController<
             this.getLogger().debug("Processing model of type of type {}...",
                 ingress.getModelType());
             var converted = this.getIngressMapper().map(ingress, this.cachedEntityClass);
-            if (Objects.nonNull(converted.getId())) {
+            if (Objects.nonNull(converted.getUbiquiaId())) {
                 throw new IllegalArgumentException("ERROR: Payload has an id during an add; "
                     + " id's must be null for adds!");
             }
@@ -196,7 +196,7 @@ public abstract class AbstractAclModelController<
         var parentEntity = parentRecord.get();
         var childField = match.get();
         var childEntity = this.getChildRecord(childField, association);
-        childEntity.setId(association.getChildAssociation().getChildId());
+        childEntity.setUbiquiaId(association.getChildAssociation().getChildId());
         this.associateParentAndChild(childField, parentEntity, childEntity);
         parentEntity = parentRepository.save(parentEntity);
         this.getEntityRelationshipBuilder().tryBuildRelationships(parentEntity);
@@ -228,10 +228,10 @@ public abstract class AbstractAclModelController<
         }
         var entity = record.get();
 
-        if (Objects.isNull(entity.getTags())) {
-            entity.setTags(new HashSet<>());
+        if (Objects.isNull(entity.getUbiquiaTags())) {
+            entity.setUbiquiaTags(new HashSet<>());
         }
-        entity.getTags().add(tag);
+        entity.getUbiquiaTags().add(tag);
 
         entity = this.getEntityRepository().save(entity);
         var response = this.ingressResponseBuilder.buildIngressResponseFor(entity);
@@ -262,12 +262,12 @@ public abstract class AbstractAclModelController<
         }
         var entity = record.get();
 
-        if (Objects.isNull(entity.getTags())) {
+        if (Objects.isNull(entity.getUbiquiaTags())) {
             throw new IllegalArgumentException("ERROR: Could not find a tag with key: "
                 + tag.getKey());
         }
         var match = entity
-            .getTags()
+            .getUbiquiaTags()
             .stream()
             .filter(x -> x.getKey().equals(tag.getKey()))
             .findFirst();
@@ -275,7 +275,7 @@ public abstract class AbstractAclModelController<
             throw new IllegalArgumentException("ERROR: Could not find a tag with key: "
                 + tag.getKey());
         }
-        entity.getTags().remove(match.get());
+        entity.getUbiquiaTags().remove(match.get());
         entity = this.getEntityRepository().save(entity);
 
         var response = this.ingressResponseBuilder.buildIngressResponseFor(entity);
@@ -364,7 +364,7 @@ public abstract class AbstractAclModelController<
         if (record.isEmpty()) {
             response = ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
-            response = ResponseEntity.status(HttpStatus.OK).body(record.get().getId());
+            response = ResponseEntity.status(HttpStatus.OK).body(record.get().getUbiquiaId());
             this.getEntityRepository().delete(record.get());
         }
         if (Objects.nonNull(sample)) {
@@ -396,7 +396,7 @@ public abstract class AbstractAclModelController<
         var parameterMap = new HashMap<String, String[]>();
         var array = new String[1];
         array[0] = id;
-        parameterMap.put("id", array);
+        parameterMap.put("ubiquiaId", array);
 
         var records = this.entityDao.getPage(
             parameterMap,

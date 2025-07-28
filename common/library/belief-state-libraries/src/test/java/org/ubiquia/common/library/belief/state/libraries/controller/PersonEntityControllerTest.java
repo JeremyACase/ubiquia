@@ -160,7 +160,7 @@ public class PersonEntityControllerTest {
                 .get(queryURL)
                 .queryParam("page", "0")
                 .queryParam("size", "1")
-                .queryParam("owner.id", personResponse.getId())
+                .queryParam("owner.ubiquiaId", personResponse.getId())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
@@ -173,7 +173,7 @@ public class PersonEntityControllerTest {
             new TypeReference<GenericPageImplementation<Animal>>() {
             });
 
-        Assertions.assertEquals(result.getContent().get(0).getId(), weenResponse.getId());
+        Assertions.assertEquals(result.getContent().get(0).getUbiquiaId(), weenResponse.getId());
     }
 
     @Test
@@ -275,7 +275,7 @@ public class PersonEntityControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .queryParam("page", "0")
                 .queryParam("size", "1")
-                .queryParam("id", ingressResponse.getId())
+                .queryParam("ubiquiaId", ingressResponse.getId())
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
             .andReturn()
@@ -288,7 +288,7 @@ public class PersonEntityControllerTest {
             });
 
         var record = result.getContent().get(0);
-        var matchingTag = record.getTags().stream().filter(x -> x
+        var matchingTag = record.getUbiquiaTags().stream().filter(x -> x
                 .getKey()
                 .equals("testKey"))
             .findFirst();
@@ -334,7 +334,7 @@ public class PersonEntityControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .queryParam("page", "0")
                 .queryParam("size", "1")
-                .queryParam("id", ingressResponse.getId())
+                .queryParam("ubiquiaId", ingressResponse.getId())
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
             .andReturn()
@@ -347,7 +347,7 @@ public class PersonEntityControllerTest {
             });
 
         var record = result.getContent().get(0);
-        var matchingTag = record.getTags().stream().filter(x -> x
+        var matchingTag = record.getUbiquiaTags().stream().filter(x -> x
                 .getKey()
                 .equals("testKey"))
             .findFirst();
@@ -396,7 +396,7 @@ public class PersonEntityControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .queryParam("page", "0")
                 .queryParam("size", "1")
-                .queryParam("pets.id", weenResponse.getId())
+                .queryParam("pets.ubiquiaId", weenResponse.getId())
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
             .andReturn()
@@ -408,7 +408,7 @@ public class PersonEntityControllerTest {
             new TypeReference<GenericPageImplementation<Person>>() {
             });
 
-        Assertions.assertEquals(result.getContent().get(0).getId(), personResponse.getId());
+        Assertions.assertEquals(result.getContent().get(0).getUbiquiaId(), personResponse.getId());
     }
 
     @Test
@@ -421,7 +421,7 @@ public class PersonEntityControllerTest {
 
         var result = this.mockMvc.perform(MockMvcRequestBuilders
                 .get(queryURL)
-                .queryParam("id", ingressResponse.getId())
+                .queryParam("ubiquiaId", ingressResponse.getId())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
@@ -443,10 +443,10 @@ public class PersonEntityControllerTest {
         var queryURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/multiselect/params";
         this.mockMvc.perform(MockMvcRequestBuilders
                 .get(queryURL)
-                .queryParam("id", ingressResponse.getId())
+                .queryParam("ubiquiaId", ingressResponse.getId())
                 .queryParam("page", "0")
                 .queryParam("size", "1")
-                .queryParam("multiselect-fields", "id")
+                .queryParam("multiselect-fields", "ubiquiaId")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())

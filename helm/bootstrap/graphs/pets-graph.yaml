@@ -1,4 +1,4 @@
-graphName: Pets
+name: Pets
 modelType: Graph
 author: Jeremy Case
 description: The "Hello World" of Directed Acyclic Graphs (DAG's) in Ubiquia, but with Pets!
@@ -33,12 +33,12 @@ agentCommunicationLanguage:
 # These are a list of components that comprise this graph.
 components:
 
-  - componenttName: Pet-Store-Image-Classifier-Component
+  - name: Pet-Store-Image-Classifier-Component
 
     # Setting a component as a template will instruct Ubiquia to not instantiate it as a 
     # Kubernetes pod, but instead to generate a "proxy" for it which will act on its behalf with 
     # dummy data.
-    componentName: TEMPLATE
+    componentType: TEMPLATE
     modelType: Component
     description: This is a an example component that will classify an animal from an image.
 
@@ -102,7 +102,7 @@ components:
     adapter:
       modelType: Adapter
       adapterType: PUSH
-      adapterName: Pet-Store-Image-Classifier-Adapter
+      name: Pet-Store-Image-Classifier-Adapter
       description: This is an example adapter.
 
       communicationServiceSettings:
@@ -138,7 +138,7 @@ components:
             persistOutputPayload: false
             validateOutputPayload: true
 
-  - componentName: Pet-Generator-Component
+  - name: Pet-Generator-Component
 
     componentType: TEMPLATE
     modelType: Component
@@ -157,7 +157,7 @@ components:
     adapter:
       modelType: Adapter
       adapterType: HIDDEN
-      adapterName: Pet-Generator-Adapter
+      name: Pet-Generator-Adapter
       description: This is an example adapter.
 
       communicationServiceSettings:
@@ -192,7 +192,7 @@ componentlessAdapters:
 
   - modelType: Adapter
     adapterType: EGRESS
-    adapterName: Pet-Egress-Adapter
+    name: Pet-Egress-Adapter
     description: This is an example adapter that POSTs incoming payloads to a belief state.
 
     endpoint: http://pets-belief-state-1-2-3:8080/ubiquia/Animal/add

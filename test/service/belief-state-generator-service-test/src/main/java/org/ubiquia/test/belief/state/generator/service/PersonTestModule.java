@@ -49,9 +49,9 @@ public class PersonTestModule extends AbstractHelmTestModule {
 
         var name = Instancio
             .of(Name.class)
-            .ignore(field(AbstractAclModel::getId))
-            .ignore(field(AbstractAclModel::getCreatedAt))
-            .ignore(field(AbstractAclModel::getUpdatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaId))
+            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
             .create();
 
         var pets = new ArrayList<>();
@@ -59,9 +59,9 @@ public class PersonTestModule extends AbstractHelmTestModule {
 
         var person = Instancio
             .of(Person.class)
-            .ignore(field(AbstractAclModel::getId))
-            .ignore(field(AbstractAclModel::getCreatedAt))
-            .ignore(field(AbstractAclModel::getUpdatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaId))
+            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
             .set(field(Person::getPets), pets)
             .set(field(Person::getName), name)
             .create();
@@ -136,7 +136,7 @@ public class PersonTestModule extends AbstractHelmTestModule {
             + "-belief-state-"
             + this.cache.getAcl().getVersion().toString().replace(".", "-")
             + ":8080/ubiquia/belief-state-service/Person/query/params?page=0&size=1&pets.id="
-            + this.cache.getAnimal().getId();
+            + this.cache.getAnimal().getUbiquiaId();
 
         logger.info("GETting from URL: {}", getUrl);
 

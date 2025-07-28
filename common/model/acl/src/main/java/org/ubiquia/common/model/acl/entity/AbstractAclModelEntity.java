@@ -19,47 +19,47 @@ public abstract class AbstractAclModelEntity {
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private String id = null;
+    private String ubiquiaId = null;
 
     @CreationTimestamp
     @Column(updatable = false)
-    private OffsetDateTime createdAt = null;
+    private OffsetDateTime ubiquiaCreatedAt = null;
 
     @UpdateTimestamp
-    private OffsetDateTime updatedAt = null;
+    private OffsetDateTime ubiquiaUpdatedAt = null;
 
     @ElementCollection
     @Valid
-    private Set<KeyValuePair> tags = null;
+    private Set<KeyValuePair> ubiquiaTags = null;
 
     @Transient
     private String modelType;
 
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
-    public String getId() {
-        return this.id;
+    public String getUbiquiaId() {
+        return this.ubiquiaId;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @Valid
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setUbiquiaId(String ubiquiaId) {
+        this.ubiquiaId = ubiquiaId;
     }
 
     @Valid
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
+    public OffsetDateTime getUbiquiaCreatedAt() {
+        return ubiquiaCreatedAt;
     }
 
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUbiquiaCreatedAt(OffsetDateTime ubiquiaCreatedAt) {
+        this.ubiquiaCreatedAt = ubiquiaCreatedAt;
+    }
+
+    @Valid
+    public OffsetDateTime getUbiquiaUpdatedAt() {
+        return ubiquiaUpdatedAt;
+    }
+
+    public void setUbiquiaUpdatedAt(OffsetDateTime ubiquiaUpdatedAt) {
+        this.ubiquiaUpdatedAt = ubiquiaUpdatedAt;
     }
 
     /**
@@ -74,7 +74,7 @@ public abstract class AbstractAclModelEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, modelType);
+        return Objects.hash(ubiquiaId, modelType);
     }
 
     @Override
@@ -90,7 +90,7 @@ public abstract class AbstractAclModelEntity {
         AbstractAclModelEntity aentity = (AbstractAclModelEntity) o;
 
         return
-            Objects.equals(this.id, aentity.id)
+            Objects.equals(this.ubiquiaId, aentity.ubiquiaId)
                 && Objects.equals(this.modelType, aentity.modelType);
     }
 
@@ -98,11 +98,11 @@ public abstract class AbstractAclModelEntity {
         this.modelType = modelType;
     }
 
-    public Set<KeyValuePair> getTags() {
-        return tags;
+    public Set<KeyValuePair> getUbiquiaTags() {
+        return ubiquiaTags;
     }
 
-    public void setTags(Set<KeyValuePair> tags) {
-        this.tags = tags;
+    public void setUbiquiaTags(Set<KeyValuePair> ubiquiaTags) {
+        this.ubiquiaTags = ubiquiaTags;
     }
 }

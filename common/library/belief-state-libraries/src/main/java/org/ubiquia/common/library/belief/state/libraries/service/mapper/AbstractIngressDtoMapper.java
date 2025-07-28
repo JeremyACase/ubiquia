@@ -138,11 +138,11 @@ public abstract class AbstractIngressDtoMapper<
                     .findRepositoryFor(entity);
 
                 // ...use any provided ID's to create our database relationships.
-                if (Objects.nonNull(entity.getId())) {
-                    var record = repository.findById(entity.getId());
+                if (Objects.nonNull(entity.getUbiquiaId())) {
+                    var record = repository.findById(entity.getUbiquiaId());
                     if (record.isEmpty()) {
                         throw new IllegalArgumentException("ERROR: Entity not found: "
-                            + entity.getId());
+                            + entity.getUbiquiaId());
                     }
                     var hydrated = (AbstractAclModelEntity) Hibernate.unproxy(record.get());
                     hydratedList.add(hydrated);
@@ -169,15 +169,15 @@ public abstract class AbstractIngressDtoMapper<
         var entity = (AbstractAclModelEntity) field.get(to);
 
         // we have been provided an ID, use it to create to associate our entities.
-        if (Objects.nonNull(entity.getId())) {
+        if (Objects.nonNull(entity.getUbiquiaId())) {
             var repository = this
                 .entityRepositoryFinder
                 .findRepositoryFor(entity);
 
-            var record = repository.findById(entity.getId());
+            var record = repository.findById(entity.getUbiquiaId());
             if (record.isEmpty()) {
                 throw new IllegalArgumentException("ERROR: Entity not found: "
-                    + entity.getId());
+                    + entity.getUbiquiaId());
             }
 
             var hydrated = Hibernate.unproxy(record.get());

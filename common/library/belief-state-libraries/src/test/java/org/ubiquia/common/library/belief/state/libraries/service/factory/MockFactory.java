@@ -19,9 +19,9 @@ public class MockFactory {
     public Person generatePerson() {
         var model = Instancio
             .of(Person.class)
-            .ignore(field(AbstractAclModel::getId))
-            .ignore(field(AbstractAclModel::getCreatedAt))
-            .ignore(field(AbstractAclModel::getUpdatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaId))
+            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
             .set(field(Person::getPets), new ArrayList<>())
             .set(field(AbstractAclModel::getModelType), "Person")
             .create();
@@ -36,9 +36,9 @@ public class MockFactory {
     public Cat generateCat() {
         var model = Instancio
             .of(Cat.class)
-            .ignore(field(AbstractAclModel::getId))
-            .ignore(field(AbstractAclModel::getCreatedAt))
-            .ignore(field(AbstractAclModel::getUpdatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaId))
+            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
             .ignore(field(Animal::getOwner))
             .create();
         return model;
@@ -52,9 +52,9 @@ public class MockFactory {
     public Shark generateShark() {
         var model = Instancio
             .of(Shark.class)
-            .ignore(field(AbstractAclModel::getId))
-            .ignore(field(AbstractAclModel::getCreatedAt))
-            .ignore(field(AbstractAclModel::getUpdatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaId))
+            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
             .ignore(field(Animal::getOwner))
             .create();
         return model;
@@ -68,9 +68,9 @@ public class MockFactory {
     public Dachschund generateWienerDog() {
         var warWeen = Instancio
             .of(Dachschund.class)
-            .ignore(field(AbstractAclModel::getId))
-            .ignore(field(AbstractAclModel::getCreatedAt))
-            .ignore(field(AbstractAclModel::getUpdatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaId))
+            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
             .ignore(field(Animal::getOwner))
             .create();
         return warWeen;

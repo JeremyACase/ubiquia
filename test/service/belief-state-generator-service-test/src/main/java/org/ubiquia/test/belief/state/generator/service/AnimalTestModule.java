@@ -48,16 +48,16 @@ public class AnimalTestModule extends AbstractHelmTestModule {
 
         var name = Instancio
             .of(Name.class)
-            .ignore(field(AbstractAclModel::getId))
-            .ignore(field(AbstractAclModel::getCreatedAt))
-            .ignore(field(AbstractAclModel::getUpdatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaId))
+            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
             .create();
 
         var animal = Instancio
             .of(Animal.class)
-            .ignore(field(AbstractAclModel::getId))
-            .ignore(field(AbstractAclModel::getCreatedAt))
-            .ignore(field(AbstractAclModel::getUpdatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaId))
+            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
             .ignore(field(Animal::getOwner))
             .set(field(Animal::getName), name)
             .create();

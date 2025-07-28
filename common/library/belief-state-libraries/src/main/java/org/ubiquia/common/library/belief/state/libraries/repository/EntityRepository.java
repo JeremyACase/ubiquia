@@ -11,12 +11,12 @@ public interface EntityRepository<T extends AbstractAclModelEntity>
     extends PagingAndSortingRepository<T, String>,
     CrudRepository<T, String> {
 
-    @Query("SELECT DISTINCT et.key FROM #{#entityName} e JOIN e.tags et")
+    @Query("SELECT DISTINCT et.key FROM #{#entityName} e JOIN e.ubiquiaTags et")
     List<String> findAllDistinctTagKeys();
 
-    @Query("SELECT DISTINCT et.value FROM #{#entityName} e JOIN e.tags et")
+    @Query("SELECT DISTINCT et.value FROM #{#entityName} e JOIN e.ubiquiaTags et")
     List<String> findAllDistinctTagValues();
 
-    @Query("SELECT DISTINCT et.value FROM #{#entityName} e JOIN e.tags et WHERE et.key = ?1")
+    @Query("SELECT DISTINCT et.value FROM #{#entityName} e JOIN e.ubiquiaTags et WHERE et.key = ?1")
     List<String> findAllDistinctTagValuesByKey(String key);
 }

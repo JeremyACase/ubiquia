@@ -37,7 +37,7 @@ public class EntityUpdater {
 
         logger.debug("Attempting to set entity of type {} with id {} with key-value-pair {}",
             entity.getClass().getSimpleName(),
-            entity.getId(),
+            entity.getUbiquiaId(),
             keyValuePairs);
 
         var fields = FieldUtils.getAllFieldsList(entity.getClass());

@@ -9,7 +9,7 @@ public class FlowEventTimes {
 
     private OffsetDateTime componentResponseTime;
 
-    private OffsetDateTime payloadSentToAgentTime;
+    private OffsetDateTime payloadSentToComponentTime;
 
     private OffsetDateTime eventStartTime;
 
@@ -23,12 +23,12 @@ public class FlowEventTimes {
 
     private OffsetDateTime pollStartedTime;
 
-    public OffsetDateTime getPayloadSentToAgentTime() {
-        return payloadSentToAgentTime;
+    public OffsetDateTime getPayloadSentToComponentTime() {
+        return payloadSentToComponentTime;
     }
 
-    public void setPayloadSentToAgentTime(OffsetDateTime payloadSentToAgentTime) {
-        this.payloadSentToAgentTime = payloadSentToAgentTime;
+    public void setPayloadSentToComponentTime(OffsetDateTime payloadSentToComponentTime) {
+        this.payloadSentToComponentTime = payloadSentToComponentTime;
     }
 
     public OffsetDateTime getEventStartTime() {

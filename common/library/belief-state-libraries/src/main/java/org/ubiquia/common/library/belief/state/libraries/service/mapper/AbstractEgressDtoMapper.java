@@ -69,7 +69,7 @@ public abstract class AbstractEgressDtoMapper<
 
         var to = this.getNewDto();
         to.setModelType(this.getModelType());
-        to.setId(from.getId());
+        to.setUbiquiaId(from.getUbiquiaId());
 
         this.tryHydrateObject(from, to);
         return to;

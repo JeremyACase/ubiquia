@@ -69,7 +69,7 @@ public class AdapterPostToComponentCommand implements InterfaceLogger {
         logger.info("POSTing synchronous payload to URI: {}...", adapterContext.getEndpointUri());
 
         var flowEventTimes = flowEventEntity.getFlowEventTimes();
-        flowEventTimes.setPayloadSentToAgentTime(OffsetDateTime.now());
+        flowEventTimes.setPayloadSentToComponentTime(OffsetDateTime.now());
 
         var request = new HttpEntity<>(inputPayload, headers);
         ResponseEntity<Object> response = null;

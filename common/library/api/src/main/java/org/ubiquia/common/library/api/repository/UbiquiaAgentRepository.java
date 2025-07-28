@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.query.Param;
 import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgentEntity;
 
 public interface UbiquiaAgentRepository extends PagingAndSortingRepository<UbiquiaAgentEntity, String>,
@@ -20,9 +20,9 @@ public interface UbiquiaAgentRepository extends PagingAndSortingRepository<Ubiqu
         final Integer patch,
         final String id);
 
-    @Query("SELECT DISTINCT g.id FROM UbiquiaAgentEntity a JOIN a.deployedGraphs g WHERE a.id = :agentId")
+    @Query("SELECT DISTINCT g.id FROM UbiquiaAgentEntity a JOIN a.deployedGraphs g WHERE a.id = :id")
     Page<String> findDeployedGraphIdsById(
-        final String agentId,
-        final Pageable pageable);
+        @Param("id") String id,
+        Pageable pageable);
 
 }

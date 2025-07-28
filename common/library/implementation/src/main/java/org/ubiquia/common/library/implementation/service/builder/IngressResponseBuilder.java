@@ -15,10 +15,10 @@ public class IngressResponseBuilder {
 
     public IngressResponse buildIngressResponseFor(final AbstractAclModelEntity entity) {
         logger.debug("...building ingress response for entity with: \nid: {} \ntype: {}",
-            entity.getId(),
+            entity.getUbiquiaId(),
             entity.getModelType());
         var response = new IngressResponse();
-        response.setId(entity.getId());
+        response.setId(entity.getUbiquiaId());
         response.setPayloadModelType(entity.getModelType());
         return response;
     }
