@@ -16,7 +16,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan(basePackages = {"org.ubiquia.*"})
 @EntityScan(basePackages = {
     "org.ubiquia.acl.generated",
-    "org.ubiquia.common.model.acl.entity",
     "org.ubiquia.common.model.ubiquia.entity"})
 @EnableJpaRepositories(basePackages = {"org.ubiquia.common.library", "org.ubiquia.acl.generated"})
 public class Application {
