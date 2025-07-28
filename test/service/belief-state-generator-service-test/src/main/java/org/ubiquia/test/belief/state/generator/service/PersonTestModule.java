@@ -135,7 +135,7 @@ public class PersonTestModule extends AbstractHelmTestModule {
             + this.cache.getAcl().getDomain()
             + "-belief-state-"
             + this.cache.getAcl().getVersion().toString().replace(".", "-")
-            + ":8080/ubiquia/belief-state-service/Person/query/params?page=0&size=1&pets.id="
+            + ":8080/ubiquia/belief-state-service/Person/query/params?page=0&size=1&pets.ubiquiaId="
             + this.cache.getAnimal().getUbiquiaId();
 
         logger.info("GETting from URL: {}", getUrl);
