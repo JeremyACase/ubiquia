@@ -41,23 +41,6 @@ public abstract class AbstractGlobalExceptionHandler extends ResponseEntityExcep
      * @return The error response.
      */
     @ResponseBody
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(IOException.class)
-    public ResponseEntity<ErrorResponse> handleIOException(
-        Exception ex,
-        WebRequest request) {
-        var error = this.handlerHelper(ex, "IO exception occurred.");
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    /**
-     * Catch any IO exceptions and return the response to the client.
-     *
-     * @param ex      The exception.
-     * @param request The originating request.
-     * @return The error response.
-     */
-    @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({TransactionSystemException.class})
     public ResponseEntity<ErrorResponse> handleTransactionException(
@@ -163,23 +146,6 @@ public abstract class AbstractGlobalExceptionHandler extends ResponseEntityExcep
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * Catch any exceptions regarding http server errors.
-     *
-     * @param ex      The exception.
-     * @param request The originating request.
-     * @return The error response.
-     */
-    @ResponseBody
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler({HttpServerErrorException.class})
-    public ResponseEntity<ErrorResponse> handleServerError(
-        Exception ex,
-        WebRequest request) {
-        var error = this.handlerHelper(ex, "HTTP server exception occurred.");
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
         HttpMessageNotReadableException ex,
@@ -190,18 +156,6 @@ public abstract class AbstractGlobalExceptionHandler extends ResponseEntityExcep
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @Override
-    protected ResponseEntity<Object> handleExceptionInternal(
-        Exception ex,
-        @Nullable Object body,
-        HttpHeaders headers,
-        HttpStatusCode statusCode,
-        WebRequest request) {
-
-        var error = this.handlerHelper(ex, ex.getMessage());
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
     /**
      * Helper method to build and return an error response.
      *
@@ -210,10 +164,7 @@ public abstract class AbstractGlobalExceptionHandler extends ResponseEntityExcep
      * @return A populated error message.
      */
     private ErrorResponse handlerHelper(Exception ex, String helperMessage) {
-        var details = new ArrayList<String>();
-        details.add(ex.getLocalizedMessage());
         var error = new ErrorResponse();
-        error.setDetails(details);
         error.setMessage(helperMessage);
         return error;
     }
