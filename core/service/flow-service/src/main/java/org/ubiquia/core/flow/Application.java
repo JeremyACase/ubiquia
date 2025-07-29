@@ -1,6 +1,9 @@
 package org.ubiquia.core.flow;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -43,6 +46,14 @@ public class Application {
      * @param args Any command-line arguments.
      */
     public static void main(final String[] args) {
+        // Reset any preconfigured JUL handlers
+        LogManager.getLogManager().reset();
+
+        // Set JUL root logger to suppress FINE and below
+        var rootLogger = Logger.getLogger("");
+        rootLogger.setLevel(Level.WARNING);
+
+        // Bridge JUL to SLF4J
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
         SpringApplication.run(Application.class, args);
