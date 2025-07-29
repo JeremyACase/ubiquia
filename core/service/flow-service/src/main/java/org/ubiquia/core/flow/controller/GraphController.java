@@ -189,7 +189,7 @@ public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Gr
 
         var graphRecord = this.graphFinder.findGraphFor(deployment.getName(), version);
         if (graphRecord.isEmpty()) {
-            throw new RuntimeException("ERROR: Could not find Graph:  "
+            throw new IllegalArgumentException("ERROR: Could not find Graph:  "
                 + this.objectMapper.writeValueAsString(deployment)
                 + "...");
         }

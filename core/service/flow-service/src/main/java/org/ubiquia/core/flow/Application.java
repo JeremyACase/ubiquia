@@ -1,6 +1,7 @@
 package org.ubiquia.core.flow;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -42,6 +43,8 @@ public class Application {
      * @param args Any command-line arguments.
      */
     public static void main(final String[] args) {
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
         SpringApplication.run(Application.class, args);
     }
 

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
-import org.ubiquia.core.flow.component.adapter.EgressAdapter;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.orchestrator.AdapterPayloadOrchestrator;
@@ -42,31 +41,6 @@ public class AdapterInboxMessageCommand {
     public void tryProcessInboxMessageFor(
         final FlowMessage message,
         final AbstractAdapter adapter) {
-
-        try {
-            this.payloadModelValidator.tryValidateInputPayloadFor(
-                message.getPayload(),
-                adapter);
-
-            var flowEvent = this.flowEventBuilder.makeEventFrom(
-                message.getPayload(),
-                message.getFlowEvent().getBatchId(),
-                adapter);
-
-            this.adapterPayloadOrchestrator.forwardPayload(
-                flowEvent,
-                adapter,
-                message.getPayload());
-
-            this.flowMessageRepository.deleteById(message.getId());
-        } catch (Exception e) {
-            this.getLogger().error("ERROR: Could not process inbox message: {}", e.getMessage());
-        }
-    }
-
-    public void tryProcessInboxMessageFor(
-        final FlowMessage message,
-        final EgressAdapter adapter) {
 
         try {
             this.payloadModelValidator.tryValidateInputPayloadFor(

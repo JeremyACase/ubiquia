@@ -34,7 +34,7 @@ public class Outbox {
     private ObjectMapper objectMapper;
 
     /**
-     * Queue up a response from an component so that a downstream adapter may
+     * Queue up a response from a component so that a downstream adapter may
      * consume it.
      *
      * @param flowEventEntity   The event associated with the response.
