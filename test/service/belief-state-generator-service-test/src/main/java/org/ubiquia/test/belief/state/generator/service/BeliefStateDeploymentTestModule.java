@@ -96,10 +96,16 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
             + this.beliefStateGeneratorServiceConfig.getPort()
             + "/belief-state-generator/generate/belief-state";
 
-        var response = this.restTemplate.postForEntity(
-            postUrl,
-            generation,
-            BeliefStateGeneration.class);
+        logger.info("POSTing to URL: {}", postUrl);
+
+        try {
+            var response = this.restTemplate.postForEntity(
+                postUrl,
+                generation,
+                BeliefStateGeneration.class);
+        } catch (Exception e) {
+            this.testState.addFailure("ERROR: " + e.getMessage());
+        }
 
         try {
             logger.info("...sleeping to give generated Belief State a chance to come alive...");
