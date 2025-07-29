@@ -8,7 +8,7 @@ data:
     logging:
       level:
         # You haven't seen logs until you've seen this library complain about generating timestamps from JSON schema
-        net.jimblackler: WARN
+        net.jimblackler: OFF
         org.ubiquia: {{ .Values.logging.ubiquia }}
 
     management:

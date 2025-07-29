@@ -46,19 +46,16 @@ public class Application {
      * @param args Any command-line arguments.
      */
     public static void main(final String[] args) {
-        // Reset any preconfigured JUL handlers
-        LogManager.getLogManager().reset();
-
-        // Set JUL root logger to suppress FINE and below
-        var rootLogger = Logger.getLogger("");
-        rootLogger.setLevel(Level.WARNING);
-
-        // Bridge JUL to SLF4J
+        // Bridge java.util.logging (JUL) to SLF4J
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
+
+        // Optionally suppress ONLY the noisy package
+        Logger noisyLibLogger = Logger.getLogger("net.jimblackler");
+        noisyLibLogger.setLevel(Level.OFF);
+
         SpringApplication.run(Application.class, args);
     }
-
 
     /**
      * Something - some library - is overwriting our object mapping config;
