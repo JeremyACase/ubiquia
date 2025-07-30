@@ -165,7 +165,7 @@ componentlessAdapters:
     name: Not-Takokat-Post-Adapter
     description: SENPAI!
 
-    endpoint: http://udl-belief-state-1-2-3:8080/ubiquia/belief-state-service/EOObservation_Full/add
+    endpoint: http://udl-belief-state-1-2-3:8080/ubiquia/belief-state-service/EOObservationFull/add
 
     inputSubSchemas:
       - modelName: EOObservation_Full

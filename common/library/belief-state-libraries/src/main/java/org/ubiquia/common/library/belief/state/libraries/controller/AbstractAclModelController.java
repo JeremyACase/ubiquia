@@ -120,6 +120,7 @@ public abstract class AbstractAclModelController<
         entity = this.getEntityRepository().save(entity);
         this.getEntityRelationshipBuilder().tryBuildRelationships(entity);
         var response = this.ingressResponseBuilder.buildIngressResponseFor(entity);
+        this.getLogger().info("...persisted.");
         if (Objects.nonNull(sample)) {
             this.microMeterCommand.endSample(sample, "add", this.tags);
         }
@@ -164,6 +165,8 @@ public abstract class AbstractAclModelController<
             var response = this.ingressResponseBuilder.buildIngressResponseFor(entity);
             responses.add(response);
         }
+
+        this.getLogger().info("...persisted.");
 
         if (Objects.nonNull(sample)) {
             this.microMeterCommand.endSample(sample, "addList", this.tags);

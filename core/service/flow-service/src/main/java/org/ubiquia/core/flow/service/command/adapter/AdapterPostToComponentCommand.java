@@ -80,6 +80,7 @@ public class AdapterPostToComponentCommand implements InterfaceLogger {
                 Object.class);
             flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
         } catch (Exception e) {
+            logger.error("ERROR: {}", e.getMessage());
             if (e instanceof HttpStatusCodeException cast) {
                 response = new ResponseEntity<>(
                     cast.getResponseBodyAsString(),
