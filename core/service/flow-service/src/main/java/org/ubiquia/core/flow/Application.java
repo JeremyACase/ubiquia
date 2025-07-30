@@ -1,10 +1,6 @@
 package org.ubiquia.core.flow;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -46,14 +42,6 @@ public class Application {
      * @param args Any command-line arguments.
      */
     public static void main(final String[] args) {
-        // Bridge java.util.logging (JUL) to SLF4J
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
-
-        // Optionally suppress ONLY the noisy package
-        Logger noisyLibLogger = Logger.getLogger("net.jimblackler");
-        noisyLibLogger.setLevel(Level.OFF);
-
         SpringApplication.run(Application.class, args);
     }
 

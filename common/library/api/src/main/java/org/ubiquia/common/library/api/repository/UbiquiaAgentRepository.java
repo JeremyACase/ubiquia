@@ -10,9 +10,23 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgentEntity;
 
-public interface UbiquiaAgentRepository extends PagingAndSortingRepository<UbiquiaAgentEntity, String>,
+/**
+ * An interface for Ubiquia Agent entities.
+ */
+public interface UbiquiaAgentRepository
+    extends PagingAndSortingRepository<UbiquiaAgentEntity, String>,
     CrudRepository<UbiquiaAgentEntity, String> {
 
+    /**
+     * Query for a specific agent to see if it is deploying the specific graph and version.
+     *
+     * @param graphName The graph to search for.
+     * @param major     The major semantic version.
+     * @param minor     The minor semantic version.
+     * @param patch     The patch semantic version.
+     * @param id        The ID of the Ubiquia agent.
+     * @return An optional record with the results.
+     */
     Optional<UbiquiaAgentEntity> findByDeployedGraphsNameAndDeployedGraphsVersionMajorAndDeployedGraphsVersionMinorAndDeployedGraphsVersionPatchAndId(
         final String graphName,
         final Integer major,
@@ -20,9 +34,15 @@ public interface UbiquiaAgentRepository extends PagingAndSortingRepository<Ubiqu
         final Integer patch,
         final String id);
 
+    /**
+     * Customized query method to fetch what Graphs are deployed by a Ubiquia agent provided the
+     * agent ID.
+     *
+     * @param id       The ID of the Ubiquia agent.
+     * @param pageable Pageable stuff.
+     * @return A page representing the results.
+     */
     @Query("SELECT DISTINCT g.id FROM UbiquiaAgentEntity a JOIN a.deployedGraphs g WHERE a.id = :id")
-    Page<String> findDeployedGraphIdsById(
-        @Param("id") String id,
-        Pageable pageable);
+    Page<String> findDeployedGraphIdsById(@Param("id") String id, Pageable pageable);
 
 }

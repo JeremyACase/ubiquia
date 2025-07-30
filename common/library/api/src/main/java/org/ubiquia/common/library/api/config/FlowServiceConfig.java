@@ -1,9 +1,13 @@
 package org.ubiquia.common.library.api.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-@Service
+/**
+ * A bean to be used for service configuration. Makes for consistent Helm injection.
+ */
+@Component
 @ConfigurationProperties(prefix = "ubiquia.flow.service")
 public class FlowServiceConfig {
 

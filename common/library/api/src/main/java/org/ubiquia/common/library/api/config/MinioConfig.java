@@ -3,6 +3,9 @@ package org.ubiquia.common.library.api.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+/**
+ * A bean to be used for service configuration. Makes for consistent Helm injection.
+ */
 @Component
 @ConfigurationProperties(prefix = "minio")
 public class MinioConfig {

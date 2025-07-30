@@ -1,9 +1,7 @@
 package org.ubiquia.common.library.belief.state.libraries.service.builder.io;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -12,6 +10,12 @@ import org.ubiquia.common.model.acl.dto.AbstractAclModel;
 import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 
+/**
+ * A service dedicated to building paginated responses for Ubiquia belief states.
+ *
+ * @param <T> The entity class we're building pages for.
+ * @param <D> The DTO class we're egressing in the paginated responses.
+ */
 @Service
 public class DtoPageBuilder<T extends AbstractAclModelEntity, D extends AbstractAclModel> {
 
@@ -21,6 +25,13 @@ public class DtoPageBuilder<T extends AbstractAclModelEntity, D extends Abstract
     @Autowired
     private ObjectMapper objectMapper;
 
+    /**
+     * Build a paginated response from a page of database of records.
+     *
+     * @param records The database records to egress as a page of DTOs.
+     * @return paginated response of DTOs.
+     * @throws IllegalAccessException Exceptions from reflection.
+     */
     @SuppressWarnings("unchecked")
     public GenericPageImplementation<D> buildPageFrom(Page<T> records)
         throws IllegalAccessException {

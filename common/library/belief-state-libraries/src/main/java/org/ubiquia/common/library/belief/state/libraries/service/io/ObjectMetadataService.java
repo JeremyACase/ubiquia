@@ -19,7 +19,10 @@ import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
 import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;
 import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgentEntity;
 
-
+/**
+ * A service meant to store relational object metadata in a relational database for any
+ * Ubiquia objects stored in object storages.
+ */
 @Service
 public class ObjectMetadataService {
 
@@ -40,10 +43,20 @@ public class ObjectMetadataService {
     @Autowired
     private UbiquiaAgentConfig ubiquiaAgentConfig;
 
+    /**
+     * Persist the object metadata into the relational database.
+     *
+     * @param bucketName The object bucket where the file is going to be persisted.
+     * @param file       The file upload.
+     * @return Metadata about the file.
+     * @throws JsonProcessingException Exceptions from parsing JSON.
+     * @throws SQLException            Exceptions from SQL database.
+     */
     @Transactional
     public ObjectMetadata persistObjectMetadata(
         final String bucketName,
-        final MultipartFile file) throws JsonProcessingException, SQLException {
+        final MultipartFile file)
+        throws JsonProcessingException, SQLException {
 
         logger.info("Received a request to persist object data for "
                 + "\nFilename: {}"
@@ -58,6 +71,14 @@ public class ObjectMetadataService {
         return dto;
     }
 
+    /**
+     * Helper method to build metadata from a file.
+     *
+     * @param file       The file to build metadata from.
+     * @param bucketName The bucket where the file will be uploaded.
+     * @param agent      The Ubiquia agent that will be housing the data.
+     * @return Persisted metadata.
+     */
     @Transactional
     private ObjectMetadataEntity buildMetadataEntityFrom(
         final MultipartFile file,
@@ -75,6 +96,12 @@ public class ObjectMetadataService {
         return metadataEntity;
     }
 
+    /**
+     * Fetch this Ubiquia agent information from the relational database.
+     *
+     * @return The database record for this Ubiquia agent.
+     * @throws SQLException Exceptions from database stuff.
+     */
     @Transactional
     private UbiquiaAgentEntity getUbiquiaAgent() throws SQLException {
         var agentRecord = this.ubiquiaAgentRepository
@@ -97,6 +124,12 @@ public class ObjectMetadataService {
         return agent;
     }
 
+    /**
+     * Determine whether or not we're running in H2.
+     *
+     * @return Whether or not this Ubiquia agent is running with an H2 database.
+     * @throws SQLException Exception from SQL stuff.
+     */
     @Transactional
     private Boolean isRunningH2() throws SQLException {
 
@@ -118,6 +151,10 @@ public class ObjectMetadataService {
         return isRunningH2;
     }
 
+    /**
+     * Initialize our H2 database with the Ubiquia information since we cannot get it from an
+     * external database.
+     */
     @Transactional
     public void initializeInMemoryDatabaseAgent() {
         logger.info("...service is running a local in-memory database; " +

@@ -17,23 +17,25 @@ public class EntityRelationshipBuilderFinder {
     private ApplicationContext applicationContext;
 
     /**
-     * Given a model, attempt to get retrieve a bean that knows how to map its relationships.
+     * Given an entity, attempt to get retrieve a bean that knows how to map its relationships.
      *
-     * @param model The model to retrieve a mapper for.
+     * @param entity The entity to retrieve a mapper for.
      * @return The mapper if found, else null.
      */
     @SuppressWarnings("rawtypes")
-    public EntityRelationshipBuilder findRelationshipBuilderFor(final AbstractAclModelEntity model) {
+    public EntityRelationshipBuilder findRelationshipBuilderFor(
+        final AbstractAclModelEntity entity) {
+
         EntityRelationshipBuilder mapperBean = null;
 
-        var mapperBeanName = model.getModelType() + "RelationshipBuilder";
+        var mapperBeanName = entity.getModelType() + "RelationshipBuilder";
         if (this.applicationContext.containsBean(mapperBeanName)) {
             mapperBean = (EntityRelationshipBuilder)
                 this.applicationContext.getBean(mapperBeanName);
         } else {
-            var lowerCase = Character.toLowerCase(model.getModelType().charAt(0));
+            var lowerCase = Character.toLowerCase(entity.getModelType().charAt(0));
             mapperBeanName = lowerCase
-                + model.getModelType().substring(1)
+                + entity.getModelType().substring(1)
                 + "RelationshipBuilder";
             if (this.applicationContext.containsBean(mapperBeanName)) {
                 mapperBean = (EntityRelationshipBuilder)

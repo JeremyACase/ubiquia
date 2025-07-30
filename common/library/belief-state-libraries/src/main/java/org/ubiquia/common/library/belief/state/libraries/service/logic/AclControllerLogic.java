@@ -3,11 +3,13 @@ package org.ubiquia.common.library.belief.state.libraries.service.logic;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+/**
+ * Some common logic for Belief State controllers for ACL entities.
+ */
 @Service
 public class AclControllerLogic {
 
@@ -16,7 +18,7 @@ public class AclControllerLogic {
     private final Pattern camelcaseRegex;
 
     /**
-     * Abandon all hope, ye who enter here.
+     * Constructors are fun.
      */
     public AclControllerLogic() {
         logger.debug("Initializing...");

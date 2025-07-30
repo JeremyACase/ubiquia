@@ -138,8 +138,8 @@ public class PersonEntityControllerTest {
         var person = this.mockFactory.generatePerson();
         var ween = this.mockFactory.generateWienerDog();
 
-        var personResponse = this.personController.add(person, "test");
-        var weenResponse = this.animalController.add(ween, "test");
+        var personResponse = this.personController.add(person);
+        var weenResponse = this.animalController.add(ween);
 
         association.getChildAssociation().setChildId(weenResponse.getId());
         association.getParentAssociation().setParentId(personResponse.getId());
@@ -180,7 +180,7 @@ public class PersonEntityControllerTest {
     public void assertGetUniqueTagKeys_isValid() throws Throwable {
 
         var model = this.mockFactory.generatePerson();
-        var ingressResponse = this.personController.add(model, "test");
+        var ingressResponse = this.personController.add(model);
 
         var addTagUrl = "http://localhost:8080/ubiquia/belief-state-service/person/tag/add/"
             + ingressResponse.getId();
@@ -216,7 +216,7 @@ public class PersonEntityControllerTest {
     public void assertGetValuesByKey_isValid() throws Throwable {
 
         var model = this.mockFactory.generatePerson();
-        var ingressResponse = this.personController.add(model, "test");
+        var ingressResponse = this.personController.add(model);
 
         var addTagUrl = "http://localhost:8080/ubiquia/belief-state-service/person/tag/add/"
             + ingressResponse.getId();
@@ -252,7 +252,7 @@ public class PersonEntityControllerTest {
     public void assertAddTags_isValid() throws Throwable {
 
         var model = this.mockFactory.generatePerson();
-        var ingressResponse = this.personController.add(model, "test");
+        var ingressResponse = this.personController.add(model);
 
         var addTagUrl = "http://localhost:8080/ubiquia/belief-state-service/person/tag/add/"
             + ingressResponse.getId();
@@ -300,7 +300,7 @@ public class PersonEntityControllerTest {
     public void assertRemovesTag_isValid() throws Throwable {
 
         var model = this.mockFactory.generatePerson();
-        var ingressResponse = this.personController.add(model, "test");
+        var ingressResponse = this.personController.add(model);
 
         var addTagUrl = "http://localhost:8080/ubiquia/belief-state-service/person/tag/add/"
             + ingressResponse.getId();
@@ -382,13 +382,13 @@ public class PersonEntityControllerTest {
 
         var personResponse = this
             .personController
-            .add(person, "test");
+            .add(person);
 
         var personRecord = this.personController.queryModelWithId(
             personResponse.getId());
 
         ween.setOwner(personRecord.getBody());
-        var weenResponse = this.animalController.add(ween, "test");
+        var weenResponse = this.animalController.add(ween);
 
         var getURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/params";
         var json = this.mockMvc.perform(MockMvcRequestBuilders
@@ -415,7 +415,7 @@ public class PersonEntityControllerTest {
     public void assertQueriesCountWithParams_isValid() throws Throwable {
 
         var model = this.mockFactory.generatePerson();
-        var ingressResponse = this.personController.add(model, "test");
+        var ingressResponse = this.personController.add(model);
 
         var queryURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/count/params";
 
@@ -438,7 +438,7 @@ public class PersonEntityControllerTest {
     public void assertQueriesMultiSelectWithParams_isValid() throws Throwable {
 
         var model = this.mockFactory.generatePerson();
-        var ingressResponse = this.personController.add(model, "test");
+        var ingressResponse = this.personController.add(model);
 
         var queryURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/multiselect/params";
         this.mockMvc.perform(MockMvcRequestBuilders

@@ -14,6 +14,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * A service that can interface with Minio on behalf of Ubiquia towards object storage.
+ */
 @Service
 @ConditionalOnProperty(
     value = "ubiquia.agent.storage.minio.enabled",
@@ -27,6 +30,14 @@ public class MinioService {
     @Autowired
     private MinioClient minioClient;
 
+    /**
+     * Upload a file to Minio.
+     *
+     * @param bucketName The bucket to upload the file to.
+     * @param objectName The object name to upload the file as.
+     * @param file       The file itself.
+     * @throws MinioException Exceptions from minio.
+     */
     public void uploadFile(
         final String bucketName,
         final String objectName,
@@ -57,6 +68,14 @@ public class MinioService {
         logger.info("...upload successfully.");
     }
 
+    /**
+     * Download a file from minio.
+     *
+     * @param bucketName The bucket name to download from.
+     * @param objectName The object name to download.
+     * @return The file as a stream.
+     * @throws MinioException Exceptions from minio.
+     */
     public InputStream downloadFile(
         final String bucketName,
         final String objectName)
@@ -82,6 +101,13 @@ public class MinioService {
         return inputStream;
     }
 
+    /**
+     * Given a bucket, list the files housed within.
+     *
+     * @param bucketName The bucket name to list files from.
+     * @return The list of file names.
+     * @throws MinioException Exceptions from minio.
+     */
     public List<Item> listFiles(final String bucketName) throws MinioException {
 
         logger.info("Received a request to list files for Bucket '{}'...",
@@ -106,6 +132,12 @@ public class MinioService {
         return items;
     }
 
+    /**
+     * A helper method to create a bucket in minio.
+     *
+     * @param bucketName The bucket name to create.
+     * @throws Exception Exceptions from stuff.
+     */
     private void tryMakeBucket(final String bucketName) throws Exception {
 
         var bucketExistsArgs = BucketExistsArgs

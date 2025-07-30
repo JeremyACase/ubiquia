@@ -8,5 +8,10 @@ import org.slf4j.Logger;
  */
 public interface InterfaceLogger {
 
+    /**
+     * Get the logger from the implementing class.
+     *
+     * @return The logger used.
+     */
     Logger getLogger();
 }

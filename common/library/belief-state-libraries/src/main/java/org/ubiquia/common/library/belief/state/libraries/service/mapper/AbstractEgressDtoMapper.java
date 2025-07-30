@@ -15,6 +15,15 @@ import org.ubiquia.common.library.belief.state.libraries.interfaces.service.mapp
 import org.ubiquia.common.model.acl.dto.AbstractAclModel;
 import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
 
+/**
+ * An abstract class defining how DTO mappers should map ACL entities to DTO's. It will be
+ * implemented by Ubiquia Belief States where models are defined in the ACL. Importantly,
+ * this class WILL NOT cache the "many" side of any ACL relationships, thereby ensuring
+ * that no unbounded lists get egressed to clients.
+ *
+ * @param <F> The entity class we're mapping from.
+ * @param <T> The DTO class we're mapping to.
+ */
 @Service
 public abstract class AbstractEgressDtoMapper<
     F extends AbstractAclModelEntity,
@@ -29,6 +38,9 @@ public abstract class AbstractEgressDtoMapper<
     @Autowired
     private ApplicationContext applicationContext;
 
+    /**
+     * Constructor. Cache requisite data.
+     */
     @SuppressWarnings("unchecked")
     public AbstractEgressDtoMapper() {
         this.getLogger().debug("Initializing reflection cache for mapper: {}...",
@@ -47,8 +59,15 @@ public abstract class AbstractEgressDtoMapper<
         this.getLogger().debug("...reflection cache initialized.");
     }
 
+    /**
+     * Map from entities to DTOs.
+     *
+     * @param froms The list of entities to map from.
+     * @return a list of mapped DTOs.
+     * @throws IllegalAccessException Exceptions from reflection.
+     */
     @Transactional
-    public List<AbstractAclModel> map(List<F> froms)
+    public List<AbstractAclModel> map(final List<F> froms)
         throws IllegalAccessException {
 
         var tos = new ArrayList<AbstractAclModel>();
@@ -63,8 +82,15 @@ public abstract class AbstractEgressDtoMapper<
         return tos;
     }
 
+    /**
+     * Map from an entity to a DTO.
+     *
+     * @param from The entity to map from.
+     * @return A mapped DTO.
+     * @throws IllegalAccessException Exceptions from reflection.
+     */
     @Transactional
-    public AbstractAclModel map(F from)
+    public AbstractAclModel map(final F from)
         throws IllegalAccessException {
 
         var to = this.getNewDto();
@@ -75,12 +101,25 @@ public abstract class AbstractEgressDtoMapper<
         return to;
     }
 
+    /**
+     * Get the type of the generics that this class is implementing.
+     *
+     * @param index The element of the type being referenced.
+     * @param <C>   The class type we're resolving.
+     * @return The class type.
+     */
     @SuppressWarnings("unchecked")
-    private <C> Class<C> resolveGenericClass(int index) {
+    private <C> Class<C> resolveGenericClass(final Integer index) {
         var type = (ParameterizedType) this.getClass().getGenericSuperclass();
         return (Class<C>) type.getActualTypeArguments()[index];
     }
 
+    /**
+     * Provided an entity and a mirrored DTO, cache the fields for quicker lookups later.
+     *
+     * @param entityFields The list of entity fields.
+     * @param dtoFields    The list of DTO fields.
+     */
     private void matchFields(final Field[] entityFields, final Field[] dtoFields) {
         for (var entityField : entityFields) {
             this.getLogger().debug("Processing field: {}", entityField.getName());
@@ -91,21 +130,26 @@ public abstract class AbstractEgressDtoMapper<
 
             if (dtoMatch.isEmpty()) {
                 this.getLogger().warn("No matching DTO field for: {}", entityField.getName());
-                continue;
-            }
-
-            var dtoField = dtoMatch.get();
-
-            if (this.shouldCache(entityField)) {
-                this.cacheField(entityField, dtoField);
             } else {
-                this.getLogger().debug("Skipping field: {}", entityField.getName());
+                var dtoField = dtoMatch.get();
+                if (this.shouldCache(entityField)) {
+                    this.cacheField(entityField, dtoField);
+                } else {
+                    this.getLogger().debug("Skipping field: {}", entityField.getName());
+                }
             }
         }
     }
 
-    private boolean shouldCache(Field field) {
+    /**
+     * Determine whether field is cacheable or not.
+     *
+     * @param field The field to determine.
+     * @return If field should be cached or not.
+     */
+    private Boolean shouldCache(final Field field) {
         var shouldCache = true;
+
         if (Modifier.isStatic(field.getModifiers())) {
             shouldCache = false;
         }
@@ -117,7 +161,15 @@ public abstract class AbstractEgressDtoMapper<
         return shouldCache;
     }
 
-    private boolean isCollectionOfAclEntities(Field field) {
+    /**
+     * Determine if the field is a collection of Ubiquia belief state entities. This is important
+     * because it would be possible to egress arbitrarily-sized collections via JSON to clients
+     * unless we guard against it.
+     *
+     * @param field The field to check for.
+     * @return Whether the field is a collection of Belief State entities or not.
+     */
+    private Boolean isCollectionOfAclEntities(final Field field) {
 
         var isCollectionOfAclEntities = true;
 
@@ -129,11 +181,12 @@ public abstract class AbstractEgressDtoMapper<
                 var arg = type.getActualTypeArguments()[0];
 
                 if (arg instanceof Class<?> elementClass) {
-                    isCollectionOfAclEntities = AbstractAclModelEntity.class.isAssignableFrom(elementClass);
+                    isCollectionOfAclEntities =
+                        AbstractAclModelEntity.class.isAssignableFrom(elementClass);
                 }
 
             } catch (Exception e) {
-                this.getLogger().warn("Unable to inspect generic type of field: {}",
+                this.getLogger().error("Unable to inspect generic type of field: {}",
                     field.getName(),
                     e);
             }
@@ -141,7 +194,13 @@ public abstract class AbstractEgressDtoMapper<
         return isCollectionOfAclEntities;
     }
 
-    private void cacheField(Field entityField, Field dtoField) {
+    /**
+     * Cache mirrored DTO and entity fields for quicker lookup later.
+     *
+     * @param entityField The entity field to cache.
+     * @param dtoField    The DTO field to cache.
+     */
+    private void cacheField(final Field entityField, final Field dtoField) {
         entityField.setAccessible(true);
         dtoField.setAccessible(true);
         this.cachedEntityFields.add(entityField);
@@ -157,7 +216,7 @@ public abstract class AbstractEgressDtoMapper<
      * @throws IllegalAccessException Reflection exceptions.
      */
     @Transactional
-    private void tryHydrateObject(F from, T to)
+    private void tryHydrateObject(final F from, T to)
         throws IllegalAccessException {
 
         var unproxied = Hibernate.unproxy(from);
@@ -175,6 +234,14 @@ public abstract class AbstractEgressDtoMapper<
         }
     }
 
+    /**
+     * Provided an object, hydrate it with data from the database.
+     *
+     * @param to       The object to hydrate.
+     * @param value    The value to fetch from teh database.
+     * @param dtoField The mirrored DTO field to use to set our values.
+     * @throws IllegalAccessException Exceptions from Reflection.
+     */
     private void hydrateObject(T to, Object value, final Field dtoField)
         throws IllegalAccessException {
 
@@ -203,6 +270,14 @@ public abstract class AbstractEgressDtoMapper<
         }
     }
 
+    /**
+     * Attempt to set the DTO and its field with the values from the database.
+     *
+     * @param dto      The DTO to hydrate.
+     * @param dtoField The specific field to set.
+     * @param value    The value we're updating the field with.
+     * @throws IllegalAccessException Reflection exceptions.
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Transactional
     private void trySetDtoField(T dto, final Field dtoField, final Object value)
@@ -238,7 +313,7 @@ public abstract class AbstractEgressDtoMapper<
                     mapped = (AbstractAclModel) Hibernate.unproxy(mapped);
                     dtoField.set(dto, mapped);
 
-                } else if (applicationContext.containsBean(fullType)) {
+                } else if (this.applicationContext.containsBean(fullType)) {
 
                     this.getLogger().debug("...Found mapper bean for type {}; attempting to map...",
                         fullType);

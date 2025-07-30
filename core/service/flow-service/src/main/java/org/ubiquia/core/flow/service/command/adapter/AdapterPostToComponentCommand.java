@@ -78,14 +78,19 @@ public class AdapterPostToComponentCommand implements InterfaceLogger {
                 adapterContext.getEndpointUri(),
                 request,
                 Object.class);
-        } catch (HttpStatusCodeException e) {
-            response = new ResponseEntity<>(
-                e.getResponseBodyAsString(),
-                e.getResponseHeaders(),
-                e.getStatusCode());
+            flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
+        } catch (Exception e) {
+            if (e instanceof HttpStatusCodeException cast) {
+                response = new ResponseEntity<>(
+                    cast.getResponseBodyAsString(),
+                    cast.getResponseHeaders(),
+                    cast.getStatusCode());
+                flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
+            } else {
+                response = new ResponseEntity<>(e.getMessage(), null, null);
+            }
         }
         flowEventTimes.setComponentResponseTime(OffsetDateTime.now());
-        flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
         this.adapterComponentResponseCommand.processComponentResponse(flowEventEntity, adapter, response);
     }
 

@@ -34,6 +34,13 @@ import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 
+/**
+ * A base controller to be used by generated belief states to serve models defined in the
+ * belief state's Agent Communication Language (ACL.)
+ *
+ * @param <T> The entity type we're processing.
+ * @param <D> The DTO mirroring the entity.
+ */
 public abstract class AbstractAclModelController<
     T extends AbstractAclModelEntity,
     D extends AbstractAclModel>
@@ -86,11 +93,16 @@ public abstract class AbstractAclModelController<
         this.getLogger().info("...initialized...");
     }
 
+    /**
+     * A RESTful method allowing the service to ingest new ACL models and persist them.
+     *
+     * @param ingress The ingress model.
+     * @return A response with metadata about the new record.
+     * @throws Throwable Exceptions from black magic.
+     */
     @Transactional
     @PostMapping(value = "/add")
-    public IngressResponse add(
-        @RequestBody D ingress,
-        @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource)
+    public IngressResponse add(@RequestBody D ingress)
         throws Throwable {
 
         Timer.Sample sample = null;
@@ -115,11 +127,16 @@ public abstract class AbstractAclModelController<
         return response;
     }
 
+    /**
+     * Accept a list of models to ingress and persist into the back-end database.
+     *
+     * @param ingresses The list of models to ingress.
+     * @return A list of metadata representing the persisted models.
+     * @throws Throwable Exceptions from black magic.
+     */
     @PostMapping(value = "/add/list")
     @Transactional
-    public List<IngressResponse> addList(
-        @RequestBody List<D> ingresses,
-        @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource)
+    public List<IngressResponse> addList(@RequestBody List<D> ingresses)
         throws Throwable {
 
         Timer.Sample sample = null;
@@ -155,11 +172,16 @@ public abstract class AbstractAclModelController<
         return responses;
     }
 
+    /**
+     * Associate two models together using this endpoint.
+     *
+     * @param association The model housing the data to associate together.
+     * @return A response with the ingress data.
+     * @throws Throwable Exceptions from black magic.
+     */
     @PostMapping(value = "/associate")
     @Transactional
-    public IngressResponse associate(
-        @RequestBody @Validated Association association,
-        @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource)
+    public IngressResponse associate(@RequestBody @Validated Association association)
         throws Throwable {
 
         Timer.Sample sample = null;
@@ -209,12 +231,18 @@ public abstract class AbstractAclModelController<
         return response;
     }
 
+    /**
+     * Add a tag to an existing entity in the database.
+     *
+     * @param id  The ID of the entity to add a tag to.
+     * @param tag The tag to append to the entity's existing tags.
+     * @return Ingress metadata.
+     */
     @PostMapping(value = "/tag/add/{id}")
     @Transactional
     public IngressResponse addTag(
         @PathVariable("id") final String id,
-        @RequestBody KeyValuePair tag,
-        @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource) {
+        @RequestBody KeyValuePair tag) {
 
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterCommand)) {
@@ -243,12 +271,18 @@ public abstract class AbstractAclModelController<
         return response;
     }
 
+    /**
+     * Remove a tag from the entity provided the entity's ID.
+     *
+     * @param id  The ID of the entity.
+     * @param tag The tag to remove.
+     * @return Ingress metadata confirming a response.
+     */
     @PostMapping(value = "/tag/remove/{id}")
     @Transactional
     public IngressResponse removeTag(
         @PathVariable("id") final String id,
-        @RequestBody KeyValuePair tag,
-        @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource) {
+        @RequestBody KeyValuePair tag) {
 
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterCommand)) {
@@ -285,6 +319,11 @@ public abstract class AbstractAclModelController<
         return response;
     }
 
+    /**
+     * Return the entire list of unique tag keys from this class of models.
+     *
+     * @return The list of unique keys.
+     */
     @GetMapping("/tags/get/keys")
     public List<String> getDistinctKeys() {
         Timer.Sample sample = null;
@@ -299,6 +338,12 @@ public abstract class AbstractAclModelController<
         return keys;
     }
 
+    /**
+     * Get the unique values for a given tag key for this model.
+     *
+     * @param key The key to produce unique values for.
+     * @return The list of unique values.
+     */
     @GetMapping("/tags/get/values-by-key/{key}")
     public List<String> getDistinctValuesByKey(@PathVariable("key") String key) {
         Timer.Sample sample = null;
@@ -313,13 +358,20 @@ public abstract class AbstractAclModelController<
         return values;
     }
 
-    @SuppressWarnings("checkstyle:Indentation")
+    /**
+     * Update the values for specific fields for an entity provided the entity ID.
+     *
+     * @param id            The ID of the entity.
+     * @param keyValuePairs The list of values to update provided the field names as keys.
+     * @return Ingress response confirmation.
+     * @throws IllegalArgumentException Exceptions from bad requests.
+     * @throws IllegalAccessException   Exceptions from reflection.
+     */
     @Transactional
     @PostMapping("/update/field/{id}")
     public IngressResponse updateField(
         @PathVariable String id,
-        @RequestBody List<KeyValuePair> keyValuePairs,
-        @RequestParam(value = "message-source", defaultValue = "belief-state") String messageSource)
+        @RequestBody List<KeyValuePair> keyValuePairs)
         throws IllegalArgumentException,
         IllegalAccessException {
 
@@ -352,6 +404,12 @@ public abstract class AbstractAclModelController<
         return response;
     }
 
+    /**
+     * Delete a model provided the ID of the entity to delete.
+     *
+     * @param id The id of the model to delete.
+     * @return A response entity with confirmation.
+     */
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteModel(@PathVariable("id") final String id) {
         Timer.Sample sample = null;
@@ -416,7 +474,7 @@ public abstract class AbstractAclModelController<
         }
 
         if (Objects.nonNull(sample)) {
-            this.microMeterCommand.endSample(sample, "queryWithId", this.tags);
+            this.microMeterCommand.endSample(sample, "queryModelWithId", this.tags);
         }
 
         return response;
@@ -451,6 +509,18 @@ public abstract class AbstractAclModelController<
         return count;
     }
 
+    /**
+     * A query allowing for no-frills "multi-select" for performance-intensive needs.
+     *
+     * @param page               The page number to query for.
+     * @param size               The size of the page to query for.
+     * @param sortDescending     Whether or not to sort descending.
+     * @param sortByFields       The fields to sort by.
+     * @param multiselectFields  The fields to return on response.
+     * @param httpServletRequest The servlet request with any potential predicates.
+     * @return The page response with our minimal data.
+     * @throws NoSuchFieldException Exceptions from bad client requests.
+     */
     @GetMapping("/query/multiselect/params")
     @Transactional
     public Page<Object[]> queryWithMultiselectParams(
@@ -488,6 +558,17 @@ public abstract class AbstractAclModelController<
         return records;
     }
 
+    /**
+     * Query for page of data provided predicates.
+     *
+     * @param page               The page number to query for.
+     * @param size               The size of the page to query for.
+     * @param sortDescending     Whether or not to sort descending.
+     * @param sortByFields       The fields to sort by.
+     * @param httpServletRequest The servlet request with any potential predicates.
+     * @return The page response with our minimal data.
+     * @throws NoSuchFieldException Exceptions from bad client requests.
+     */
     @GetMapping("/query/params")
     @Transactional
     public GenericPageImplementation<D> queryWithParams(
@@ -525,6 +606,14 @@ public abstract class AbstractAclModelController<
         return egress;
     }
 
+    /**
+     * Helper method to associate two entities together before persisting into the DBMS.
+     *
+     * @param childField   The field representing the child.
+     * @param parentEntity The parent entity to associate.
+     * @param childEntity  The child entity to associate.
+     * @throws IllegalAccessException Exceptions from access.
+     */
     @SuppressWarnings("unchecked")
     private void associateParentAndChild(
         Field childField,

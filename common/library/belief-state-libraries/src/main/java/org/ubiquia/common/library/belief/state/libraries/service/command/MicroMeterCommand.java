@@ -12,6 +12,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.acl.embeddable.KeyValuePair;
 
+/**
+ * A command object to use micrometer to feed Prometheus metrics.
+ */
 @ConditionalOnProperty(
     value = "management.endpoint.info.prometheus.enabled",
     havingValue = "true",

@@ -177,16 +177,16 @@ public abstract class GenericUbiquiaDaoController<
      * @throws JsonProcessingException Exceptions from processing fields retrieved from database.
      */
     protected GenericPageImplementation<D> query(
-        Integer page,
-        Integer size,
-        Boolean sortDescending,
-        List<String> sortByFields,
-        HttpServletRequest httpServletRequest)
+        final Integer page,
+        final Integer size,
+        final Boolean sortDescending,
+        final List<String> sortByFields,
+        final HttpServletRequest httpServletRequest)
         throws NoSuchFieldException, JsonProcessingException {
 
         this.pageValidator.validatePageAndSize(page, size);
         var map = this.getMapFromServletRequest(httpServletRequest);
-        this.getLogger().info("Received a query request by params: {}", map);
+        this.getLogger().info("Received a query request by params...");
 
         var records = this.getDataAccessObject().getPage(
             map,
