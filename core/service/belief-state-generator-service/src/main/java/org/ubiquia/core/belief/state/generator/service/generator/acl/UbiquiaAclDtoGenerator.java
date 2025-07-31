@@ -41,18 +41,18 @@ public class UbiquiaAclDtoGenerator extends JavaClientCodegen {
     @Override
     public void postProcessFile(java.io.File file, String fileType) {
         if ("model".equals(fileType)) {
-            String filename = file.getName();
+            var filename = file.getName();
 
             if (filename.endsWith("IngressDtoMapper.java") ||
                 filename.endsWith("EgressDtoMapper.java") ||
                 filename.endsWith("Controller.java")) {
 
-                String modelName = filename
+                var modelName = filename
                     .replace("IngressDtoMapper.java", "")
                     .replace("EgressDtoMapper.java", "")
                     .replace("Controller.java", "");
 
-                CodegenModel model = modelIndex.get(modelName);
+                var model = modelIndex.get(modelName);
                 if (model != null && model.isEnum) {
                     boolean deleted = file.delete();
                     if (deleted) {

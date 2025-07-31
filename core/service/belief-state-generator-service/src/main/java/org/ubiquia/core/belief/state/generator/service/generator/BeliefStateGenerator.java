@@ -2,6 +2,7 @@ package org.ubiquia.core.belief.state.generator.service.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateCompiler;
 import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateUberizer;
+import org.ubiquia.core.belief.state.generator.service.decorator.EnumNormalizer;
 import org.ubiquia.core.belief.state.generator.service.decorator.InheritancePreprocessor;
 import org.ubiquia.core.belief.state.generator.service.decorator.UbiquiaModelInjector;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiDtoGenerator;
@@ -38,6 +40,9 @@ public class BeliefStateGenerator {
 
     @Autowired(required = false)
     private BeliefStateOperator beliefStateOperator;
+
+    @Autowired
+    private EnumNormalizer enumNormalizer;
 
     @Autowired
     private GenerationCleanupProcessor generationCleanupProcessor;
@@ -75,9 +80,7 @@ public class BeliefStateGenerator {
         logger.info("Generating new Belief State from: {}",
             this.objectMapper.writeValueAsString(acl));
 
-        var jsonSchema = this.objectMapper.writeValueAsString(acl.getJsonSchema());
-        jsonSchema = this.ubiquiaModelInjector.appendAclModels(jsonSchema);
-        jsonSchema = this.inheritancePreprocessor.appendInheritance(jsonSchema);
+        var jsonSchema = this.getJsonSchemaFrom(acl);
 
         var openApiEntityYaml =
             this.jsonSchemaToOpenApiEntityYamlMapper
@@ -115,6 +118,17 @@ public class BeliefStateGenerator {
         if (Objects.nonNull(this.beliefStateOperator)) {
             this.beliefStateOperator.tryDeployBeliefState(acl);
         }
+    }
+
+    private String getJsonSchemaFrom(final AgentCommunicationLanguage acl)
+        throws IOException {
+
+        var jsonSchema = this.objectMapper.writeValueAsString(acl.getJsonSchema());
+        jsonSchema = this.enumNormalizer.normalizeEnums(jsonSchema);
+        jsonSchema = this.ubiquiaModelInjector.appendAclModels(jsonSchema);
+        jsonSchema = this.inheritancePreprocessor.appendInheritance(jsonSchema);
+
+        return jsonSchema;
     }
 
     private List<String> getJarPaths(final String libsDirPath) {

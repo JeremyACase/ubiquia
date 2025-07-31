@@ -49,7 +49,10 @@ public class Outbox {
         logger.debug("Received an event with ID {} to queue up for outbox...",
             flowEventEntity.getId());
 
-        var targetAdapterRecord = this.adapterRepository.findById(flowEventEntity.getAdapter().getId());
+        var targetAdapterRecord = this
+            .adapterRepository
+            .findById(flowEventEntity.getAdapter().getId());
+
         if (!targetAdapterRecord.get().getDownstreamAdapters().isEmpty()) {
 
             var eventTimes = flowEventEntity.getFlowEventTimes();
