@@ -59,7 +59,6 @@ public class AdapterPostToComponentCommand implements InterfaceLogger {
         final AbstractAdapter adapter,
         final Object inputPayload)
         throws ValidationException,
-        GenerationException,
         JsonProcessingException {
 
         var headers = new HttpHeaders();

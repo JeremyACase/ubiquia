@@ -69,13 +69,12 @@ public class Outbox {
                 flowEventEntity.getFlowMessages().add(message);
             }
             eventTimes.setEventCompleteTime(OffsetDateTime.now());
-            this.flowEventRepository.save(flowEventEntity);
         } else {
             logger.debug("No downstream adapters for adapter with id {}; not creating "
                     + "an outbox message...",
                 flowEventEntity.getAdapter().getId());
         }
-
+        this.flowEventRepository.save(flowEventEntity);
         logger.debug("...Completed processing of event.");
     }
 }
