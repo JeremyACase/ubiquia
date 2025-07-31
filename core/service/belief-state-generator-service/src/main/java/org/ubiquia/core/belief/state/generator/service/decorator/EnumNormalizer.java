@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,47 +17,38 @@ public class EnumNormalizer {
     private ObjectMapper objectMapper;
 
     public String normalizeEnums(String rawSchemaJson) throws IOException {
+        var normalizedResult = rawSchemaJson;
+
         var root = this.objectMapper.readTree(rawSchemaJson);
         var jsonSchemaNode = root.get("jsonSchema");
 
-        var normalizedResult = rawSchemaJson;
         if (jsonSchemaNode instanceof ObjectNode jsonSchemaObject) {
             var definitions = jsonSchemaObject.with("definitions");
             var enumToDefName = new HashMap<String, String>();
 
-            for (var defName : Lists.newArrayList(definitions.fieldNames())) {
+            if (jsonSchemaObject.has("properties")) {
+                var topLevelPropsNode = jsonSchemaObject.get("properties");
+                if (topLevelPropsNode instanceof ObjectNode topLevelProps) {
+                    normalizeEnumsInProperties(topLevelProps, definitions, enumToDefName);
+                }
+            }
+
+            var defNames = Lists.newArrayList(definitions.fieldNames());
+            for (String defName : defNames) {
                 var defNode = definitions.get(defName);
-                if (defNode instanceof ObjectNode def
-                    && "object".equals(def.path("type").asText())) {
 
+                var isObjectNode = defNode instanceof ObjectNode;
+                var type = isObjectNode ? defNode.path("type").asText() : null;
+
+                if (isObjectNode && "object".equals(type)) {
+                    var def = (ObjectNode) defNode;
                     var propsNode = def.get("properties");
+
                     if (propsNode instanceof ObjectNode props) {
-                        for (var propName : Lists.newArrayList(props.fieldNames())) {
-                            var propNode = props.get(propName);
-                            if (propNode instanceof ObjectNode prop
-                                && prop.has("enum") && !prop.has("$ref")) {
-
-                                var enumArray = (ArrayNode) prop.get("enum");
-                                var enumValues = new ArrayList<String>();
-                                enumArray.forEach(v -> enumValues.add(v.asText()));
-                                Collections.sort(enumValues);
-                                var enumKey = String.join("|", enumValues);
-
-                                var defEnumName = enumToDefName.computeIfAbsent(enumKey, k -> {
-                                    var hash = DigestUtils.sha256Hex(k).substring(0, 8);
-                                    var enumDefName = "Enum_" + hash;
-                                    var newEnum = this.objectMapper.createObjectNode();
-                                    newEnum.put("type", "string");
-                                    newEnum.set("enum", enumArray);
-                                    definitions.set(enumDefName, newEnum);
-                                    return enumDefName;
-                                });
-
-                                var refNode = this.objectMapper.createObjectNode();
-                                refNode.put("$ref", "#/definitions/" + defEnumName);
-                                props.set(propName, refNode);
-                            }
-                        }
+                        this.normalizeEnumsInProperties(
+                            props,
+                            definitions,
+                            enumToDefName);
                     }
                 }
             }
@@ -71,5 +60,51 @@ public class EnumNormalizer {
         }
 
         return normalizedResult;
+    }
+
+    private void normalizeEnumsInProperties(
+        ObjectNode props,
+        ObjectNode definitions,
+        Map<String, String> enumToDefName
+    ) {
+        var propNames = Lists.newArrayList(props.fieldNames());
+
+        for (var propName : propNames) {
+            var propNode = props.get(propName);
+
+            var isObjectNode = propNode instanceof ObjectNode;
+            var hasEnum = isObjectNode && ((ObjectNode) propNode).has("enum");
+            var hasRef = isObjectNode && ((ObjectNode) propNode).has("$ref");
+
+            if (isObjectNode && hasEnum && !hasRef) {
+                var prop = (ObjectNode) propNode;
+                var enumArray = (ArrayNode) prop.get("enum");
+
+                var enumValues = new ArrayList<String>();
+                enumArray.forEach(v -> enumValues.add(v.asText()));
+                Collections.sort(enumValues);
+
+                var enumKey = String.join("|", enumValues);
+
+                String defEnumName = null;
+                if (enumToDefName.containsKey(enumKey)) {
+                    defEnumName = enumToDefName.get(enumKey);
+                } else {
+                    String hash = DigestUtils.sha256Hex(enumKey).substring(0, 8);
+                    defEnumName = "Enum_" + hash;
+
+                    var newEnum = this.objectMapper.createObjectNode();
+                    newEnum.put("type", "string");
+                    newEnum.set("enum", enumArray);
+
+                    definitions.set(defEnumName, newEnum);
+                    enumToDefName.put(enumKey, defEnumName);
+                }
+
+                var refNode = this.objectMapper.createObjectNode();
+                refNode.put("$ref", "#/definitions/" + defEnumName);
+                props.set(propName, refNode);
+            }
+        }
     }
 }
