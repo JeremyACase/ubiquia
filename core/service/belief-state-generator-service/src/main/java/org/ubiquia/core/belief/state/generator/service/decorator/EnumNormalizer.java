@@ -20,7 +20,7 @@ public class EnumNormalizer {
         var normalizedResult = rawSchemaJson;
 
         var root = this.objectMapper.readTree(rawSchemaJson);
-        var jsonSchemaNode = root.get("jsonSchema");
+        var jsonSchemaNode = root.has("jsonSchema") ? root.get("jsonSchema") : root;
 
         if (jsonSchemaNode instanceof ObjectNode jsonSchemaObject) {
             var definitions = jsonSchemaObject.with("definitions");
