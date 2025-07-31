@@ -73,8 +73,8 @@ public class EnumNormalizer {
             var propNode = props.get(propName);
 
             var isObjectNode = propNode instanceof ObjectNode;
-            var hasEnum = isObjectNode && ((ObjectNode) propNode).has("enum");
-            var hasRef = isObjectNode && ((ObjectNode) propNode).has("$ref");
+            var hasEnum = isObjectNode && (propNode).has("enum");
+            var hasRef = isObjectNode && (propNode).has("$ref");
 
             if (isObjectNode && hasEnum && !hasRef) {
                 var prop = (ObjectNode) propNode;

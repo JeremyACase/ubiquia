@@ -128,6 +128,8 @@ public class BeliefStateGenerator {
         jsonSchema = this.ubiquiaModelInjector.appendAclModels(jsonSchema);
         jsonSchema = this.inheritancePreprocessor.appendInheritance(jsonSchema);
 
+        logger.debug("Preprocessed JSON Schema to: {}", jsonSchema);
+
         return jsonSchema;
     }
 
