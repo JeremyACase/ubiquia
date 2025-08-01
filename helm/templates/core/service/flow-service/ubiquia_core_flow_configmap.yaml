@@ -88,6 +88,8 @@ data:
               enabled: true
               directory: 
                 path: /app/etc/acls/
+            beliefStates:
+              enabled: true
             graphs:
               enabled: true
               directory: 
@@ -107,9 +109,5 @@ data:
       kubernetes:
         enabled: true
         namespace: {{ .Release.Namespace }}
-      outbox:
-        enabled: true
-        frequency-milliseconds: 1000
-        mode: DEFAULT
       page:
         max-size: 100

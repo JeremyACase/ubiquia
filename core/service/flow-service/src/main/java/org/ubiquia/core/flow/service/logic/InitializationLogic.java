@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.service.io.Bootstrapper;
+import org.ubiquia.core.flow.service.io.bootstrap.AclBootstrapper;
+import org.ubiquia.core.flow.service.io.bootstrap.BeliefStateBootstrapper;
+import org.ubiquia.core.flow.service.io.bootstrap.DagBootstrapper;
 import org.ubiquia.core.flow.service.k8s.ComponentOperator;
 import org.ubiquia.core.flow.service.logic.ubiquia.UbiquiaAgentLogic;
 
@@ -21,7 +23,13 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
     private static final Logger logger = LoggerFactory.getLogger(InitializationLogic.class);
 
     @Autowired(required = false)
-    private Bootstrapper bootstrapper;
+    private AclBootstrapper aclBootstrapper;
+
+    @Autowired(required = false)
+    private BeliefStateBootstrapper beliefStateBootstrapper;
+
+    @Autowired(required = false)
+    private DagBootstrapper dagBootstrapper;
 
     @Autowired(required = false)
     private ComponentOperator componentOperator;
@@ -43,8 +51,28 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
             }
         }
 
-        if (Objects.nonNull(this.bootstrapper)) {
-            this.bootstrapper.init();
+        if (Objects.nonNull(this.aclBootstrapper)) {
+            try {
+                this.aclBootstrapper.bootstrap();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (Objects.nonNull(this.beliefStateBootstrapper)) {
+            try {
+                this.beliefStateBootstrapper.bootstrap();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (Objects.nonNull(this.dagBootstrapper)) {
+            try {
+                this.dagBootstrapper.bootstrap();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
         logger.info("...completed initialization.");

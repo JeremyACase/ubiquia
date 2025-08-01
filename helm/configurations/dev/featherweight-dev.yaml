@@ -12,5 +12,20 @@ ubiquia:
     flowService:
       bootstrap:
         enabled: true
-      graph:
-        deployments:
+        beliefStates:
+          deployments:
+            - name: Pets
+              version:
+                major: 1
+                minor: 2
+                patch: 3
+        graph:
+          deployments:
+            - name: Pets
+              version:
+                major: 1
+                minor: 2
+                patch: 3
+              graphSettings:
+                flag: demo
+      
