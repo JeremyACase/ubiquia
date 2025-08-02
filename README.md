@@ -2,6 +2,7 @@
 
 > **Ubiquia is a distributed, schema-driven multi-agent orchestration system. Define agent DAGs declaratively, and Ubiquia automatically deploys and wires them into a live Kubernetes ecosystem—with optional belief state services for distributed, persistent, queryable shared context. All data is governed by schemas, ensuring reliable structure across all agents and components--including LLMs.**
 
+
 ---
 
 ## 🌟 Why Ubiquia?
