@@ -16,7 +16,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
     havingValue = "true",
     matchIfMissing = false
 )
-@ConfigurationProperties("ubiquia.agent.flow-service.bootstrap.beliefStates")
+@ConfigurationProperties("ubiquia.agent.flow-service.bootstrap.belief-states")
 public class BeliefStateBootstrapConfig {
 
     private Boolean enabled;
