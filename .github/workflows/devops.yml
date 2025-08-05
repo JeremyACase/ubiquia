@@ -10,10 +10,10 @@ on:
 env:
   DOCKER_REPO: ubiquia
   SUBPROJECTS: |
-    core/service/belief-state-generator-service
-    core/service/communication-service
-    core/service/flow-service
-    test/service/belief-state-generator-service-test
+    core/service/core-belief-state-generator-service
+    core/service/core-communication-service
+    core/service/core-flow-service
+    test/service/test-belief-state-generator-service
 
 jobs:
 
