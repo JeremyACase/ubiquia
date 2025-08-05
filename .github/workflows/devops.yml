@@ -195,7 +195,7 @@ jobs:
           VERSION=${{ needs.build.outputs.chart_version }}
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
-            project_name=core-$(basename $dir)
+            project_name=$(basename $dir)
             IMAGE_NAME=${DOCKER_REPO}/${project_name}
 
             echo "Loading image from docker-images/${project_name}.tar"
