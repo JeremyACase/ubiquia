@@ -107,7 +107,7 @@ jobs:
         run: |
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
-            project_name=core-$(basename $dir)
+            project_name=$(basename $dir)
             IMAGE_NAME=${DOCKER_REPO}/${project_name}
             echo "Loading docker image from docker-images/${project_name}.tar"
             docker load -i docker-images/${project_name}.tar
