@@ -1,4 +1,4 @@
-name: Pets
+name: pets
 modelType: Graph
 author: Jeremy Case
 description: The "Hello World" of Directed Acyclic Graphs (DAG's) in Ubiquia, but with Pets!

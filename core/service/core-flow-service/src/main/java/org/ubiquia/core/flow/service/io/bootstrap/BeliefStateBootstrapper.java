@@ -21,7 +21,7 @@ import org.ubiquia.core.flow.service.registrar.AgentCommunicationLanguageRegistr
  * languages from file.
  */
 @ConditionalOnProperty(
-    value = "ubiquia.agent.flowService.bootstrap.enabled",
+    value = "ubiquia.agent.flow-service.bootstrap.enabled",
     havingValue = "true",
     matchIfMissing = false
 )
@@ -57,7 +57,7 @@ public class BeliefStateBootstrapper implements InterfaceBootstrapper {
             logger.warn("Kubernetes is not enabled, skipping deployment of belief states...");
         } else {
             for (var deployment : this.config.getDeployments()) {
-                logger.info("...deploying belief state for domain {} with version: {}",
+                logger.info("...deploying belief state for domain named {} with version: {}",
                     deployment.getDomainName(),
                     deployment.getVersion());
 

@@ -20,7 +20,7 @@ import org.ubiquia.core.flow.service.registrar.AgentCommunicationLanguageRegistr
  * languages from file.
  */
 @ConditionalOnProperty(
-    value = "ubiquia.agent.flowService.bootstrap.enabled",
+    value = "ubiquia.agent.flow-service.bootstrap.enabled",
     havingValue = "true",
     matchIfMissing = false
 )

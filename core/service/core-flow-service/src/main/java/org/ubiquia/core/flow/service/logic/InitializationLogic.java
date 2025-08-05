@@ -55,7 +55,8 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
             try {
                 this.aclBootstrapper.bootstrap();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                logger.error("ERROR bootstrapping ACL - could not initialize: {}",
+                    e.getMessage());
             }
         }
 
@@ -63,7 +64,8 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
             try {
                 this.beliefStateBootstrapper.bootstrap();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                logger.error("ERROR bootstrapping belief state - could not initialize: {}",
+                    e.getMessage());
             }
         }
 
@@ -71,7 +73,7 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
             try {
                 this.dagBootstrapper.bootstrap();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                logger.error("ERROR - could not initialize: {}", e.getMessage());
             }
         }
 

@@ -4,7 +4,8 @@ import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
+import org.springframework.validation.annotation.Validated;
+import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 
 /**
  * Configuration component that maintains what graphs we're configured to deploy
@@ -16,12 +17,23 @@ import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
     havingValue = "true",
     matchIfMissing = false
 )
-@ConfigurationProperties("ubiquia.agent.flow-service.bootstrap.belief-states")
-public class BeliefStateBootstrapConfig {
+@ConfigurationProperties("ubiquia.agent.flow-service.bootstrap.graph")
+@Validated
+public class GraphBootstrapConfig {
 
     private Boolean enabled;
 
-    private List<BeliefStateGeneration> deployments;
+    private String directory;
+
+    private List<GraphDeployment> deployments;
+
+    public List<GraphDeployment> getDeployments() {
+        return deployments;
+    }
+
+    public void setDeployments(List<GraphDeployment> deployments) {
+        this.deployments = deployments;
+    }
 
     public Boolean getEnabled() {
         return enabled;
@@ -31,11 +43,11 @@ public class BeliefStateBootstrapConfig {
         this.enabled = enabled;
     }
 
-    public List<BeliefStateGeneration> getDeployments() {
-        return deployments;
+    public String getDirectory() {
+        return directory;
     }
 
-    public void setDeployments(List<BeliefStateGeneration> deployments) {
-        this.deployments = deployments;
+    public void setDirectory(String directory) {
+        this.directory = directory;
     }
 }

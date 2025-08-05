@@ -51,7 +51,7 @@ jobs:
           mkdir -p docker-images
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
-            project_name=core-$(basename $dir)
+            project_name=$(basename $dir)
             IMAGE_NAME=${DOCKER_REPO}/${project_name}
             echo "Building image for $dir -> $IMAGE_NAME:latest"
             docker build \

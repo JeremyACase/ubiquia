@@ -3,6 +3,7 @@ package org.ubiquia.core.flow.component.config.bootstrap;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Configuration component that maintains what graphs we're configured to deploy
@@ -14,7 +15,8 @@ import org.springframework.stereotype.Component;
     havingValue = "true",
     matchIfMissing = false
 )
-@ConfigurationProperties("ubiquia.agent.flow-service.bootstrap.acls")
+@ConfigurationProperties("ubiquia.agent.flow-service.bootstrap.acl")
+@Validated
 public class AclBootstrapConfig {
 
     private Boolean enabled;

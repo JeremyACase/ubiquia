@@ -21,7 +21,7 @@ import org.ubiquia.core.flow.service.registrar.GraphRegistrar;
  * languages from file.
  */
 @ConditionalOnProperty(
-    value = "ubiquia.agent.flowService.bootstrap.enabled",
+    value = "ubiquia.agent.flow-service.bootstrap.enabled",
     havingValue = "true",
     matchIfMissing = false
 )
@@ -39,7 +39,8 @@ public class DagBootstrapper implements InterfaceBootstrapper {
 
     @Override
     public void bootstrap() throws Exception {
-        logger.info("...bootstrapping graphs from {}...", this.config.getDirectory());
+        logger.info("...bootstrapping graphs from {}...",
+            this.config.getDirectory());
         var bootstrapPath = Paths.get(this.config.getDirectory());
 
         var filePaths = Files.list(bootstrapPath).toList();
