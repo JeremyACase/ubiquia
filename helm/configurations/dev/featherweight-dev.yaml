@@ -12,5 +12,46 @@ ubiquia:
     flowService:
       bootstrap:
         enabled: true
-      graph:
-        deployments:
+        beliefState:
+          deployments:
+            - domainName: pets
+              version:
+                major: 1
+                minor: 2
+                patch: 3
+        graph:
+          deployments:
+            - name: pets
+              version:
+                major: 1
+                minor: 2
+                patch: 3
+              graphSettings:
+                flag: demo
+  components:
+    core:
+      beliefStateGeneratorService:
+        image:
+          registry: docker.io/ubiquia
+          repository: core-belief-state-generator-service
+          tag: latest
+      communicationService:
+        image:
+          registry: docker.io/ubiquia
+          repository: core-communication-service
+          tag: latest
+      flowService:
+        image:
+          registry: docker.io/ubiquia
+          repository: core-flow-service
+          tag: latest
+    test:
+      beliefStateGeneratorService:
+        image:
+          registry: docker.io/ubiquia
+          repository: test-belief-state-generator-service
+          tag: latest
+      
+infrastructure:
+  image:
+    pullPolicy: Never

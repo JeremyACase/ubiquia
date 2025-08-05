@@ -10,10 +10,10 @@ on:
 env:
   DOCKER_REPO: ubiquia
   SUBPROJECTS: |
-    core/service/belief-state-generator-service
-    core/service/communication-service
-    core/service/flow-service
-    test/service/belief-state-generator-service-test
+    core/service/core-belief-state-generator-service
+    core/service/core-communication-service
+    core/service/core-flow-service
+    test/service/test-belief-state-generator-service
 
 jobs:
 
@@ -51,7 +51,7 @@ jobs:
           mkdir -p docker-images
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
-            project_name=core-$(basename $dir)
+            project_name=$(basename $dir)
             IMAGE_NAME=${DOCKER_REPO}/${project_name}
             echo "Building image for $dir -> $IMAGE_NAME:latest"
             docker build \

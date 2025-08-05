@@ -24,14 +24,6 @@ ubiquia:
       allowed:
         origins: http://localhost:3000,http://localhost:3001
 
-  outbox:
-
-    enabled: true
-    frequency-milliseconds: 300
-
-    # Current supported values are: DEFAULT
-    mode: DEFAULT
-
   kubernetes:
     enabled: false
     namespace: test

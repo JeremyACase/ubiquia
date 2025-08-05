@@ -2,11 +2,17 @@
 
 # Author: Jeremy Case
 # Email: JeremyCase@odysseyconsult.com
-# Purpose: This script will allow devs to install a local Ubiquia instance in Kubernetes-IN-Docker KIND. 
-#          It assumes that KIND is installed and available globally via the command line, 
-#          and that Helm and Kubectl have been installed. 
+# Purpose: This 
 
-echo Installing Ubiquia into KIND from scratch...
+
+set -euo pipefail
+
+# ----------- CONFIGURATION -------------
+OPENJDK_VERSION="${OPENJDK_VERSION:-21}"             # Default version
+KIND_CLUSTER_NAME="${KIND_CLUSTER_NAME:-ubiquia-agent-0}"   # Default KIND cluster name
+
+echo "Using OPENJDK_VERSION=${OPENJDK_VERSION}"
+echo "Using KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME}"
 
 # Check that 'kind' is available in the path
 if ! command -v kind &> /dev/null; then
@@ -22,12 +28,12 @@ for cmd in helm kubectl; do
     fi
 done
 
-helm dependency update helm/
-
-if kind get clusters | grep -q "^ubiquia-agent-0$"; then
-    echo "KIND cluster 'ubiquia-agent-0' already exists."
+# ----------- KIND CLUSTER --------------
+if kind get clusters | grep -q "^${KIND_CLUSTER_NAME}$"; then
+    echo "✅ KIND cluster '${KIND_CLUSTER_NAME}' already exists."
 else
-    kind create cluster --name ubiquia-agent-0
+    echo "🔧 Creating KIND cluster '${KIND_CLUSTER_NAME}'..."
+    kind create cluster --name "${KIND_CLUSTER_NAME}"
 fi
 
 # Check if the namespace 'ubiquia' already exists
@@ -37,6 +43,28 @@ else
     echo "Creating namespace 'ubiquia'..."
     kubectl create namespace ubiquia
 fi
+
+# ----------- BUILD LOOP ----------------
+find . -type f -name 'Dockerfile' | while read -r dockerfile; do
+  dir=$(dirname "$dockerfile")
+  short_name=$(basename "$dir" | tr '[:upper:]' '[:lower:]')
+  image_name="ubiquia/${short_name}"
+
+  echo "🔨 Building Docker image: $image_name from $dockerfile"
+  docker build \
+    --build-arg OPENJDK_VERSION="$OPENJDK_VERSION" \
+    -t "$image_name:latest" \
+    "$dir"
+
+  echo "📦 Loading image into KIND: $image_name:latest"
+  kind load docker-image "$image_name:latest" --name "$KIND_CLUSTER_NAME"
+done
+
+echo "✅ All Docker images built and loaded into KIND."
+
+echo Installing Ubiquia into KIND...
+
+helm dependency update helm/
 
 # Create a mount for KIND to mount into to store our generated belief state jars
 docker exec ubiquia-agent-0-control-plane mkdir -p /mnt/data/belief-state-jars

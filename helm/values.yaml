@@ -35,9 +35,11 @@ ubiquia:
         enabled: true
     flowService:
       bootstrap:
-        enabled: true
-      graph:
-        deployments:
+        enabled: true 
+        beliefState:
+          deployments:
+        graph:
+          deployments:
       jvm:
         maxRAMPercentage: 25
   components:
@@ -61,7 +63,7 @@ ubiquia:
       beliefStateGeneratorService:
         image:
           registry: ubiquia
-          repository: core-belief-state-generator-service-test
+          repository: test-belief-state-generator-service
           tag: latest
 
 k8s:

@@ -81,19 +81,27 @@ data:
     ubiquia:
       agent:
         id: {{ .Values.ubiquia.agent.id }}
-        flowService:
+        flow-service:
           bootstrap:
             enabled: {{ .Values.ubiquia.agent.flowService.bootstrap.enabled }}          
-            acls:
+            acl:
               enabled: true
-              directory: 
-                path: /app/etc/acls/
-            graphs:
+              directory:  /app/etc/acls/
+            belief-state:
               enabled: true
-              directory: 
-                path: /app/etc/graphs/
               deployments:
-                {{- range $v := .Values.ubiquia.agent.flowService.graph.deployments }}
+                {{- range $v := .Values.ubiquia.agent.flowService.bootstrap.beliefState.deployments }}
+                - domainName: {{ $v.domainName }}
+                  version: 
+                    major: {{ $v.version.major }}
+                    minor: {{ $v.version.minor }}
+                    patch: {{ $v.version.patch }}
+                {{- end }}
+            graph:
+              enabled: true
+              directory: /app/etc/graphs/
+              deployments:
+                {{- range $v := .Values.ubiquia.agent.flowService.bootstrap.graph.deployments }}
                 - name: {{ $v.name }}
                   version: 
                     major: {{ $v.version.major }}
@@ -104,12 +112,12 @@ data:
                     flag: {{ $v.graphSettings.flag }}
                   {{- end -}}
                 {{- end }}
+      belief-state-generator:
+        service:
+          port: {{ .Values.convenience.variables.spring.port }}
+          url: http://ubiquia-core-belief-state-generator-service
       kubernetes:
         enabled: true
         namespace: {{ .Release.Namespace }}
-      outbox:
-        enabled: true
-        frequency-milliseconds: 1000
-        mode: DEFAULT
       page:
         max-size: 100

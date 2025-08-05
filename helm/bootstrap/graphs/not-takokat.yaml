@@ -1,4 +1,4 @@
-name: NotTakokat
+name: notTakokat
 modelType: Graph
 author: Jeremy Case
 description: A DAG that definitely isn't TAKOKAT.

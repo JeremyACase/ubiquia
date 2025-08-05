@@ -26,7 +26,7 @@ Modern agent-based systems often rely on brittle glue code: ad-hoc APIs, hand-ro
   Helm-first deployments, Prometheus & Micrometer observability baked in. Built for production from day one.
 
 - 🌍 **Cross-Cluster DAG Communication**  
-  DAGs can span **multiple Kubernetes clusters**, enabling components to operate across physical and cloud boundaries:  
+  DAGs can span **multiple Kubernetes clusters**, enabling agents to operate across physical and cloud boundaries:  
   - **Resilient Compute**: workloads can route around degraded or partitioned clusters  
   - **Topology-Aware Execution**: deploy agents near data, users, or available compute zones
 
@@ -40,8 +40,8 @@ Unlike most MAS (Multi-Agent System) frameworks, **Ubiquia is designed from the 
 
 * [Quickstart](#quickstart)
   * [Quickstart: Requirements](#quick-start-requirements)
-  * [Quickstart: Scripts](#quick-start-scripts)
   * [Quickstart: Scripts - One-Time Setup](#quick-start-scripts-one-time-setup)
+  * [Quickstart: Scripts - Recurring Setup](#quick-start-scripts-recurring-setup)
 * [Getting Started](#getting-started)
   * [Getting Started: Requirements](#getting-started-requirements)
   * [Getting Started: Helm Repo](#getting-started-helm-repo)
@@ -89,13 +89,13 @@ These scripts need to be run whenever you want to do a fresh install of Ubiquia 
 $ ./scripts/devs/install-ubiquia-into-kind.sh
 ```
 
-After invoking the script and a successful installation, Helm will output to console how to interface with the newly-installed Ubiquia component.
+After invoking the script and a successful installation, Helm will output to console how to interface with the newly-installed Ubiquia agent.
 
 ### Quickstart: Deleting Ubiquia Cluster
 If you ran the above script to install Ubiquia into KIND and want a completely fresh start, you can delete the KIND Kubernetes cluster
 
 ```bash
-$ kind delete clusters ubiquia-component-0
+$ kind delete clusters ubiquia-agent-0
 ```
 
 Now you can re-run the installation script with a fresh Kubernetes cluster!
@@ -128,11 +128,11 @@ Ubiquia should be able to be installed into any Kubernetes environment using Hel
 
 Example Ubiquia Installation
 ```bash
-$ helm install ubiquia ubiquia-helm --values helm/configurations/featherwweight.yaml -n ubiquia
+$ helm install ubiquia ubiquia-helm --values helm/configurations/prod/featherwweight.yaml -n ubiquia
 ```
 
 ### Getting Started: Project Overview
-Ubiquia is a modular multi-component orchestration platform designed for scalable, belief-driven AI systems running on Kubernetes.
+Ubiquia is a modular multi-agent orchestration platform designed for scalable, belief-driven AI systems running on Kubernetes.
 
 To ensure modularity, clarity, and maintainability, the codebase is divided into subprojects. Each will eventually have its own README and design documents — some already do, and others are coming soon.
 
@@ -886,7 +886,7 @@ $ ./gradlew :core:service:flow-service:build
 
 | Term | Definition |
 |------|------------|
-| **ACL (Agent Communication Language)** | A JSON Schema-based contract that defines the types of messages components can send or receive. Enforces runtime validation of component I/O. |
+| **ACL (Agent Communication Language)** | A JSON Schema-based contract that defines the types of messages components and agents can send or receive. Enforces runtime validation of component I/O. |
 | **Adapter** | A software component that connects nodes in a DAG and defines how messages are transported or transformed (e.g., `publish`, `merge`, `poll`). |
 | **Component** | A stateful microservice deployed as part of a DAG, capable of sending, receiving, and acting on messages according to ACLs. |
 | **Componentless Adapter** | An adapter node in a DAG that performs flow control (e.g., routing, polling, merging) but does not host an component implementation. |
@@ -898,8 +898,8 @@ $ ./gradlew :core:service:flow-service:build
 | **DAG Manifest** | A YAML configuration file that declares how a DAG and its components/adapters should be deployed, configured, and interconnected. |
 | **DTO (Data Transfer Object)** | A simple object used to encapsulate data transferred between layers or services in Ubiquia. Used heavily in REST APIs. |
 | **Flow Service** | A core Ubiquia microservice responsible for materializing DAGs into running components and adapters. Manages lifecycle, registration, and event querying. |
-| **MAO (Multi-Agent Orchestration)** | The process of managing and coordinating interactions among components in a MAS. Ubiquia handles MAO through DAG deployment and adapter coordination. |
-| **MAS (Multi-Agent System)** | A system composed of multiple intelligent components that interact or work together to perform tasks or solve problems. Ubiquia provides runtime infrastructure for these systems. |
+| **MAO (Multi-Agent Orchestration)** | The process of managing and coordinating interactions among components and agents in a MAS. Ubiquia handles MAO through DAG deployment and adapter coordination. |
+| **MAS (Multi-Agent System)** | A system composed of multiple intelligent agents that interact or work together to perform tasks or solve problems. Ubiquia provides runtime infrastructure for these systems. |
 | **Schema Registry** | A repository of JSON Schemas (ACLs) that define I/O contracts for components and services. Used for validation, code generation, and schema evolution. |
 ---
 

@@ -1,0 +1,11 @@
+logging:
+  ubiquia: INFO
+
+ubiquia:
+  cluster:
+  agent:
+    database: 
+      h2:
+        enabled: true
+      yugabyte:
+        enabled: false

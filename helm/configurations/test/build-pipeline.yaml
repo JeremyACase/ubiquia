@@ -14,13 +14,6 @@ ubiquia:
         enabled: false
       graph:
         deployments:
-          - name: Pets
-            version:
-              major: 1
-              minor: 2
-              patch: 3
-            graphSettings:
-              flag: demo
   components:
     core:
       beliefStateGeneratorService:
@@ -42,5 +35,5 @@ ubiquia:
       beliefStateGeneratorService:
         image:
           registry: docker.io/ubiquia
-          repository: core-belief-state-generator-service-test
+          repository: test-belief-state-generator-service
           tag: latest
