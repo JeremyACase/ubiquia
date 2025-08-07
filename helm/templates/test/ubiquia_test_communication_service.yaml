@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubiquia-core-communication-service-test
+  namespace: ubiquia
+  annotations:
+    "helm.sh/hook": test
+  labels:
+    sidecar.istio.io/inject: "false"
+spec:
+  restartPolicy: Never
+  containers:
+    - name: curl
+      image: curlimages/curl:8.6.0
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          set -e
+
+          test_endpoint() {
+            local METHOD=$1
+            local URL=$2
+            local EXPECT_CODE=$3
+            local NAME=$4
+
+            echo "Testing $NAME ($METHOD $URL)..."
+
+            local RESPONSE_FILE=$(mktemp)
+            local STATUS=$(curl -s -o "$RESPONSE_FILE" -w "%{http_code}" -X "$METHOD" "$URL")
+            local BODY=$(cat "$RESPONSE_FILE")
+            rm "$RESPONSE_FILE"
+
+            if [ "$STATUS" != "$EXPECT_CODE" ]; then
+              echo "❌ $NAME failed (expected $EXPECT_CODE, got $STATUS)"
+              echo "🔍 Response body:"
+              echo "$BODY"
+              exit 1
+            fi
+
+            echo "✅ $NAME passed (HTTP $STATUS)"
+          }
+
+          test_endpoint_allowing_any_non_404() {
+            local METHOD=$1
+            local URL=$2
+            local NAME=$3
+
+            echo "Testing $NAME ($METHOD $URL)..."
+
+            local RESPONSE_FILE=$(mktemp)
+            local STATUS=$(curl -s -o "$RESPONSE_FILE" -w "%{http_code}" -X "$METHOD" "$URL")
+            local BODY=$(cat "$RESPONSE_FILE")
+            rm "$RESPONSE_FILE"
+
+            if [ "$STATUS" = "404" ]; then
+              echo "❌ $NAME failed (404 Not Found)"
+              echo "🔍 Response body:"
+              echo "$BODY"
+              exit 1
+            fi
+
+            echo "✅ $NAME passed (HTTP $STATUS)"
+          }
+
+          BASE_URL="http://ubiquia-core-communication-service:8080"
+
+          # -- Health check --
+          test_endpoint GET "$BASE_URL/actuator/health" 200 "Health Check"
+
+          # -- Belief state generator --
+          test_endpoint_allowing_any_non_404 POST "$BASE_URL/ubiquia/communication-service/belief-state-generator-service/generate/belief-state" "Generate Belief State"
+          test_endpoint_allowing_any_non_404 POST "$BASE_URL/ubiquia/communication-service/belief-state-generator-service/teardown/belief-state" "Teardown Belief State"
+
+          # -- Proxy to flow-service/ubiquia-agent --
+          test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/communication-service/flow-service/ubiquia-agent/instance/get" "Proxy: Get Instance"
+
+          AGENT_ID=test-agent-id
+          test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/communication-service/flow-service/ubiquia-agent/${AGENT_ID}/get-deployed-graph-ids?page=0&size=10" "Proxy: Get Deployed Graph IDs"
+
+          echo "🎉 All endpoint checks passed!"

@@ -8,6 +8,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.test.helm.service.AbstractTestManager;
 import org.ubiquia.common.test.helm.service.TestRegistrar;
+import org.ubiquia.test.belief.state.generator.service.module.*;
 
 @Service
 public class TestManager extends AbstractTestManager {
@@ -38,7 +39,7 @@ public class TestManager extends AbstractTestManager {
         this.testRegistrar.registerModule(this.beliefStateDeploymentTestModule);
         this.testRegistrar.registerModule(this.animalTestModule);
         this.testRegistrar.registerModule(this.personTestModule);
-        //this.testRegistrar.registerModule(this.beliefStateTeardownTestModule);
+        this.testRegistrar.registerModule(this.beliefStateTeardownTestModule);
     }
 
     @EventListener(ApplicationReadyEvent.class)

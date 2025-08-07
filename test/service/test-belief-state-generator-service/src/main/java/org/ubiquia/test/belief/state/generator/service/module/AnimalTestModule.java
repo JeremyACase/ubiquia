@@ -1,4 +1,4 @@
-package org.ubiquia.test.belief.state.generator.service;
+package org.ubiquia.test.belief.state.generator.service.module;
 
 import static org.instancio.Select.field;
 
@@ -16,6 +16,7 @@ import org.ubiquia.common.test.helm.component.GenericAclPostAndRetriever;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
 import org.ubiquia.test.belief.state.generator.model.Animal;
 import org.ubiquia.test.belief.state.generator.model.Name;
+import org.ubiquia.test.belief.state.generator.service.Cache;
 
 @Service
 public class AnimalTestModule extends AbstractHelmTestModule {

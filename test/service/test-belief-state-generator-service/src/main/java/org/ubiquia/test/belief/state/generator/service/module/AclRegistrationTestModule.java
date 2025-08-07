@@ -1,4 +1,4 @@
-package org.ubiquia.test.belief.state.generator.service;
+package org.ubiquia.test.belief.state.generator.service.module;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,9 +16,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
-import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.test.helm.component.GenericUbiquiaPostAndRetriever;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
+import org.ubiquia.test.belief.state.generator.service.Cache;
 
 @Service
 public class AclRegistrationTestModule extends AbstractHelmTestModule {

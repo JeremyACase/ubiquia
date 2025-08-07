@@ -1,4 +1,4 @@
-package org.ubiquia.test.belief.state.generator.service;
+package org.ubiquia.test.belief.state.generator.service.module;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kubernetes.client.informer.ResourceEventHandler;
@@ -22,6 +22,7 @@ import org.ubiquia.common.library.api.config.BeliefStateGeneratorServiceConfig;
 import org.ubiquia.common.library.implementation.service.builder.BeliefStateNameBuilder;
 import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
+import org.ubiquia.test.belief.state.generator.service.Cache;
 
 @Service
 public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {

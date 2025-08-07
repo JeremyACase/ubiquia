@@ -2,7 +2,6 @@ package org.ubiquia.core.flow.service.io.bootstrap;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.library.api.config.BeliefStateGeneratorServiceConfig;
-import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
 import org.ubiquia.core.flow.component.config.bootstrap.BeliefStateBootstrapConfig;
 import org.ubiquia.core.flow.interfaces.InterfaceBootstrapper;
 import org.ubiquia.core.flow.service.registrar.AgentCommunicationLanguageRegistrar;
@@ -36,6 +34,9 @@ public class BeliefStateBootstrapper implements InterfaceBootstrapper {
     @Autowired
     private BeliefStateGeneratorServiceConfig beliefStateGeneratorServiceConfig;
 
+    @Autowired
+    private BeliefStatePoster beliefStatePoster;
+
     @Value("${ubiquia.kubernetes.enabled}")
     private Boolean kubernetesEnabled;
 
@@ -49,7 +50,7 @@ public class BeliefStateBootstrapper implements InterfaceBootstrapper {
     private RestTemplate restTemplate;
 
     @Override
-    public void bootstrap() throws IOException {
+    public void bootstrap() throws Exception {
 
         logger.info("...bootstrapping belief states ...");
 
@@ -66,13 +67,7 @@ public class BeliefStateBootstrapper implements InterfaceBootstrapper {
                     + this.beliefStateGeneratorServiceConfig.getPort()
                     + "/belief-state-generator/generate/belief-state";
 
-                var response = this.restTemplate.postForObject(
-                    url,
-                    deployment,
-                    BeliefStateGeneration.class);
-
-                logger.info("...response: {}",
-                    this.objectMapper.writeValueAsString(response));
+                this.beliefStatePoster.postToBeliefState(url, deployment);
             }
         }
 

@@ -26,6 +26,7 @@ spec:
         {{- include "ubiquia.podLabels" . | nindent 8 }}
         component: ubiquia-core-flow-service
 
+
     spec:
       {{- with .Values.infrastructure.image.pullSecrets }}
       imagePullSecrets:

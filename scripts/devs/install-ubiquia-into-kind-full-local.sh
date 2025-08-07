@@ -2,7 +2,9 @@
 
 # Author: Jeremy Case
 # Email: JeremyCase@odysseyconsult.com
-# Purpose: This 
+# Purpose: This script will take locally-built artifacts and containerize them, load the 
+#          containers into KIND, and then install Ubiquia. This is often faster than
+#          doing this via a Github-based devops pipeline when trying to iterate on local builds.
 
 
 set -euo pipefail

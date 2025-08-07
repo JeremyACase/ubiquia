@@ -3,19 +3,23 @@ package org.ubiquia.core.communication.controller.belief;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.ubiquia.common.model.ubiquia.IngressResponse;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
 import org.ubiquia.common.library.api.config.BeliefStateGeneratorServiceConfig;
+import org.ubiquia.core.communication.interfaces.InterfaceUbiquiaDaoControllerProxy;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/ubiquia/communication-service/belief-state-generator-service")
-public class BeliefStateGeneratorControllerProxy {
+public class BeliefStateGeneratorControllerProxy implements InterfaceUbiquiaDaoControllerProxy {
 
     @Autowired
     private BeliefStateGeneratorServiceConfig beliefStateGeneratorServiceConfig;
@@ -23,12 +27,12 @@ public class BeliefStateGeneratorControllerProxy {
     @Autowired
     private WebClient webClient;
 
-    @PostMapping("/generate/domain")
-    public Mono<ResponseEntity<BeliefStateGeneration>> proxyGenerateDomain(
-        @RequestBody Mono<BeliefStateGeneration> body) {
+    @PostMapping("/generate/belief-state")
+    public Mono<ResponseEntity<BeliefStateGeneration>> proxyGenerate(
+        @RequestBody BeliefStateGeneration body) {
 
         var url = this.getUrlHelper();
-        var uri = UriComponentsBuilder.fromHttpUrl(url + "/generate/domain")
+        var uri = UriComponentsBuilder.fromHttpUrl(url + "/generate/belief-state")
             .build(true)
             .toUri();
 
@@ -36,7 +40,27 @@ public class BeliefStateGeneratorControllerProxy {
             .webClient
             .method(HttpMethod.POST)
             .uri(uri)
-            .body(body, BeliefStateGeneration.class)
+            .bodyValue(body)
+            .retrieve()
+            .toEntity(BeliefStateGeneration.class);
+
+        return response;
+    }
+
+    @PostMapping("/teardown/belief-state")
+    public Mono<ResponseEntity<BeliefStateGeneration>> proxyTeardown(
+        @RequestBody BeliefStateGeneration body) {
+
+        var url = this.getUrlHelper();
+        var uri = UriComponentsBuilder.fromHttpUrl(url + "/teardown/belief-state")
+            .build(true)
+            .toUri();
+
+        var response = this
+            .webClient
+            .method(HttpMethod.POST)
+            .uri(uri)
+            .bodyValue(body)
             .retrieve()
             .toEntity(BeliefStateGeneration.class);
 

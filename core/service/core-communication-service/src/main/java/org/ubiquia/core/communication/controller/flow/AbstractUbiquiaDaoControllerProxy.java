@@ -50,14 +50,15 @@ public abstract class AbstractUbiquiaDaoControllerProxy<T extends AbstractModel>
             .get()
             .uri(targetUri)
             .retrieve()
-            .toEntity(new ParameterizedTypeReference<GenericPageImplementation<T>>() {})
+            .toEntity(new ParameterizedTypeReference<GenericPageImplementation<T>>() {
+            })
             .onErrorResume(e -> Mono.just(ResponseEntity.status(502).body(null)));
     }
 
     public Mono<ResponseEntity<IngressResponse>> proxyToPostEndpoint(
         String path,
         ServerHttpRequest originalRequest,
-        Mono<T> body) {
+        T body) {
 
         var url = this.getUrlHelper();
 
@@ -71,7 +72,7 @@ public abstract class AbstractUbiquiaDaoControllerProxy<T extends AbstractModel>
             .method(originalRequest.getMethod())
             .uri(uri)
             .headers(headers -> headers.addAll(originalRequest.getHeaders()))
-            .body(body, String.class)
+            .bodyValue(body)
             .retrieve()
             .toEntity(IngressResponse.class);
 
