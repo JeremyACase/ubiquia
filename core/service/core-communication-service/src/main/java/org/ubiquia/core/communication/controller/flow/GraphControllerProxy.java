@@ -22,7 +22,7 @@ public class GraphControllerProxy
 
     @PostMapping("/register/post")
     public Mono<ResponseEntity<IngressResponse>> proxyGraphPost(
-        @RequestBody Mono<Graph> body,
+        @RequestBody Graph body,
         ServerHttpRequest request) {
 
         var proxied = super.proxyToPostEndpoint("/register/post", request, body);

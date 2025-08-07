@@ -49,6 +49,10 @@ data:
     ubiquia:
       agent:
         id: {{ .Values.ubiquia.agent.id }}
+      belief-state-generator:
+        service:
+          port: {{ .Values.convenience.variables.spring.port }}
+          url: http://ubiquia-core-belief-state-generator-service
       flow:
         service:
           pollFrequencyMilliseconds: 5000

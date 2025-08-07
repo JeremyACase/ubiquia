@@ -10,6 +10,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 /**
@@ -28,6 +29,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
     "org.ubiquia.common.library.dao",
     "org.ubiquia.common.library.implementation"})
 @EntityScan(basePackages = {"org.ubiquia.common.model.ubiquia"})
+@EnableRetry
 public class Application {
 
     @Autowired
