@@ -156,7 +156,7 @@ public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Gr
      */
     @PostMapping("/deploy")
     @Transactional
-    public void tryDeployGraph(@RequestBody @Valid GraphDeployment deployment)
+    public GraphDeployment tryDeployGraph(@RequestBody @Valid GraphDeployment deployment)
         throws Exception {
 
         this.getLogger().info("Received a request to deploy graph {} with version {}...",
@@ -201,6 +201,8 @@ public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Gr
 
         this.componentManager.tryDeployComponentsFor(deployment);
         this.adapterManager.tryDeployAdaptersFor(deployment);
+        
+        return deployment;
     }
 
     @PostMapping("/teardown")

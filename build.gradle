@@ -14,7 +14,7 @@ plugins {
 
 allprojects {
     group = 'org.ubiquia'
-    version = '0.6.0'
+    version = '0.7.0'
 
     repositories {
         mavenCentral()
@@ -30,6 +30,13 @@ allprojects {
 subprojects {
     configurations.all {
         exclude group: 'commons-logging', module: 'commons-logging'
+
+        // Old Swagger is breaking stuff.
+        resolutionStrategy.eachDependency {
+            if (requested.group == "io.swagger" && requested.name == "swagger-annotations") {
+                useTarget("io.swagger.core.v3:swagger-annotations-jakarta:2.2.30")
+            }
+        }
     }
 
     dependencies {

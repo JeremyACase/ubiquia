@@ -65,7 +65,7 @@ public class BeliefStateBootstrapper implements InterfaceBootstrapper {
                 var url = this.beliefStateGeneratorServiceConfig.getUrl()
                     + ":"
                     + this.beliefStateGeneratorServiceConfig.getPort()
-                    + "/belief-state-generator/generate/belief-state";
+                    + "/belief-state-generator/belief-state/generate";
 
                 this.beliefStatePoster.postToBeliefState(url, deployment);
             }

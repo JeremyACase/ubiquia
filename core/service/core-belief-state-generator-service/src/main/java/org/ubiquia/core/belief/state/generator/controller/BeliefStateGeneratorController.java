@@ -46,7 +46,7 @@ public class BeliefStateGeneratorController {
     @Autowired
     private RestTemplate restTemplate;
 
-    @PostMapping("/generate/belief-state")
+    @PostMapping("/belief-state/generate")
     public BeliefStateGeneration generateBeliefState(
         @RequestBody @Valid final BeliefStateGeneration beliefStateGeneration)
         throws Exception {
@@ -96,7 +96,7 @@ public class BeliefStateGeneratorController {
         return beliefStateGeneration;
     }
 
-    @PostMapping("/teardown/belief-state")
+    @PostMapping("/belief-state/teardown")
     public BeliefStateGeneration teardownBeliefState(
         @RequestBody @Valid final BeliefStateGeneration beliefStateGeneration)
         throws Exception {

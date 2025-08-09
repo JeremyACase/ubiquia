@@ -27,12 +27,12 @@ public class BeliefStateGeneratorControllerProxy implements InterfaceUbiquiaDaoC
     @Autowired
     private WebClient webClient;
 
-    @PostMapping("/generate/belief-state")
+    @PostMapping("/belief-state/generate")
     public Mono<ResponseEntity<BeliefStateGeneration>> proxyGenerate(
         @RequestBody BeliefStateGeneration body) {
 
         var url = this.getUrlHelper();
-        var uri = UriComponentsBuilder.fromHttpUrl(url + "/generate/belief-state")
+        var uri = UriComponentsBuilder.fromHttpUrl(url + "/belief-state/generate")
             .build(true)
             .toUri();
 
@@ -47,12 +47,12 @@ public class BeliefStateGeneratorControllerProxy implements InterfaceUbiquiaDaoC
         return response;
     }
 
-    @PostMapping("/teardown/belief-state")
+    @PostMapping("/belief-state/teardown")
     public Mono<ResponseEntity<BeliefStateGeneration>> proxyTeardown(
         @RequestBody BeliefStateGeneration body) {
 
         var url = this.getUrlHelper();
-        var uri = UriComponentsBuilder.fromHttpUrl(url + "/teardown/belief-state")
+        var uri = UriComponentsBuilder.fromHttpUrl(url + "/belief-state/teardown")
             .build(true)
             .toUri();
 

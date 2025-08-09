@@ -1,6 +1,5 @@
-package org.ubiquia.test.belief.state.generator.service.module;
+package org.ubiquia.test.flow.service.module;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kubernetes.client.informer.ResourceEventHandler;
 import io.kubernetes.client.informer.SharedInformerFactory;
@@ -12,39 +11,34 @@ import io.kubernetes.client.openapi.models.V1ServiceList;
 import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.generic.GenericKubernetesApi;
 import java.io.IOException;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.ubiquia.common.library.api.config.BeliefStateGeneratorServiceConfig;
-import org.ubiquia.common.library.implementation.service.builder.BeliefStateNameBuilder;
-import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
+import org.ubiquia.common.library.api.config.FlowServiceConfig;
+import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
+import org.ubiquia.common.model.ubiquia.embeddable.GraphSettings;
+import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
-import org.ubiquia.test.belief.state.generator.service.Cache;
 
 @Service
-public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
+public class ComponentDeploymentTestModule extends AbstractHelmTestModule {
 
-    private static final Logger logger = LoggerFactory.getLogger(BeliefStateDeploymentTestModule.class);
-
-    @Autowired
-    private BeliefStateGeneratorServiceConfig beliefStateGeneratorServiceConfig;
-
-    @Autowired
-    private BeliefStateNameBuilder beliefStateNameBuilder;
-
-    @Autowired
-    private Cache cache;
+    private static final Logger logger = LoggerFactory.getLogger(ComponentDeploymentTestModule.class);
 
     @Autowired
     private ObjectMapper objectMapper;
 
+    private Boolean dagDeployed = false;
+
+    @Autowired
+    private FlowServiceConfig flowServiceConfig;
+
     @Autowired
     private RestTemplate restTemplate;
-
-    private Boolean beliefStateDeploymentCreated = false;
 
     private ApiClient apiClient;
     private GenericKubernetesApi<V1Deployment, V1DeploymentList> deploymentClient;
@@ -57,15 +51,16 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
         return logger;
     }
 
-
     @Override
     public void doSetup() {
         logger.info("Initializing Kubernetes client connection...");
+
         try {
             this.apiClient = ClientBuilder.standard().build();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         this.deploymentClient = new GenericKubernetesApi<>(
             V1Deployment.class,
             V1DeploymentList.class,
@@ -73,6 +68,7 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
             "v1",
             "deployments",
             apiClient);
+
         this.serviceClient = new GenericKubernetesApi<>(
             V1Service.class,
             V1ServiceList.class,
@@ -80,6 +76,7 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
             "v1",
             "services",
             apiClient);
+
         this.initializeDeploymentUpdateInformer();
         logger.info("...Kubernetes client connection initialized.");
     }
@@ -88,45 +85,47 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
     public void doTests() {
         logger.info("Proceeding with tests...");
 
-        var generation = new BeliefStateGeneration();
-        generation.setDomainName(this.cache.getAcl().getDomain());
-        generation.setVersion(this.cache.getAcl().getVersion());
+        var graphDeployment = new GraphDeployment();
+        graphDeployment.setName("pets");
 
-        var postUrl = this.beliefStateGeneratorServiceConfig.getUrl()
+        var version = new SemanticVersion();
+        version.setMajor(1);
+        version.setMinor(2);
+        version.setPatch(3);
+        graphDeployment.setVersion(version);
+
+        var graphSettings = new GraphSettings();
+        graphSettings.setFlag("devops");
+        graphDeployment.setGraphSettings(graphSettings);
+
+        var postUrl = this.flowServiceConfig.getUrl()
             + ":"
-            + this.beliefStateGeneratorServiceConfig.getPort()
-            + "/belief-state-generator/belief-state/generate";
+            + this.flowServiceConfig.getPort()
+            + "/ubiquia/flow-service/graph/deploy";
 
         logger.info("POSTing to URL: {}", postUrl);
 
         try {
             var response = this.restTemplate.postForEntity(
                 postUrl,
-                generation,
-                BeliefStateGeneration.class);
+                graphDeployment,
+                GraphDeployment.class);
+            logger.info("Response: {}", this.objectMapper.writeValueAsString(response));
+
         } catch (Exception e) {
             this.testState.addFailure("ERROR: " + e.getMessage());
         }
 
         try {
-            logger.info("...sleeping to give generated Belief State a chance to come alive...");
+            logger.info("...sleeping to give deployed DAG a chance to come alive...");
             Thread.sleep(60000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
-        if (!this.beliefStateDeploymentCreated) {
-            var name = this
-                .beliefStateNameBuilder
-                .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
-            this.testState.addFailure("A belief state was never created with name: " + name);
-        }
-
-        try {
-            logger.info("...generated a belief state for : {}",
-                this.objectMapper.writeValueAsString(generation));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        if (this.dagDeployed) {
+            this.testState.addFailure("No components for a pets DAG were created in "
+                + "Kubernetes...");
         }
 
         logger.info("...completed.");
@@ -140,17 +139,15 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
             60000L,
             this.namespace);
 
-        var beliefStateName = this
-            .beliefStateNameBuilder
-            .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
-
         // Receive updates from Kubernetes when Deployments change
         informer.addEventHandler(new ResourceEventHandler<>() {
 
             @Override
             public void onAdd(V1Deployment v1Deployment) {
-                if (v1Deployment.getMetadata().getName().equals(beliefStateName)) {
-                    beliefStateDeploymentCreated = true;
+
+                var labels = v1Deployment.getMetadata().getLabels();
+                if (Objects.nonNull(labels) && labels.get("ubiquia-graph").equals("pets")) {
+                    dagDeployed = true;
                 }
             }
 

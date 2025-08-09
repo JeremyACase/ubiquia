@@ -68,8 +68,8 @@ spec:
           test_endpoint GET "$BASE_URL/actuator/health" 200 "Health Check"
 
           # -- Belief state generator --
-          test_endpoint_allowing_any_non_404 POST "$BASE_URL/ubiquia/communication-service/belief-state-generator-service/generate/belief-state" "Generate Belief State"
-          test_endpoint_allowing_any_non_404 POST "$BASE_URL/ubiquia/communication-service/belief-state-generator-service/teardown/belief-state" "Teardown Belief State"
+          test_endpoint_allowing_any_non_404 POST "$BASE_URL/ubiquia/communication-service/belief-state-generator-service/belief-state/generate" "Generate Belief State"
+          test_endpoint_allowing_any_non_404 POST "$BASE_URL/ubiquia/communication-service/belief-state-generator-service/belief-state/teardown" "Teardown Belief State"
 
           # -- Proxy to flow-service/ubiquia-agent --
           test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/communication-service/flow-service/ubiquia-agent/instance/get" "Proxy: Get Instance"
