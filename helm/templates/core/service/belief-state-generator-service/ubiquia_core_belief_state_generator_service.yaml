@@ -3,7 +3,6 @@ kind: Service
 metadata:
   name: ubiquia-core-belief-state-generator-service
   labels:
-    {{- include "ubiquia.labels" . | nindent 4 }}
     component: ubiquia-core-belief-state-generator-service
 spec:
   type: ClusterIP
@@ -13,5 +12,4 @@ spec:
       targetPort: http
       protocol: TCP
   selector:
-    {{- include "ubiquia.selectorLabels" . | nindent 4 }}
     component: ubiquia-core-belief-state-generator-service
