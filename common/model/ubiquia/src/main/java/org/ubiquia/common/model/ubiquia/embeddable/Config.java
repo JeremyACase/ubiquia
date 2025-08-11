@@ -1,14 +1,20 @@
 package org.ubiquia.common.model.ubiquia.embeddable;
 
 
-import jakarta.persistence.Column;
+import jakarta.persistence.Basic;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Embeddable
 public class Config {
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     private String configMap;
 
     private String configMountPath;

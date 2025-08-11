@@ -3,6 +3,8 @@ package org.ubiquia.common.model.ubiquia.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 public class FlowMessageEntity extends AbstractModelEntity {
@@ -15,7 +17,9 @@ public class FlowMessageEntity extends AbstractModelEntity {
     @JoinColumn(name = "message_target_adapter_join_id", nullable = false)
     private AdapterEntity targetAdapter;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     private String payload;
 
     @NotNull

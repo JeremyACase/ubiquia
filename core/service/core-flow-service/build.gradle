@@ -46,6 +46,7 @@ dependencies {
     implementation "net.jimblackler:jsongenerator:0.4.7"
 
     runtimeOnly "com.h2database:h2:${H2_VERSION}"
+    runtimeOnly group: 'com.yugabyte', name: 'jdbc-yugabytedb', version:  "${YUGABYTE_DRIVER_VERSION}"
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${MICROMETER_VERSION}"
 
     testImplementation "com.h2database:h2:${H2_VERSION}"

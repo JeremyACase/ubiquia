@@ -79,8 +79,8 @@ kubectl apply -f config/dev/ubiquia_dev_kind_pv.yaml -n ubiquia
 
 if helm status ubiquia -n ubiquia > /dev/null 2>&1; then
     echo "Helm release 'ubiquia' exists — upgrading..."
-    helm upgrade ubiquia helm/ --values helm/configurations/dev/featherweight-dev.yaml -n ubiquia
+    helm upgrade ubiquia helm/ --values helm/configurations/dev/lightweight-dev.yaml -n ubiquia
 else
     echo "Installing Helm release 'ubiquia'..."
-    helm install ubiquia helm/ --values helm/configurations/dev/featherweight-dev.yaml -n ubiquia
+    helm install ubiquia helm/ --values helm/configurations/dev/lightweight-dev.yaml -n ubiquia
 fi

@@ -56,7 +56,7 @@ spec:
           httpGet:
             path: /actuator/health
             port: {{ .Values.convenience.variables.spring.port }}
-          initialDelaySeconds: 60  
+          initialDelaySeconds: 180  
         image: {{ include "ubiquia.core.flowService.image" . }}
         imagePullPolicy: {{ .Values.infrastructure.image.pullPolicy }}
         ports:

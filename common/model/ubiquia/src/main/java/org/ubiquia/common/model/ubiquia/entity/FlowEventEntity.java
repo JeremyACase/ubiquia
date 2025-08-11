@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.util.Set;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.validation.annotation.Validated;
 import org.ubiquia.common.model.ubiquia.embeddable.FlowEventTimes;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
@@ -19,10 +21,14 @@ public class FlowEventEntity extends AbstractModelEntity {
 
     private String batchId;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     private String inputPayload;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     private String outputPayload;
 
     private Integer httpResponseCode;
@@ -54,7 +60,7 @@ public class FlowEventEntity extends AbstractModelEntity {
     })
     private Set<KeyValuePair> outputPayloadStamps;
 
-    @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
+    @Pattern(regexp = "^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$")
     @NotNull
     public String getBatchId() {
         return this.batchId;
