@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${SPRING_BOOT_VERSION}"
+    }
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation "org.springframework.boot:spring-boot-starter-web"
+
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: "${APACHE_COMMONS_VERSION}"
+    implementation group: 'org.reflections', name: 'reflections', version: "${REFLECTIONS_VERSION}"
+
+    implementation project(':common:java:library:api')
+    implementation project(':common:java:library:implementation')
+    implementation project(':common:java:model:ubiquia')
+
+    testImplementation "com.h2database:h2:${H2_VERSION}"
+    testImplementation group: 'org.instancio', name: 'instancio-junit', version: "${INSTANCIO_VERSION}"
+}
+
+jacocoTestReport {
+    reports {
+        xml.required=true
+        csv.required=false
+        xml.destination file("./build/reports/jacoco.xml")
+        html.destination file("./build/reports/jacocoHtml")
+    }
+}
+
+
+test {
+    useJUnitPlatform()
+}

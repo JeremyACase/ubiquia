@@ -1,0 +1,139 @@
+plugins {
+    id 'org.springframework.boot' version "${SPRING_BOOT_VERSION}"
+    id 'java'
+}
+
+bootJar {
+    mainClass = 'org.ubiquia.core.belief.state.generator.Application'
+    archiveFileName = 'ubiquia-core-belief-state-generator-service.jar'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${SPRING_BOOT_VERSION}"
+    }
+}
+
+jar {
+    enabled = false
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-loader-tools"
+
+    // Import the Page implementation stuff without having to have a database
+    implementation "org.springframework.data:spring-data-commons"
+
+    // Adding these for now to prevent failures occurring when generating OpenAPI files from yaml
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
+
+    implementation project(':common:java:model:ubiquia')
+    implementation project(':common:java:library:advice')
+    implementation project(':common:java:library:api')
+    implementation project(':common:java:library:implementation')
+
+    implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
+    implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
+    implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"
+    implementation "org.openapitools:openapi-generator:${OPENAPI_GENERATOR_VERSION}"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${SPRING_DOC_VERSION}"
+
+    runtimeOnly "com.h2database:h2:${H2_VERSION}"
+    runtimeOnly "io.micrometer:micrometer-registry-prometheus:${MICROMETER_VERSION}"
+
+    testImplementation "org.instancio:instancio-junit:${INSTANCIO_VERSION}"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+}
+
+/**
+ * Instruct our code coverage tool where to place the report.
+ */
+jacocoTestReport {
+    reports {
+        xml.required = true
+        csv.required = false
+        xml.destination file("./build/reports/jacoco.xml")
+        html.destination file("./build/reports/jacocoHtml")
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+def openJdkVersion = rootProject.findProperty("OPENJDK_VERSION") ?: "21"
+
+tasks.named("processResources") {
+    inputs.property("OPENJDK_VERSION", openJdkVersion)
+    filteringCharset = 'UTF-8'
+
+    // Inject our openJDK version into our yaml file.
+    filesMatching("application.yaml") {
+        println "✅ Forcing expand for main: $path"
+        filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [
+                OPENJDK_VERSION: openJdkVersion
+        ])
+    }
+}
+
+
+tasks.named("processTestResources") {
+    inputs.property("OPENJDK_VERSION", openJdkVersion)
+    filteringCharset = 'UTF-8'
+
+    filesMatching('application.yaml') {
+        println "✅ Forcing expand for test: $path"
+        filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [
+                OPENJDK_VERSION: openJdkVersion
+        ])
+    }
+}
+
+task copyRuntimeLibs(type: Copy) {
+    description = 'Copies all runtime dependencies and project jars to build/belief-state-libs'
+
+    from configurations.runtimeClasspath
+
+    def projectJars = [
+        ':common:java:model:acl',
+        ':common:java:model:ubiquia',
+        ':common:java:library:advice',
+        ':common:java:library:api',
+        ':common:java:library:belief-state-libraries',
+        ':common:java:library:dao',
+        ':common:java:library:implementation'
+    ]
+
+    projectJars.each { path ->
+        def subproject = project(path)
+
+        // Add the compiled jar
+        def jarTask = subproject.tasks.named('jar')
+        dependsOn(jarTask)
+        from(jarTask.map { it.archiveFile.get().asFile })
+
+        // Add runtime dependencies from the subproject
+        dependsOn(subproject.configurations.runtimeClasspath)
+        from(subproject.configurations.runtimeClasspath)
+    }
+
+    into "belief-state-libs"
+}
+
+tasks.named("build") {
+    dependsOn tasks.named("copyRuntimeLibs")
+    dependsOn tasks.named("processResources")
+    mustRunAfter tasks.named("copyRuntimeLibs")
+    mustRunAfter tasks.named("processResources")
+}
+
+tasks.named("test") {
+    dependsOn tasks.named("copyRuntimeLibs")
+    dependsOn tasks.named("processTestResources")
+    mustRunAfter tasks.named("copyRuntimeLibs")
+    mustRunAfter tasks.named("processTestResources")
+}
