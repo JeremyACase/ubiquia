@@ -14,20 +14,18 @@ ubiquia:
         enabled: true
         beliefState:
           deployments:
-            - domainName: udl
+            - domainName: ubiquia-workbench
               version:
                 major: 1
-                minor: 2
-                patch: 3
+                minor: 0
+                patch: 0
         graph:
           deployments:
-            - name: notTakokat
+            - name: ubiquia-workbench
               version:
                 major: 1
-                minor: 2
-                patch: 3
-              graphSettings:
-                flag: demo
+                minor: 0
+                patch: 0
   components:
     core:
       beliefStateGeneratorService:

@@ -1,0 +1,239 @@
+{
+    "domain": "ubiquia-workbench",
+    "version": {
+        "major": 1,
+        "minor": 0,
+        "patch": 0
+    },
+    "modelType": "AgentCommunicationLanguage",
+    "jsonSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Ubiquia Workbench",
+        "type": "object",
+        "definitions": {
+            "Version": {
+                "description": "Semantic version object reused across models.",
+                "type": "object",
+                "required": [
+                    "major",
+                    "minor",
+                    "patch"
+                ],
+                "properties": {
+                    "major": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "minor": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "patch": {
+                        "type": "integer",
+                        "minimum": 0
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ExecutionContext": {
+                "description": "Immutable context carried across all DAG hops for a single user request.",
+                "type": "object",
+                "required": [
+                    "userPrompt"
+                ],
+                "properties": {
+                    "userPrompt": {
+                        "type": "string",
+                        "maxLength": 2000,
+                        "description": "Natural-language request from the user."
+                    }
+                },
+                "additionalProperties": false
+            },
+            "DagYaml": {
+                "description": "A single DAG artifact to register with GraphController.",
+                "type": "object",
+                "required": [
+                    "name",
+                    "yaml"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120,
+                        "pattern": "^[a-zA-Z0-9][a-zA-Z0-9\\-_.]{1,119}$",
+                        "description": "Graph name."
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 600
+                    },
+                    "yaml": {
+                        "type": "string",
+                        "minLength": 10,
+                        "maxLength": 200000,
+                        "description": "The complete Graph YAML as a string."
+                    },
+                    "graphVersion": {
+                        "$ref": "#/definitions/Version"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "AclProposal": {
+                "description": "LLM-synthesized ACL and DAG plan ready for preflight validation.",
+                "type": "object",
+                "required": [
+                    "domain",
+                    "version",
+                    "jsonSchema",
+                    "dagPlan"
+                ],
+                "properties": {
+                    "domain": {
+                        "type": "string",
+                        "maxLength": 120,
+                        "pattern": "^[a-zA-Z][a-zA-Z0-9\\-_.]{1,119}$"
+                    },
+                    "version": {
+                        "$ref": "#/definitions/Version"
+                    },
+                    "jsonSchema": {
+                        "type": "object",
+                        "description": "Draft-07 JSON Schema of the synthesized domain.",
+                        "minProperties": 1
+                    },
+                    "dagPlan": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/DagYaml"
+                        },
+                        "minItems": 1,
+                        "maxItems": 12
+                    },
+                    "notes": {
+                        "type": "string",
+                        "maxLength": 1200
+                    }
+                },
+                "additionalProperties": false
+            },
+            "RegistrationResult": {
+                "description": "Outcome of belief-state generation and DAG registrations.",
+                "type": "object",
+                "properties": {
+                    "aclVersion": {
+                        "type": "string",
+                        "maxLength": 60
+                    },
+                    "graphNames": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "maxLength": 120
+                        },
+                        "maxItems": 32
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "maxLength": 300
+                        },
+                        "maxItems": 50
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Provenance": {
+                "description": "Per-hop trace record for building the user-visible timeline.",
+                "type": "object",
+                "required": [
+                    "graphRunId",
+                    "node",
+                    "startedAt"
+                ],
+                "properties": {
+                    "graphRunId": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "dagName": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "node": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "startedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "endedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "STARTED",
+                            "SUCCESS",
+                            "FAILED",
+                            "SKIPPED"
+                        ]
+                    },
+                    "message": {
+                        "type": "string",
+                        "maxLength": 500
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ErrorReport": {
+                "description": "Normalized error payload surfaced to the UI.",
+                "type": "object",
+                "required": [
+                    "code",
+                    "message"
+                ],
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "message": {
+                        "type": "string",
+                        "maxLength": 500
+                    },
+                    "details": {
+                        "type": "string",
+                        "maxLength": 2000
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        "properties": {
+            "ExecutionContext": {
+                "$ref": "#/definitions/ExecutionContext"
+            },
+            "DagYaml": {
+                "$ref": "#/definitions/DagYaml"
+            },
+            "AclProposal": {
+                "$ref": "#/definitions/AclProposal"
+            },
+            "RegistrationResult": {
+                "$ref": "#/definitions/RegistrationResult"
+            },
+            "Provenance": {
+                "$ref": "#/definitions/Provenance"
+            },
+            "ErrorReport": {
+                "$ref": "#/definitions/ErrorReport"
+            }
+        },
+        "additionalProperties": false
+    }
+}
