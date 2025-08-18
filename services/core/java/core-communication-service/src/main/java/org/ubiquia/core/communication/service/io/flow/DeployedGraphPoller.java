@@ -1,5 +1,6 @@
 package org.ubiquia.core.communication.service.io.flow;
 
+import java.net.URISyntaxException;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,8 @@ public class DeployedGraphPoller {
     /**
      * Process the currently deployed graph IDs: identify new deployments and torn-down graphs.
      */
-    private void tryProcessDeployedGraphIds(final List<String> currentlyDeployedGraphIds) {
+    private void tryProcessDeployedGraphIds(final List<String> currentlyDeployedGraphIds)
+        throws URISyntaxException {
         var newlyDeployedGraphIds = this.identifyNewlyDeployedGraphIds(currentlyDeployedGraphIds);
         var newlyTornDownGraphIds = this.identifyNewlyTornDownGraphIds(currentlyDeployedGraphIds);
 
@@ -159,11 +161,12 @@ public class DeployedGraphPoller {
     /**
      * Process newly deployed graphs by notifying the managers.
      */
-    private void processNewDeployments(final List<String> newlyDeployedGraphIds) {
+    private void processNewDeployments(final List<String> newlyDeployedGraphIds)
+        throws URISyntaxException {
         for (var id : newlyDeployedGraphIds) {
             var graph = this.currentGraphs.get(id);
             this.adapterProxyManager.tryProcessNewlyDeployedGraph(graph);
-            //this.agentProxyManager.tryProcessNewlyDeployedGraph(graph);
+            this.componentProxyManager.tryProcessNewlyDeployedGraph(graph);
         }
     }
 
@@ -174,7 +177,7 @@ public class DeployedGraphPoller {
         for (var id : newlyTornDownGraphIds) {
             var graph = this.currentGraphs.get(id);
             this.adapterProxyManager.tryProcessNewlyTornDownGraph(graph);
-            //this.agentProxyManager.tryProcessNewlyTornDownGraph(graph);
+            this.componentProxyManager.tryProcessNewlyTornDownGraph(graph);
             this.currentGraphs.remove(id);
         }
     }

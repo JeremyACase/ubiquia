@@ -10,11 +10,12 @@ on:
 env:
   DOCKER_REPO: ubiquia
   SUBPROJECTS: |
-    core/service/core-belief-state-generator-service
-    core/service/core-communication-service
-    core/service/core-flow-service
-    test/service/test-belief-state-generator-service
-    test/service/test-flow-service
+    services/core/java/core-belief-state-generator-service
+    services/core/java/core-communication-service
+    services/core/java/core-flow-service
+    services/dag/workbench/ts/dag-workbench-ui
+    services/test/java/test-belief-state-generator-service
+    services/test/java/test-flow-service
 
 jobs:
 
@@ -51,14 +52,43 @@ jobs:
         run: |
           mkdir -p docker-images
           IFS=$'\n'
+
+          # detect whether this is a tag build like v1.2.3
+          IS_TAG_BUILD=false
+          VERSION_TAG=""
+          if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" =~ ^v[0-9] ]]; then
+            IS_TAG_BUILD=true
+            VERSION_TAG="${GITHUB_REF_NAME#v}"
+          fi
+
           for dir in $SUBPROJECTS; do
-            project_name=$(basename $dir)
-            IMAGE_NAME=${DOCKER_REPO}/${project_name}
-            echo "Building image for $dir -> $IMAGE_NAME:latest"
-            docker build \
-              --build-arg OPENJDK_VERSION=${OPENJDK_VERSION} \
-              -t $IMAGE_NAME:latest $dir
-            docker save -o docker-images/${project_name}.tar $IMAGE_NAME:latest
+            project_name=$(basename "$dir")
+            IMAGE_NAME="${DOCKER_REPO}/${project_name}"
+
+            echo "----"
+            echo "Building $dir  ->  ${IMAGE_NAME}:latest"
+
+            # Special-case the UI subproject: build with APP_BASE_PATH (Angular/NGINX image)
+            if [[ "$dir" == *"/dag-workbench-ui" ]]; then
+              docker build \
+                --build-arg APP_BASE_PATH="/" \
+                -t "${IMAGE_NAME}:latest" "$dir"
+            else
+              # Default: Java services use OPENJDK_VERSION build arg
+              docker build \
+                --build-arg OPENJDK_VERSION="${OPENJDK_VERSION}" \
+                -t "${IMAGE_NAME}:latest" "$dir"
+            fi
+
+            # Save latest tar for artifact
+            docker save -o "docker-images/${project_name}.tar" "${IMAGE_NAME}:latest"
+
+            # If tag build, also tag + save versioned tar
+            if $IS_TAG_BUILD ; then
+              echo "Tagging ${IMAGE_NAME}:${VERSION_TAG}"
+              docker tag "${IMAGE_NAME}:latest" "${IMAGE_NAME}:${VERSION_TAG}"
+              docker save -o "docker-images/${project_name}-${VERSION_TAG}.tar" "${IMAGE_NAME}:${VERSION_TAG}"
+            fi
           done
 
       - name: Upload Docker images as artifacts

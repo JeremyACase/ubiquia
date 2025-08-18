@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.common.library.implementation.service.builder.AdapterEndpointRecordBuilder;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
-import org.ubiquia.common.library.api.config.FlowServiceConfig;
 
 @Service
 public class AdapterProxyManager {
@@ -28,7 +28,9 @@ public class AdapterProxyManager {
     private WebClient webClient;
 
     public void tryProcessNewlyDeployedGraph(final Graph graph) {
-        var adaptersToProxy = graph.getAdapters().stream()
+        var adaptersToProxy = graph
+            .getAdapters()
+            .stream()
             .filter(adapter ->
                 Boolean.TRUE.equals(
                     adapter.getCommunicationServiceSettings().getExposeViaCommService()))

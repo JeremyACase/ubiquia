@@ -11,6 +11,8 @@ public class CommunicationServiceSettings {
 
     private Boolean exposeViaCommService = false;
 
+    private String proxiedEndpoint;
+
     @NotNull
     public Boolean getExposeViaCommService() {
         return exposeViaCommService;
@@ -18,5 +20,13 @@ public class CommunicationServiceSettings {
 
     public void setExposeViaCommService(Boolean exposeViaCommService) {
         this.exposeViaCommService = exposeViaCommService;
+    }
+
+    public String getProxiedEndpoint() {
+        return proxiedEndpoint;
+    }
+
+    public void setProxiedEndpoint(String proxiedEndpoint) {
+        this.proxiedEndpoint = proxiedEndpoint;
     }
 }

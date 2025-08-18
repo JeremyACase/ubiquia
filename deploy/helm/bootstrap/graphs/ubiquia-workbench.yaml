@@ -10,8 +10,6 @@ version:
   patch: 0
 
 tags:
- - Ubiquia
- - Workbench
 
 capabilities:
  - AclGeneration
@@ -34,12 +32,13 @@ components:
 
     communicationServiceSettings:
       exposeViaCommService: true
+      proxiedEndpoint: /index.html
 
-    port: 4200
+    port: 8080
 
     image:
       registry: ubiquia
-      repository: workbench-ui
+      repository: dag-workbench-ui
       tag: latest
 
     overrideSettings:

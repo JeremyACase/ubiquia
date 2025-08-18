@@ -99,9 +99,9 @@
                         "$ref": "#/definitions/Version"
                     },
                     "jsonSchema": {
-                        "type": "object",
-                        "description": "Draft-07 JSON Schema of the synthesized domain.",
-                        "minProperties": 1
+                        "type": "string",
+                        "maxLength": 200000,
+                        "description": "Draft-07 JSON Schema of the synthesized domain, stored as a JSON string."
                     },
                     "dagPlan": {
                         "type": "array",

@@ -14,57 +14,48 @@ plugins {
 
 allprojects {
     group = 'org.ubiquia'
-    version = '0.7.0'
+    version = '0.8.0'
 
     repositories {
         mavenCentral()
         maven { url 'https://jitpack.io' }
     }
 
-    apply plugin: 'java'
     apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
     apply plugin: 'io.spring.dependency-management'
 
     checkstyle {
         toolVersion = '10.23.1'
-        // Use the shared Checkstyle XML from common/
         config = resources.text.fromFile("$rootDir/common/java/checkstyle/checkstyle.xml")
-        configProperties = [
-                'basedir': rootDir
-                // 'checkstyle.suppressions.file': "$rootDir/common/java/checkstyle/suppressions.xml"
-        ]
+        configProperties = ['basedir': rootDir]
     }
 
     tasks.withType(Checkstyle).configureEach {
-        reports {
-            xml.required = false
-            html.required = true
-        }
+        reports { xml.required = false; html.required = true }
     }
 
-    jacoco {
-        toolVersion = '0.8.8'
-    }
+    jacoco { toolVersion = '0.8.8' }
 }
 
 subprojects {
-    configurations.all {
-        exclude group: 'commons-logging', module: 'commons-logging'
 
-        // Old Swagger is breaking stuff.
-        resolutionStrategy.eachDependency {
-            if (requested.group == "io.swagger" && requested.name == "swagger-annotations") {
-                useTarget("io.swagger.core.v3:swagger-annotations-jakarta:2.2.30")
-            }
+    if (file("$projectDir/src/main/java").exists()) {
+        apply plugin: 'java'
+
+        // Apply Boot only to services with a main class
+        if (project.path.startsWith(':services:core:java') ||
+            project.path.startsWith(':services:test:java')) {
+            apply plugin: 'org.springframework.boot'
+        }
+
+        dependencies {
+            testImplementation "org.springframework.boot:spring-boot-starter-test"
+            testImplementation "org.junit.jupiter:junit-jupiter-api:${JUNIT_JUPITER_VERSION}"
+            testImplementation "org.junit.jupiter:junit-jupiter-engine:${JUNIT_JUPITER_VERSION}"
+            testRuntimeOnly "org.junit.platform:junit-platform-launcher:${JUNIT_PLATFORM_VERSION}"
+            testRuntimeOnly "org.junit.platform:junit-platform-commons:${JUNIT_PLATFORM_VERSION}"
         }
     }
-
-    dependencies {
-        testImplementation "org.springframework.boot:spring-boot-starter-test"
-        testImplementation "org.junit.jupiter:junit-jupiter-api:${JUNIT_JUPITER_VERSION}"
-        testImplementation "org.junit.jupiter:junit-jupiter-engine:${JUNIT_JUPITER_VERSION}"
-        testRuntimeOnly "org.junit.platform:junit-platform-launcher:${JUNIT_PLATFORM_VERSION}"
-        testRuntimeOnly "org.junit.platform:junit-platform-commons:${JUNIT_PLATFORM_VERSION}"
-    }
 }
+
