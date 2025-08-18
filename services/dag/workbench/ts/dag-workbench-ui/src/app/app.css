@@ -1,0 +1,123 @@
+.wrap {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 2rem;
+  padding: clamp(16px, 3vw, 32px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  letter-spacing: .2em;
+  font-weight: 700;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.logo {
+  background: linear-gradient(90deg, var(--ubq-accent), var(--ubq-accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.divider {
+  width: 2px;
+  height: 18px;
+  background: linear-gradient(180deg, var(--ubq-accent), transparent);
+  opacity: .6;
+}
+
+.product { color: var(--ubq-muted); }
+
+.card {
+  max-width: 900px;
+  margin-inline: auto;
+  background: var(--ubq-card);
+  border: 1px solid var(--ubq-card-border);
+  border-radius: 20px;
+  padding: clamp(16px, 3vw, 28px);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+h1 {
+  margin: 0 0 .5rem;
+  font-size: clamp(20px, 3.2vw, 28px);
+}
+
+.muted {
+  margin: 0 0 1rem;
+  color: var(--ubq-muted);
+}
+
+.form {
+  display: grid;
+  gap: .75rem;
+}
+
+textarea {
+  width: 100%;
+  border: 1px solid var(--ubq-card-border);
+  background: rgba(255,255,255,0.04);
+  color: var(--ubq-fg);
+  border-radius: 14px;
+  padding: 14px 16px;
+  font: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+textarea:focus-visible {
+  border-color: color-mix(in oklab, var(--ubq-accent) 70%, white);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ubq-accent) 20%, transparent);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hint {
+  color: var(--ubq-muted);
+}
+
+.hint.error { color: #ff9b9b; }
+
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, var(--ubq-accent) 40%, transparent);
+  background: linear-gradient(90deg, var(--ubq-accent), var(--ubq-accent-2));
+  color: white;
+  cursor: pointer;
+  min-width: 170px;
+  transition: transform .06s ease, filter .2s ease;
+}
+
+button[disabled] {
+  opacity: .6;
+  cursor: not-allowed;
+  filter: grayscale(.2);
+}
+
+button:active:not([disabled]) {
+  transform: translateY(1px);
+}
+
+.ok { color: #7dffbf; margin: .25rem 0 0; }
+.err { color: #ffb0b0; margin: .25rem 0 0; }
+
+.foot {
+  opacity: .8;
+  font-size: .9rem;
+}
