@@ -16,4 +16,5 @@ include ':services:core:java:core-flow-service'
 include ':services:test:java:test-belief-state-generator-service'
 include ':services:test:java:test-flow-service'
 
+include ':services:dag:workbench:python:dag-workbench-ollama-whisperer'
 include ':services:dag:workbench:ts:dag-workbench-ui'

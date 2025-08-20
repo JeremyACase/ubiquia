@@ -43,6 +43,60 @@ components:
 
     overrideSettings:
 
+  - name: Workbench-Ollama-Whisperer
+
+    componentType: POD
+    modelType: Component
+    description: This UI will allow clients to prompt Ubiquia to generate new ACLs and DAGs for those problem domains.
+
+    port: 8080
+
+    image:
+      registry: ubiquia
+      repository: dag-workbench-ui
+      tag: latest
+
+    adapter:
+      modelType: Adapter
+      adapterType: PUSH
+      name: Workbench-Ollama-Whisperer-Adapter
+      description: SENPAI!
+
+      communicationServiceSettings:
+        exposeViaCommService: true
+
+      endpoint: /wrap
+
+      inputSubSchemas:
+        - modelName: UserPrompt
+
+      outputSubSchema:
+        modelName: LlamaInput
+      
+      adapterSettings:
+        persistInputPayload: true
+        persistOutputPayload: true
+        validateOutputPayload: true
+        validateInputPayload: true
+        stimulateInputPayload: false
+
+    overrideSettings:
+
+  - name: Workbench-ACL-Generator
+
+    componentType: POD
+    modelType: Component
+    description: An LLM to generate Agent Communication Languages from
+
+    port: 8080
+
+    image:
+      registry: ollama
+      repository: ollama
+      tag: 0.11.5
+
+    overrideSettings:
+
 componentlessAdapters:
 
 edges:

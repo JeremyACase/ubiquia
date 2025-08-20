@@ -145,6 +145,30 @@
                 },
                 "additionalProperties": false
             },
+            "LlamaInput": {
+                "description": "Input payload for a Llama model request.",
+                "type": "object",
+                "required": [
+                    "model",
+                    "prompt"
+                ],
+                "properties": {
+                    "model": {
+                        "type": "string",
+                        "description": "The model identifier to invoke."
+                    },
+                    "stream": {
+                        "type": "boolean",
+                        "description": "Whether to stream output tokens."
+                    },
+                    "prompt": {
+                        "type": "string",
+                        "maxLength": 2000,
+                        "description": "The natural-language prompt to send to the LLM."
+                    },
+                    "additionalProperties": false
+                }
+            },
             "Provenance": {
                 "description": "Per-hop trace record for building the user-visible timeline.",
                 "type": "object",

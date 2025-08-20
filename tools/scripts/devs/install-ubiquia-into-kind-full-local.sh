@@ -6,10 +6,10 @@
 set -euo pipefail
 
 # ----------- CONFIGURATION -------------
-OPENJDK_VERSION="${OPENJDK_VERSION:-21}"                    # For Java service images
+OPENJDK_VERSION="${OPENJDK_VERSION:-21}"                    # For Java service images that declare ARG OPENJDK_VERSION
 KIND_CLUSTER_NAME="${KIND_CLUSTER_NAME:-ubiquia-agent-0}"   # KIND cluster name
 UI_BASE_PATH="${UI_BASE_PATH:-/}"                           # Angular base-href (/, /workbench, etc.)
-WORKBENCH_PATH="services/dag/workbench/ts/dag-workbench-ui" # UI subproject root
+WORKBENCH_PATH="services/dag/workbench/ts/dag-workbench-ui" # UI subproject root (Angular/NGINX)
 
 echo "Using OPENJDK_VERSION=${OPENJDK_VERSION}"
 echo "Using KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME}"
@@ -32,8 +32,6 @@ fi
 kubectl get namespace ubiquia >/dev/null 2>&1 || kubectl create namespace ubiquia
 
 # ----------- BUILD & LOAD --------------
-# (No BuildKit)
-
 # Find Dockerfiles (skip node_modules to keep it tidy)
 mapfile -t DOCKERFILES < <(find . -type d -name node_modules -prune -o -type f -name 'Dockerfile' -print | sort)
 
@@ -54,10 +52,16 @@ for dockerfile in "${DOCKERFILES[@]}"; do
       docker build --build-arg APP_BASE_PATH="${UI_BASE_PATH}" \
                    -t "${image_name}:latest" "$dir"
     fi
-  else
-    # Java services
+
+  # Java services: only pass OPENJDK_VERSION if the Dockerfile declares it
+  elif grep -q -E '^[[:space:]]*ARG[[:space:]]+OPENJDK_VERSION' "$dockerfile"; then
     docker build --build-arg OPENJDK_VERSION="${OPENJDK_VERSION}" \
                  -t "${image_name}:latest" "$dir"
+
+  else
+    # Python and everything else (e.g., ollama-whisperer)
+    # The Python image’s Dockerfile installs uv + app inside the container; no host uv needed.
+    docker build -t "${image_name}:latest" "$dir"
   fi
 
   echo "📦 Loading image into KIND: ${image_name}:latest"

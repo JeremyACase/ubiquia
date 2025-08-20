@@ -1,22 +1,18 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { ConfigService } from './config.service'; // loads runtime config
 
-interface ExecutionContext {
-  userPrompt: string;
-}
+interface ExecutionContext { userPrompt: string; }
 
 @Injectable({ providedIn: 'root' })
 export class WorkbenchService {
   private http = inject(HttpClient);
-
-  private apiBase(): string {
-    // Read from <meta name="ubiquia-api-base"> or default to /api
-    const meta = document.querySelector('meta[name="ubiquia-api-base"]') as HTMLMetaElement | null;
-    return (meta?.content || '/api').replace(/\/$/, '');
-  }
+  private cfg = inject(ConfigService);
 
   postPrompt(prompt: string) {
     const payload: ExecutionContext = { userPrompt: prompt };
-    return this.http.post(`${this.apiBase()}/workbench/prompt`, payload);
+    // e.g., http://ubiquia:8080/dag/workbench/generate (from workbench.config.json)
+    const url = `${this.cfg.apiBase()}/generate`;
+    return this.http.post(url, payload, { observe: 'response' as const });
   }
 }

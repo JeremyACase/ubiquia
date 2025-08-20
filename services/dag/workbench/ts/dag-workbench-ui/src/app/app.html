@@ -7,12 +7,15 @@
 
   <section class="card">
     <h1>Describe the DAG you want to build</h1>
-    <p class="muted">Type a natural‑language request. We’ll forward it downstream to generate a Ubiquia DAG.</p>
+    <p class="muted">Type a natural-language request. We’ll forward it downstream to generate a Ubiquia DAG.</p>
 
-    <form (ngSubmit)="submit()" class="form" autocomplete="off">
-      <textarea [formControl]="prompt"
-                rows="6"
-                placeholder="e.g., Build a pipeline that classifies uploaded pet images and generates a pet profile, then persist it to the belief state…"></textarea>
+    <!-- NOTE: use native (submit), not (ngSubmit) -->
+    <form (submit)="submit(); $event.preventDefault()" class="form" autocomplete="off">
+      <textarea
+        [formControl]="prompt"
+        rows="6"
+        placeholder="e.g., Build a pipeline that classifies uploaded pet images and generates a pet profile, then persist it to the belief state…">
+      </textarea>
 
       <div class="row">
         <div class="hint" [class.error]="prompt.invalid">
@@ -21,6 +24,7 @@
         </div>
 
         <button type="submit"
+                (click)="submit()"
                 [disabled]="prompt.invalid || sending()"
                 [attr.aria-busy]="sending()">
           <span *ngIf="!sending()">Send to Ubiquia</span>
