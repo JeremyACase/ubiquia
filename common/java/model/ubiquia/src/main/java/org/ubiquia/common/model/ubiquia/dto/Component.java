@@ -19,6 +19,8 @@ public class Component extends AbstractModel {
 
     private Boolean exposeService = false;
 
+    private List<String> postStartExecCommands;
+
     private List<EnvironmentVariable> environmentVariables;
 
     private List<OverrideSettings> overrideSettings;
@@ -174,5 +176,13 @@ public class Component extends AbstractModel {
 
     public void setCommunicationServiceSettings(CommunicationServiceSettings communicationServiceSettings) {
         this.communicationServiceSettings = communicationServiceSettings;
+    }
+
+    public List<String> getPostStartExecCommands() {
+        return postStartExecCommands;
+    }
+
+    public void setPostStartExecCommands(List<String> postStartExecCommands) {
+        this.postStartExecCommands = postStartExecCommands;
     }
 }

@@ -1,25 +1,24 @@
+# Build stage
 FROM python:3.11-slim AS base
-
-RUN pip install --no-cache-dir uv && \
-    useradd -m app
-
+RUN pip install --no-cache-dir uv
 WORKDIR /app
-COPY pyproject.toml .
-COPY uv.lock* ./
 
-RUN uv sync --no-dev
-
+# If pyproject references README.md, copy it
+COPY pyproject.toml README.md ./
 COPY src ./src
-RUN uv pip install -e .
 
+# Create venv and install deps + the package
+RUN uv sync --no-dev   # creates /app/.venv and installs uvicorn, fastapi, your pkg
+
+# Runtime stage
 FROM python:3.11-slim AS runtime
-ENV PATH="/root/.local/bin:${PATH}"
 WORKDIR /app
 
-COPY --from=base /root/.cache/uv /root/.cache/uv
-COPY --from=base /root/.local /root/.local
+# Bring app + its virtualenv
 COPY --from=base /app /app
 
+# Use the venv's binaries (uvicorn is here)
+ENV PATH="/app/.venv/bin:${PATH}"
+
 EXPOSE 8080
-USER root
-CMD ["uv", "run", "uvicorn", "ollama_whisperer.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "ollama_whisperer.main:app", "--host", "0.0.0.0", "--port", "8080"]

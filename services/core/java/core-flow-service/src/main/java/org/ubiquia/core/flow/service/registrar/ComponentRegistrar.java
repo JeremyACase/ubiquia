@@ -109,6 +109,10 @@ public class ComponentRegistrar {
         if (Objects.isNull(componentEntity.getCommunicationServiceSettings())) {
             componentEntity.setCommunicationServiceSettings(new CommunicationServiceSettings());
         }
+
+        if (Objects.isNull(componentEntity.getPostStartExecCommands())) {
+            componentEntity.setPostStartExecCommands(new ArrayList<>());
+        }
     }
 
     /**
@@ -169,7 +173,7 @@ public class ComponentRegistrar {
                 + "!");
         }
 
-        var componentEntityEntity = new ComponentEntity();
+        var componentEntity = new ComponentEntity();
 
         if (Objects.nonNull(componentRegistration.getConfig())) {
 
@@ -179,43 +183,44 @@ public class ComponentRegistrar {
                 componentRegistration.getConfig().getConfigMap());
             config.setConfigMap(configMap);
             config.setConfigMountPath(componentRegistration.getConfig().getConfigMountPath());
-            componentEntityEntity.setConfig(config);
+            componentEntity.setConfig(config);
         }
 
-        componentEntityEntity.setName(componentRegistration.getName());
-        componentEntityEntity.setImage(componentRegistration.getImage());
+        componentEntity.setName(componentRegistration.getName());
+        componentEntity.setImage(componentRegistration.getImage());
 
-        componentEntityEntity.setEnvironmentVariables(new HashSet<>());
+        componentEntity.setEnvironmentVariables(new HashSet<>());
         if (Objects.nonNull(componentRegistration.getEnvironmentVariables())) {
-            componentEntityEntity.getEnvironmentVariables()
+            componentEntity.getEnvironmentVariables()
                 .addAll(componentRegistration.getEnvironmentVariables());
         }
 
-        componentEntityEntity.setTags(new HashSet<>());
+        componentEntity.setTags(new HashSet<>());
         if (Objects.nonNull(componentRegistration.getTags())) {
-            componentEntityEntity.getTags().addAll(componentRegistration.getTags());
+            componentEntity.getTags().addAll(componentRegistration.getTags());
         }
-        componentEntityEntity.setCommunicationServiceSettings(componentRegistration.getCommunicationServiceSettings());
-        componentEntityEntity.setExposeService(componentRegistration.getExposeService());
-        componentEntityEntity.setInitContainer(componentRegistration.getInitContainer());
-        componentEntityEntity.setLivenessProbe(componentRegistration.getLivenessProbe());
-        componentEntityEntity.setPort(componentRegistration.getPort());
-        componentEntityEntity.setScaleSettings(componentRegistration.getScaleSettings());
-        componentEntityEntity.setType(componentRegistration.getComponentType());
+        componentEntity.setCommunicationServiceSettings(componentRegistration.getCommunicationServiceSettings());
+        componentEntity.setExposeService(componentRegistration.getExposeService());
+        componentEntity.setInitContainer(componentRegistration.getInitContainer());
+        componentEntity.setLivenessProbe(componentRegistration.getLivenessProbe());
+        componentEntity.setPort(componentRegistration.getPort());
+        componentEntity.setScaleSettings(componentRegistration.getScaleSettings());
+        componentEntity.setType(componentRegistration.getComponentType());
+        componentEntity.setPostStartExecCommands(componentRegistration.getPostStartExecCommands());
 
-        componentEntityEntity.setOverrideSettings(new HashSet<>());
+        componentEntity.setOverrideSettings(new HashSet<>());
         if (Objects.nonNull(componentRegistration.getOverrideSettings())) {
             var converted = this.overrideSettingsMapper.mapToStringified(
                 componentRegistration.getOverrideSettings());
-            componentEntityEntity.getOverrideSettings().addAll(converted);
+            componentEntity.getOverrideSettings().addAll(converted);
         }
 
-        componentEntityEntity.setVolumes(new HashSet<>());
+        componentEntity.setVolumes(new HashSet<>());
         if (Objects.nonNull(componentRegistration.getVolumes())) {
-            componentEntityEntity.getVolumes().addAll(componentRegistration.getVolumes());
+            componentEntity.getVolumes().addAll(componentRegistration.getVolumes());
         }
 
-        this.cleanComponent(componentEntityEntity);
-        return componentEntityEntity;
+        this.cleanComponent(componentEntity);
+        return componentEntity;
     }
 }

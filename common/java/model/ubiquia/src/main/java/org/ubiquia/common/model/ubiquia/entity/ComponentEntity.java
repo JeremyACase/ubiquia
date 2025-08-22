@@ -2,6 +2,7 @@ package org.ubiquia.common.model.ubiquia.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Set;
 import org.ubiquia.common.model.ubiquia.embeddable.*;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
@@ -16,6 +17,14 @@ public class ComponentEntity extends AbstractModelEntity {
     private Config config;
 
     private String name;
+
+    @ElementCollection
+    @CollectionTable(
+        name = "component_post_start_exec_commands",
+        joinColumns = @JoinColumn(name = "component_id")
+    )
+    @Column(name = "post_start_exec_command", columnDefinition = "TEXT")
+    private List<String> postStartExecCommands;
 
     private String description;
 
@@ -190,5 +199,13 @@ public class ComponentEntity extends AbstractModelEntity {
 
     public void setCommunicationServiceSettings(CommunicationServiceSettings communicationServiceSettings) {
         this.communicationServiceSettings = communicationServiceSettings;
+    }
+
+    public List<String> getPostStartExecCommands() {
+        return postStartExecCommands;
+    }
+
+    public void setPostStartExecCommands(List<String> postStartExecCommands) {
+        this.postStartExecCommands = postStartExecCommands;
     }
 }

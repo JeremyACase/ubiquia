@@ -43,6 +43,7 @@ public class ComponentDtoMapper extends GenericDtoMapper<
             to.setPort(from.getPort());
             to.setScaleSettings(from.getScaleSettings());
             to.setComponentType(from.getType());
+            to.setPostStartExecCommands(from.getPostStartExecCommands());
             to.setCommunicationServiceSettings(from.getCommunicationServiceSettings());
 
             if (Objects.nonNull(from.getOverrideSettings())) {

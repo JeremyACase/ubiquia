@@ -282,6 +282,13 @@ public class ComponentDeploymentBuilder {
             container.getEnvFrom().add(envFrom);
         }
 
+        if (Objects.nonNull(component.getPostStartExecCommands())
+            && !component.getPostStartExecCommands().isEmpty()) {
+
+            var lifecyle = this.tryGetPostStartExecCommand(component);
+            container.setLifecycle(lifecyle);
+        }
+
         if (Objects.nonNull(component.getLivenessProbe())) {
             var probe = this.tryGetLivenessProbe(component);
             container.setLivenessProbe(probe);
@@ -302,6 +309,23 @@ public class ComponentDeploymentBuilder {
         }
 
         return container;
+    }
+
+    private V1Lifecycle tryGetPostStartExecCommand(final Component component) {
+
+        V1Lifecycle lifecycle = null;
+        var exec = new V1ExecAction();
+        for (var command : component.getPostStartExecCommands()) {
+            exec.addCommandItem(command);
+        }
+
+        var postStart = new V1LifecycleHandler();
+        postStart.exec(exec);
+
+        lifecycle = new V1Lifecycle();
+        lifecycle.postStart(postStart);
+
+        return lifecycle;
     }
 
     /**

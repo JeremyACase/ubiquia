@@ -17,17 +17,6 @@ export class ConfigService {
   async load(): Promise<void> {
     if (this._cfg() !== null) return;
     const base = document.baseURI;
-    const candidates = [
-      new URL('workbench.config.json', base).toString(),          // served from public/
-      new URL('assets/workbench.config.json', base).toString()    // fallback to classic assets/
-    ];
-    for (const url of candidates) {
-      try {
-        const json = (await fetchJson(url)) as WorkbenchConfig;
-        this._cfg.set(json ?? {});
-        return;
-      } catch { /* try next */ }
-    }
     this._cfg.set({});
   }
 }

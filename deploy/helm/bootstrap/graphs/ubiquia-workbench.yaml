@@ -53,7 +53,7 @@ components:
 
     image:
       registry: ubiquia
-      repository: dag-workbench-ui
+      repository: dag-workbench-ollama-whisperer
       tag: latest
 
     adapter:
@@ -97,6 +97,49 @@ components:
 
     overrideSettings:
 
+    postStartExecCommands:
+      - /bin/sh
+      - -c
+      - |
+        set -eu
+        echo "Waiting for Ollama..."
+        i=0
+        while [ "$i" -lt 180 ]; do
+          if ollama list >/dev/null 2>&1; then
+            echo "Daemon up. Pulling model..."
+            ollama pull llama3.2
+            exit 0
+          fi
+          i=$((i+1))
+          sleep 1
+        done
+        echo "Ollama not ready after 180s" >&2
+        exit 1
+
+    adapter:
+      modelType: Adapter
+      adapterType: HIDDEN
+      name: Workbench-ACL-Generator-Adapter
+      description: SENPAI!
+
+      endpoint: /api/generate
+
+      inputSubSchemas:
+        - modelName: LlamaInput
+
+      outputSubSchema:
+        modelName: LlamaInput
+      
+      adapterSettings:
+        persistInputPayload: true
+        persistOutputPayload: true
+        validateOutputPayload: false
+        validateInputPayload: true
+        stimulateInputPayload: false
+
 componentlessAdapters:
 
 edges:
+  - leftAdapterName: Workbench-Ollama-Whisperer-Adapter
+    rightAdapterNames:
+      - Workbench-ACL-Generator-Adapter

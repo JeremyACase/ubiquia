@@ -145,6 +145,21 @@
                 },
                 "additionalProperties": false
             },
+            "UserPrompt": {
+                "description": "User prompt from Workbench UI.",
+                "type": "object",
+                "required": [
+                    "userPrompt"
+                ],
+                "properties": {
+                    "prompt": {
+                        "type": "string",
+                        "maxLength": 2000,
+                        "description": "The natural-language prompt to send to the LLM."
+                    },
+                    "additionalProperties": false
+                }
+            },
             "LlamaInput": {
                 "description": "Input payload for a Llama model request.",
                 "type": "object",
@@ -256,6 +271,12 @@
             },
             "ErrorReport": {
                 "$ref": "#/definitions/ErrorReport"
+            },
+            "LlamaInput": {
+                "$ref": "#/definitions/LlamaInput"
+            },
+            "UserPrompt": {
+                "$ref": "#/definitions/UserPrompt"
             }
         },
         "additionalProperties": false
