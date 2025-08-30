@@ -79,9 +79,7 @@ public class AdapterContextBuilder {
 
         if (!adapterData.getAdapterSettings().getIsPassthrough()) {
 
-            if (this.adapterTypeLogic.adapterTypeRequiresComponent(
-                adapterData.getAdapterType())) {
-
+            if (Objects.nonNull(adapterData.getComponent())) {
 
                 switch (adapterData.getComponent().getComponentType()) {
 

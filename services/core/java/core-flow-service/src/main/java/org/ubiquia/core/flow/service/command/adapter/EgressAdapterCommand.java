@@ -75,11 +75,11 @@ public class EgressAdapterCommand implements InterfaceLogger {
                 adapter);
 
             this.tryEgressPayload(flowEvent, adapter, inputPayload);
-            this.flowMessageRepository.deleteById(flowMessage.getId());
         } catch (Exception e) {
             this.getLogger().error("ERROR: Could not process inbox message: {}",
                 e.getMessage());
         }
+        this.flowMessageRepository.deleteById(flowMessage.getId());
 
         if (Objects.nonNull(sample)) {
             this.microMeterHelper.endSample(

@@ -151,7 +151,6 @@ public class AdapterValidator {
      */
     public void tryValidateMergeAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
-        this.validateAdapterIsNotPassthroughWithAComponent(adapterEntity);
         this.validateAdapterHasEgressSettings(adapterEntity);
         this.validateAdapterIsNotPassthroughWithoutDownstreamAdapters(adapterEntity);
         logger.info("...validated...");
@@ -164,7 +163,6 @@ public class AdapterValidator {
      */
     public void tryValidatePollAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
-        this.validateAdapterIsNotPassthroughWithAComponent(adapterEntity);
         this.validateAdapterHasNoUpstreamAdapters(adapterEntity);
         this.validateAdapterHasPollSettings(adapterEntity);
         this.validateAdapterHasASingleInputSubSchema(adapterEntity);
@@ -195,7 +193,6 @@ public class AdapterValidator {
      */
     public void tryValidatePushAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
-        this.validateAdapterIsNotPassthroughWithAComponent(adapterEntity);
         this.validateAdapterHasNoUpstreamAdapters(adapterEntity);
         this.validateAdapterHasEgressSettings(adapterEntity);
         this.validateAdapterHasASingleInputSubSchema(adapterEntity);
@@ -226,7 +223,6 @@ public class AdapterValidator {
      */
     public void tryValidateHiddenAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
-        this.validateAdapterIsNotPassthroughWithAComponent(adapterEntity);
         this.validateAdapterHasASingleUpstreamAdapter(adapterEntity);
         this.validateAdapterHasEgressSettings(adapterEntity);
         this.validateAdapterHasASingleInputSubSchema(adapterEntity);
@@ -241,7 +237,6 @@ public class AdapterValidator {
      */
     public void tryValidateSubscribeAdapter(final AdapterEntity adapterEntity) {
         this.tryValidateAdapterSettings(adapterEntity);
-        this.validateAdapterIsNotPassthroughWithAComponent(adapterEntity);
         this.validateAdapterHasEgressSettings(adapterEntity);
         this.validateAdapterHasNoUpstreamAdapters(adapterEntity);
         this.validateAdapterHasASingleInputSubSchema(adapterEntity);
@@ -462,33 +457,6 @@ public class AdapterValidator {
                 + adapterEntity.getAdapterType()
                 + " type adapter is not allowed to "
                 + "have a component!");
-        }
-    }
-
-    /**
-     * Validate that an adapter only a single component.
-     *
-     * @param adapterEntity The adapter to validate.
-     */
-    private void validateAdapterIsNotPassthroughWithAComponent(final AdapterEntity adapterEntity) {
-
-        if (adapterEntity.getAdapterSettings().getIsPassthrough()) {
-            logger.info("...adapter named {} for graph {} has "
-                    + " is configured as passthrough, not verifying downstream component...",
-                adapterEntity.getName(),
-                adapterEntity.getGraph().getName());
-        } else {
-            logger.info("...validating adapter named {} for graph {} has "
-                    + "a component...",
-                adapterEntity.getName(),
-                adapterEntity.getGraph().getName());
-
-            if (Objects.isNull(adapterEntity.getComponent())) {
-                throw new IllegalArgumentException("ERROR: "
-                    + adapterEntity.getAdapterType()
-                    + " type adapter has to have "
-                    + "a component!");
-            }
         }
     }
 

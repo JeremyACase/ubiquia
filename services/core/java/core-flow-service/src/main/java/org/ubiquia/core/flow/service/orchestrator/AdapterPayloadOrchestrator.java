@@ -69,10 +69,7 @@ public class AdapterPayloadOrchestrator implements InterfaceLogger {
         FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final Object inputPayload)
-        throws
-        ValidationException,
-        GenerationException,
-        JsonProcessingException {
+        throws JsonProcessingException {
 
         var egressSettings = adapter.getAdapterContext().getEgressSettings();
 

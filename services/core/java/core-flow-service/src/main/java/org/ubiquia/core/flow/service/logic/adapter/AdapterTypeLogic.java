@@ -25,20 +25,6 @@ public class AdapterTypeLogic {
     }
 
     /**
-     * Return whether or not this type of adapter requires a component.
-     *
-     * @param adapterType The type of adapter to verify.
-     * @return Whether or not the adapter requires an component.
-     */
-    public Boolean adapterTypeRequiresComponent(final AdapterType adapterType) {
-
-        return adapterType.equals(AdapterType.PUSH)
-            || adapterType.equals(AdapterType.HIDDEN)
-            || adapterType.equals(AdapterType.SUBSCRIBE)
-            || adapterType.equals(AdapterType.MERGE);
-    }
-
-    /**
      * Return whether or not this type of adapter requires an endpoint.
      *
      * @param adapterType The type of adapter to verify.

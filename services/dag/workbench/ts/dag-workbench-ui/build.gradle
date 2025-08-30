@@ -23,7 +23,6 @@ clean.doLast {
 
 tasks.register('npmCi', com.github.gradle.node.npm.task.NpmTask) {
     args = ['ci']
-    inputs.file('package-lock.json')
     inputs.file('package.json')
     outputs.dir('node_modules')
 }

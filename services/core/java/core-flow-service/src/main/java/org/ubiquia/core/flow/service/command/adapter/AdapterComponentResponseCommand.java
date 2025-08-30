@@ -35,16 +35,28 @@ public class AdapterComponentResponseCommand {
         final FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final ResponseEntity<Object> response)
-        throws JsonProcessingException, ValidationException {
+        throws JsonProcessingException {
 
+        var success = true;
         var stringifiedPayload = this.objectMapper.writeValueAsString(response.getBody());
-        this.payloadModelValidator.tryValidateOutputPayloadFor(stringifiedPayload, adapter);
+
+        try {
+            this.payloadModelValidator.tryValidateOutputPayloadFor(
+                stringifiedPayload,
+                adapter);
+        } catch (Exception e) {
+            success = false;
+        }
+
         this.stamperVisitor.tryStampOutputs(flowEventEntity, stringifiedPayload);
 
         if (adapter.getAdapterContext().getAdapterSettings().getPersistOutputPayload()) {
             flowEventEntity.setOutputPayload(stringifiedPayload);
         }
         flowEventEntity.getFlowEventTimes().setEventCompleteTime(OffsetDateTime.now());
-        this.outbox.tryQueueComponentResponse(flowEventEntity, stringifiedPayload);
+
+        if (success) {
+            this.outbox.tryQueueComponentResponse(flowEventEntity, stringifiedPayload);
+        }
     }
 }

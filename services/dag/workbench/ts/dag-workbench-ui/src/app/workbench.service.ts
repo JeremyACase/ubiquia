@@ -6,7 +6,7 @@ interface ExecutionContext { userPrompt: string; }
 @Injectable({ providedIn: 'root' })
 export class WorkbenchService {
   private http = inject(HttpClient);
-  private base = '/ubiquia/communication-service/adapter-reverse-proxy/workbench-ollama-whisperer-adapter';
+  private base = '/ubiquia/communication-service/adapter-reverse-proxy/workbench-user-prompt-adapter';
 
   postPrompt(prompt: string) {
     const payload: ExecutionContext = { userPrompt: prompt };

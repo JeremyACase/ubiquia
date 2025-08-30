@@ -6,17 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
-  },
-  "prettier": {
-    "overrides": [
-      {
-        "files": "*.html",
-        "options": {
-          "parser": "angular"
-        }
-      }
-    ]
+    "test": "ng test",
+    "postinstall": "npm rebuild esbuild || true"
   },
   "private": true,
   "dependencies": {
@@ -41,6 +32,18 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.8.2"
+    "typescript": "~5.8.2",
+    "esbuild": "0.25.9"
+  },
+  "overrides": {
+    "esbuild": "0.25.9"
+  },
+  "prettier": {
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": { "parser": "angular" }
+      }
+    ]
   }
 }

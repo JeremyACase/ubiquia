@@ -57,9 +57,14 @@ public class AdapterInboxMessageCommand {
                 adapter,
                 message.getPayload());
 
-            this.flowMessageRepository.deleteById(message.getId());
         } catch (Exception e) {
-            this.getLogger().error("ERROR: Could not process inbox message: {}", e.getMessage());
+            this.getLogger().error("ERROR: {} could not process inbox message: {}",
+                adapter.getAdapterContext().getAdapterName(),
+                e.getMessage());
+            this.getLogger().debug("Message payload: {}",
+                message.getPayload());
         }
+
+        this.flowMessageRepository.deleteById(message.getId());
     }
 }

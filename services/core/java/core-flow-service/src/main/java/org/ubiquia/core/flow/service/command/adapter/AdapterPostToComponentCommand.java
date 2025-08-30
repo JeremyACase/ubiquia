@@ -58,8 +58,7 @@ public class AdapterPostToComponentCommand implements InterfaceLogger {
         FlowEventEntity flowEventEntity,
         final AbstractAdapter adapter,
         final Object inputPayload)
-        throws ValidationException,
-        JsonProcessingException {
+        throws JsonProcessingException {
 
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

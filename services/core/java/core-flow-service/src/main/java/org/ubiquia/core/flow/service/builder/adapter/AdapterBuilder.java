@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
 import net.jimblackler.jsonschemafriend.GenerationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,8 +101,7 @@ public class AdapterBuilder {
         var adapterContext = adapter.getAdapterContext();
         if (!adapterData.getAdapterSettings().getIsPassthrough()) {
 
-            if (this.adapterTypeLogic.adapterTypeRequiresComponent(
-                adapterData.getAdapterType())) {
+            if (Objects.nonNull(componentData)) {
 
                 switch (componentData.getComponentType()) {
 
@@ -124,7 +124,9 @@ public class AdapterBuilder {
                     }
 
                 }
-            } else if (this.adapterTypeLogic.adapterTypeRequiresEndpoint(adapterData.getAdapterType())) {
+            } else if (this.adapterTypeLogic.adapterTypeRequiresEndpoint(
+                adapterData.getAdapterType())) {
+
                 adapterContext.setEndpointUri(new URI(adapterData.getEndpoint()));
             }
         }
