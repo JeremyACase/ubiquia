@@ -173,7 +173,7 @@ jobs:
 
       - name: Deploy Helm chart (images tagged as latest)
         run: |
-          helm install ubiquia helm/ --values deploy/helm/configurations/test/build-pipeline.yaml -n ubiquia
+          helm install ubiquia deploy/helm/ --values deploy/helm/configurations/test/build-pipeline.yaml -n ubiquia
 
       - name: Inspect resources before Helm test
         run: |
