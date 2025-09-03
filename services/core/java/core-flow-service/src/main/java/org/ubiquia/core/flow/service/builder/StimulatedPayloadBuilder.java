@@ -81,7 +81,6 @@ public class StimulatedPayloadBuilder {
             var entity = record.get();
 
             var jsonSchema = entity
-                .getComponent()
                 .getGraph()
                 .getAgentCommunicationLanguage()
                 .getJsonSchema();
@@ -107,7 +106,7 @@ public class StimulatedPayloadBuilder {
                 throw new RuntimeException("ERROR: Cannot find subschema named  '"
                     + inputSchema.getModelName()
                     + "' in agent communication language named '"
-                    + entity.getComponent().getGraph().getAgentCommunicationLanguage().getDomain()
+                    + entity.getGraph().getAgentCommunicationLanguage().getDomain()
                     + "'!");
             }
             var jsonSubSchema = schema.getSubSchemas().get(match.get());

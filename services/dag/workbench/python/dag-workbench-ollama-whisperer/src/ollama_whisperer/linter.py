@@ -133,7 +133,7 @@ SCHEMA_LINT_CONTRACT = """Contract (must satisfy):
 """
 
 SCHEMA_LINT_PREAMBLE = (
-    "Given the provided Draft-07 JSON Schema, lint and (optionally) apply edits while preserving intent."
+    "Given the provided Draft-07 JSON Schema, lint and (optionally) apply edits while preserving intent. Ensure any missing model references are also defined."
 )
 
 
@@ -151,19 +151,12 @@ def _build_lint_prompt(schema_text: str) -> str:
 # ---------- Endpoint ----------
 @router.post("/lint")
 async def lint(llama_output: LlamaOutput, request: Request) -> dict:
-    """
-    Accepts a LlamaOutput (Ollama response), extracts the candidate schema from `response`,
-    and RETURNS the /api/generate payload that will cause Ollama to lint/repair the schema.
-
-    This endpoint DOES NOT call Ollama; your adapters can forward the returned `request` to `target`.
-    """
     request_id = request.headers.get("X-Request-ID", "-")
 
     raw_text = llama_output.response or ""
     if not raw_text.strip():
         raise HTTPException(status_code=400, detail="LlamaOutput.response is empty")
 
-    # Best-effort: extract the first JSON object from the response; if not found, pass raw text
     try:
         schema_text = _extract_first_json_object(raw_text)
     except ValueError:
@@ -177,9 +170,7 @@ async def lint(llama_output: LlamaOutput, request: Request) -> dict:
     system_text = squish(SCHEMA_LINT_SYSTEM)
 
     model_name = os.getenv("OLLAMA_MODEL", "llama3.2")
-    base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
-    generate_url = f"{base_url}/api/generate"
-
+    # base_url / generate_url removed since we no longer return them
     stream_enabled = os.getenv("OLLAMA_STREAM", "false").lower() in ("1", "true", "yes", "on")
 
     payload = {
@@ -189,7 +180,7 @@ async def lint(llama_output: LlamaOutput, request: Request) -> dict:
         "system": system_text,
         "stream": stream_enabled,
         "options": {
-            "temperature": float(os.getenv("OLLAMA_TEMPERATURE", "0.0")),  # deterministic for linting
+            "temperature": float(os.getenv("OLLAMA_TEMPERATURE", "0.0")),
             "top_p": float(os.getenv("OLLAMA_TOP_P", "0.9")),
             "top_k": int(os.getenv("OLLAMA_TOP_K", "40")),
             "repeat_penalty": float(os.getenv("OLLAMA_REPEAT_PENALTY", "1.05")),
@@ -200,8 +191,6 @@ async def lint(llama_output: LlamaOutput, request: Request) -> dict:
 
     logger.info("Prepared Ollama generate payload (no network call).", extra={"request_id": request_id})
 
-    # Return exactly what your bus needs to call Ollama
-    return {
-        "target": generate_url,
-        "request": payload
-    }
+    # NEW: return the payload directly as the top-level object
+    return payload
+

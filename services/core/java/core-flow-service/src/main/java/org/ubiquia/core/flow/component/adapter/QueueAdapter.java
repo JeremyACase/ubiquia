@@ -1,6 +1,7 @@
 package org.ubiquia.core.flow.component.adapter;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import net.jimblackler.jsonschemafriend.GenerationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class QueueAdapter extends AbstractAdapter {
     }
 
     @Override
-    public void initializeBehavior() throws GenerationException {
+    public void initializeBehavior() throws GenerationException, JsonProcessingException {
         super.initializeBehavior();
         super.adapterDecorator.registerPeekEndpointFor(this);
         super.adapterDecorator.registerPopEndpointFor(this);

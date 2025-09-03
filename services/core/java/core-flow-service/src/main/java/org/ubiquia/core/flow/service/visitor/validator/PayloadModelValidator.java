@@ -1,6 +1,8 @@
 package org.ubiquia.core.flow.service.visitor.validator;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import java.net.URI;
 import java.util.HashMap;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
+import org.ubiquia.core.flow.model.adapter.AdapterContext;
 import org.ubiquia.core.flow.repository.AdapterRepository;
 
 /**
@@ -28,6 +31,9 @@ public class PayloadModelValidator {
     private final HashMap<String, Schema> inputSchemaCache = new HashMap<>();
 
     private final HashMap<String, Schema> outputSchemaCache = new HashMap<>();
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private AdapterRepository adapterRepository;
@@ -76,16 +82,21 @@ public class PayloadModelValidator {
     /**
      * Initialize our cache for an adapter if necessary.
      *
-     * @param adapterId The ID of the adapter to initialize.
+     * @param adapterContext The adapter to initialize.
      * @throws GenerationException Exception from generating our schema.
      */
-    public void tryInitializeOutputSchema(final String adapterId) throws GenerationException {
+    public void tryInitializeOutputSchema(final AdapterContext adapterContext)
+        throws GenerationException {
 
+        var adapterId = adapterContext.getAdapterId();
         if (!this.outputSchemaCache.containsKey(adapterId)) {
-            logger.info("Initializing input schema cache for adapter id {}...", adapterId);
+            logger.info("Initializing output schema cache for adapter {}...",
+                adapterContext.getAdapterName());
+
             var record = this.adapterRepository.findById(adapterId);
             if (record.isEmpty()) {
-                throw new RuntimeException("ERROR: Cannot find adapter with id: " + adapterId);
+                throw new RuntimeException("ERROR: Cannot find adapter: "
+                    + adapterContext.getAdapterName());
             }
 
             var adapterEntity = record.get();
@@ -107,15 +118,17 @@ public class PayloadModelValidator {
                     .findFirst();
 
                 if (match.isEmpty()) {
-                    throw new RuntimeException("ERROR: Cannot find subschema named  '"
+                    throw new RuntimeException("ERROR: Cannot find output subschema named  '"
                         + adapterEntity.getOutputSubSchema().getModelName()
-                        + "' in domain ontology named '"
-                        + adapterEntity.getComponent().getGraph().getAgentCommunicationLanguage().getDomain()
+                        + "' in ACL named '"
+                        + adapterEntity.getGraph().getAgentCommunicationLanguage().getDomain()
                         + "'!");
                 }
+
                 var jsonSubSchema = schema.getSubSchemas().get(match.get());
                 this.outputSchemaCache.put(adapterId, jsonSubSchema);
                 logger.info("...initialized.");
+
             } else {
                 logger.info("...no output schema defined; not initializing.");
             }
@@ -125,17 +138,22 @@ public class PayloadModelValidator {
     /**
      * Initialize our cache for an adapter if necessary.
      *
-     * @param adapterId The ID of the adapter to initialize.
+     * @param adapterContext The adapter to initialize.
      * @throws GenerationException Exception from generating our schema.
      */
-    public void tryInitializeInputPayloadSchema(final String adapterId)
-        throws GenerationException {
+    public void tryInitializeInputPayloadSchema(final AdapterContext adapterContext)
+        throws GenerationException, JsonProcessingException {
+
+        var adapterId = adapterContext.getAdapterId();
 
         if (!this.inputSchemaCache.containsKey(adapterId)) {
-            logger.info("Initializing output schema cache for adapter id {}...", adapterId);
+            logger.info("Initializing input schema cache for adapter {}...",
+                adapterContext.getAdapterName());
+
             var record = this.adapterRepository.findById(adapterId);
             if (record.isEmpty()) {
-                throw new RuntimeException("ERROR: Cannot find adapter with id: " + adapterId);
+                throw new RuntimeException("ERROR: Cannot find adapter: "
+                    + adapterContext.getAdapterName());
             }
 
             var entity = record.get();
@@ -150,6 +168,7 @@ public class PayloadModelValidator {
             URI jsonSubSchemaURI = null;
 
             for (var inputSchema : entity.getInputSubSchemas()) {
+
                 var match = schema
                     .getSubSchemas()
                     .keySet()
@@ -164,10 +183,13 @@ public class PayloadModelValidator {
             }
 
             if (Objects.isNull(jsonSubSchemaURI)) {
-                throw new RuntimeException("ERROR: Cannot find subschema named  '"
-                    + entity.getOutputSubSchema().getModelName()
-                    + "' in domain ontology named '"
-                    + entity.getComponent().getGraph().getAgentCommunicationLanguage().getDomain()
+
+                var schemas = this.objectMapper.writeValueAsString(entity.getInputSubSchemas());
+
+                throw new RuntimeException("ERROR: Cannot find match any input subschema  '"
+                    + schemas
+                    + "' in ACL named '"
+                    + entity.getGraph().getAgentCommunicationLanguage().getDomain()
                     + "'!");
             }
 

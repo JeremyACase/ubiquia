@@ -1,6 +1,7 @@
 package org.ubiquia.core.flow.component.adapter;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import net.jimblackler.jsonschemafriend.GenerationException;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ public class PublishAdapter extends AbstractAdapter {
     }
 
     @Override
-    public void initializeBehavior() throws GenerationException {
+    public void initializeBehavior() throws GenerationException, JsonProcessingException {
         super.initializeBehavior();
         super.adapterDecorator.initializeInboxPollingFor(this);
         super.adapterDecorator.initializeBackPressurePollingFor(this);

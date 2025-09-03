@@ -1,6 +1,7 @@
 package org.ubiquia.core.flow.component.adapter;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.Timer;
 import java.util.List;
@@ -79,7 +80,7 @@ public abstract class AbstractAdapter implements InterfaceLogger {
         this.adapterContext = adapterContext;
     }
 
-    public void initializeBehavior() throws GenerationException {
+    public void initializeBehavior() throws GenerationException, JsonProcessingException {
         var adapterContext = this.getAdapterContext();
         this.getLogger().info("...Initializing {} adapter named {} for graph {}...",
             adapterContext.getAdapterType(),

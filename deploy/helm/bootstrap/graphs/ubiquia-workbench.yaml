@@ -164,26 +164,66 @@ componentlessAdapters:
       validateOutputPayload: false
       validateInputPayload: false
 
-  # - modelType: Adapter
-  #   adapterType: EGRESS
-  #   name: ACL-Registration-Adapter
-  #   description: This adapter will attempt to register LLM-generated ACLs with Ubiquia.
+  - modelType: Adapter
+    adapterType: HIDDEN
+    name: Linted-Json-Schema-Generator-Adapter
+    description: An adapter that forwards traffic to our LLM
 
-  #   endpoint: http://ubiquia-core-flow-service:8080/agent-communication-language/register/post
+    endpoint: http://workbench-llm:11434/api/generate
 
-  #   inputSubSchemas:
-  #     - modelName: GeneratedAgentCommunicationLanguage
+    inputSubSchemas:
+      - modelName: LlamaInput
 
-  #   egressSettings:
-  #     httpOutputType: POST
-  #     egressType: SYNCHRONOUS
-  #     egressConcurrency: 1
+    outputSubSchema:
+      modelName: LlamaOutput
+    
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: false
+      stimulateInputPayload: false
 
-  #   adapterSettings:
-  #     persistInputPayload: true
-  #     persistOutputPayload: true
-  #     validateOutputPayload: false
-  #     validateInputPayload: true
+  - modelType: Adapter
+    adapterType: HIDDEN
+    name: Acl-Wrapper-Adapter
+    description: An adapter that wraps our generated JSON Schema into an ACL
+
+    endpoint: http://workbench-ollama-whisperer:8080/acl/from-llama-output
+
+    inputSubSchemas:
+      - modelName: LlamaOutput
+
+    outputSubSchema:
+      modelName: GeneratedAgentCommunicationLanguage
+    
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: false
+      stimulateInputPayload: false
+
+  - modelType: Adapter
+    adapterType: EGRESS
+    name: ACL-Registration-Adapter
+    description: This adapter will attempt to register LLM-generated ACLs with Ubiquia.
+
+    endpoint: http://ubiquia-core-flow-service:8080/agent-communication-language/register/post
+
+    inputSubSchemas:
+      - modelName: GeneratedAgentCommunicationLanguage
+
+    egressSettings:
+      httpOutputType: POST
+      egressType: SYNCHRONOUS
+      egressConcurrency: 1
+
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: true
 
 edges:
   - leftAdapterName: Workbench-User-Prompt-Adapter
@@ -192,3 +232,12 @@ edges:
   - leftAdapterName: Json-Schema-Generator-Adapter
     rightAdapterNames:
       - Json-Schema-Linter-Adapter
+  - leftAdapterName: Json-Schema-Linter-Adapter
+    rightAdapterNames:
+      - Linted-Json-Schema-Generator-Adapter
+  - leftAdapterName: Linted-Json-Schema-Generator-Adapter
+    rightAdapterNames:
+      - Acl-Wrapper-Adapter
+  - leftAdapterName: Acl-Wrapper-Adapter
+    rightAdapterNames:
+      - ACL-Registration-Adapter

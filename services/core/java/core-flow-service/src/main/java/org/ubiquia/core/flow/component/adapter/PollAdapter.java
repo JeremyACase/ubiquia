@@ -1,6 +1,7 @@
 package org.ubiquia.core.flow.component.adapter;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.micrometer.core.instrument.Timer;
 import java.util.Objects;
 import net.jimblackler.jsonschemafriend.GenerationException;
@@ -23,7 +24,7 @@ public class PollAdapter extends AbstractAdapter {
     }
 
     @Override
-    public void initializeBehavior() throws GenerationException {
+    public void initializeBehavior() throws GenerationException, JsonProcessingException {
         super.initializeBehavior();
         super.adapterDecorator.initializePollingFor(this);
         super.adapterDecorator.initializeOutputLogicFor(this);

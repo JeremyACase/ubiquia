@@ -1,6 +1,7 @@
 package org.ubiquia.core.flow.service.decorator.adapter;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -77,7 +78,7 @@ public class AdapterDecorator {
             adapterContext.getAdapterName(),
             adapterContext.getGraphName());
 
-        this.payloadModelValidator.tryInitializeOutputSchema(adapterContext.getAdapterId());
+        this.payloadModelValidator.tryInitializeOutputSchema(adapterContext);
         logger.info("...completed egress logic initialization...");
     }
 
@@ -87,13 +88,13 @@ public class AdapterDecorator {
      * @param adapter The adapter to initialize.
      */
     public void initializeInboxPollingFor(AbstractAdapter adapter)
-        throws GenerationException {
+        throws GenerationException, JsonProcessingException {
         var adapterContext = adapter.getAdapterContext();
         logger.info("...Initializing polling of inbox for adapter {} of graph {}...",
             adapterContext.getAdapterName(),
             adapterContext.getGraphName());
 
-        this.payloadModelValidator.tryInitializeInputPayloadSchema(adapterContext.getAdapterId());
+        this.payloadModelValidator.tryInitializeInputPayloadSchema(adapterContext);
         var executor = new ScheduledThreadPoolExecutor(1);
         var task = executor.scheduleAtFixedRate(
             adapter::tryPollInbox,
@@ -109,13 +110,15 @@ public class AdapterDecorator {
      *
      * @param adapter The adapter to initialize.
      */
-    public void initializePollingFor(PollAdapter adapter) throws GenerationException {
+    public void initializePollingFor(PollAdapter adapter)
+        throws GenerationException,
+        JsonProcessingException {
         var adapterContext = adapter.getAdapterContext();
         logger.info("...Initializing polling for adapter {} of graph {}... ",
             adapterContext.getAdapterName(),
             adapterContext.getGraphName());
 
-        this.payloadModelValidator.tryInitializeInputPayloadSchema(adapterContext.getAdapterId());
+        this.payloadModelValidator.tryInitializeInputPayloadSchema(adapterContext);
 
         var executor = new ScheduledThreadPoolExecutor(1);
         var task = executor.scheduleAtFixedRate(

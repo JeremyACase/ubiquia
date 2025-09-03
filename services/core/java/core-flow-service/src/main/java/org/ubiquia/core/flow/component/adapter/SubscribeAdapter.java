@@ -1,6 +1,7 @@
 package org.ubiquia.core.flow.component.adapter;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.micrometer.core.instrument.Timer;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
@@ -27,7 +28,7 @@ public class SubscribeAdapter
     }
 
     @Override
-    public void initializeBehavior() throws GenerationException {
+    public void initializeBehavior() throws GenerationException, JsonProcessingException {
         super.initializeBehavior();
         super.adapterDecorator.initializeSubscriptionFor(this);
         super.adapterDecorator.initializeOutputLogicFor(this);

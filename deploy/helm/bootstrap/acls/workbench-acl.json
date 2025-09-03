@@ -118,47 +118,32 @@
           "type": "string",
           "minLength": 2,
           "maxLength": 200000
-        },
-        "GeneratedAgentCommunicationLanguage": {
-          "description": "Top-level ACL model.",
-          "type": "object",
-          "required": [
-            "domain",
-            "version",
-            "jsonSchema"
-          ],
-          "properties": {
-            "domain": {
-              "type": "string",
-              "maxLength": 120,
-              "pattern": "^[a-zA-Z][a-zA-Z0-9\\-_.]{1,119}$",
-              "description": "Domain namespace for this ACL."
-            },
-            "version": {
-              "$ref": "#/definitions/SemanticVersion"
-            },
-            "jsonSchema": {
-              "$ref": "#/definitions/JsonSchema"
-            }
+        }
+      },
+      "GeneratedAgentCommunicationLanguage": {
+        "description": "Top-level ACL model.",
+        "type": "object",
+        "required": [
+          "domain",
+          "version",
+          "jsonSchema"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string",
+            "maxLength": 120,
+            "pattern": "^[a-zA-Z][a-zA-Z0-9\\-_.]{1,119}$",
+            "description": "Domain namespace for this ACL."
           },
-          "additionalProperties": true
-        }
-      },
-      "properties": {
-        "LlamaInput": {
-          "$ref": "#/definitions/LlamaInput"
+          "version": {
+            "$ref": "#/definitions/SemanticVersion"
+          },
+          "jsonSchema": {
+            "$ref": "#/definitions/JsonSchema"
+          }
         },
-        "UserPrompt": {
-          "$ref": "#/definitions/UserPrompt"
-        },
-        "SemanticVersion": {
-          "$ref": "#/definitions/SemanticVersion"
-        },
-        "GeneratedAgentCommunicationLanguage": {
-          "$ref": "#/definitions/GeneratedAgentCommunicationLanguage"
-        }
-      },
-      "additionalProperties": false
+        "additionalProperties": true
+      }
     }
   }
 }

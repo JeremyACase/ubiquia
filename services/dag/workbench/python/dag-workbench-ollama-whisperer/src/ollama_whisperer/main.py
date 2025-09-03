@@ -1,3 +1,4 @@
+# src/ollama_whisperer/main.py
 import os
 import uuid
 import logging
@@ -85,10 +86,12 @@ async def health() -> dict:
 # ---------- Routers ----------
 from .generator import router as generator_router
 from .linter import router as linter_router
+from .acl_wrapper import router as acl_router  # new
 
 app.include_router(generator_router, tags=["schema-generate"])
 app.include_router(linter_router, tags=["schema-lint"])
+app.include_router(acl_router, tags=["acl"])  # new
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True, log_config=None)
+    uvicorn.run("ollama_whisperer.main:app", host="0.0.0.0", port=8080, reload=True, log_config=None)
