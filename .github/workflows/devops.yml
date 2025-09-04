@@ -51,8 +51,12 @@ jobs:
         run: |
           set -euo pipefail
           OPENJDK_VERSION="$(awk -F'= *' '$1=="OPENJDK_VERSION"{print $2; exit}' gradle.properties)"
-          # robustly grab 'version:' from deploy/helm/Chart.yaml
-          CHART_VERSION="$(awk -F': *' '$1=="version"{print $2; exit}' deploy/helm/Chart.yaml)"
+          # Grab version from deploy/helm/Chart.yaml, strip optional quotes, trim
+          CHART_VERSION="$(
+            awk -F': *' '$1=="version"{print $2; exit}' deploy/helm/Chart.yaml \
+            | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//" \
+            | xargs
+          )"
 
           echo "Resolved OPENJDK_VERSION=${OPENJDK_VERSION}"
           echo "Resolved CHART_VERSION=${CHART_VERSION}"
@@ -226,8 +230,6 @@ jobs:
   push-images:
     needs: [build, helm-test]
     runs-on: ubuntu-latest
-    env:
-      VERSION: ${{ needs.build.outputs.chart_version }}
 
     steps:
       - name: Checkout repository
@@ -250,9 +252,18 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Fallback if VERSION wasn't propagated (shouldn't happen, but be safe)
+          # Sanitize VERSION from the build output (remove optional quotes/spaces)
+          VERSION="$(echo "${{ needs.build.outputs.chart_version }}" \
+            | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//" \
+            | xargs)"
+
+          # Fallback if needed: read from Chart.yaml directly and sanitize
           if [[ -z "${VERSION:-}" ]]; then
-            VERSION="$(awk -F': *' '$1=="version"{print $2; exit}' deploy/helm/Chart.yaml || true)"
+            VERSION="$(
+              awk -F': *' '$1=="version"{print $2; exit}' deploy/helm/Chart.yaml \
+              | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//" \
+              | xargs
+            )"
           fi
 
           if [[ -z "${VERSION:-}" ]]; then
