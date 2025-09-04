@@ -47,11 +47,18 @@ jobs:
 
       - name: Load OPENJDK_VERSION and CHART_VERSION
         id: chart
+        shell: bash
         run: |
-          OPENJDK_VERSION=$(grep '^OPENJDK_VERSION=' gradle.properties | cut -d'=' -f2)
-          CHART_VERSION=$(grep '^version:' helm/Chart.yaml | head -n1 | awk '{print $2}')
-          echo "OPENJDK_VERSION=$OPENJDK_VERSION" >> $GITHUB_ENV
-          echo "version=$CHART_VERSION" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          OPENJDK_VERSION="$(awk -F'= *' '$1=="OPENJDK_VERSION"{print $2; exit}' gradle.properties)"
+          # robustly grab 'version:' from deploy/helm/Chart.yaml
+          CHART_VERSION="$(awk -F': *' '$1=="version"{print $2; exit}' deploy/helm/Chart.yaml)"
+
+          echo "Resolved OPENJDK_VERSION=${OPENJDK_VERSION}"
+          echo "Resolved CHART_VERSION=${CHART_VERSION}"
+
+          echo "OPENJDK_VERSION=${OPENJDK_VERSION}" >> "$GITHUB_ENV"
+          echo "version=${CHART_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Build all JARs
         run: ./gradlew clean build
@@ -60,7 +67,9 @@ jobs:
         run: uv --version
 
       - name: Build Docker images (tagged as latest)
+        shell: bash
         run: |
+          set -euo pipefail
           mkdir -p docker-images
           IFS=$'\n'
 
@@ -73,7 +82,7 @@ jobs:
           fi
 
           for dir in $SUBPROJECTS; do
-            project_name=$(basename "$dir")
+            project_name="$(basename "$dir")"
             IMAGE_NAME="${DOCKER_REPO}/${project_name}"
 
             echo "----"
@@ -146,14 +155,16 @@ jobs:
           path: docker-images
 
       - name: Load Docker images into Docker and KinD (tagged as latest)
+        shell: bash
         run: |
+          set -euo pipefail
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
-            project_name=$(basename $dir)
-            IMAGE_NAME=${DOCKER_REPO}/${project_name}
+            project_name="$(basename "$dir")"
+            IMAGE_NAME="${DOCKER_REPO}/${project_name}"
             echo "Loading docker image from docker-images/${project_name}.tar"
-            docker load -i docker-images/${project_name}.tar
-            kind load docker-image --name ubiquia-agent-0 $IMAGE_NAME:latest
+            docker load -i "docker-images/${project_name}.tar"
+            kind load docker-image --name ubiquia-agent-0 "$IMAGE_NAME:latest"
           done
 
       - name: List Docker images loaded into KinD node
@@ -215,6 +226,8 @@ jobs:
   push-images:
     needs: [build, helm-test]
     runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.build.outputs.chart_version }}
 
     steps:
       - name: Checkout repository
@@ -233,20 +246,34 @@ jobs:
           path: docker-images
 
       - name: Load and push Docker images (tagged as latest + chart version)
+        shell: bash
         run: |
-          VERSION=${{ needs.build.outputs.chart_version }}
+          set -euo pipefail
+
+          # Fallback if VERSION wasn't propagated (shouldn't happen, but be safe)
+          if [[ -z "${VERSION:-}" ]]; then
+            VERSION="$(awk -F': *' '$1=="version"{print $2; exit}' deploy/helm/Chart.yaml || true)"
+          fi
+
+          if [[ -z "${VERSION:-}" ]]; then
+            echo "ERROR: VERSION is empty. Aborting push to avoid invalid tags."
+            exit 1
+          fi
+
+          echo "Using chart VERSION=${VERSION}"
+
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
-            project_name=$(basename $dir)
-            IMAGE_NAME=${DOCKER_REPO}/${project_name}
+            project_name="$(basename "$dir")"
+            IMAGE_NAME="${DOCKER_REPO}/${project_name}"
 
             echo "Loading image from docker-images/${project_name}.tar"
-            docker load -i docker-images/${project_name}.tar
+            docker load -i "docker-images/${project_name}.tar"
 
             echo "Tagging and pushing $IMAGE_NAME:$VERSION and $IMAGE_NAME:latest"
-            docker tag $IMAGE_NAME:latest docker.io/$IMAGE_NAME:$VERSION
-            docker push docker.io/$IMAGE_NAME:$VERSION
+            docker tag "$IMAGE_NAME:latest" "docker.io/$IMAGE_NAME:$VERSION"
+            docker push "docker.io/$IMAGE_NAME:$VERSION"
 
-            docker tag $IMAGE_NAME:latest docker.io/$IMAGE_NAME:latest
-            docker push docker.io/$IMAGE_NAME:latest
+            docker tag "$IMAGE_NAME:latest" "docker.io/$IMAGE_NAME:latest"
+            docker push "docker.io/$IMAGE_NAME:latest"
           done
