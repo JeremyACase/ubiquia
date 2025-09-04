@@ -10,11 +10,12 @@ on:
 env:
   DOCKER_REPO: ubiquia
   SUBPROJECTS: |
-    core/service/core-belief-state-generator-service
-    core/service/core-communication-service
-    core/service/core-flow-service
-    test/service/test-belief-state-generator-service
-    test/service/test-flow-service
+    services/core/java/core-belief-state-generator-service
+    services/core/java/core-communication-service
+    services/core/java/core-flow-service
+    services/dag/workbench/ts/dag-workbench-ui
+    services/test/java/test-belief-state-generator-service
+    services/test/java/test-flow-service
 
 jobs:
 
@@ -27,6 +28,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -38,27 +47,72 @@ jobs:
 
       - name: Load OPENJDK_VERSION and CHART_VERSION
         id: chart
+        shell: bash
         run: |
-          OPENJDK_VERSION=$(grep '^OPENJDK_VERSION=' gradle.properties | cut -d'=' -f2)
-          CHART_VERSION=$(grep '^version:' helm/Chart.yaml | head -n1 | awk '{print $2}')
-          echo "OPENJDK_VERSION=$OPENJDK_VERSION" >> $GITHUB_ENV
-          echo "version=$CHART_VERSION" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          OPENJDK_VERSION="$(awk -F'= *' '$1=="OPENJDK_VERSION"{print $2; exit}' gradle.properties)"
+          # Grab version from deploy/helm/Chart.yaml, strip optional quotes, trim
+          CHART_VERSION="$(
+            awk -F': *' '$1=="version"{print $2; exit}' deploy/helm/Chart.yaml \
+            | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//" \
+            | xargs
+          )"
+
+          echo "Resolved OPENJDK_VERSION=${OPENJDK_VERSION}"
+          echo "Resolved CHART_VERSION=${CHART_VERSION}"
+
+          echo "OPENJDK_VERSION=${OPENJDK_VERSION}" >> "$GITHUB_ENV"
+          echo "version=${CHART_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Build all JARs
         run: ./gradlew clean build
 
+      - name: uv version (diagnostic)
+        run: uv --version
+
       - name: Build Docker images (tagged as latest)
+        shell: bash
         run: |
+          set -euo pipefail
           mkdir -p docker-images
           IFS=$'\n'
+
+          # detect whether this is a tag build like v1.2.3
+          IS_TAG_BUILD=false
+          VERSION_TAG=""
+          if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" =~ ^v[0-9] ]]; then
+            IS_TAG_BUILD=true
+            VERSION_TAG="${GITHUB_REF_NAME#v}"
+          fi
+
           for dir in $SUBPROJECTS; do
-            project_name=$(basename $dir)
-            IMAGE_NAME=${DOCKER_REPO}/${project_name}
-            echo "Building image for $dir -> $IMAGE_NAME:latest"
-            docker build \
-              --build-arg OPENJDK_VERSION=${OPENJDK_VERSION} \
-              -t $IMAGE_NAME:latest $dir
-            docker save -o docker-images/${project_name}.tar $IMAGE_NAME:latest
+            project_name="$(basename "$dir")"
+            IMAGE_NAME="${DOCKER_REPO}/${project_name}"
+
+            echo "----"
+            echo "Building $dir  ->  ${IMAGE_NAME}:latest"
+
+            # Special-case the UI subproject: build with APP_BASE_PATH (Angular/NGINX image)
+            if [[ "$dir" == *"/dag-workbench-ui" ]]; then
+              docker build \
+                --build-arg APP_BASE_PATH="/" \
+                -t "${IMAGE_NAME}:latest" "$dir"
+            else
+              # Default: Java services use OPENJDK_VERSION build arg
+              docker build \
+                --build-arg OPENJDK_VERSION="${OPENJDK_VERSION}" \
+                -t "${IMAGE_NAME}:latest" "$dir"
+            fi
+
+            # Save latest tar for artifact
+            docker save -o "docker-images/${project_name}.tar" "${IMAGE_NAME}:latest"
+
+            # If tag build, also tag + save versioned tar
+            if $IS_TAG_BUILD ; then
+              echo "Tagging ${IMAGE_NAME}:${VERSION_TAG}"
+              docker tag "${IMAGE_NAME}:latest" "${IMAGE_NAME}:${VERSION_TAG}"
+              docker save -o "docker-images/${project_name}-${VERSION_TAG}.tar" "${IMAGE_NAME}:${VERSION_TAG}"
+            fi
           done
 
       - name: Upload Docker images as artifacts
@@ -95,8 +149,8 @@ jobs:
 
       - name: Apply supporting manifests (RBAC and PV)
         run: |
-          kubectl apply -f config/test/ubiquia_test_service_account.yaml -n ubiquia
-          kubectl apply -f config/test/ubiquia_test_kind_pv.yaml -n ubiquia
+          kubectl apply -f deploy/config/test/ubiquia_test_service_account.yaml -n ubiquia
+          kubectl apply -f deploy/config/test/ubiquia_test_kind_pv.yaml -n ubiquia
 
       - name: Download Docker image artifacts
         uses: actions/download-artifact@v4
@@ -105,14 +159,16 @@ jobs:
           path: docker-images
 
       - name: Load Docker images into Docker and KinD (tagged as latest)
+        shell: bash
         run: |
+          set -euo pipefail
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
-            project_name=$(basename $dir)
-            IMAGE_NAME=${DOCKER_REPO}/${project_name}
+            project_name="$(basename "$dir")"
+            IMAGE_NAME="${DOCKER_REPO}/${project_name}"
             echo "Loading docker image from docker-images/${project_name}.tar"
-            docker load -i docker-images/${project_name}.tar
-            kind load docker-image --name ubiquia-agent-0 $IMAGE_NAME:latest
+            docker load -i "docker-images/${project_name}.tar"
+            kind load docker-image --name ubiquia-agent-0 "$IMAGE_NAME:latest"
           done
 
       - name: List Docker images loaded into KinD node
@@ -128,11 +184,11 @@ jobs:
 
       - name: Build Helm chart dependencies
         run: |
-          helm dependency build helm/
+          helm dependency build deploy/helm/
 
       - name: Deploy Helm chart (images tagged as latest)
         run: |
-          helm install ubiquia helm/ --values helm/configurations/test/build-pipeline.yaml -n ubiquia
+          helm install ubiquia deploy/helm/ --values deploy/helm/configurations/test/build-pipeline.yaml -n ubiquia
 
       - name: Inspect resources before Helm test
         run: |
@@ -192,20 +248,43 @@ jobs:
           path: docker-images
 
       - name: Load and push Docker images (tagged as latest + chart version)
+        shell: bash
         run: |
-          VERSION=${{ needs.build.outputs.chart_version }}
+          set -euo pipefail
+
+          # Sanitize VERSION from the build output (remove optional quotes/spaces)
+          VERSION="$(echo "${{ needs.build.outputs.chart_version }}" \
+            | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//" \
+            | xargs)"
+
+          # Fallback if needed: read from Chart.yaml directly and sanitize
+          if [[ -z "${VERSION:-}" ]]; then
+            VERSION="$(
+              awk -F': *' '$1=="version"{print $2; exit}' deploy/helm/Chart.yaml \
+              | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//" \
+              | xargs
+            )"
+          fi
+
+          if [[ -z "${VERSION:-}" ]]; then
+            echo "ERROR: VERSION is empty. Aborting push to avoid invalid tags."
+            exit 1
+          fi
+
+          echo "Using chart VERSION=${VERSION}"
+
           IFS=$'\n'
           for dir in $SUBPROJECTS; do
-            project_name=$(basename $dir)
-            IMAGE_NAME=${DOCKER_REPO}/${project_name}
+            project_name="$(basename "$dir")"
+            IMAGE_NAME="${DOCKER_REPO}/${project_name}"
 
             echo "Loading image from docker-images/${project_name}.tar"
-            docker load -i docker-images/${project_name}.tar
+            docker load -i "docker-images/${project_name}.tar"
 
             echo "Tagging and pushing $IMAGE_NAME:$VERSION and $IMAGE_NAME:latest"
-            docker tag $IMAGE_NAME:latest docker.io/$IMAGE_NAME:$VERSION
-            docker push docker.io/$IMAGE_NAME:$VERSION
+            docker tag "$IMAGE_NAME:latest" "docker.io/$IMAGE_NAME:$VERSION"
+            docker push "docker.io/$IMAGE_NAME:$VERSION"
 
-            docker tag $IMAGE_NAME:latest docker.io/$IMAGE_NAME:latest
-            docker push docker.io/$IMAGE_NAME:latest
+            docker tag "$IMAGE_NAME:latest" "docker.io/$IMAGE_NAME:latest"
+            docker push "docker.io/$IMAGE_NAME:latest"
           done

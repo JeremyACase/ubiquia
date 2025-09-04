@@ -1,0 +1,76 @@
+plugins {
+    id 'org.springframework.boot' version "${SPRING_BOOT_VERSION}"
+    id 'java'
+}
+
+bootJar {
+    mainClass = 'org.ubiquia.core.flow.Application'
+    archiveFileName = 'ubiquia-core-flow-service.jar'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${SPRING_BOOT_VERSION}"
+    }
+}
+
+jar {
+    enabled = false  
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-aop"
+    implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-webflux"
+    implementation "org.springframework.retry:spring-retry"
+
+    implementation project(':common:java:model:ubiquia')
+    implementation project(':common:java:library:advice')
+    implementation project(':common:java:library:api')
+    implementation project(':common:java:library:dao')
+    implementation project(':common:java:library:implementation')
+
+    implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${JACKSON_VERSION}"
+    implementation "com.github.java-json-tools:json-schema-core:${JAVA_JSON_TOOLS}"
+    implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
+    implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"
+    implementation "org.reflections:reflections:${REFLECTIONS_VERSION}"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${SPRING_DOC_VERSION}"
+    implementation "org.springframework.kafka:spring-kafka:${SPRING_BOOT_KAFKA_VERSION}"
+    implementation "net.jimblackler.jsonschemafriend:core:${JSON_SCHEMA_FRIEND_VERSION}"
+    implementation "net.jimblackler:jsongenerator:0.4.7"
+
+    runtimeOnly "com.h2database:h2:${H2_VERSION}"
+    runtimeOnly group: 'com.yugabyte', name: 'jdbc-yugabytedb', version:  "${YUGABYTE_DRIVER_VERSION}"
+    runtimeOnly "io.micrometer:micrometer-registry-prometheus:${MICROMETER_VERSION}"
+
+    testImplementation "com.h2database:h2:${H2_VERSION}"
+    testImplementation "org.instancio:instancio-junit:${INSTANCIO_VERSION}"
+    testImplementation "org.springframework.kafka:spring-kafka-test"
+    testImplementation "com.squareup.okhttp3:mockwebserver:4.12.0"
+    testImplementation "com.squareup.okhttp3:okhttp:4.12.0"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+}
+
+/**
+* Instruct our code coverage tool where to place the report.
+*/
+jacocoTestReport {
+    reports {
+        xml.required=true
+        csv.required=false
+        xml.destination file("./build/reports/jacoco.xml")
+        html.destination file("./build/reports/jacocoHtml")
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+build.dependsOn jacocoTestReport

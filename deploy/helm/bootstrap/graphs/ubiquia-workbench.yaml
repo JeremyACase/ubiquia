@@ -1,0 +1,243 @@
+name: ubiquia-workbench
+modelType: Graph
+author: Jeremy Case
+description: A DAG that ships with Ubiquia that can be used to generate new ACLs and DAGs
+
+# Graphs require semantic versions
+version:
+  major: 1
+  minor: 0
+  patch: 0
+
+tags:
+
+capabilities:
+ - AclGeneration
+ - DagGeneration
+
+agentCommunicationLanguage:
+  name: ubiquia-workbench
+  version:
+    major: 1
+    minor: 0
+    patch: 0
+
+components:
+
+  - name: Workbench-UI
+
+    componentType: POD
+    modelType: Component
+    description: This UI will allow clients to prompt Ubiquia to generate new ACLs and DAGs for those problem domains.
+
+    communicationServiceSettings:
+      exposeViaCommService: true
+      proxiedEndpoint: /index.html
+
+    port: 8080
+
+    image:
+      registry: ubiquia
+      repository: dag-workbench-ui
+      tag: latest
+
+    overrideSettings:
+
+  - name: Workbench-Ollama-Whisperer
+
+    componentType: POD
+    modelType: Component
+    description: This UI will allow clients to prompt Ubiquia to generate new ACLs and DAGs for those problem domains.
+
+    port: 8080
+
+    image:
+      registry: ubiquia
+      repository: dag-workbench-ollama-whisperer
+      tag: latest
+
+    adapter:
+      modelType: Adapter
+      adapterType: PUSH
+      name: Workbench-User-Prompt-Adapter
+      description: SENPAI!
+
+      communicationServiceSettings:
+        exposeViaCommService: true
+
+      endpoint: /wrap
+
+      inputSubSchemas:
+        - modelName: UserPrompt
+
+      outputSubSchema:
+        modelName: LlamaInput
+      
+      adapterSettings:
+        persistInputPayload: true
+        persistOutputPayload: true
+        validateOutputPayload: true
+        validateInputPayload: true
+        stimulateInputPayload: false
+
+    overrideSettings:
+
+  - name: Workbench-LLM
+
+    componentType: POD
+    modelType: Component
+    description: An LLM for our workbench.
+
+    port: 11434
+
+    image:
+      registry: ollama
+      repository: ollama
+      tag: 0.11.5
+
+    overrideSettings:
+
+    postStartExecCommands:
+      - /bin/sh
+      - -c
+      - |
+        set -eu
+        echo "Waiting for Ollama..."
+        i=0
+        while [ "$i" -lt 180 ]; do
+          if ollama list >/dev/null 2>&1; then
+            echo "Daemon up. Pulling model..."
+            ollama pull llama3.2
+            exit 0
+          fi
+          i=$((i+1))
+          sleep 1
+        done
+        echo "Ollama not ready after 180s" >&2
+        exit 1
+
+    adapter:
+      modelType: Adapter
+      adapterType: HIDDEN
+      name: Json-Schema-Generator-Adapter
+      description: An adapter that forwards traffic to our LLM
+
+      endpoint: /api/generate
+
+      inputSubSchemas:
+        - modelName: LlamaInput
+
+      outputSubSchema:
+        modelName: LlamaOutput
+      
+      adapterSettings:
+        persistInputPayload: true
+        persistOutputPayload: true
+        validateOutputPayload: false
+        validateInputPayload: false
+        stimulateInputPayload: false
+
+
+componentlessAdapters:
+
+  - modelType: Adapter
+    adapterType: HIDDEN
+    name: Json-Schema-Linter-Adapter
+    description: This adapter will have Ollama lint a JSON Schema.
+
+    endpoint: http://workbench-ollama-whisperer:8080/lint
+
+    inputSubSchemas:
+      - modelName: LlamaOutput
+
+    outputSubSchema:
+        modelName: LlamaInput
+
+    egressSettings:
+      httpOutputType: POST
+      egressType: SYNCHRONOUS
+      egressConcurrency: 1
+
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: false
+
+  - modelType: Adapter
+    adapterType: HIDDEN
+    name: Linted-Json-Schema-Generator-Adapter
+    description: An adapter that forwards traffic to our LLM
+
+    endpoint: http://workbench-llm:11434/api/generate
+
+    inputSubSchemas:
+      - modelName: LlamaInput
+
+    outputSubSchema:
+      modelName: LlamaOutput
+    
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: false
+      stimulateInputPayload: false
+
+  - modelType: Adapter
+    adapterType: HIDDEN
+    name: Acl-Wrapper-Adapter
+    description: An adapter that wraps our generated JSON Schema into an ACL
+
+    endpoint: http://workbench-ollama-whisperer:8080/acl/from-llama-output
+
+    inputSubSchemas:
+      - modelName: LlamaOutput
+
+    outputSubSchema:
+      modelName: GeneratedAgentCommunicationLanguage
+    
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: false
+      stimulateInputPayload: false
+
+  - modelType: Adapter
+    adapterType: EGRESS
+    name: ACL-Registration-Adapter
+    description: This adapter will attempt to register LLM-generated ACLs with Ubiquia.
+
+    endpoint: http://ubiquia-core-flow-service:8080/agent-communication-language/register/post
+
+    inputSubSchemas:
+      - modelName: GeneratedAgentCommunicationLanguage
+
+    egressSettings:
+      httpOutputType: POST
+      egressType: SYNCHRONOUS
+      egressConcurrency: 1
+
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: true
+
+edges:
+  - leftAdapterName: Workbench-User-Prompt-Adapter
+    rightAdapterNames:
+      - Json-Schema-Generator-Adapter
+  - leftAdapterName: Json-Schema-Generator-Adapter
+    rightAdapterNames:
+      - Json-Schema-Linter-Adapter
+  - leftAdapterName: Json-Schema-Linter-Adapter
+    rightAdapterNames:
+      - Linted-Json-Schema-Generator-Adapter
+  - leftAdapterName: Linted-Json-Schema-Generator-Adapter
+    rightAdapterNames:
+      - Acl-Wrapper-Adapter
+  - leftAdapterName: Acl-Wrapper-Adapter
+    rightAdapterNames:
+      - ACL-Registration-Adapter

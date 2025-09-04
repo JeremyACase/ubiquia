@@ -1,0 +1,43 @@
+plugins {
+    id 'base'                                     // gives you `assemble`, `clean`, etc.
+    id 'com.github.node-gradle.node' version '7.1.0'
+}
+
+node {
+    // Angular 20 wants Node 20.19+ or 22.12+; download locally so CI needs no preinstalled Node
+    version = '22.12.0'
+    download = true
+    // npmInstallCommand defaults to 'install'; CI prefers 'ci'
+    npmInstallCommand = 'ci'
+    // set yarnVersion if you use yarn; otherwise npm is fine
+}
+
+// Ensure a clean deletes Angular dist
+def distDir = file("$projectDir/dist")
+clean.doLast {
+    if (distDir.exists()) {
+        println "Deleting $distDir"
+        distDir.deleteDir()
+    }
+}
+
+tasks.register('npmCi', com.github.gradle.node.npm.task.NpmTask) {
+    args = ['ci']
+    inputs.file('package.json')
+    outputs.dir('node_modules')
+}
+
+tasks.register('ngBuild', com.github.gradle.node.npm.task.NpmTask) {
+    dependsOn 'npmCi'
+    // Pass a base-href at build time if you want; usually `/` is fine because Comm Service handles subpath
+    // Use -PappBasePath=/workbench if you need to override in CI: gradlew build -PappBasePath=/workbench
+    def basePath = project.findProperty('appBasePath') ?: '/'
+    args = ['run', 'build', '--', '--configuration', 'production', '--base-href', basePath, '--deploy-url', basePath]
+    inputs.dir('src')
+    inputs.file('angular.json')
+    inputs.file('tsconfig.json')
+    outputs.dir('dist')
+}
+
+tasks.named('assemble').configure { dependsOn 'ngBuild' }
+tasks.named('build').configure    { dependsOn 'ngBuild' }

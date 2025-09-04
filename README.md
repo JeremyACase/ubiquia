@@ -79,14 +79,14 @@ Some convenience scripts are provided to users in this repo to get users up and 
 ### Quickstart: Scripts - One-Time Setup
 These scripts should only ever need to be run once.
 ```bash
-$ ./scripts/devs/helm-repo-setup.sh
+$ ./tools/scripts/devs/helm-repo-setup.sh
 ```
 
 ### Quickstart: Scripts - Recurring Setup
 These scripts need to be run whenever you want to do a fresh install of Ubiquia in a new KIND cluster.
 
 ```bash
-$ ./scripts/devs/install-ubiquia-into-kind.sh
+$ ./tools/scripts/devs/install-ubiquia-into-kind.sh
 ```
 
 After invoking the script and a successful installation, Helm will output to console how to interface with the newly-installed Ubiquia agent.
@@ -141,15 +141,19 @@ root/
 ├── build.gradle            # Top-level Gradle build
 ├── settings.gradle         # Declares subprojects
 ├── gradle.properties       # Centralized version declarations
-├── helm/                   # Helm chart for Kubernetes deployment
-├── scripts/                # Dev and ops automation scripts
+├── deploy/                 # Deployment files
+│   ├── config/             # Any configuration for Ubiquia existing outside of Helm
+│   └── helm/               # Helm manifests to deploy Ubiquia into Kubernetes
+├── tools/                  # Dev and ops automation scripts
 ├── docs/                   # System-level documentation and diagrams
 ├── config/                 # Project-wide config (e.g., Checkstyle rules) or development config separate of Helm
-├── common/ 
+├── common/java
 │   ├── library/            # Shared APIs and libraries used across services
 │   └── model/              # Shared model definitions and database entities  
-├── core/
-│   └── service/            # Core services that will run as as K8s microservices
+├── services/
+│   ├── dag/                # Services related to DAGs that ship with Ubiquia
+│   ├── test/               # Test microservices that run in Helm tests
+│   └── core/               # Core services that will run as as K8s microservices
 └──
 ```
 
@@ -869,7 +873,7 @@ $ ./gradlew :<folder>:<folder>:<subproject>:<command>
 
 Concrete Example:
 ```bash
-$ ./gradlew :core:service:flow-service:build
+$ ./gradlew :services:core:java:core-flow-service:build
 ```
 
 ## Who Is This For?

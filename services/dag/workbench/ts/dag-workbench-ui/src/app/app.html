@@ -1,0 +1,43 @@
+<main class="wrap">
+  <header class="brand">
+    <div class="logo">UBIQUIA</div>
+    <div class="divider"></div>
+    <div class="product">WORKBENCH</div>
+  </header>
+
+  <section class="card">
+    <h1>Describe the DAG you want to build</h1>
+    <p class="muted">Type a natural-language request. We’ll forward it downstream to generate a Ubiquia DAG.</p>
+
+    <!-- NOTE: use native (submit), not (ngSubmit) -->
+    <form (submit)="submit(); $event.preventDefault()" class="form" autocomplete="off">
+      <textarea
+        [formControl]="prompt"
+        rows="6"
+        placeholder="e.g., Build a pipeline that classifies uploaded pet images and generates a pet profile, then persist it to the belief state…">
+      </textarea>
+
+      <div class="row">
+        <div class="hint" [class.error]="prompt.invalid">
+          <span *ngIf="prompt.hasError('required')">Prompt is required.</span>
+          <span *ngIf="!prompt.hasError('required')">{{chars()}} / {{max}} characters</span>
+        </div>
+
+        <button type="submit"
+                (click)="submit()"
+                [disabled]="prompt.invalid || sending()"
+                [attr.aria-busy]="sending()">
+          <span *ngIf="!sending()">Send to Ubiquia</span>
+          <span *ngIf="sending()">Sending…</span>
+        </button>
+      </div>
+    </form>
+
+    <p *ngIf="sent()" class="ok">✅ Prompt sent. You can check progress in the Workbench.</p>
+    <p *ngIf="error()" class="err">⚠️ {{error()}}</p>
+  </section>
+
+  <footer class="foot">
+    <span>Tip: Press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to send.</span>
+  </footer>
+</main>
