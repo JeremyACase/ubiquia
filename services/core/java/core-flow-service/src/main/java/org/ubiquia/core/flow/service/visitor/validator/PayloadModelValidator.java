@@ -102,6 +102,7 @@ public class PayloadModelValidator {
             var adapterEntity = record.get();
 
             if (Objects.nonNull(adapterEntity.getOutputSubSchema())) {
+
                 var jsonSchema = adapterEntity
                     .getGraph()
                     .getAgentCommunicationLanguage()

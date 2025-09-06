@@ -3,9 +3,7 @@ package org.ubiquia.common.library.advice.exception;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.persistence.PersistenceException;
 import jakarta.validation.ConstraintViolationException;
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Objects;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -13,14 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.lang.Nullable;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -163,7 +159,7 @@ public abstract class AbstractGlobalExceptionHandler extends ResponseEntityExcep
      * @param helperMessage The message passed in from our exception handler.
      * @return A populated error message.
      */
-    private ErrorResponse handlerHelper(Exception ex, String helperMessage) {
+    protected ErrorResponse handlerHelper(Exception ex, String helperMessage) {
         var error = new ErrorResponse();
         error.setMessage(helperMessage);
         return error;

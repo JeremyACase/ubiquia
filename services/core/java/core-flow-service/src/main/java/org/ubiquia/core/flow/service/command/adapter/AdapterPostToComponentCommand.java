@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.Objects;
-import net.jimblackler.jsonschemafriend.GenerationException;
-import net.jimblackler.jsonschemafriend.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
@@ -81,13 +80,15 @@ public class AdapterPostToComponentCommand implements InterfaceLogger {
             flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
         } catch (Exception e) {
             logger.error("ERROR: {}", e.getMessage());
-            if (e instanceof HttpStatusCodeException cast) {
-                response = new ResponseEntity<>(
-                    cast.getResponseBodyAsString(),
-                    cast.getResponseHeaders(),
-                    cast.getStatusCode());
 
-                flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
+            if (e instanceof RestClientResponseException cast) {
+                var responseHeaders = cast.getResponseHeaders();
+                response = ResponseEntity
+                    .status(cast.getStatusCode())
+                    .headers(responseHeaders)
+                    .body(cast.getResponseBodyAsString());
+
+                flowEventEntity.setHttpResponseCode(cast.getStatusCode().value());
             } else {
                 response = new ResponseEntity<>(e.getMessage(), null, null);
             }
