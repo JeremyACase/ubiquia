@@ -100,7 +100,6 @@ task copyRuntimeLibs(type: Copy) {
 
     def projectJars = [
         ':common:java:model:acl',
-        ':common:java:model:ubiquia',
         ':common:java:library:advice',
         ':common:java:library:api',
         ':common:java:library:belief-state-libraries',

@@ -46,6 +46,7 @@ ubiquia:
       minio:
         enabled: false
   beliefStateGeneratorService:
+    directories:
     libraries:
       directory:
         path: "belief-state-libs"

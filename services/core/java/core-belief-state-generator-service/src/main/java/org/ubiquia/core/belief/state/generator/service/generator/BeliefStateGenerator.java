@@ -20,6 +20,7 @@ import org.ubiquia.core.belief.state.generator.service.decorator.InheritancePrep
 import org.ubiquia.core.belief.state.generator.service.decorator.UbiquiaModelInjector;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiDtoGenerator;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiEntityGenerator;
+import org.ubiquia.core.belief.state.generator.service.generator.preprocessor.Preprocessor;
 import org.ubiquia.core.belief.state.generator.service.k8s.BeliefStateOperator;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiDtoYamlMapper;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiEntityYamlMapper;
@@ -34,6 +35,9 @@ public class BeliefStateGenerator {
 
     @Value("${ubiquia.beliefStateGeneratorService.uber.jars.path}")
     private String uberJarsPath;
+
+    @Autowired
+    private Preprocessor preprocessor;
 
     @Autowired
     private BeliefStateCompiler beliefStateCompiler;
@@ -79,6 +83,8 @@ public class BeliefStateGenerator {
 
         logger.info("Generating new Belief State from: {}",
             this.objectMapper.writeValueAsString(acl));
+
+        this.preprocessor.preprocess();
 
         var jsonSchema = this.getJsonSchemaFrom(acl);
 
