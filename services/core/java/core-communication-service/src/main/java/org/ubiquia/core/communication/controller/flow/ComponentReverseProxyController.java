@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.*;
@@ -27,17 +28,13 @@ import org.ubiquia.core.communication.service.manager.flow.ComponentProxyManager
 public class ComponentReverseProxyController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private final ComponentProxyManager componentProxyManager;
-    private final FlowServiceConfig flowServiceConfig;
     private final Set<String> hopByHopHeaders;
+    @Autowired
+    private ComponentProxyManager componentProxyManager;
+    @Autowired
+    private FlowServiceConfig flowServiceConfig;
 
-    public ComponentReverseProxyController(
-        final ComponentProxyManager componentProxyManager,
-        final FlowServiceConfig flowServiceConfig
-    ) {
-        this.componentProxyManager = componentProxyManager;
-        this.flowServiceConfig = flowServiceConfig;
+    public ComponentReverseProxyController() {
         this.hopByHopHeaders = new HashSet<>(Arrays.asList(
             "connection", "keep-alive", "proxy-authenticate", "proxy-authorization",
             "te", "trailer", "transfer-encoding", "upgrade",
