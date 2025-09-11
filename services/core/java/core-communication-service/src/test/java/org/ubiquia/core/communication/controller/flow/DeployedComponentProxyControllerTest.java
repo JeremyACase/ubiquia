@@ -26,10 +26,10 @@ import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.core.communication.service.io.flow.DeployedGraphPoller;
 import org.ubiquia.core.communication.service.manager.flow.ComponentProxyManager;
 
-@WebMvcTest(controllers = ComponentReverseProxyController.class)
+@WebMvcTest(controllers = DeployedComponentProxyController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(properties = "spring.task.scheduling.enabled=false")
-class ComponentReverseProxyControllerTest {
+class DeployedComponentProxyControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

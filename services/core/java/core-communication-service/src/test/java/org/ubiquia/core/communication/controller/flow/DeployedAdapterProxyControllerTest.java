@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -18,10 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,9 +26,9 @@ import org.ubiquia.core.communication.config.MockWebServerTestConfig;
 import org.ubiquia.core.communication.service.io.flow.DeployedGraphPoller;
 import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
 
-@WebMvcTest(controllers = AdapterReverseProxyController.class)
+@WebMvcTest(controllers = DeployedAdapterProxyController.class)
 @Import({MockWebServerTestConfig.class})
-class AdapterReverseProxyControllerTest {
+class DeployedAdapterProxyControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

@@ -16,7 +16,7 @@ import org.ubiquia.common.model.ubiquia.entity.ComponentEntity;
  * A controller that exposes a RESTful interface for components within a DAG.
  */
 @RestController
-@RequestMapping("/ubiquia/component")
+@RequestMapping("/ubiquia/flow-service/component")
 public class ComponentController extends GenericUbiquiaDaoController<ComponentEntity, Component> {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentController.class);

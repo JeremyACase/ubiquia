@@ -16,7 +16,7 @@ import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
  * A controller that exposes a RESTful interface for adapter.
  */
 @RestController
-@RequestMapping("/ubiquia/adapter")
+@RequestMapping("/ubiquia/flow-service/adapter")
 public class AdapterController extends GenericUbiquiaDaoController<AdapterEntity, Adapter> {
 
     private static final Logger logger = LoggerFactory.getLogger(AdapterController.class);

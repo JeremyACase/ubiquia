@@ -16,11 +16,29 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
+/**
+ * Central Spring configuration for the Ubiquia Communication Service.
+ *
+ * <p>Defines application-wide beans, including:</p>
+ * <ul>
+ *   <li>A {@link WebClient} preconfigured with JSON content-type.</li>
+ *   <li>A classic blocking {@link RestTemplate} for simple HTTP calls.</li>
+ *   <li>OpenAPI metadata ({@link OpenAPI}) for Swagger / API docs.</li>
+ *   <li>Global timezone initialization (UTC).</li>
+ *   <li>Micrometer {@link MeterRegistry} and {@link TimedAspect} for metrics and method timing.</li>
+ * </ul>
+ */
 @Configuration
 public class Config {
 
     protected static final Logger logger = LoggerFactory.getLogger(Config.class);
 
+    /**
+     * Builds a reactive {@link WebClient} with a default {@code Content-Type: application/json}.
+     *
+     * @param builder injected {@link WebClient.Builder}
+     * @return a configured {@link WebClient} instance
+     */
     @Bean
     public WebClient webClient(WebClient.Builder builder) {
         return builder
@@ -29,15 +47,20 @@ public class Config {
     }
 
     /**
-     * Rest template bean.
+     * Creates a shared {@link RestTemplate} bean for simple blocking HTTP interactions.
      *
-     * @return our REST template.
+     * @return a new {@link RestTemplate}
      */
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
 
+    /**
+     * Supplies base OpenAPI metadata for the service, used by Swagger UI / generators.
+     *
+     * @return an {@link OpenAPI} instance populated with title, version, and description
+     */
     @Bean
     public OpenAPI baseOpenAPI() {
         return new OpenAPI().info(new Info()
@@ -46,6 +69,11 @@ public class Config {
             .description("Generated OpenAPI docs for UBIQUIA"));
     }
 
+    /**
+     * Initializes global application state after bean construction.
+     *
+     * <p>Sets the default JVM timezone to UTC to ensure consistent timestamp handling.</p>
+     */
     @PostConstruct
     public void init() {
         // Setting Spring Boot SetTimeZone
@@ -53,9 +81,12 @@ public class Config {
     }
 
     /**
-     * Bean for micrometer.
+     * Provides a {@link MeterRegistry} for Micrometer metrics.
      *
-     * @return A meter registry.
+     * <p>Uses a {@link CompositeMeterRegistry}, allowing additional registries
+     * (e.g., Prometheus, StatsD) to be added at runtime if desired.</p>
+     *
+     * @return a composite meter registry
      */
     @Bean
     public MeterRegistry getMeterRegistry() {
@@ -63,10 +94,10 @@ public class Config {
     }
 
     /**
-     * Bean towards using time aspect for micrometer.
+     * Enables the {@link TimedAspect} so methods annotated with {@code @Timed} are recorded by Micrometer.
      *
-     * @param registry The registry we're using time aspect for.
-     * @return A timedAspect bean.
+     * @param registry the {@link MeterRegistry} used to publish timing metrics
+     * @return the {@link TimedAspect} AOP advice bean
      */
     @Bean
     public TimedAspect timedAspect(MeterRegistry registry) {

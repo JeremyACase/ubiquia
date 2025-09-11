@@ -8,6 +8,22 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+/**
+ * Entry point for the Ubiquia Communication Service.
+ *
+ * <p>
+ * This Spring Boot application:
+ * </p>
+ * <ul>
+ *   <li>Excludes {@link DataSourceAutoConfiguration} since this service does not use a local datasource.</li>
+ *   <li>Enables scheduled tasks via {@link EnableScheduling} (e.g., background pollers).</li>
+ *   <li>Scans multiple base packages for components, APIs, and shared implementations.</li>
+ * </ul>
+ *
+ * <p>
+ * The {@link ObjectMapper} is autowired for JSON (de)serialization needs across the service.
+ * </p>
+ */
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @ComponentScan(basePackages = {
     "org.ubiquia.core.communication",
@@ -21,9 +37,9 @@ public class Application {
     private ObjectMapper objectMapper;
 
     /**
-     * The main command-line interface for our program.
+     * Launches the Spring Boot application.
      *
-     * @param args Any command-line arguments.
+     * @param args command-line arguments passed to the application
      */
     public static void main(final String[] args) {
         SpringApplication.run(Application.class, args);
