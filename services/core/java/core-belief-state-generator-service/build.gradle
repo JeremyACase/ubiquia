@@ -43,6 +43,7 @@ dependencies {
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${SPRING_DOC_VERSION}"
 
     runtimeOnly "com.h2database:h2:${H2_VERSION}"
+    runtimeOnly group: 'com.yugabyte', name: 'jdbc-yugabytedb', version:  "${YUGABYTE_DRIVER_VERSION}"
     runtimeOnly "io.micrometer:micrometer-registry-prometheus:${MICROMETER_VERSION}"
 
     testImplementation "org.instancio:instancio-junit:${INSTANCIO_VERSION}"

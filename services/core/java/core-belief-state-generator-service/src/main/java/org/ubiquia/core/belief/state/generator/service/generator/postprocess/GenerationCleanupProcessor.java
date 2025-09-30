@@ -1,4 +1,4 @@
-package org.ubiquia.core.belief.state.generator.service.generator;
+package org.ubiquia.core.belief.state.generator.service.generator.postprocess;
 
 import java.io.IOException;
 import java.nio.file.Files;

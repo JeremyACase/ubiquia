@@ -44,6 +44,11 @@ ubiquia:
     storage:
       minio:
         enabled: false
+    database:
+      h2:
+        enabled: true
+      yugabyte:
+        enabled: false
   beliefStateGeneratorService:
     libraries:
       directory:

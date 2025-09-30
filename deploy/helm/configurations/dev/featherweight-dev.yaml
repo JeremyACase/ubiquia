@@ -6,14 +6,19 @@ ubiquia:
   agent:
     database: 
       h2:
-        enabled: true
-      yugabyte:
         enabled: false
+      yugabyte:
+        enabled: true
     flowService:
       bootstrap:
         enabled: true
         beliefState:
           deployments:
+            - domainName: pets
+              version:
+                major: 1
+                minor: 2
+                patch: 3
         graph:
           deployments:
             - name: ubiquia-workbench
@@ -21,6 +26,9 @@ ubiquia:
                 major: 1
                 minor: 0
                 patch: 0
+    storage:  
+      minio:
+        enabled: true
   components:
     core:
       beliefStateGeneratorService:

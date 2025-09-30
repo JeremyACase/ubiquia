@@ -16,4 +16,7 @@ dependencies {
     implementation project(':common:java:model:acl')
     implementation project(':common:java:model:ubiquia')
     implementation project(':common:java:library:api')
+
+    testImplementation "com.h2database:h2:${H2_VERSION}"
+    testImplementation "org.instancio:instancio-junit:${INSTANCIO_VERSION}"
 }

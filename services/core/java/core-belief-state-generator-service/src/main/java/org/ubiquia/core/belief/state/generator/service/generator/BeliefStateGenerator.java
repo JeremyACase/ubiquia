@@ -3,7 +3,6 @@ package org.ubiquia.core.belief.state.generator.service.generator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,6 +19,7 @@ import org.ubiquia.core.belief.state.generator.service.decorator.InheritancePrep
 import org.ubiquia.core.belief.state.generator.service.decorator.UbiquiaModelInjector;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiDtoGenerator;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiEntityGenerator;
+import org.ubiquia.core.belief.state.generator.service.generator.postprocess.PostProcessor;
 import org.ubiquia.core.belief.state.generator.service.k8s.BeliefStateOperator;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiDtoYamlMapper;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiEntityYamlMapper;
@@ -42,13 +42,10 @@ public class BeliefStateGenerator {
     private BeliefStateOperator beliefStateOperator;
 
     @Autowired
+    private PostProcessor postProcessor;
+
+    @Autowired
     private EnumNormalizer enumNormalizer;
-
-    @Autowired
-    private GenerationCleanupProcessor generationCleanupProcessor;
-
-    @Autowired
-    private GenerationSupportProcessor generationSupportProcessor;
 
     @Autowired
     private InheritancePreprocessor inheritancePreprocessor;
@@ -92,8 +89,7 @@ public class BeliefStateGenerator {
                 .translateJsonSchemaToOpenApiYaml(jsonSchema);
         this.openApiDtoGenerator.generateOpenApiDtosFrom(openApiDtoYaml);
 
-        this.generationCleanupProcessor.removeBlacklistedFiles(Paths.get("generated"));
-        this.generationSupportProcessor.postProcess(acl);
+        this.postProcessor.postProcess(acl);
 
         var beliefStateLibraries = this.getJarPaths(this.beliefStateLibsDirectory);
 
