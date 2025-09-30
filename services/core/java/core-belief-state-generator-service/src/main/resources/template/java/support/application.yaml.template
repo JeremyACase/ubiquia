@@ -37,10 +37,10 @@ spring:
     name: ubiquia-generated-belief-state
 
   datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
-    username: sa
-    password: sa
+    driverClassName: {DB_DRIVER_CLASS}
+    url: {DB_URL}
+    username: {DB_USERNAME}
+    password: {DB_PASSWORD}
     hikari:
       transaction-isolation: TRANSACTION_READ_COMMITTED
   h2:
@@ -55,7 +55,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         generate_statistics: false

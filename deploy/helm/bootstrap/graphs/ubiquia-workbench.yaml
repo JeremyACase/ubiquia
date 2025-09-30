@@ -104,7 +104,7 @@ components:
         set -eu
         echo "Waiting for Ollama..."
         i=0
-        while [ "$i" -lt 180 ]; do
+        while [ "$i" -lt 360 ]; do
           if ollama list >/dev/null 2>&1; then
             echo "Daemon up. Pulling model..."
             ollama pull llama3.2
@@ -113,7 +113,7 @@ components:
           i=$((i+1))
           sleep 1
         done
-        echo "Ollama not ready after 180s" >&2
+        echo "Ollama not ready after 360s" >&2
         exit 1
 
     adapter:

@@ -1,5 +1,5 @@
 logging:
-  ubiquia: DEBUG
+  ubiquia: INFO
 
 ubiquia:
   cluster:
@@ -14,11 +14,6 @@ ubiquia:
         enabled: true
         beliefState:
           deployments:
-            - domainName: ubiquia-workbench
-              version:
-                major: 1
-                minor: 0
-                patch: 0
         graph:
           deployments:
             - name: ubiquia-workbench

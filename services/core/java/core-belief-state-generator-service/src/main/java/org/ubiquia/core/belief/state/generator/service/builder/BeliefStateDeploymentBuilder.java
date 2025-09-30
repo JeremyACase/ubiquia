@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.library.api.config.MinioConfig;
 import org.ubiquia.common.library.implementation.service.builder.BeliefStateNameBuilder;
 import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 
@@ -27,6 +28,8 @@ public class BeliefStateDeploymentBuilder {
     private String jdkVersion;
     @Value("${ubiquia.beliefStateGeneratorService.uber.jars.path}")
     private String uberJarsPath;
+    @Value("${ubiquia.agent.storage.minio.enabled}")
+    private Boolean minioEnabled;
     @Autowired
     private BeliefStateNameBuilder beliefStateNameBuilder;
     private V1Deployment ubiquiaDeployment;
@@ -182,23 +185,25 @@ public class BeliefStateDeploymentBuilder {
         container.setImagePullPolicy("IfNotPresent");
         container.setImage("eclipse-temurin:" + this.jdkVersion);
 
-        container.setEnv(List.of(
-            new V1EnvVar()
-                .name("MINIO_URL")
-                .value("http://ubiquia-minio:9000"),
-            new V1EnvVar()
-                .name("MINIO_ACCESS_KEY")
-                .valueFrom(new V1EnvVarSource()
-                    .secretKeyRef(new V1SecretKeySelector()
-                        .name("ubiquia-minio")
-                        .key("root-user"))),
-            new V1EnvVar()
-                .name("MINIO_SECRET_KEY")
-                .valueFrom(new V1EnvVarSource()
-                    .secretKeyRef(new V1SecretKeySelector()
-                        .name("ubiquia-minio")
-                        .key("root-password")))
-        ));
+        if (this.minioEnabled) {
+            container.setEnv(List.of(
+                new V1EnvVar()
+                    .name("MINIO_URL")
+                    .value("http://ubiquia-minio:9000"),
+                new V1EnvVar()
+                    .name("MINIO_ACCESS_KEY")
+                    .valueFrom(new V1EnvVarSource()
+                        .secretKeyRef(new V1SecretKeySelector()
+                            .name("ubiquia-minio")
+                            .key("root-user"))),
+                new V1EnvVar()
+                    .name("MINIO_SECRET_KEY")
+                    .valueFrom(new V1EnvVarSource()
+                        .secretKeyRef(new V1SecretKeySelector()
+                            .name("ubiquia-minio")
+                            .key("root-password")))
+            ));
+        }
 
         // Port setup
         var port = new V1ContainerPort()

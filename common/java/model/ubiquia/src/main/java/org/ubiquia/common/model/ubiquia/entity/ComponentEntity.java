@@ -23,6 +23,7 @@ public class ComponentEntity extends AbstractModelEntity {
         name = "component_post_start_exec_commands",
         joinColumns = @JoinColumn(name = "component_id")
     )
+    @OrderColumn(name = "command_order")
     @Column(name = "post_start_exec_command", columnDefinition = "TEXT")
     private List<String> postStartExecCommands;
 

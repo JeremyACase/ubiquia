@@ -49,6 +49,11 @@ data:
     ubiquia:
       agent:
         id: {{ .Values.ubiquia.agent.id }}
+        database: 
+          h2: 
+            enabled: {{ .Values.ubiquia.agent.database.h2.enabled }}
+          yugabyte: 
+            enabled: {{ .Values.ubiquia.agent.database.yugabyte.enabled }}
         storage:
           minio:
             enabled: {{ .Values.ubiquia.agent.storage.minio.enabled }}
@@ -62,7 +67,7 @@ data:
             entity: "/app/resources/template/java/entity"
         uber:
           jars:
-            path: "/belief-state-jars/"
+            path: "/belief-state-jars/"        
       flow:
         service:
           port: {{ .Values.convenience.variables.spring.port }}

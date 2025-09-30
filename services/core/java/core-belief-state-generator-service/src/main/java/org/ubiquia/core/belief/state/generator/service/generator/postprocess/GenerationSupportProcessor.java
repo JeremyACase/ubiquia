@@ -1,4 +1,4 @@
-package org.ubiquia.core.belief.state.generator.service.generator;
+package org.ubiquia.core.belief.state.generator.service.generator.postprocess;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,14 @@ import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
 @Service
 public class GenerationSupportProcessor {
 
-    @Value("${ubiquia.agent.storage.minio.enabled}")
+    @Value("${ubiquia.agent.storage.minio.enabled:false}")
     private Boolean minioEnabled;
+
+    @Value("${ubiquia.agent.database.h2.enabled:false}")
+    private boolean h2Enabled;
+
+    @Value("${ubiquia.agent.database.yugabyte.enabled:false}")
+    private boolean yugabyteEnabled;
 
     @Autowired
     private UbiquiaAgentConfig ubiquiaAgentConfig;
@@ -43,8 +50,10 @@ public class GenerationSupportProcessor {
 
         var tokenMap = new HashMap<String, String>();
         tokenMap.put("{DOMAIN_NAME}", acl.getDomain());
-        tokenMap.put("{MINIO_ENABLED}", this.minioEnabled.toString());
+        tokenMap.put("{MINIO_ENABLED}", String.valueOf(this.minioEnabled));
         tokenMap.put("{UBIQUIA_AGENT_ID}", this.ubiquiaAgentConfig.getId());
+
+        tokenMap.putAll(this.resolveDbTokensFromBooleans());
 
         this.copyAndReplacePlaceholders(
             "template/java/support/application.yaml.template",
@@ -52,11 +61,35 @@ public class GenerationSupportProcessor {
             tokenMap);
     }
 
+    private Map<String, String> resolveDbTokensFromBooleans() {
+        // Require exactly one true to avoid ambiguous configs
+        if (this.h2Enabled == this.yugabyteEnabled) {
+            throw new IllegalStateException(
+                "Exactly one database must be enabled: " +
+                    "ubiquia.agent.database.h2.enabled=" + this.h2Enabled + ", " +
+                    "ubiquia.agent.database.yugabyte.enabled=" + this.yugabyteEnabled
+            );
+        }
+
+        var tokens = new HashMap<String, String>();
+        if (this.yugabyteEnabled) {
+            tokens.put("{DB_DRIVER_CLASS}", "com.yugabyte.Driver");
+            tokens.put("{DB_URL}", "jdbc:yugabytedb://yb-tservers:5433/yugabyte?autoReconnect=true");
+            tokens.put("{DB_USERNAME}", "yugabyte");
+            tokens.put("{DB_PASSWORD}", "yugabyte");
+        } else { // H2 selected
+            tokens.put("{DB_DRIVER_CLASS}", "org.h2.Driver");
+            tokens.put("{DB_URL}", "jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1");
+            tokens.put("{DB_USERNAME}", "sa");
+            tokens.put("{DB_PASSWORD}", "sa");
+        }
+        return tokens;
+    }
+
     private void copyResourceFromClasspath(String resourcePath, String destinationPath) throws IOException {
         try (var in = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
-            if (in == null) {
-                throw new FileNotFoundException("Resource not found in classpath: "
-                    + resourcePath);
+            if (Objects.isNull(in)) {
+                throw new FileNotFoundException("Resource not found in classpath: " + resourcePath);
             }
             Files.createDirectories(Paths.get(destinationPath).getParent());
             Files.copy(in, Paths.get(destinationPath), StandardCopyOption.REPLACE_EXISTING);
@@ -70,23 +103,20 @@ public class GenerationSupportProcessor {
         throws IOException {
 
         try (var in = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
-            if (in == null) {
+            if (Objects.isNull(in)) {
                 throw new FileNotFoundException("Resource not found in classpath: " + resourcePath);
             }
 
             var content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-
             for (var entry : replacements.entrySet()) {
-                var token = entry.getKey();
-                var value = entry.getValue();
-                content = content.replace(token, value);
+                content = content.replace(entry.getKey(), entry.getValue());
             }
 
             var targetPath = Paths.get(destinationPath);
             Files.createDirectories(targetPath.getParent());
-            Files.writeString(targetPath, content, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-
+            Files.writeString(
+                targetPath, content, StandardCharsets.UTF_8,
+                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         }
     }
 }
-

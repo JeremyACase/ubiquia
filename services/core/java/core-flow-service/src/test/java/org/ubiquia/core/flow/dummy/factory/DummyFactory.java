@@ -71,7 +71,7 @@ public class DummyFactory {
      * @return A component.
      */
     public Component generateComponent() {
-        var agent = Instancio
+        var component = Instancio
             .of(Component.class)
             .ignore(field(AbstractModel::getId))
             .ignore(field(AbstractModel::getCreatedAt))
@@ -84,7 +84,7 @@ public class DummyFactory {
             .set(field(AbstractModel::getModelType), "Component")
             .set(field(Component::getComponentType), ComponentType.TEMPLATE)
             .create();
-        return agent;
+        return component;
     }
 
     /**
