@@ -24,4 +24,4 @@ jacoco.xml
 .gradle
 
 # Helm charts
-helm/charts
+deploy/helm/charts
