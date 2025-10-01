@@ -29,7 +29,7 @@ import org.ubiquia.core.flow.service.registrar.AgentCommunicationLanguageRegistr
  * A controller that exposes a RESTful interface for Agent Communication Language.
  */
 @RestController
-@RequestMapping("/agent-communication-language")
+@RequestMapping("/ubiquia/flow-service/agent-communication-language")
 public class AgentCommunicationLanguageController extends GenericUbiquiaDaoController<
     AgentCommunicationLanguageEntity,
     AgentCommunicationLanguage> {
