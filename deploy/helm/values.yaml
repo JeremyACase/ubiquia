@@ -78,6 +78,12 @@ infrastructure:
     pullPolicy: IfNotPresent
 
 # Dependency Overrides
+minio:
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/minio
+    tag: 2025.7.23-debian-12-r3
+
 yugabyte:
   enableLoadBalancer: false
   replicas:
