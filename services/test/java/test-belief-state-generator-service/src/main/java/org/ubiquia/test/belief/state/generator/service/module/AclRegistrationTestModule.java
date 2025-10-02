@@ -79,12 +79,12 @@ public class AclRegistrationTestModule extends AbstractHelmTestModule {
                 var getUrl = this.flowServiceConfig.getUrl()
                     + ":"
                     + this.flowServiceConfig.getPort()
-                    + "/agent-communication-language/query";
+                    + "/ubiquia/flow-service/agent-communication-language/query";
 
                 var postUrl = this.flowServiceConfig.getUrl()
                     + ":"
                     + this.flowServiceConfig.getPort()
-                    + "/agent-communication-language/register/post";
+                    + "/ubiquia/flow-service/agent-communication-language/register/post";
 
                 var persistedAcl = this.postAndRetriever.postAndRetrieve(
                     postUrl,
@@ -115,7 +115,7 @@ public class AclRegistrationTestModule extends AbstractHelmTestModule {
                 this.flowServiceConfig.getUrl()
                     + ":"
                     + this.flowServiceConfig.getPort())
-            .path("/agent-communication-language/query/params")
+            .path("/ubiquia/flow-service/agent-communication-language/query/params")
             .queryParam("page", "0")
             .queryParam("size", "1")
             .queryParam("domain", acl.getDomain())

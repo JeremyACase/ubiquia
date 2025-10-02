@@ -80,9 +80,11 @@ infrastructure:
 # Dependency Overrides
 minio:
   image:
-    registry: docker.io
     repository: bitnamilegacy/minio
-    tag: 2025.7.23-debian-12-r3
+  clientImage:
+    repository: bitnamilegacy/minio-client
+    registry: docker.io
+    tag: 2025.7.21-debian-12-r2
 
 yugabyte:
   enableLoadBalancer: false

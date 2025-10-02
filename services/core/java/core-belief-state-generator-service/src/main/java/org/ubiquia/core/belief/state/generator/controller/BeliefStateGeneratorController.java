@@ -57,7 +57,7 @@ public class BeliefStateGeneratorController {
         var url = this.flowServiceConfig.getUrl()
             + ":"
             + this.flowServiceConfig.getPort()
-            + "/agent-communication-language/query/params";
+            + "/ubiquia/flow-service/agent-communication-language/query/params";
 
         var uri = UriComponentsBuilder
             .fromHttpUrl(url)
