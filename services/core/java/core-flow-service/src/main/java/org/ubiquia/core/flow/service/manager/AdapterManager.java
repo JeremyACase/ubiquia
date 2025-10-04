@@ -8,12 +8,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.library.implementation.service.mapper.ComponentDtoMapper;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
+import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
+import org.ubiquia.common.model.ubiquia.entity.ComponentEntity;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.service.command.manager.AdapterManagerCommand;
 import org.ubiquia.core.flow.service.factory.AdapterFactory;
+import org.ubiquia.core.flow.service.visitor.AdapterCardinalityVisitor;
+import org.ubiquia.core.flow.service.visitor.ComponentCardinalityVisitor;
 
 /**
  * This is a service that manages adapters at runtime. It is able to deploy them or tear them down
@@ -28,6 +33,12 @@ public class AdapterManager {
     private AdapterFactory adapterFactory;
     @Autowired
     private AdapterManagerCommand adapterManagerCommand;
+    @Autowired
+    private AdapterCardinalityVisitor adapterCardinalityVisitor;
+    @Autowired
+    private ComponentDtoMapper componentDtoMapper;
+    @Autowired
+    private ComponentCardinalityVisitor componentCardinalityVisitor;
     @Autowired
     private GraphRepository graphRepository;
 
@@ -137,25 +148,43 @@ public class AdapterManager {
         final GraphEntity graphEntity,
         final GraphDeployment graphDeployment)
         throws Exception {
+
         logger.info("...deploying adapters attached to components...");
+
         var graphName = graphEntity.getName();
         for (var componentEntity : graphEntity.getComponents()) {
+
             if (Objects.nonNull(componentEntity.getAdapter())) {
+
                 if (this.adapterMap.containsKey(graphName)
                     && this.adapterMap.get(graphName).containsKey(
                     componentEntity.getAdapter().getId())) {
+
                     logger.warn("WARNING: Adapter for graph {} and component {} is "
                             + "already deployed; not deploying another adapter...",
                         graphName,
                         componentEntity.getName());
                 } else {
-                    var adapter = this.adapterFactory.makeAdapterFor(componentEntity, graphDeployment);
-                    if (!this.adapterMap.containsKey(graphName)) {
-                        this.adapterMap.put(graphName, new HashMap<>());
+
+                    var component = this.componentDtoMapper.map(componentEntity);
+
+                    if (this.componentCardinalityVisitor.hasMatchingCardinality(
+                        component.getName(),
+                        graphDeployment)) {
+
+                        if (this.componentCardinalityVisitor.isCardinalityEnabled(
+                            component.getName(),
+                            graphDeployment)) {
+
+                            this.deployAdapterFor(componentEntity, graphDeployment);
+                        } else {
+                            logger.info("...cardinality disabled for component: {} "
+                                    + "\n...not deploying...",
+                                component.getName());
+                        }
+                    } else {
+                        this.deployAdapterFor(componentEntity, graphDeployment);
                     }
-                    this.adapterMap
-                        .get(graphName)
-                        .put(adapter.getAdapterContext().getAdapterId(), adapter);
                 }
             } else {
                 logger.info("...component {} is a disjointed component; "
@@ -163,6 +192,57 @@ public class AdapterManager {
                     componentEntity.getName());
             }
         }
+    }
+
+    /**
+     * Deploy an adapter for a component of a graph.
+     *
+     * @param componentEntity The component record from the database.
+     * @param graphDeployment The graph deployment.
+     * @throws Exception Exceptions from errors.
+     */
+    @Transactional
+    private void deployAdapterFor(
+        final ComponentEntity componentEntity,
+        final GraphDeployment graphDeployment)
+        throws Exception {
+
+        var adapter = this.adapterFactory.makeAdapterFor(
+            componentEntity,
+            graphDeployment);
+
+        var graphName = graphDeployment.getName();
+
+        if (!this.adapterMap.containsKey(graphName)) {
+            this.adapterMap.put(graphName, new HashMap<>());
+        }
+
+        this.adapterMap
+            .get(graphName)
+            .put(adapter.getAdapterContext().getAdapterId(), adapter);
+    }
+
+    @Transactional
+    private void deployAdapterFor(
+        final AdapterEntity adapterEntity,
+        final GraphEntity graphEntity,
+        final GraphDeployment graphDeployment)
+        throws Exception {
+
+        var adapter = this.adapterFactory.makeAdapterFor(
+            adapterEntity,
+            graphEntity,
+            graphDeployment);
+
+        var graphName = graphDeployment.getName();
+
+        if (!this.adapterMap.containsKey(graphName)) {
+            this.adapterMap.put(graphName, new HashMap<>());
+        }
+
+        this.adapterMap
+            .get(graphName)
+            .put(adapter.getAdapterContext().getAdapterId(), adapter);
     }
 
     /**
@@ -175,32 +255,40 @@ public class AdapterManager {
         final GraphEntity graphEntity,
         final GraphDeployment graphDeployment)
         throws Exception {
+
         logger.info("...deploying adapters that are not attached to components...");
 
         for (var adapterEntity : graphEntity.getAdapters()) {
 
             if (Objects.isNull(adapterEntity.getComponent())) {
+
                 if (this.adapterMap.containsKey(graphEntity.getName())
                     && this.adapterMap.get(graphEntity.getName())
                     .containsKey(adapterEntity.getId())) {
+
                     logger.warn("WARNING: {} for graph {} is "
                             + "already deployed; not deploying another adapter...",
                         adapterEntity.getName(),
                         graphEntity.getName());
+
                 } else {
+                    if (this.adapterCardinalityVisitor.hasMatchingCardinality(
+                        adapterEntity.getName(),
+                        graphDeployment)) {
 
-                    var adapter = this.adapterFactory.makeAdapterFor(
-                        adapterEntity,
-                        graphEntity,
-                        graphDeployment);
+                        if (this.adapterCardinalityVisitor.isCardinalityEnabled(
+                            adapterEntity.getName(),
+                            graphDeployment)) {
 
-                    if (!this.adapterMap.containsKey(graphEntity.getName())) {
-                        this.adapterMap.put(graphEntity.getName(), new HashMap<>());
+                            this.deployAdapterFor(adapterEntity, graphEntity, graphDeployment);
+                        } else {
+                            logger.info("...cardinality disabled for adapter: {} "
+                                    + "...not deploying...",
+                                adapterEntity.getName());
+                        }
+                    } else {
+                        this.deployAdapterFor(adapterEntity, graphEntity, graphDeployment);
                     }
-
-                    this.adapterMap
-                        .get(graphEntity.getName())
-                        .put(adapter.getAdapterContext().getAdapterId(), adapter);
                 }
             }
         }

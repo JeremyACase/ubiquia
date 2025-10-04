@@ -11,10 +11,12 @@ import org.springframework.stereotype.Component;
 import org.ubiquia.common.library.implementation.service.mapper.ComponentDtoMapper;
 import org.ubiquia.common.library.implementation.service.mapper.GraphDtoMapper;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
+import org.ubiquia.common.model.ubiquia.entity.ComponentEntity;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.service.decorator.override.ComponentOverrideDecorator;
 import org.ubiquia.core.flow.service.k8s.ComponentOperator;
+import org.ubiquia.core.flow.service.visitor.ComponentCardinalityVisitor;
 
 /**
  * This is a service that will manage agents for Ubiquia at runtime.
@@ -23,6 +25,8 @@ import org.ubiquia.core.flow.service.k8s.ComponentOperator;
 public class ComponentManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentManager.class);
+    @Autowired
+    private ComponentCardinalityVisitor componentCardinalityVisitor;
     @Autowired(required = false)
     private ComponentOperator componentOperator;
     @Autowired
@@ -65,31 +69,63 @@ public class ComponentManager {
         var graphEntity = graphRecord.get();
 
         for (var componentEntity : graphEntity.getComponents()) {
-            logger.info("...deploying component: {}",
+            logger.info("...attempting to deploy component: {}",
                 componentEntity.getName());
 
             var component = this.componentDtoMapper.map(componentEntity);
 
-            // Set the graph here as the DTO Mapper will not.
-            component.setGraph(this.graphDtoMapper.map(graphEntity));
+            if (this.componentCardinalityVisitor.hasMatchingCardinality(
+                component.getName(),
+                graphDeployment)) {
 
-            this.componentOverrideDecorator.tryOverrideBaselineValues(
-                component,
-                componentEntity.getOverrideSettings().stream().toList(),
-                graphDeployment);
+                if (this.componentCardinalityVisitor.isCardinalityEnabled(
+                    component.getName(),
+                    graphDeployment)) {
 
-            if (component.getComponentType().equals(ComponentType.POD)) {
-                if (Objects.isNull(this.componentOperator)) {
-                    throw new IllegalArgumentException("ERROR: Kubernetes is not enabled and "
-                        + "the agent is a POD type!"
-                        + " Cannot deploy POD components without Kubernetes!");
+                    this.tryDeployComponent(component, componentEntity, graphDeployment);
                 } else {
-                    this.componentOperator.tryDeployComponent(component);
+                    logger.info("...cardinality disabled for component: {} "
+                            + "...not deploying...",
+                        component.getName());
                 }
             } else {
-                logger.info("...agent is not a POD type; not deploying...");
+                this.tryDeployComponent(component, componentEntity, graphDeployment);
             }
         }
         logger.info("...completed deploying agents.");
+    }
+
+    /**
+     * Attempt to deploy the component.
+     *
+     * @param component       The component DTO we're deploying.
+     * @param componentEntity The database record of the component.
+     * @param graphDeployment The deployment and associated settings.
+     * @throws JsonProcessingException Exceptions from JSON parsing.
+     * @throws IllegalAccessException  Exceptions from overriding.
+     */
+    @Transactional
+    private void tryDeployComponent(
+        final org.ubiquia.common.model.ubiquia.dto.Component component,
+        final ComponentEntity componentEntity,
+        final GraphDeployment graphDeployment)
+        throws JsonProcessingException, IllegalAccessException {
+
+        this.componentOverrideDecorator.tryOverrideBaselineValues(
+            component,
+            componentEntity.getOverrideSettings().stream().toList(),
+            graphDeployment);
+
+        if (component.getComponentType().equals(ComponentType.POD)) {
+            if (Objects.isNull(this.componentOperator)) {
+                throw new IllegalArgumentException("ERROR: Kubernetes is not enabled and "
+                    + "the agent is a POD type!"
+                    + " Cannot deploy POD components without Kubernetes!");
+            } else {
+                this.componentOperator.tryDeployComponent(component);
+            }
+        } else {
+            logger.info("...agent is not a POD type; not deploying...");
+        }
     }
 }
