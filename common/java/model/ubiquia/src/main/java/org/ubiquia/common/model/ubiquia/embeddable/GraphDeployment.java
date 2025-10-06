@@ -9,6 +9,8 @@ public class GraphDeployment {
 
     private String name;
 
+    private Cardinality cardinality;
+
     private GraphSettings graphSettings;
 
     private SemanticVersion version;
@@ -37,5 +39,13 @@ public class GraphDeployment {
 
     public void setGraphSettings(GraphSettings graphSettings) {
         this.graphSettings = graphSettings;
+    }
+
+    public Cardinality getCardinality() {
+        return cardinality;
+    }
+
+    public void setCardinality(Cardinality cardinality) {
+        this.cardinality = cardinality;
     }
 }
