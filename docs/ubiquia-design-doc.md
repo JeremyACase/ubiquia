@@ -78,7 +78,7 @@ Ubiquia can be used to orchestrate a collection of SDA assets--human, LLM, hardw
 ## Architecture
 
 ### High-Level Architecture Diagram
-![System Overview](diagram/system/Ubiquia_Lifecycle.drawio.png)
+![System Overview](https://github.com/JeremyACase/ubiquia/blob/main/docs/diagram/system/Ubiquia_Lifecycle.drawio.png)
 
 ### Components
 - **Flow Service**: Allows for user-defined logic to be registered, instantiated, and ochestrated in runtime.
