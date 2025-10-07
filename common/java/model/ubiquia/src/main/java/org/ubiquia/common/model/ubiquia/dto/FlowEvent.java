@@ -9,7 +9,7 @@ public class FlowEvent extends AbstractModel {
 
     private Adapter adapter;
 
-    private String batchId;
+    private String flowId;
 
     private Object inputPayload;
 
@@ -25,12 +25,12 @@ public class FlowEvent extends AbstractModel {
 
     @Schema(readOnly = true)
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
-    public String getBatchId() {
-        return this.batchId;
+    public String getFlowId() {
+        return this.flowId;
     }
 
-    public void setBatchId(String batchId) {
-        this.batchId = batchId;
+    public void setFlowId(String flowId) {
+        this.flowId = flowId;
     }
 
     @Override

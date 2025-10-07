@@ -112,8 +112,8 @@ public class QueueAdapterTest {
             QueueAdapterEgress.class);
 
         Assertions.assertEquals(
-            event.getBatchId(),
-            queueResponse.getFlowEvent().getBatchId());
+            event.getFlowId(),
+            queueResponse.getFlowEvent().getFlowId());
     }
 
     @Test
@@ -185,8 +185,8 @@ public class QueueAdapterTest {
             QueueAdapterEgress.class);
 
         Assertions.assertEquals(
-            event.getBatchId(),
-            popEventOne.getFlowEvent().getBatchId());
+            event.getFlowId(),
+            popEventOne.getFlowEvent().getFlowId());
         Assertions.assertEquals(
             0,
             popEventTwo.getQueuedRecords());

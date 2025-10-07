@@ -64,9 +64,9 @@ public class MergeAdapterCommand implements InterfaceLogger {
 
         try {
             var messages = this.flowMessageRepository
-                .findAllByTargetAdapterIdAndFlowEventBatchId(
+                .findAllByTargetAdapterIdAndFlowEventFlowId(
                     adapterContext.getAdapterId(),
-                    message.getFlowEvent().getBatchId());
+                    message.getFlowEvent().getFlowId());
 
             if (!messages.isEmpty()) {
 
@@ -82,13 +82,13 @@ public class MergeAdapterCommand implements InterfaceLogger {
                             + "with batch id {}; processing...",
                         adapterContext.getAdapterName(),
                         messages.size(),
-                        message.getFlowEvent().getBatchId());
+                        message.getFlowEvent().getFlowId());
 
                     var merged = this.mergeMessages(messages);
 
                     var event = this.flowEventBuilder.makeEventFrom(
                         merged,
-                        message.getFlowEvent().getBatchId(),
+                        message.getFlowEvent().getFlowId(),
                         adapter);
 
                     this.adapterPayloadOrchestrator.forwardPayload(event, adapter, merged);
@@ -99,7 +99,7 @@ public class MergeAdapterCommand implements InterfaceLogger {
                             + "not processing...",
                         adapterContext.getAdapterName(),
                         messages.size(),
-                        message.getFlowEvent().getBatchId());
+                        message.getFlowEvent().getFlowId());
                 }
             } else {
                 throw new RuntimeException("ERROR: Somehow, the messages list is empty!");

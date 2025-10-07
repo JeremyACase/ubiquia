@@ -3,7 +3,6 @@ package org.ubiquia.core.flow.service.command.adapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,7 +121,7 @@ public class AdapterPostToComponentCommand implements InterfaceLogger {
                     flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
                     logger.info("...got response code {} from agent for batch id {}...",
                         response.getStatusCode(),
-                        flowEventEntity.getBatchId());
+                        flowEventEntity.getFlowId());
                     try {
                         this.adapterComponentResponseCommand.processComponentResponse(
                             flowEventEntity,

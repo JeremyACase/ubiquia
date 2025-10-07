@@ -10,10 +10,12 @@ public interface FlowMessageRepository extends AbstractEntityRepository<FlowMess
 
     Long countByTargetAdapterId(final String adapterId);
 
-    Page<FlowMessageEntity> findAllByTargetAdapterId(Pageable pageable, final String targetAdapterId);
+    Page<FlowMessageEntity> findAllByTargetAdapterId(
+        Pageable pageable,
+        final String targetAdapterId);
 
-    List<FlowMessageEntity> findAllByTargetAdapterIdAndFlowEventBatchId(
+    List<FlowMessageEntity> findAllByTargetAdapterIdAndFlowEventFlowId(
         final String targetAdapterId,
-        final String eventBatchId);
+        final String flowId);
 
 }
