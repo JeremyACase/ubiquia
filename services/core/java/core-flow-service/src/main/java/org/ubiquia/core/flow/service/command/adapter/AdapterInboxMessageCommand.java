@@ -49,7 +49,7 @@ public class AdapterInboxMessageCommand {
 
             var flowEvent = this.flowEventBuilder.makeEventFrom(
                 message.getPayload(),
-                message.getFlowEvent().getBatchId(),
+                message.getFlowEvent().getFlowId(),
                 adapter);
 
             this.adapterPayloadOrchestrator.forwardPayload(

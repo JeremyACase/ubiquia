@@ -19,7 +19,7 @@ public class FlowEventEntity extends AbstractModelEntity {
     @JoinColumn(name = "adapter_event_join_id", nullable = false)
     private AdapterEntity adapter;
 
-    private String batchId;
+    private String flowId;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
@@ -62,12 +62,12 @@ public class FlowEventEntity extends AbstractModelEntity {
 
     @Pattern(regexp = "^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$")
     @NotNull
-    public String getBatchId() {
-        return this.batchId;
+    public String getFlowId() {
+        return this.flowId;
     }
 
-    public void setBatchId(String batchId) {
-        this.batchId = batchId;
+    public void setFlowId(String flowId) {
+        this.flowId = flowId;
     }
 
     @NotNull

@@ -43,7 +43,7 @@ public class FlowEventBuilder {
         var flowEvent = this.getEventHelper(adapter);
 
         // We haven't received an upstream event in this method; we're assuming it's a new batch
-        flowEvent.setBatchId(UUID.randomUUID().toString());
+        flowEvent.setFlowId(UUID.randomUUID().toString());
 
         var eventTimes = flowEvent.getFlowEventTimes();
         eventTimes.setPollStartedTime(OffsetDateTime.now());
@@ -59,7 +59,7 @@ public class FlowEventBuilder {
         var flowEvent = this.getEventHelper(adapter);
 
         // We haven't received an upstream event in this method; we're assuming it's a new batch
-        flowEvent.setBatchId(UUID.randomUUID().toString());
+        flowEvent.setFlowId(UUID.randomUUID().toString());
 
         var adapterContext = adapter.getAdapterContext();
         if (adapterContext.getAdapterSettings().getPersistInputPayload()) {
@@ -80,7 +80,7 @@ public class FlowEventBuilder {
         var flowEvent = this.getEventHelper(adapter);
 
         // We have an upstream event from our message; use that event's batch ID.
-        flowEvent.setBatchId(batchId);
+        flowEvent.setFlowId(batchId);
 
         var adapterContext = adapter.getAdapterContext();
         if (adapterContext.getAdapterSettings().getPersistInputPayload()) {

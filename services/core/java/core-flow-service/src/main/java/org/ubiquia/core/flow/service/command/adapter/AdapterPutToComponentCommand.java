@@ -115,7 +115,7 @@ public class AdapterPutToComponentCommand implements InterfaceLogger {
                     flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
                     logger.info("...got response code {} from agent for batch id {}...",
                         response.getStatusCode(),
-                        flowEventEntity.getBatchId());
+                        flowEventEntity.getFlowId());
                     try {
                         this.adapterComponentResponseCommand.processComponentResponse(
                             flowEventEntity,

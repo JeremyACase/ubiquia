@@ -124,7 +124,7 @@ public class QueueAdapterCommand implements InterfaceLogger {
         var egress = new QueueAdapterEgress();
         var event = this.flowEventBuilder.makeEventFrom(
             message.getPayload(),
-            message.getFlowEvent().getBatchId(),
+            message.getFlowEvent().getFlowId(),
             adapter);
         event.getFlowEventTimes().setPayloadEgressedTime(OffsetDateTime.now());
         event = this.flowEventRepository.save(event);

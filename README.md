@@ -42,6 +42,7 @@ Unlike most MAS (Multi-Agent System) frameworks, **Ubiquia is designed from the 
   * [Quickstart: Requirements](#quick-start-requirements)
   * [Quickstart: Scripts - One-Time Setup](#quick-start-scripts-one-time-setup)
   * [Quickstart: Scripts - Recurring Setup](#quick-start-scripts-recurring-setup)
+  * [Quickstart: Workbench](#quick-start-workbench)
 * [Getting Started](#getting-started)
   * [Getting Started: Requirements](#getting-started-requirements)
   * [Getting Started: Helm Repo](#getting-started-helm-repo)
@@ -50,11 +51,18 @@ Unlike most MAS (Multi-Agent System) frameworks, **Ubiquia is designed from the 
 * [Agent Communication Language](#agent-communication-language)
   * [Agent Communication Language: Defining ACLs](#agent-communication-language-defining-acls)
 * [DAGs](#dags)
+  * [DAGs: Flow](#dags-flow)
+  * [DAGs: Cardinality](#dags-cardinality)
 * [Belief States](#belief-states)
   * [Belief States: Querying Data](#belief-states-querying-data)
+* [Datastores](#datastores)
+  * [Datastores: Configuration](#datastores-configuration)
 * [For Devs](#for-devs)
   * [For Devs: Building Ubiquia](#for-devs-building-ubiquia)
   * [For Devs: Building Subprojects](#for-devs-building-subprojects)
+* [Advanced Topics](#advanced-topics)
+  * [Advanced Topics: Adapter Backpressure](#advanced-topics-adapter-backpressure)
+  * [Advanced Topics: PostStartExecCommand](#advanced-topics-poststartexeccommands)
 * [Contributors](#contributors)
 * [Who Is This For?](#who-is-this-for)
 * [Glossary](#glossary)
@@ -99,6 +107,15 @@ $ kind delete clusters ubiquia-agent-0
 ```
 
 Now you can re-run the installation script with a fresh Kubernetes cluster!
+
+### Quickstart: Workbench
+Ubiquia ships with a standard DAG called the "Ubiquia Workbench." The quickstart installation scripts above use a configuration that deploys this DAG by default. Once both the DAG and Ubiquia come alive in the cluster, it can be accessed through the Ubiquia communication service (like after port-forwarding the comm service) per the below:
+
+```http
+GET http://localhost:8080/ubiquia/communication-service/component-reverse-proxy/workbench-ui/index.html
+```
+
+The workbench DAG leverages an LLM that will generate an ACL and DAG to match the user's prompt. It will automatically register the DAG and ACL with Ubiquia so that a client can in turn instantiate the DAG and a Belief State.  
 
 
 ## Getting Started
@@ -671,9 +688,47 @@ edges:
 
 ```
 
+### DAGs: Flow
+In Ubiquia, a "flow" is considered a discrete unit of work that starts when the first node of a DAG ingests data. All subsequent events within that flow will be considered to be a part of that parent "flow" - they will have the same "FlowId." This flow can occur entirely within a single DAG, or across multiple DAGs across multiple Ubiquia Agents.
+
+### DAGs: Cardinality
+DAGs can be deployed by individual Ubiquia agents with "Cardinality" - or the ability to toggle on/off components/adapters of the DAG at "deploy time." This allows multiple Ubiquia agents to coordinate on a distributed DAG such that the agents can optimize the execution of the DAG internals in a way best-suited to the compute resources available to those Ubiquia agents.
+
+The "Cardinality" is defined at deploy time, either as a part of the bootstrapping process (defined in Helm), or when a RESTful GraphDeployment payload is set to Ubiquia instructing it to instantiate a new DAG. 
+
+```yaml
+ubiquia:
+  agent:
+    flowService:
+      bootstrap:
+        graph:
+          deployments:
+            - name: ubiquia-workbench
+              version:
+                major: 1
+                minor: 0
+                patch: 0
+              cardinality:
+                componentSettings:
+                - name: component-a
+                  enabled: true
+                - name: component-b
+                  enabled: false
+                componentlessAdapterSettings:
+                - name: adapter-a
+                  enabled: false
+                - name: adapter-b
+                  enabled: true
+```
+
+If the cardinality is not explicitly defined at deploy time, Ubiquia will default to "enabled = true" for every component and adapter.
+
+
 ## Belief States
 
 Ubiquia allows clients to deploy fully RESTful, schema-validating, queryable **Belief State** services directly from an Agent Communication Language (ACL — really just JSON Schema). These services are automatically deployed into Kubernetes and support both ingestion and querying of relational data out of the box.
+
+When configured to run against YugabyteDB, these belief states will be distributed and automatically synch with other belief states also connected to the same logical YugabyteDB cluster.
 
 ---
 
@@ -854,6 +909,27 @@ Multiselect Response:
 }
 ```
 
+## Datastores
+Ubiquia supports different datastore configurations. Primarily, this boils down to a relational datastore choice between a distributed YugabyteDB SQL setting or an embedded H2 SQL setting, and whether or not to enable a (Minio)[https://www.min.io] object storage. Both Ubiquia's "Core Flow Service" and generated Belief States will use the configured relational datastore. 
+
+Moreover, generated Belief States will automatically connect against the internal Minio instance should minio be enabled. Thus, clients can upload binaries (or anything) to Minio for later retrieval. ***Importantly, the metadata of these objects will be housed in the relational database.*** This last point is important for when multiple Ubiquia agents are running against a distributed YugabyteDB cluster, and may need specific artifacts available only locally to one agent. In this specific case, Ubiquia agents will be aware of artifacts available locally to other agents, and be able to retrive them through the communication service.
+
+### Datastores: Configuration
+Configuration of Ubiquia Datastores is defined via Helm per any values configuration per the below:
+
+```yaml
+ubiquia:
+  agent:
+    database: 
+      h2:
+        enabled: false
+      yugabyte:
+        enabled: true
+    storage:
+      minio:
+        enabled: true
+```
+
 ## For Devs
 This section will contain a handful of useful commands, topics, concepts, or otherwise for developers using the Ubiquia framework.
 
@@ -885,6 +961,50 @@ $ ./gradlew :services:core:java:core-flow-service:build
 - **DoD/IC technologists** looking to modernize simulation, orchestration, or planning infrastructure
 
 ---
+
+## Advanced Topics
+
+### Advanced Topics: Adapter Backpressure
+Ubiquia adapters leverage an inbox/outbox mechanism to ensure that they can "pop" messages off of the database queue. This is especially important when the database is distributed. Adapters provide a "backpressure" endpoint that can be used to show how how many records are in this queue, and the rate at which this queue is growing (or shrinking.)
+
+The adapters themselves provide this information, it is up to external entities to act upon that information. As of now, the plan is to have the Ubiquia Executive Command and/or Kubernetes autoscaling "scale up" adapters as necessary to alleviate this backpressure should a queue grow.
+
+### Advanced Topics: PostStartExecCommands
+It is sometimes necessary for components deployed within Ubiquia DAGs to have some form of "post start" hook. Ubiquia leverages the Kubernetes "PostStartExecComand" by allowing developers to configure an array of arguments that the component should invoke after it has come alive as a Kubernetes pod. 
+
+In fact, Ubiquia does this very thing with the "Workbench DAG" via the Ollama container. When the Ollama container (the so-called Workbench-LLM component) starts, it invokes the below command to pull down the latest Llama LLM.
+
+```yaml
+name: Workbench-LLM
+
+  componentType: POD
+  modelType: Component
+  description: An LLM for our workbench.
+
+  image:
+    registry: ollama
+    repository: ollama
+    tag: 0.11.5
+
+  postStartExecCommands:
+    - /bin/sh
+    - -c
+    - |
+      set -eu
+      echo "Waiting for Ollama..."
+      i=0
+      while [ "$i" -lt 360 ]; do
+        if ollama list >/dev/null 2>&1; then
+          echo "Daemon up. Pulling model..."
+          ollama pull llama3.2
+          exit 0
+        fi
+        i=$((i+1))
+        sleep 1
+      done
+      echo "Ollama not ready after 360s" >&2
+      exit 1
+```
 
 ## Glossary
 

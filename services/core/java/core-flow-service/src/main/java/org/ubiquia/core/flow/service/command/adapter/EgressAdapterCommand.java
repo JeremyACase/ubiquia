@@ -71,7 +71,7 @@ public class EgressAdapterCommand implements InterfaceLogger {
                 adapter);
             var flowEvent = this.flowEventBuilder.makeEventFrom(
                 inputPayload,
-                flowMessage.getFlowEvent().getBatchId(),
+                flowMessage.getFlowEvent().getFlowId(),
                 adapter);
 
             this.tryEgressPayload(flowEvent, adapter, inputPayload);

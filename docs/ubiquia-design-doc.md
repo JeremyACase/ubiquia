@@ -2,8 +2,8 @@
 This is a design document for Ubiquia, a Multi-Agent-System orchestration tool and framework.
 
 ## Document Version
-- **Version:** 0.1
-- **Date:** 2025-05-23
+- **Version:** 0.2
+- **Date:** 2025-10-06
 - **Author:** Jeremy Case
 - **Reviewed by:** [TBD]
 
@@ -23,8 +23,6 @@ This is a design document for Ubiquia, a Multi-Agent-System orchestration tool a
   * [Communication Service](#communication-service)
   * [Executive Service](#executive-service)
   * [Learning Service](#learning-service)
-* [Data Model](#data-model)
-  * [Flow Service](#flow-service)
 * [Scalability and Resilience](#scalability-and-resilience)
   * [Scalability](#scalability)
   * [Resilience](#resilience)
@@ -43,11 +41,12 @@ This is a design document for Ubiquia, a Multi-Agent-System orchestration tool a
   * [Overview](#overview)
   * [Helm Structure](#helm-structure)
 * [Tradeoffs](#tradeoffs)
+* [Dogfooding](#dogfooding)
 
 
 ## Overview
 
-**Ubiquia**  is a software system designed to serve as a general-purpose framework for decentralized autonomous situational awareness (ASA.) It is designed with lessons learned from MACHINA as well as recent advancements in Multi Agent Systems (MAS) and Large Language Models (LLMs) such as ChatGPT 3.5.
+**Ubiquia**  is a software system designed to serve as a general-purpose framework for decentralized autonomous situational awareness (ASA.) It is designed with lessons learned from MACHINA as well as recent advancements in Multi Agent Systems (MAS) and Large Language Models (LLMs) such as ChatGPT and Ollama.
 
 **Use Case Example:**
 Ubiquia can be used to orchestrate a collection of SDA assets--human, LLM, hardware, or otherwise--into an autonomous system capable of surviving a military conflict while still providing invaluable real-time awareness.
@@ -79,7 +78,7 @@ Ubiquia can be used to orchestrate a collection of SDA assets--human, LLM, hardw
 ## Architecture
 
 ### High-Level Architecture Diagram
-TODO
+![System Overview](diagram/system/Ubiquia_Lifecycle.drawio.png)
 
 ### Components
 - **Flow Service**: Allows for user-defined logic to be registered, instantiated, and ochestrated in runtime.
@@ -137,126 +136,6 @@ TODO
 - **Responsibilities**
   - **Update Model Weights**: Allows for an API to update model weights for any LLM components existing in the ubiquia component
 
-## Data Model
-
-### Flow Service
-
-**Flow Service Event**:
-```json
-{
-    "id": "09454cee-a2e4-4c2e-a463-baf5d400ded7",
-    "createdAt:" "2022-08-30T21:00:00.000Z",
-    "updatedAt:" "2022-08-30T21:00:00.000Z",
-    "modelType:" "flowEvent",
-    "adapter": {},
-    "batchId": "09454cee-a2e4-4c2e-a463-baf5d400ded7",
-    "eventTimes": {
-        "payloadReceivedTime": "2022-08-30T21:00:00.000Z",
-        "payloadSentAgentTime": "2022-08-30T21:00:00.000Z",
-        "eventStartTime": "2022-08-30T21:00:00.000Z",
-        "eventCompleteTime": "2022-08-30T21:00:00.000Z",
-        "egressResponseReceivedTime": "2022-08-30T21:00:00.000Z",
-        "agentReponseTime": "2022-08-30T21:00:00.000Z",
-        "pollStartedTime": "2022-08-30T21:00:00.000Z",
-        "payloadEgressedTime": "2022-08-30T21:00:00.000Z",
-    },
-    "inputPayload": "I'm the input payload sent to the component",
-    "inputPayloadStamps": [
-      {
-        "filename": "abc.xyz"
-      }
-    ],
-    "outputPayload": "I'm the out payload the component responded with",
-    "outputPayloadStamps": [
-      {
-        "pet": "dog"
-      }
-    ],
-    "httpResponseCode": 200,
-    "batchId": "09454cee-a2e4-4c2e-a463-baf5d400ded7",
-    "inboxOutboxMessages": []
-}
-```
-
-**Agent Communication Language**:
-```json
-{
-    "id": "09454cee-a2e4-4c2e-a463-baf5d400ded7",
-    "createdAt:" "2022-08-30T21:00:00.000Z",
-    "updatedAt:" "2022-08-30T21:00:00.000Z",
-    "modelType:" "Flow ServiceEvent",
-    "version": {
-        "major": 1,
-        "minor": 2,
-        "patch": 3,
-    },
-    "graphs": [],
-    "jsonSchema": "{
-      "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "title": "Pet",
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the pet"
-        },
-        "name": {
-          "type": "string",
-          "description": "The pet's name"
-        },
-        "species": {
-          "type": "string",
-          "enum": ["dog", "cat", "bird", "fish", "other"],
-          "description": "Type of animal"
-        },
-        "age": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Age of the pet in years"
-        },
-        "vaccinated": {
-          "type": "boolean",
-          "description": "Whether the pet is vaccinated"
-        }
-      },
-      "required": ["id", "name", "species"],
-      "additionalProperties": false
-    }"
-}
-```
-
-**InboxOutboxMessage**:
-```json
-{
-    "id": "09454cee-a2e4-4c2e-a463-baf5d400ded7",
-    "createdAt:" "2022-08-30T21:00:00.000Z",
-    "updatedAt:" "2022-08-30T21:00:00.000Z",
-    "poppedAt:" null,
-    "modelType:" "InboxOutboxMessage",
-    "targetAdapter": {},
-    "Flow ServiceEvent": {},
-    "payload": "I'm the payload!",
-}
-```
-
-**Backpressure**:
-```json
-{
-  "ingress:" {
-    "queuedRecords": 2,
-    "queueRatePerMinute": 1.2,
-  },
-  "egress": {
-    "maxOpenMessages": 3,
-    "currentOpenMessages": 3,
-  }
-}
-```
-
-### Communications Service: TODO
-### Learning Service: TODO
-### Mission Logic Service: TODO
-
 ## Scalability and Resilience
 
 ### Scalability
@@ -267,6 +146,7 @@ TODO
 - **Inbox/Outbox Queue Design**: Messages flowing over Flow Service DAG's can be treated as queue, where messages can be popped faster or slower depending on compute requirements.
 - **Rate Limiting**: API Gateway enforces rate limits per user to protect backend services.
 - **Agent Weights**: Ubiquia instances will be configurable with different "weights" (e.g., light, heavy, etc.) so that heterogenous components of a cluster can be run across anything between edge devices and the cloud.
+- **DAG Cardinality**: DAGs deployed by Ubiquia agents can have cardinality configured at deployment time. This means that components and adapters within a DAG can be "toggled" on/off within a specific Ubiquia Agent.
 
 ### Resilience
 
@@ -292,9 +172,9 @@ TODO
 
 ### Data Protection
 
-- **Encryption at Rest**: All data stored in PostgreSQL and object storage (e.g., S3) is encrypted using AES-256.
+- **Encryption at Rest**: All data stored in PostgreSQL and object storage (e.g., S3) will be encrypted using AES-256.
 - **Encryption in Transit**: All external and internal communication is TLS 1.3 encrypted.
-- **Secrets Management**: All secrets (e.g., API keys, DB creds) are stored in HashiCorp Vault and injected into containers at runtime.
+- **Secrets Management**: All production secrets (e.g., API keys, DB creds) are stored in K8s secrets and injected into containers at runtime.
 
 ### Input Validation
 
@@ -323,9 +203,7 @@ Grafana is the central dashboarding and observability platform for this service.
 - **Scraped by Prometheus** and visualized in Grafana dashboards.
 
 **Key Metrics:**
-- `http_server_requests_seconds_count` – request count by status and path
-- `http_server_requests_seconds_bucket` – request latency histogram
-- `db_query_duration_seconds` – duration of key DB queries
+TBD
 
 **Grafana Dashboards:**
 - API Latency & Throughput
@@ -361,24 +239,35 @@ Deployments target three environments: **dev**, **staging**, and **production**.
 ```text
 helm/
 ├── Chart.yaml                  
-├── values.yaml                 
-├── values/
-│   ├── dev.yaml
-│   ├── staging.yaml
-│   ├── prod.yaml
-│   └── configurations/
+├── values.yaml  
+├── bootstrap/     
+│   ├── acls/          
+│   │   ├── pets-acl.json
+│   │   └── workbench-acl.json
+│   └── graphs/          
+│       ├── pets-graph.yaml
+│       └── ubiquia-workbench.yaml
+├── configurations/     
+│   ├── dev/          
+│   │   ├── featherweight-default.yaml
+│   │   ├── featherweight-dev.yaml
+│   │   └── lightweight-dev.yaml
+│   ├── test/
+│   │   └── build-pipeline.yaml          
+│   └── prod/          
 │       ├── featherweight.yaml
 │       ├── lightweight.yaml
 │       ├── middleweight.yaml
 │       ├── heavyweight.yaml
 │       └── ultraweight.yaml
 ├── templates/
-│   ├── core/
-│   │   └── service/
-│   │       ├── flow-service/
-│   │       ├── communications-service/
-│   │       ├── executive-service/
-│   │       └── learning-service/
+│   ├── services/
+│   │   ├── core/
+│   │   │   ├── flow-service/
+│   │   │   ├── communications-service/
+│   │   │   ├── executive-service/
+│   │   │   └── learning-service/
+│   │   └── test/
 |   └── other/
 |
 ```
@@ -404,7 +293,7 @@ helm/
 
 **Pros:**
 - Flexible architecture allows orchestration of varied compute nodes (LLMs, IoT, APIs).
-- DAGs can span cloud and edge environments seamlessly.
+- DAGs can span cloud and edge environments seamlessly provided connectivity of YugabyteDB nodes into logical clusters.
 - Flow Service abstraction enables runtime orchestration without recompilation.
 
 **Cons:**
@@ -469,6 +358,12 @@ helm/
 - Distributed failures in a DAG may be harder to diagnose than in statically defined pipelines.
 
 ---
+
+## Dogfooding
+Dogfooding is the concept of "eating one own's cooking" in Software. For Ubiquia, this means that Ubiquia will ship with "non-core" applications themselves defined as Ubiquia DAGs. The first such DAG is the "Ubiquia Workbench."
+
+### Ubiquia Workbench
+The Ubiquia Workbench is a DAG that "ships" with Ubiquia. It has its own ACL, and once deployed, can be reached through the Ubiquia Communication Service per its configuration. The UI it ships with allows clients to request Ubiquia to use an LLM as a part of the Workbench DAG to generate a new "workflow" that gets persisted into Ubiquia. Specifically, this workflow output results in an ACL and DAG artifacts that can be used to instantiate a new belief state and workflow, respectively.  
 
 ## Contributors
 * __Jeremy Case__: jeremycase@odysseyconsult.com
