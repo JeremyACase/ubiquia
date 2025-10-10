@@ -1,5 +1,6 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-#.pytest_cache/
-#.venv/
+.pytest_cache/
+.venv/
+#dist
 uv.lock
