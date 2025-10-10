@@ -2,7 +2,7 @@
   "domain": "ubiquia-workbench",
   "version": {
     "major": 1,
-    "minor": 0,
+    "minor": 1,
     "patch": 0
   },
   "modelType": "AgentCommunicationLanguage",
@@ -143,6 +143,37 @@
           }
         },
         "additionalProperties": true
+      },
+      "PythonScriptPayload": {
+        "description": "Payload carrying a full Python script to be written to disk and exposed at a REST endpoint.",
+        "type": "object",
+        "required": [
+          "filename",
+          "script"
+        ],
+        "properties": {
+          "filename": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[A-Za-z0-9._\\-\\/]+\\.py$",
+            "description": "Target filename (relative path allowed) the server should write, must end with .py"
+          },
+          "script": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000000,
+            "contentMediaType": "text/x-python",
+            "description": "The complete Python source code."
+          }
+        },
+        "additionalProperties": false,
+        "examples": [
+          {
+            "filename": "handlers/thumbnailer.py",
+            "script": "from fastapi import APIRouter, UploadFile\\nrouter = APIRouter()\\n@router.post('/api/v1/thumbnail')\\nasync def create_thumbnail(file: UploadFile):\\n    data = await file.read()\\n    # ... do work ...\\n    return {'ok': True}"
+          }
+        ]
       }
     }
   }
