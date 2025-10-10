@@ -4,4 +4,4 @@
 .venv/
 dist
 uv.lock
-tests/__pycache__
+**/__pycache__
