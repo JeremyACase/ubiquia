@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 router = APIRouter()
-logger = logging.getLogger("ollama_whisperer")
+logger = logging.getLogger("workbench_whisperer")
 
 
 # ---------- Models ----------

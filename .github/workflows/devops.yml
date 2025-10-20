@@ -13,7 +13,7 @@ env:
     services/core/java/core-belief-state-generator-service
     services/core/java/core-communication-service
     services/core/java/core-flow-service
-    services/dag/workbench/python/dag-workbench-ollama-whisperer
+    services/dag/workbench/python/dag-workbench-whisperer
     services/dag/workbench/python/dag-workbench-scaffold
     services/dag/workbench/ts/dag-workbench-ui
     services/test/java/test-belief-state-generator-service

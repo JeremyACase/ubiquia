@@ -8,7 +8,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 router = APIRouter()
-logger = logging.getLogger("ollama_whisperer")
+logger = logging.getLogger("workbench_whisperer")
 
 # ---------- Helpers ----------
 def squish(text: str) -> str:
@@ -20,15 +20,19 @@ def squish(text: str) -> str:
     return t
 
 # ---------- Prompt scaffolding (Schema-only) ----------
-SCHEMA_ONLY_SYSTEM = (
-    "You are a JSON Schema synthesizer. Output ONLY a single valid JSON object that is a Draft-07 JSON Schema. "
-    "No code fences. No prose. No explanations."
-)
+SCHEMA_ONLY_SYSTEM = squish("""
+You are a JSON Schema synthesizer. Output ONLY a single valid JSON object that is a Draft-07 JSON Schema.
+No code fences. No prose. No explanations.
+""")
 
-SCHEMA_CONTRACT = """Contract (must satisfy):
+SCHEMA_CONTRACT = """
+Contract (must satisfy):
 - Produce exactly ONE JSON object that is a Draft-07 JSON Schema.
-- Top-level describes the primary object implied by the user's request and MUST include:
+- The top-level MUST include:
   { "$schema": "http://json-schema.org/draft-07/schema#", "type": "object", ... }.
+- Add a top-level field "definition" (string) that concisely condenses the user's prompt into <= 200 characters,
+  in plain English, no line breaks, no quotes metadata, and without repeating these instructions.
+  This is NOT "definitions"; it is a single "definition" string summary for downstream use.
 - Do NOT embed/inline object schemas inside properties or array items.
   Instead, declare EVERY object type under "definitions" and reference it with "$ref".
   (Use "definitions" explicitly — not "$defs".)
@@ -67,7 +71,8 @@ async def wrap_prompt(req: PromptRequest, request: Request) -> LlamaInput:
     user_prompt = req.userPrompt.strip()
     logger.info("Wrapping prompt (length=%s)", len(user_prompt), extra={"request_id": request_id})
 
-    # Build a compact, schema-only instruction that includes the user's prompt.
+    # Build a compact, schema-only instruction that includes the user's prompt
+    # and requires a top-level "definition" string summarizing the prompt.
     raw_prompt = (
         SCHEMA_PROMPT_PREAMBLE + " "
         + SCHEMA_CONTRACT + " "
@@ -82,7 +87,7 @@ async def wrap_prompt(req: PromptRequest, request: Request) -> LlamaInput:
         stream=False,
         prompt=final_prompt,
         format="json",                         # Request strict JSON output
-        system=squish(SCHEMA_ONLY_SYSTEM),     # Squished system message
+        system=SCHEMA_ONLY_SYSTEM,             # Squished system message
         options={
             "temperature": float(os.getenv("OLLAMA_TEMPERATURE", "0.1")),
             "top_p": float(os.getenv("OLLAMA_TOP_P", "0.9")),

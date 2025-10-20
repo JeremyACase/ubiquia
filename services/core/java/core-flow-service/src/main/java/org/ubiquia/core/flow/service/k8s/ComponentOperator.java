@@ -179,9 +179,7 @@ public class ComponentOperator {
     public void tryDeployComponent(final Component component)
         throws JsonProcessingException {
 
-        logger.info("Trying to deploy an component for with name {} for graph {}...",
-            component.getName(),
-            component.getGraph().getName());
+        logger.info("Trying to deploy component {}...", component.getName());
 
         var currentDeployment = this.deploymentClient.get(
             this.namespace,
