@@ -2,7 +2,7 @@
   "domain": "ubiquia-workbench",
   "version": {
     "major": 1,
-    "minor": 0,
+    "minor": 1,
     "patch": 0
   },
   "modelType": "AgentCommunicationLanguage",
@@ -34,6 +34,44 @@
           }
         },
         "additionalProperties": false
+      },
+      "BeliefStateGeneration": {
+        "description": "Top-level object describing which belief state to generate/deploy.",
+        "type": "object",
+        "required": [
+          "domainName",
+          "version",
+          "modelType"
+        ],
+        "properties": {
+          "modelType": {
+            "type": "string",
+            "const": "BeliefStateGeneration",
+            "default": "BeliefStateGeneration",
+            "description": "Discriminator for this model type."
+          },
+          "domainName": {
+            "type": "string",
+            "maxLength": 120,
+            "pattern": "^[a-zA-Z][a-zA-Z0-9\\-_.]{1,119}$",
+            "description": "Domain namespace of the belief state (mirrors Java @NotNull String)."
+          },
+          "version": {
+            "$ref": "#/definitions/SemanticVersion"
+          }
+        },
+        "additionalProperties": false,
+        "examples": [
+          {
+            "modelType": "BeliefStateGeneration",
+            "domainName": "pets",
+            "version": {
+              "major": 1,
+              "minor": 2,
+              "patch": 3
+            }
+          }
+        ]
       },
       "UserPrompt": {
         "description": "User prompt from Workbench UI.",
@@ -77,48 +115,73 @@
       "LlamaOutput": {
         "description": "Output from Llama LLM.",
         "type": "object",
-        "required": [],
         "properties": {
           "model": {
             "type": "string",
-            "minLength": 1,
-            "description": "Model name, e.g., 'llama3.2'."
+            "minLength": 1
           },
           "created_at": {
             "type": "string",
-            "format": "date-time",
-            "description": "RFC 3339 timestamp (e.g., '2025-08-30T01:38:00.342116838Z')."
+            "format": "date-time"
+          },
+          "prompt": {
+            "type": "string",
+            "maxLength": 300000,
+            "description": "The natural-language prompt to send to the LLM."
           },
           "response": {
             "type": "string",
             "minLength": 1,
-            "contentMediaType": "application/json",
-            "description": "Model response text. If it contains JSON, it is encoded as a JSON string."
+            "contentMediaType": "application/json"
           },
           "done": {
-            "type": "boolean",
-            "description": "Whether generation is complete."
+            "type": "boolean"
           },
           "done_reason": {
-            "type": "string",
-            "description": "Reason generation stopped (e.g., 'stop')."
+            "type": "string"
           },
           "context": {
             "type": "array",
-            "description": "Token context array.",
             "items": {
               "type": "integer",
               "minimum": 0
             }
-          },
-          "additionalProperties": false
+          }
         },
-        "JsonSchema": {
-          "description": "A JSON Schema Draft-07 document (object/boolean) or a string containing such a schema.",
-          "type": "string",
-          "minLength": 2,
-          "maxLength": 200000
-        }
+        "additionalProperties": false
+      },
+      "JsonSchema": {
+        "description": "A JSON Schema Draft-07 document (object/boolean) or a string containing such a schema.",
+        "type": [
+          "object",
+          "boolean",
+          "string"
+        ],
+        "minLength": 2,
+        "maxLength": 200000
+      },
+      "PythonScriptPayload": {
+        "description": "Payload carrying a full Python script to be written to disk and exposed at a REST endpoint.",
+        "type": "object",
+        "required": [
+          "filename",
+          "script"
+        ],
+        "properties": {
+          "filename": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[A-Za-z0-9._\\-\\/]+\\.py$"
+          },
+          "script": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000000,
+            "contentMediaType": "text/x-python"
+          }
+        },
+        "additionalProperties": false
       },
       "GeneratedAgentCommunicationLanguage": {
         "description": "Top-level ACL model.",
@@ -132,8 +195,7 @@
           "domain": {
             "type": "string",
             "maxLength": 120,
-            "pattern": "^[a-zA-Z][a-zA-Z0-9\\-_.]{1,119}$",
-            "description": "Domain namespace for this ACL."
+            "pattern": "^[a-zA-Z][a-zA-Z0-9\\-_.]{1,119}$"
           },
           "version": {
             "$ref": "#/definitions/SemanticVersion"
@@ -141,8 +203,60 @@
           "jsonSchema": {
             "$ref": "#/definitions/JsonSchema"
           }
+        }
+      },
+      "IngressResponse": {
+        "description": "Generic ingress acknowledgement/response wrapper.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Server-generated identifier (e.g., UUID)."
+          },
+          "modelType": {
+            "type": "string",
+            "const": "IngressResponse",
+            "default": "IngressResponse",
+            "description": "Discriminator for this model."
+          },
+          "payloadModelType": {
+            "type": "string",
+            "minLength": 1,
+            "default": "IngressResponse",
+            "description": "Discriminator indicating the payload model type acknowledged by this response."
+          }
         },
-        "additionalProperties": true
+        "additionalProperties": false,
+        "examples": [
+          {
+            "id": "2f8b6a6e-3b0d-4a3a-ae6e-3a9f7f5b2d1e",
+            "modelType": "IngressResponse",
+            "payloadModelType": "GeneratedAgentCommunicationLanguage"
+          }
+        ]
+      }
+    },
+    "properties": {
+      "beliefStateGeneration": {
+        "$ref": "#/definitions/BeliefStateGeneration",
+        "description": "Top-level Belief State Generation object."
+      },
+      "acl": {
+        "$ref": "#/definitions/GeneratedAgentCommunicationLanguage"
+      },
+      "llamaInput": {
+        "$ref": "#/definitions/LlamaInput"
+      },
+      "llamaOutput": {
+        "$ref": "#/definitions/LlamaOutput"
+      },
+      "pythonScript": {
+        "$ref": "#/definitions/PythonScriptPayload"
+      },
+      "ingressResponse": {
+        "$ref": "#/definitions/IngressResponse",
+        "description": "Top-level IngressResponse object."
       }
     }
   }

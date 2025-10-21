@@ -6,25 +6,20 @@ ubiquia:
   agent:
     database: 
       h2:
-        enabled: false
-      yugabyte:
         enabled: true
+      yugabyte:
+        enabled: false
     flowService:
       bootstrap:
         enabled: true
         beliefState:
           deployments:
-            - domainName: pets
-              version:
-                major: 1
-                minor: 2
-                patch: 3
         graph:
           deployments:
             - name: ubiquia-workbench
               version:
                 major: 1
-                minor: 0
+                minor: 1
                 patch: 0
     storage:  
       minio:

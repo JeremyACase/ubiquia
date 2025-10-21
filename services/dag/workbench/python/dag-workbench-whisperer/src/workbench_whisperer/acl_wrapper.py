@@ -30,9 +30,13 @@ class LlamaOutput(BaseModel):
     done: bool
     done_reason: Optional[str] = None
     context: List[int] = Field(default_factory=list)
+    # NEW: carry forward the original prompt from LlamaInput
+    prompt: Optional[str] = Field(
+        default=None,
+        description="The original prompt used to generate this response."
+    )
 
 class GeneratedAgentCommunicationLanguage(BaseModel):
-    # Pydantic v2: use `pattern=` and `Literal[...]` instead of `regex=` / `const=`
     domain: str = Field(..., max_length=120, pattern=r"^[a-zA-Z][a-zA-Z0-9\-_.]{1,119}$")
     version: SemanticVersion
     modelType: Literal["AgentCommunicationLanguage"] = "AgentCommunicationLanguage"
@@ -48,7 +52,6 @@ def _strip_fences(s: str) -> str:
     s = s.strip()
     if s.startswith("```") and s.endswith("```"):
         s = s[3:-3].strip()
-        # optional leading language label like "json"
         if s.lower().startswith("json"):
             s = s[4:].lstrip()
     return s
@@ -66,33 +69,29 @@ def _parse_schema_from_response(resp: str) -> Union[dict, str]:
             return resp
     return resp
 
+def _inject_description(schema: Union[dict, str], description: Optional[str]) -> Union[dict, str]:
+    """
+    If the parsed schema is a dict, set/override the top-level 'description'
+    with the provided description (trimmed). Creates the field if missing.
+    If the schema isn't a dict, return it unchanged.
+    """
+    if not description:
+        return schema
+    if isinstance(schema, dict):
+        schema["description"] = description.strip()
+    return schema
+
 def _slugify_for_domain(title: str) -> str:
-    """
-    Convert a title to a domain-friendly slug that matches the allowed charset [-_.A-Za-z0-9].
-    - Lowercase
-    - Replace whitespace with '-'
-    - Drop characters not in [-_.A-Za-z0-9]
-    - Trim to max length 120 (we'll ensure the first char is a letter separately)
-    """
     t = title.strip().lower()
-    # Replace whitespace runs with single '-'
     t = re.sub(r"\s+", "-", t)
-    # Remove disallowed characters
     t = re.sub(r"[^a-z0-9\-_.]", "", t)
-    # Ensure length cap
     if len(t) > 120:
         t = t[:120]
-    # Ensure first char is a letter; if not, prefix with 'a'
     if not t or not t[0].isalpha():
         t = ("a" + t)[:120]
     return t
 
 def _resolve_domain_from_schema_title(schema: Union[dict, str]) -> str:
-    """
-    Extract the JSON Schema 'title' and convert it into a valid domain per the pattern.
-    Fallback to DEFAULT_DOMAIN if we cannot produce a valid domain.
-    """
-    # If schema isn't a dict, we can't extract title
     if not isinstance(schema, dict):
         return _fallback_domain()
 
@@ -102,22 +101,16 @@ def _resolve_domain_from_schema_title(schema: Union[dict, str]) -> str:
         if _DOMAIN_RE.match(candidate):
             return candidate
 
-    # If title is missing/invalid, try $id host-ish prefix as a bonus
     schema_id = schema.get("$id")
     if isinstance(schema_id, str) and schema_id.strip():
-        # very liberal parse: take the segment before '://' or the first '/'
         cand = schema_id.split("://", 1)[0] if "://" in schema_id else schema_id.split("/", 1)[0]
         cand = _slugify_for_domain(cand)
         if _DOMAIN_RE.match(cand):
             return cand
 
-    # Fallback
     return _fallback_domain()
 
 def _fallback_domain() -> str:
-    """
-    Last resort: use the configured DEFAULT_DOMAIN if valid, else a safe hardcoded fallback.
-    """
     if _DOMAIN_RE.match(DEFAULT_DOMAIN or ""):
         return DEFAULT_DOMAIN
     return "generated-domain"
@@ -130,12 +123,13 @@ def _fallback_domain() -> str:
 )
 def acl_from_llama_output(payload: LlamaOutput) -> Any:
     try:
-        # Validate configured default up-front to avoid surprising 500s later
-        if not _DOMAIN_RE.match(DEFAULT_DOMAIN or ""):
-            # Don't fail the whole request—just ensure we have a safe fallback
-            pass
-
+        # Parse the model response
         schema = _parse_schema_from_response(payload.response)
+
+        # Inject the prompt into the schema's description (if we have both)
+        schema = _inject_description(schema, payload.prompt)
+
+        # Determine domain (uses title/$id or falls back)
         domain = _resolve_domain_from_schema_title(schema)
 
         major, minor, patch = DEFAULT_VERSION

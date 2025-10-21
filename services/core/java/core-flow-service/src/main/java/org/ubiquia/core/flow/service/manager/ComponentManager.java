@@ -74,6 +74,11 @@ public class ComponentManager {
 
             var component = this.componentDtoMapper.map(componentEntity);
 
+            // Do this explicitly here to prevent the DTO Mapper from inadvertently egressing
+            // nested objects by our controllers
+            var graph = this.graphDtoMapper.map(graphEntity);
+            component.setGraph(graph);
+
             if (this.componentCardinalityVisitor.hasMatchingCardinality(
                 component.getName(),
                 graphDeployment)) {

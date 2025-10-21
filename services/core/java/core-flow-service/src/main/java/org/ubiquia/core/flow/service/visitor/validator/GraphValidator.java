@@ -1,6 +1,8 @@
 package org.ubiquia.core.flow.service.visitor.validator;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class GraphValidator {
 
     @Autowired
     private AdapterRepository adapterRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /**
      * Attempt to validate whether a graph is valid.
@@ -50,12 +55,13 @@ public class GraphValidator {
      * @param graphRegistration The graph to validate.
      */
     private void tryValidateMatchingAdapterSchemasFor(
-        final Graph graphRegistration) {
+        final Graph graphRegistration) throws JsonProcessingException {
 
         logger.info("...validating matching input/output schemas...");
         for (var edge : graphRegistration.getEdges()) {
 
-            logger.info("...validating edge: {}", edge);
+            logger.info("...validating edge hsa matching input/output: {}",
+                this.objectMapper.writeValueAsString(edge));
 
             var leftAdapterRecord = this.adapterRepository
                 .findByGraphNameAndName(

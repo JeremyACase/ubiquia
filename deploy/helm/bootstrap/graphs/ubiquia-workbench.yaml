@@ -3,10 +3,9 @@ modelType: Graph
 author: Jeremy Case
 description: A DAG that ships with Ubiquia that can be used to generate new ACLs and DAGs
 
-# Graphs require semantic versions
 version:
   major: 1
-  minor: 0
+  minor: 1
   patch: 0
 
 tags:
@@ -19,7 +18,7 @@ agentCommunicationLanguage:
   name: ubiquia-workbench
   version:
     major: 1
-    minor: 0
+    minor: 1
     patch: 0
 
 components:
@@ -43,42 +42,18 @@ components:
 
     overrideSettings:
 
-  - name: Workbench-Ollama-Whisperer
+  - name: Workbench-Whisperer
 
     componentType: POD
     modelType: Component
-    description: This UI will allow clients to prompt Ubiquia to generate new ACLs and DAGs for those problem domains.
+    description: This component contains several endpoints that can be used to interface successfully with the Workbench LLM.
 
     port: 8080
 
     image:
       registry: ubiquia
-      repository: dag-workbench-ollama-whisperer
+      repository: dag-workbench-whisperer
       tag: latest
-
-    adapter:
-      modelType: Adapter
-      adapterType: PUSH
-      name: Workbench-User-Prompt-Adapter
-      description: SENPAI!
-
-      communicationServiceSettings:
-        exposeViaCommService: true
-
-      endpoint: /wrap
-
-      inputSubSchemas:
-        - modelName: UserPrompt
-
-      outputSubSchema:
-        modelName: LlamaInput
-      
-      adapterSettings:
-        persistInputPayload: true
-        persistOutputPayload: true
-        validateOutputPayload: true
-        validateInputPayload: true
-        stimulateInputPayload: false
 
     overrideSettings:
 
@@ -116,57 +91,34 @@ components:
         echo "Ollama not ready after 360s" >&2
         exit 1
 
-    adapter:
-      modelType: Adapter
-      adapterType: HIDDEN
-      name: Json-Schema-Generator-Adapter
-      description: An adapter that forwards traffic to our LLM
-
-      endpoint: /api/generate
-
-      inputSubSchemas:
-        - modelName: LlamaInput
-
-      outputSubSchema:
-        modelName: LlamaOutput
-      
-      adapterSettings:
-        persistInputPayload: true
-        persistOutputPayload: true
-        validateOutputPayload: false
-        validateInputPayload: false
-        stimulateInputPayload: false
-
-
 componentlessAdapters:
 
   - modelType: Adapter
-    adapterType: HIDDEN
-    name: Json-Schema-Linter-Adapter
-    description: This adapter will have Ollama lint a JSON Schema.
+    adapterType: PUSH
+    name: Workbench-User-Prompt-Adapter
+    description: SENPAI!
 
-    endpoint: http://workbench-ollama-whisperer:8080/lint
+    communicationServiceSettings:
+      exposeViaCommService: true
+
+    endpoint: http://workbench-whisperer:8080/wrap
 
     inputSubSchemas:
-      - modelName: LlamaOutput
+      - modelName: UserPrompt
 
     outputSubSchema:
-        modelName: LlamaInput
-
-    egressSettings:
-      httpOutputType: POST
-      egressType: SYNCHRONOUS
-      egressConcurrency: 1
-
+      modelName: LlamaInput
+    
     adapterSettings:
       persistInputPayload: true
       persistOutputPayload: true
-      validateOutputPayload: false
-      validateInputPayload: false
+      validateOutputPayload: true
+      validateInputPayload: true
+      stimulateInputPayload: false
 
   - modelType: Adapter
     adapterType: HIDDEN
-    name: Linted-Json-Schema-Generator-Adapter
+    name: Json-Schema-Generator-Adapter
     description: An adapter that forwards traffic to our LLM
 
     endpoint: http://workbench-llm:11434/api/generate
@@ -189,7 +141,7 @@ componentlessAdapters:
     name: Acl-Wrapper-Adapter
     description: An adapter that wraps our generated JSON Schema into an ACL
 
-    endpoint: http://workbench-ollama-whisperer:8080/acl/from-llama-output
+    endpoint: http://workbench-whisperer:8080/acl/from-llama-output
 
     inputSubSchemas:
       - modelName: LlamaOutput
@@ -205,19 +157,127 @@ componentlessAdapters:
       stimulateInputPayload: false
 
   - modelType: Adapter
-    adapterType: EGRESS
-    name: ACL-Registration-Adapter
+    adapterType: HIDDEN
+    name: Acl-Registration-Adapter
     description: This adapter will attempt to register LLM-generated ACLs with Ubiquia.
 
-    endpoint: http://ubiquia-core-flow-service:8080/agent-communication-language/register/post
+    endpoint: http://ubiquia-core-flow-service:8080/ubiquia/flow-service/agent-communication-language/register/post
 
     inputSubSchemas:
       - modelName: GeneratedAgentCommunicationLanguage
+
+    outputSubSchema:
+      modelName: IngressResponse
+
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: true
+    
+  - modelType: Adapter
+    adapterType: HIDDEN
+    name: Acl-Query-Adapter
+    description: This adapter will query adapters 
+
+    endpoint: http://workbench-whisperer:8080/ingress/relay
+
+    inputSubSchemas:
+      - modelName: IngressResponse
+
+    outputSubSchema:
+      modelName: GeneratedAgentCommunicationLanguage
 
     egressSettings:
       httpOutputType: POST
       egressType: SYNCHRONOUS
       egressConcurrency: 1
+
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: true
+
+  - modelType: Adapter
+    adapterType: HIDDEN
+    name: Acl-Belief-State-Generation
+    description: This adapter  
+
+    endpoint: http://workbench-whisperer:8080/acl/to-belief-state-generation
+
+    inputSubSchemas:
+      - modelName: GeneratedAgentCommunicationLanguage
+
+    outputSubSchema:
+      modelName: BeliefStateGeneration
+
+    egressSettings:
+      httpOutputType: POST
+      egressType: SYNCHRONOUS
+      egressConcurrency: 1
+
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: true
+
+  - modelType: Adapter
+    adapterType: EGRESS
+    name: Acl-Belief-State-Instantiate
+    description: This adapter will instantiate the generated belief state 
+
+    endpoint: http://ubiquia-core-belief-state-generator-service:8080/ubiquia/belief-state-generator/belief-state/generate
+
+    inputSubSchemas:
+      - modelName: BeliefStateGeneration
+
+    outputSubSchema:
+      modelName: BeliefStateGeneration
+
+    egressSettings:
+      httpOutputType: POST
+      egressType: SYNCHRONOUS
+      egressConcurrency: 1
+
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: true
+
+  - modelType: Adapter
+    adapterType: HIDDEN
+    name: Dag-Prompt-Generator-Adapter
+    description: This adapter will prompt our LLM to generate a DAG 
+
+    endpoint: http://workbench-whisperer:8080/wrap-dag
+
+    inputSubSchemas:
+      - modelName: GeneratedAgentCommunicationLanguage
+
+    outputSubSchema:
+      modelName: LlamaInput
+
+    adapterSettings:
+      persistInputPayload: true
+      persistOutputPayload: true
+      validateOutputPayload: false
+      validateInputPayload: true
+
+  - modelType: Adapter
+    adapterType: HIDDEN
+    name: Dag-Generator-Adapter
+    description: This adapter will prompt our LLM to generate a DAG 
+
+    endpoint: http://workbench-llm:11434/api/generate
+
+    inputSubSchemas:
+      - modelName: LlamaInput
+
+    outputSubSchema:
+      modelName: LlamaOutput
 
     adapterSettings:
       persistInputPayload: true
@@ -231,13 +291,20 @@ edges:
       - Json-Schema-Generator-Adapter
   - leftAdapterName: Json-Schema-Generator-Adapter
     rightAdapterNames:
-      - Json-Schema-Linter-Adapter
-  - leftAdapterName: Json-Schema-Linter-Adapter
-    rightAdapterNames:
-      - Linted-Json-Schema-Generator-Adapter
-  - leftAdapterName: Linted-Json-Schema-Generator-Adapter
-    rightAdapterNames:
       - Acl-Wrapper-Adapter
   - leftAdapterName: Acl-Wrapper-Adapter
     rightAdapterNames:
-      - ACL-Registration-Adapter
+      - Acl-Registration-Adapter
+  - leftAdapterName: Acl-Registration-Adapter
+    rightAdapterNames:
+      - Acl-Query-Adapter
+  - leftAdapterName: Acl-Query-Adapter
+    rightAdapterNames:
+      - Acl-Belief-State-Generation
+      - Dag-Prompt-Generator-Adapter
+  - leftAdapterName: Acl-Belief-State-Generation
+    rightAdapterNames:
+      - Acl-Belief-State-Instantiate
+  - leftAdapterName: Dag-Prompt-Generator-Adapter
+    rightAdapterNames:
+      - Dag-Generator-Adapter
