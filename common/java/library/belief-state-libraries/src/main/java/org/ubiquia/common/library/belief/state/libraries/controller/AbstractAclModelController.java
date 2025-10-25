@@ -445,7 +445,7 @@ public abstract class AbstractAclModelController<
     @GetMapping("/query/{id}")
     @Transactional
     public ResponseEntity<D> queryModelWithId(@PathVariable("id") final String id)
-        throws NoSuchFieldException, IllegalAccessException {
+        throws Exception {
 
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterCommand)) {
@@ -580,7 +580,7 @@ public abstract class AbstractAclModelController<
         @RequestParam(value = "sort-descending", required = false, defaultValue = "true") final Boolean sortDescending,
         @RequestParam(value = "sort-by-fields", required = false, defaultValue = "") final List<String> sortByFields,
         HttpServletRequest httpServletRequest) throws
-        NoSuchFieldException, IllegalAccessException {
+        Exception {
 
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterCommand)) {

@@ -36,6 +36,32 @@
           "pattern": "^([0-9]+\\.){2}(\\*|[0-9]+)(-.*)?",
           "default": "1.2.3",
           "readOnly": true
+        },
+        "embeddedModel": {
+          "$ref": "#/definitions/EmbeddedModel"
+        },
+        "embeddedModels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EmbeddedModel"
+          }
+        }
+      }
+    },
+    "EmbeddedModel": {
+      "description": "An embedded model with some fields.",
+      "type": "object",
+      "properties": {
+        "embeddedFieldOne": {
+          "type": "number",
+          "format": "float"
+        },
+        "embeddedFieldTwo": {
+          "type": "string"
+        },
+        "embeddedFieldThree": {
+          "type": "number",
+          "format": "int64"
         }
       }
     },
@@ -194,41 +220,6 @@
           "default": true
         }
       }
-    }
-  },
-  "properties": {
-    "ColorType": {
-      "$ref": "#/definitions/ColorType"
-    },
-    "Name": {
-      "$ref": "#/definitions/Name"
-    },
-    "BaseModel": {
-      "$ref": "#/definitions/BaseModel"
-    },
-    "AdoptionTransaction": {
-      "$ref": "#/definitions/AdoptionTransaction"
-    },
-    "Person": {
-      "$ref": "#/definitions/Person"
-    },
-    "Animal": {
-      "$ref": "#/definitions/Animal"
-    },
-    "Dog": {
-      "$ref": "#/definitions/Dog"
-    },
-    "Dachschund": {
-      "$ref": "#/definitions/Dachschund"
-    },
-    "Poodle": {
-      "$ref": "#/definitions/Poodle"
-    },
-    "Cat": {
-      "$ref": "#/definitions/Cat"
-    },
-    "Shark": {
-      "$ref": "#/definitions/Shark"
     }
   }
 }

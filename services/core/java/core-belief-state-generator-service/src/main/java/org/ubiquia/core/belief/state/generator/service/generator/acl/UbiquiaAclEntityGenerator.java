@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenProperty;
-import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.languages.JavaClientCodegen;
 import org.openapitools.codegen.model.ModelsMap;
 
@@ -15,13 +14,6 @@ import org.openapitools.codegen.model.ModelsMap;
  * stores it in vendor-extensions every template can use.
  */
 public class UbiquiaAclEntityGenerator extends JavaClientCodegen {
-
-    /* ------------------------------------------------------------
-     * helper that gives the same key for (A,B) and (B,A)
-     * ---------------------------------------------------------- */
-    private static String pairKey(String a, String b) {
-        return (a.compareTo(b) < 0 ? a + '_' + b : b + '_' + a);
-    }
 
     private final Map<String, CodegenModel> modelIndex = new HashMap<>();
 
@@ -33,129 +25,200 @@ public class UbiquiaAclEntityGenerator extends JavaClientCodegen {
     @Override
     public void processOpts() {
         super.processOpts();
-
-        this.setEnablePostProcessFile(true);
-
+        setEnablePostProcessFile(true);
         supportingFiles.clear();
+
         modelTemplateFiles.put("modelRepository.mustache", "Repository.java");
         modelTemplateFiles.put("modelRelationshipBuilder.mustache", "RelationshipBuilder.java");
     }
 
-    /* ------------------------------------------------------------
-     * after all models are parsed, enrich fields with JPA hints
-     * ---------------------------------------------------------- */
     @Override
     public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
+        indexModels(objs);
+        attachBaseNames();
 
-        /* 1️⃣ index every model by class-name for fast look-ups */
-        modelIndex.clear(); // ← ensures no stale state
-        for (ModelsMap mm : objs.values()) {
-            mm.getModels().forEach(m -> modelIndex.put(m.getModel().classname, m.getModel()));
-        }
-
-        // Remove 'Entity' suffix from classnames
-        for (CodegenModel model : modelIndex.values()) {
-            if (model.classname.endsWith("Entity")) {
-                model.vendorExtensions.put("x-base-classname", model.classname.replaceFirst(
-                    "Entity$", ""));
-            } else {
-                model.vendorExtensions.put("x-base-classname", model.classname);
-            }
-            System.out.printf("Model %s → x-base-classname = %s%n", model.classname, model.vendorExtensions.get("x-base-classname"));
-        }
-
-        /* 2️⃣ collect potential relationship pairs */
-        Map<String, RelationPair> pairs = new HashMap<>();
-
-        for (CodegenModel source : modelIndex.values()) {
-            for (CodegenProperty prop : source.vars) {
-
-                boolean isModelRef = prop.isModel ||
-                    (prop.isContainer && prop.items != null && prop.items.isModel);
-                if (!isModelRef) {
-                    continue;
-                }
-
-                String targetName = prop.isContainer ? prop.items.baseType : prop.baseType;
-                CodegenModel target = modelIndex.get(targetName);
-                if (target == null || target.isEnum || target.isAlias || !target.getIsModel()) {
-                    continue;
-                }
-
-                RelationPair pair = pairs.computeIfAbsent(
-                    pairKey(source.classname, target.classname), k -> new RelationPair());
-                pair.addSide(source, prop);
-            }
-        }
-
-        /* 3️⃣ pick owning side when both directions are present */
-        for (RelationPair p : pairs.values()) {
-            if (!p.isBidirectional()) {
-                continue;
-            }
-
-            switch (p.jointType()) {
-                case ONE_TO_ONE, MANY_TO_MANY -> p.chooseOwnerLexicographically();
-                default -> { /* nothing – JPA rules handle 1-N / N-1 */ }
-            }
-        }
-
-        /* 4️⃣ write vendor-extensions on every property */
+        var pairs = collectRelationPairs();
+        chooseOwners(pairs);
         pairs.values().forEach(RelationPair::stampExtensions);
 
-        /* optional debug
-        modelIndex.values().forEach(m ->
-            System.out.printf("MODEL %-20s vars=%d%n", m.classname, m.vars.size())
-        );
-        */
+        // NEW: add per-property vendor extensions (owner name, join column, collection table, element-collection flag)
+        attachPerPropertyExtensions();  // <-- important
 
         return super.postProcessAllModels(objs);
     }
 
     @Override
     public void postProcessFile(java.io.File file, String fileType) {
+        if (!"model".equals(fileType)) {
+            super.postProcessFile(file, fileType);
+            return;
+        }
 
-        if ("model".equals(fileType)) {
-            String filename = file.getName();
+        var filename = file.getName();
+        if (!isSupportFile(filename)) {
+            super.postProcessFile(file, fileType);
+            return;
+        }
 
-            // Check for Repository.java or ModelRelationshipBuilder.java
-            if (filename.endsWith("Repository.java") || filename.endsWith("RelationshipBuilder.java")) {
-                String modelName = filename
-                    .replace("Repository.java", "")
-                    .replace("RelationshipBuilder.java", "");
+        var modelName = stripSupportSuffix(filename);
+        var model = modelIndex.get(modelName);
+        if (model == null) {
+            super.postProcessFile(file, fileType);
+            return;
+        }
 
-                CodegenModel model = modelIndex.get(modelName);
-                if (model != null && model.isEnum) {
-                    boolean deleted = file.delete();
-                    if (deleted) {
-                        System.out.printf("Deleted enum-generated file: %s%n", file.getAbsolutePath());
-                    } else {
-                        System.out.printf("Failed to delete file: %s%n", file.getAbsolutePath());
-                    }
-                }
-            }
+        if (model.isEnum || isEmbeddable(model)) {
+            var deleted = file.delete();
+            System.out.printf("%s %s (%s)%n",
+                deleted ? "Deleted" : "Failed to delete",
+                file.getAbsolutePath(),
+                model.isEnum ? "enum" : "embeddable");
         }
 
         super.postProcessFile(file, fileType);
+    }
+
+    /* ------------------------------------------------------------ */
+    /* Helper methods                                               */
+    /* ------------------------------------------------------------ */
+
+    private String pairKey(String a, String b) {
+        return (a.compareTo(b) < 0 ? a + '_' + b : b + '_' + a);
+    }
+
+    private boolean isEmbeddable(CodegenModel m) {
+        return Boolean.TRUE.equals(m.vendorExtensions.get("x-embeddable"));
+    }
+
+    private boolean isSkippable(CodegenModel m) {
+        return m == null || m.isEnum || m.isAlias || !m.getIsModel() || isEmbeddable(m);
+    }
+
+    private boolean isModelRef(CodegenProperty p) {
+        return p.isModel || (p.isContainer && p.items != null && p.items.isModel);
+    }
+
+    private CodegenModel getTargetModel(CodegenProperty p) {
+        var targetName = p.isContainer ? p.items.baseType : p.baseType;
+        return modelIndex.get(targetName);
+    }
+
+    private void setBaseClassname(CodegenModel model) {
+        var base = model.classname.endsWith("Entity")
+            ? model.classname.replaceFirst("Entity$", "")
+            : model.classname;
+        model.vendorExtensions.put("x-base-classname", base);
+    }
+
+    private void indexModels(Map<String, ModelsMap> objs) {
+        modelIndex.clear();
+        for (var mm : objs.values()) {
+            for (var m : mm.getModels()) {
+                var cg = m.getModel();
+                modelIndex.put(cg.classname, cg);
+            }
+        }
+    }
+
+    private void attachBaseNames() {
+        for (var model : modelIndex.values()) {
+            setBaseClassname(model);
+        }
+    }
+
+    private Map<String, RelationPair> collectRelationPairs() {
+        var pairs = new HashMap<String, RelationPair>();
+
+        for (var source : modelIndex.values()) {
+            if (isSkippable(source)) continue;
+
+            for (var prop : source.vars) {
+                if (!isModelRef(prop)) continue;
+
+                var target = getTargetModel(prop);
+                if (isSkippable(target)) continue;
+
+                var key = pairKey(source.classname, target.classname);
+                var pair = pairs.computeIfAbsent(key, k -> new RelationPair());
+                pair.addSide(source, prop);
+            }
+        }
+        return pairs;
+    }
+
+    private void chooseOwners(Map<String, RelationPair> pairs) {
+        for (var p : pairs.values()) {
+            if (!p.isBidirectional()) continue;
+            switch (p.jointType()) {
+                case ONE_TO_ONE, MANY_TO_MANY -> p.chooseOwnerLexicographically();
+                default -> { /* 1-N / N-1 handled implicitly */ }
+            }
+        }
+    }
+
+    private boolean isSupportFile(String filename) {
+        return filename.endsWith("Repository.java") || filename.endsWith("RelationshipBuilder.java");
+    }
+
+    private String stripSupportSuffix(String filename) {
+        return filename.replace("Repository.java", "").replace("RelationshipBuilder.java", "");
+    }
+
+    /* ============================================================ */
+    /* NEW: Per-property vendor extensions                          */
+    /* ============================================================ */
+
+    private void attachPerPropertyExtensions() {
+        for (var model : modelIndex.values()) {
+            if (isSkippable(model)) continue;
+
+            boolean hasElementCollections = false; // class-level flag for conditional imports
+
+            final String ownerLower = toOwnerLower(model.classname);
+
+            for (var p : model.vars) {
+                final var v = p.vendorExtensions;
+
+                // Always provide stable names so templates never rely on outer scope
+                v.put("x-owner-classname-lower", ownerLower);
+                v.put("x-field-name", p.name);
+                v.put("x-join-column", ownerLower + "_id");
+                v.put("x-collection-table-name", ownerLower + "_" + p.name);
+
+                // ElementCollection: only for collections whose element type is an embeddable
+                if (p.isContainer && p.items != null && p.items.isModel) {
+                    var elem = modelIndex.get(p.items.baseType);
+                    if (elem != null && isEmbeddable(elem)) {
+                        v.put("x-element-collection", Boolean.TRUE);
+                        hasElementCollections = true;
+                    }
+                }
+            }
+
+            if (hasElementCollections) {
+                model.vendorExtensions.put("hasElementCollections", Boolean.TRUE);
+            }
+        }
+    }
+
+    private String toOwnerLower(String classname) {
+        if (classname == null || classname.isEmpty()) return "";
+        // lowerCamel “Entity” stays part of the name here (matches your current codegen names)
+        return classname.substring(0, 1).toLowerCase() + classname.substring(1);
     }
 
     /* ============================================================ */
 
     private enum RelationType { ONE_TO_ONE, ONE_TO_MANY, MANY_TO_ONE, MANY_TO_MANY }
 
-    /**
-     * Holds the two “sides” of a relationship
-     */
-    public static final class RelationPair {
+    /** Holds the two “sides” of a relationship */
+    public final class RelationPair {
         Side left;
         Side right;
 
         void addSide(CodegenModel mdl, CodegenProperty prop) {
-            if (left == null) {
-                left = new Side(mdl, prop);
-            } else if (right == null) {
-                right = new Side(mdl, prop);
-            }
+            if (left == null) left = new Side(mdl, prop);
+            else if (right == null) right = new Side(mdl, prop);
         }
 
         boolean isBidirectional() {
@@ -167,82 +230,61 @@ public class UbiquiaAclEntityGenerator extends JavaClientCodegen {
         }
 
         RelationType jointType() {
-            if (left == null || right == null) {
-                return RelationType.ONE_TO_ONE; // uni-dir
-            }
-            Cardinality l = cardOf(left), r = cardOf(right);
-            if (l == ONE && r == ONE) {
-                return RelationType.ONE_TO_ONE;
-            }
-            if (l == ONE && r == Cardinality.MANY) {
-                return RelationType.ONE_TO_MANY;
-            }
-            if (l == Cardinality.MANY && r == ONE) {
-                return RelationType.MANY_TO_ONE;
-            }
+            if (left == null || right == null) return RelationType.ONE_TO_ONE;
+            var l = cardOf(left);
+            var r = cardOf(right);
+            if (l == ONE && r == ONE) return RelationType.ONE_TO_ONE;
+            if (l == ONE && r == Cardinality.MANY) return RelationType.ONE_TO_MANY;
+            if (l == Cardinality.MANY && r == ONE) return RelationType.MANY_TO_ONE;
             return RelationType.MANY_TO_MANY;
         }
 
-        /**
-         * For 1-1 and N-N pick the owner deterministically
-         */
         void chooseOwnerLexicographically() {
-            if (left.model.classname.compareTo(right.model.classname) < 0) {
-                left.owningSide = true;
-            } else {
-                right.owningSide = true;
-            }
+            if (left.model.classname.compareTo(right.model.classname) < 0) left.owningSide = true;
+            else right.owningSide = true;
         }
 
         void stampExtensions() {
-            if (left != null) {
-                stamp(left, right);
-            }
-            if (right != null) {
-                stamp(right, left);
-            }
+            if (left != null) stamp(left, right);
+            if (right != null) stamp(right, left);
         }
 
         private void stamp(Side me, Side other) {
-            Map<String, Object> v = me.prop.vendorExtensions;
+            if (isEmbeddable(me.model)) return;
 
-            /* ownership + helper data */
+            var v = me.prop.vendorExtensions;
             v.put("x-is-owning-side", me.owningSide || other == null);
+
             if (other != null) {
                 v.put("x-mapped-by", other.prop.name);
                 v.put("x-related-classname", other.model.classname);
             }
 
-            /* cardinalities */
-            boolean meMany = me.prop.isContainer;
-            boolean otherMany = other != null && other.prop.isContainer;
+            var meMany = me.prop.isContainer;
+            var otherMany = other != null && other.prop.isContainer;
 
-            boolean o2o = !meMany && !otherMany;
-            boolean m2m = meMany && otherMany;
-            boolean o2m = meMany && !otherMany;  // this side owns collection
-            boolean m2o = !meMany && otherMany;  // this side is single fk
+            var o2o = !meMany && !otherMany;
+            var m2m = meMany && otherMany;
+            var o2m = meMany && !otherMany;
+            var m2o = !meMany && otherMany;
 
             v.put("x-is-one-to-one", o2o);
             v.put("x-is-many-to-many", m2m);
             v.put("x-is-one-to-many", o2m);
             v.put("x-is-many-to-one", m2o);
-            v.put("x-relation-type",
-                o2o ? "ONE_TO_ONE" :
-                    o2m ? "ONE_TO_MANY" :
-                        m2o ? "MANY_TO_ONE" :
-                            "MANY_TO_MANY");
+            v.put("x-relation-type", o2o ? "ONE_TO_ONE" : o2m ? "ONE_TO_MANY" : m2o ? "MANY_TO_ONE" : "MANY_TO_MANY");
         }
 
         enum Cardinality { ONE, MANY }
 
-        private static final class Side {
+        private final class Side {
             final CodegenModel model;
             final CodegenProperty prop;
             boolean owningSide = false;
 
             Side(CodegenModel m, CodegenProperty p) {
-                model = m;
-                prop = p;
+                this.model = m;
+                this.prop = p;
             }
         }
     }

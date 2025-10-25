@@ -24,7 +24,7 @@ public class OpenApiEntityGenerator {
 
     public void generateOpenApiEntitiesFrom(final String openApiYaml) throws IOException {
 
-        logger.debug("Generating new Belief State from: {}", openApiYaml);
+        logger.debug("Generating new entities from: {}", openApiYaml);
 
         Path tempPath;
         tempPath = Files.createTempFile("openapi-spec-entity", ".yaml");

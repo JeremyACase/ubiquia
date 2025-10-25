@@ -144,8 +144,7 @@ public interface InterfaceModelController<
      * @throws IllegalAccessException Exception from illegally accessing fields.
      */
     ResponseEntity<D> queryModelWithId(@PathVariable("id") final String id)
-        throws NoSuchFieldException,
-        IllegalAccessException;
+        throws Exception;
 
     /**
      * Query for the number of records applicable for a set of predicates.
@@ -195,6 +194,5 @@ public interface InterfaceModelController<
         @RequestParam(value = "sort-descending", required = false, defaultValue = "true") final Boolean sortDescending,
         @RequestParam(value = "sort-by-fields", required = false, defaultValue = "") final List<String> sortByFields,
         final HttpServletRequest httpServletRequest)
-        throws NoSuchFieldException,
-        IllegalAccessException;
+        throws Exception;
 }

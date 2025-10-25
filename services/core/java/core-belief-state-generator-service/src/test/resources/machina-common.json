@@ -2473,8 +2473,8 @@
           "description": "Application user who created the row in the database, auto-populated by the system",
           "example": "some.user"
         },
-        "idIntent": {
-          "type": "string"
+        "intent": {
+          "$ref": "#/components/schemas/Intent"
         },
         "status": {
           "type": "string"
@@ -6049,18 +6049,10 @@
     "MachinaKeyValuePair": {
       "properties": {
         "key": {
-          "type": "string",
-          "x-machina-entity-field": {
-            "isColumnNameInjected": true,
-            "columnNameInjectedValue": "pair_key"
-          }
+          "type": "string"
         },
         "value": {
-          "type": "string",
-          "x-machina-entity-field": {
-            "isColumnNameInjected": true,
-            "columnNameInjectedValue": "pair_value"
-          }
+          "type": "string"
         }
       },
       "type": "object",
@@ -6068,8 +6060,7 @@
         "key"
       ],
       "title": "MachinaKeyValuePair",
-      "description": "A model defining a key-value-pair that can be persisted in the MACHINA database where the value is a string.",
-      "x-machina-entity-class-embeddable": true
+      "description": "A model defining a key-value-pair that can be persisted in the MACHINA database where the value is a string."
     },
     "ReferenceFrameType": {
       "type": "string",

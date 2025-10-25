@@ -13,12 +13,11 @@ public class UbiquiaAclDtoGenerator extends JavaClientCodegen {
     @Override
     public void processOpts() {
         super.processOpts();
+        setEnablePostProcessFile(true);
 
-        super.setEnablePostProcessFile(true);
-
-        super.modelTemplateFiles.put("modelIngressDtoMapper.mustache", "IngressDtoMapper.java");
-        super.modelTemplateFiles.put("modelEgressDtoMapper.mustache", "EgressDtoMapper.java");
-        super.modelTemplateFiles.put("modelController.mustache", "Controller.java");
+        modelTemplateFiles.put("modelIngressDtoMapper.mustache", "IngressDtoMapper.java");
+        modelTemplateFiles.put("modelEgressDtoMapper.mustache", "EgressDtoMapper.java");
+        modelTemplateFiles.put("modelController.mustache", "Controller.java");
     }
 
     @Override
@@ -28,43 +27,52 @@ public class UbiquiaAclDtoGenerator extends JavaClientCodegen {
 
     @Override
     public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
-
-        /* 1️⃣ index every model by class-name for fast look-ups */
-        modelIndex.clear(); // ← ensures no stale state
-        for (ModelsMap mm : objs.values()) {
-            mm.getModels().forEach(m -> modelIndex.put(m.getModel().classname, m.getModel()));
+        modelIndex.clear();
+        for (var mm : objs.values()) {
+            for (var m : mm.getModels()) {
+                var cg = m.getModel();
+                modelIndex.put(cg.classname, cg);
+            }
         }
-
         return super.postProcessAllModels(objs);
     }
 
     @Override
     public void postProcessFile(java.io.File file, String fileType) {
-        if ("model".equals(fileType)) {
-            var filename = file.getName();
+        if (!"model".equals(fileType)) {
+            super.postProcessFile(file, fileType);
+            return;
+        }
 
-            if (filename.endsWith("IngressDtoMapper.java") ||
-                filename.endsWith("EgressDtoMapper.java") ||
-                filename.endsWith("Controller.java")) {
+        var filename = file.getName();
+        if (!(filename.endsWith("IngressDtoMapper.java")
+            || filename.endsWith("EgressDtoMapper.java")
+            || filename.endsWith("Controller.java"))) {
 
-                var modelName = filename
-                    .replace("IngressDtoMapper.java", "")
-                    .replace("EgressDtoMapper.java", "")
-                    .replace("Controller.java", "");
+            super.postProcessFile(file, fileType);
+            return;
+        }
 
-                var model = modelIndex.get(modelName);
-                if (model != null && model.isEnum) {
-                    boolean deleted = file.delete();
-                    if (deleted) {
-                        System.out.printf("Deleted enum-derived file: %s%n", file.getAbsolutePath());
-                    } else {
-                        System.out.printf("Failed to delete file: %s%n", file.getAbsolutePath());
-                    }
-                }
-            }
+        var modelName = filename
+            .replace("IngressDtoMapper.java", "")
+            .replace("EgressDtoMapper.java", "")
+            .replace("Controller.java", "");
+
+        var model = modelIndex.get(modelName);
+        if (model != null && (model.isEnum || isEmbeddable(model))) {
+            var deleted = file.delete();
+            System.out.printf("%s skipped file for %s (%s)%n",
+                deleted ? "Deleted" : "Failed to delete",
+                modelName,
+                model.isEnum ? "enum" : "embeddable");
         }
 
         super.postProcessFile(file, fileType);
     }
 
+    /* ----------------------- helpers ----------------------- */
+
+    private boolean isEmbeddable(CodegenModel m) {
+        return m != null && Boolean.TRUE.equals(m.vendorExtensions.get("x-embeddable"));
+    }
 }
