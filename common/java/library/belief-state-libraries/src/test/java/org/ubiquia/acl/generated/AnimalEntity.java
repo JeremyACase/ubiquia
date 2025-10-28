@@ -15,7 +15,9 @@ package org.ubiquia.acl.generated;
 
 
 import com.fasterxml.jackson.annotation.*;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import java.util.Objects;
@@ -63,8 +65,6 @@ public class AnimalEntity extends BaseModelEntity {
 
     protected PersonEntity owner;
     @jakarta.annotation.Nullable
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "name_id")
 
 
     protected NameEntity nameEntity;

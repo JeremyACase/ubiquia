@@ -288,7 +288,9 @@ public class PersonEntityControllerTest {
             });
 
         var record = result.getContent().get(0);
-        var matchingTag = record.getUbiquiaTags().stream().filter(x -> x
+        var matchingTag = record
+            .getUbiquiaTags()
+            .stream().filter(x -> x
                 .getKey()
                 .equals("testKey"))
             .findFirst();

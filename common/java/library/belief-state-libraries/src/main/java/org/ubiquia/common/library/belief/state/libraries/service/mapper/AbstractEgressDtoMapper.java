@@ -253,9 +253,7 @@ public abstract class AbstractEgressDtoMapper<
      * @param dtoField The DTO field representing the embedded object.
      * @throws Exception The usual exception clause.
      */
-    private void tryHydrateEmbeddable(T to, Object value, final Field dtoField)
-        throws Exception {
-
+    private void tryHydrateEmbeddable(T to, Object value, final Field dtoField) throws Exception {
         var embeddedEntityClass = value.getClass();
         this.getLogger().debug("Hydrating embeddable object of class: {}",
             embeddedEntityClass);
@@ -265,105 +263,67 @@ public abstract class AbstractEgressDtoMapper<
         var embeddedDto = embeddedDtoType.getDeclaredConstructor().newInstance();
         dtoField.set(to, embeddedDto);
 
-        while (Objects.nonNull(embeddedEntityClass) && embeddedEntityClass != Object.class) {
+        while (embeddedEntityClass != null && embeddedEntityClass != Object.class) {
             for (var embeddedField : embeddedEntityClass.getDeclaredFields()) {
                 embeddedField.setAccessible(true);
-                try {
-                    var fieldValue = embeddedField.get(value);
 
-                    var dtoEmbeddedField = embeddedDtoType
-                        .getDeclaredField(embeddedField.getName());
-                    dtoEmbeddedField.setAccessible(true);
-                    dtoEmbeddedField.set(embeddedDto, fieldValue);
+                // ---- guard: skip things we should not copy ----
+                var mods = embeddedField.getModifiers();
+                var skip = java.lang.reflect.Modifier.isStatic(mods)
+                    || embeddedField.isSynthetic();
 
-                    this.getLogger().debug("Embedded field: {} = {}",
-                        embeddedField.getName(),
-                        fieldValue);
-                } catch (NoSuchFieldException e) {
-                    // DTO doesn't have this field — skip quietly (or log at debug)
-                    this.getLogger().debug("No matching DTO embedded field for '{}'",
-                        embeddedField.getName());
-                } catch (IllegalAccessException e) {
-                    this.getLogger().warn("Unable to copy embedded field {}",
-                        embeddedField.getName(),
-                        e);
+                if (!skip) {
+                    try {
+                        // read from entity
+                        var fieldValue = embeddedField.get(value);
+
+                        // find same-named field on DTO
+                        try {
+                            var dtoSideField = embeddedDto.getClass().getDeclaredField(embeddedField.getName());
+                            dtoSideField.setAccessible(true);
+
+                            var dtoMods = dtoSideField.getModifiers();
+                            var dtoSideSkippable = java.lang.reflect.Modifier.isStatic(dtoMods)
+                                || dtoSideField.isSynthetic()
+                                || java.lang.reflect.Modifier.isFinal(dtoMods);
+
+                            if (!dtoSideSkippable) {
+                                dtoSideField.set(embeddedDto, fieldValue);
+                                this.getLogger().debug("Embedded field: {} = {}",
+                                    dtoSideField.getName(), fieldValue);
+                            }
+                        } catch (NoSuchFieldException ignored) {
+                            // DTO doesn’t declare this field—intentionally ignore
+                        }
+
+                    } catch (IllegalAccessException e) {
+                        this.getLogger().warn("ERROR: Unable to copy embedded field {}",
+                            embeddedField.getName(), e);
+                    }
                 }
             }
             embeddedEntityClass = embeddedEntityClass.getSuperclass();
         }
     }
 
+
     private void tryHydrateEmbeddables(T to, Object value, final Field dtoField) throws Exception {
-        if (to == null || value == null || dtoField == null) {
-            return;
-        }
 
-        value = Hibernate.unproxy(value);
         dtoField.setAccessible(true);
-
-        var elementDtoType = resolveCollectionElementType(dtoField);
-        var assigned = false;
-
-        if (elementDtoType == null) {
-            this.getLogger().debug("Unable to resolve collection element type for DTO field {}", dtoField.getName());
-            dtoField.set(to, value);
-            assigned = true;
-        }
-
-        var dest = (Collection<Object>) null;
-        if (!assigned) {
-            dest = newCollectionInstance(dtoField.getType());
-            var iterable = asIterable(value);
-
-            for (var raw : iterable) {
-                var src = Hibernate.unproxy(raw);
-                if (src != null) {
-                    var dtoElem = (Object) null;
-                    var alreadyAssignable = elementDtoType.isAssignableFrom(src.getClass());
-
-                    if (alreadyAssignable) {
-                        dtoElem = src;
-                    } else {
-                        dtoElem = elementDtoType.getDeclaredConstructor().newInstance();
-                        var srcCls = src.getClass();
-
-                        while (srcCls != null && srcCls != Object.class) {
-                            var declared = srcCls.getDeclaredFields();
-                            for (var sf : declared) {
-                                sf.setAccessible(true);
-                                Object fieldValue = null;
-                                try {
-                                    fieldValue = sf.get(src);
-                                } catch (IllegalAccessException e) {
-                                    this.getLogger().warn(
-                                        "Unable to read field {} from embeddable element",
-                                        sf.getName(),
-                                        e
-                                    );
-                                }
-
-                                try {
-                                    var df = elementDtoType.getDeclaredField(sf.getName());
-                                    df.setAccessible(true);
-                                    df.set(dtoElem, fieldValue);
-                                } catch (NoSuchFieldException ignored) {
-                                    // DTO element doesn't have this field
-                                }
-                            }
-                            srcCls = srcCls.getSuperclass();
-                        }
-                    }
-                    dest.add(dtoElem);
-                }
+        if (Objects.isNull(value)) {
+            dtoField.set(to, null);
+        } else {
+            if (List.class.isAssignableFrom(value.getClass())) {
+                var embeddedDtoList = new ArrayList<>();
+                embeddedDtoList.addAll((List<Object>) value);
+                dtoField.set(to, embeddedDtoList);
+            } else if (Set.class.isAssignableFrom(value.getClass())) {
+                var embeddedDtoSet = new HashSet<>();
+                embeddedDtoSet.addAll((Set<Object>) value);
+                dtoField.set(to, embeddedDtoSet);
             }
         }
-
-        if (!assigned) {
-            dtoField.set(to, dest);
-        }
     }
-
-
 
     /**
      * Provided an object, hydrate it with data from the database.
@@ -466,72 +426,5 @@ public abstract class AbstractEgressDtoMapper<
                 dtoField.set(dto, value);
             }
         }
-    }
-
-    private Class<?> resolveCollectionElementType(final Field field) {
-        var result = (Class<?>) null;
-        var g = field.getGenericType();
-
-        if (g instanceof ParameterizedType pt) {
-            var args = pt.getActualTypeArguments();
-            if (Objects.nonNull(args) && args.length == 1) {
-                var a = args[0];
-                if (a instanceof Class<?> c) {
-                    result = c;
-                } else if (a instanceof ParameterizedType p
-                    && p.getRawType() instanceof Class<?> rc) {
-                    result = rc;
-                }
-            }
-        }
-        return result;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Collection<Object> newCollectionInstance(final Class<?> collectionType) {
-        var result = (Collection<Object>) null;
-
-        var canConstructDirect =
-            collectionType != null &&
-                !collectionType.isInterface() &&
-                !Modifier.isAbstract(collectionType.getModifiers());
-
-        if (canConstructDirect) {
-            try {
-                result = (Collection<Object>) collectionType
-                    .getDeclaredConstructor()
-                    .newInstance();
-            } catch (Exception ignored) {
-                // fall through to defaults
-            }
-        }
-
-        if (Objects.isNull(result)) {
-            if (Set.class.isAssignableFrom(collectionType)) {
-                result = new HashSet<>();
-            } else {
-                result = new ArrayList<>();
-            }
-        }
-        return result;
-    }
-
-    private Iterable<?> asIterable(final Object value) {
-        var list = new ArrayList<>();
-
-        if (value instanceof Iterable<?> it) {
-            for (var o : it) {
-                list.add(o);
-            }
-
-        } else if (Objects.nonNull(value) && value.getClass().isArray()) {
-            var len = java.lang.reflect.Array.getLength(value);
-            for (var i = 0; i < len; i++) {
-                list.add(java.lang.reflect.Array.get(value, i));
-            }
-        } else if (Objects.nonNull(value)) {
-            list.add(value);
-        }
-        return list;
     }
 }

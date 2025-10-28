@@ -43,7 +43,7 @@ public abstract class AbstractGlobalExceptionHandler extends ResponseEntityExcep
         Exception ex,
         WebRequest request) {
         var cast = (TransactionSystemException) ex;
-        var error = this.handlerHelper(ex, cast.getRootCause().getMessage());
+        var error = this.handlerHelper(cast.getRootCause().getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
@@ -60,7 +60,7 @@ public abstract class AbstractGlobalExceptionHandler extends ResponseEntityExcep
     public ResponseEntity<ErrorResponse> handleInterruptionException(
         Exception ex,
         WebRequest request) {
-        var error = this.handlerHelper(ex, "Interruption exception occurred.");
+        var error = this.handlerHelper(ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -77,7 +77,7 @@ public abstract class AbstractGlobalExceptionHandler extends ResponseEntityExcep
     public ResponseEntity<ErrorResponse> handleMultipartException(
         Exception ex,
         WebRequest request) {
-        var error = this.handlerHelper(ex, "Multipart exception occurred.");
+        var error = this.handlerHelper(ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
@@ -99,7 +99,7 @@ public abstract class AbstractGlobalExceptionHandler extends ResponseEntityExcep
     public ResponseEntity<ErrorResponse> handleClientError(
         Exception ex,
         WebRequest request) {
-        var error = this.handlerHelper(ex, ex.getMessage());
+        var error = this.handlerHelper(ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
@@ -116,7 +116,7 @@ public abstract class AbstractGlobalExceptionHandler extends ResponseEntityExcep
     public ResponseEntity<ErrorResponse> handleDatabaseException(
         Exception ex,
         WebRequest request) {
-        var error = this.handlerHelper(ex, "Database exception occurred.");
+        var error = this.handlerHelper(ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -133,7 +133,7 @@ public abstract class AbstractGlobalExceptionHandler extends ResponseEntityExcep
     public ResponseEntity<ErrorResponse> handleDatabaseException(
         DataIntegrityViolationException ex,
         WebRequest request) {
-        var error = this.handlerHelper(ex, "Database exception occurred.");
+        var error = this.handlerHelper(ex.getMessage());
         var cause = ex.getCause();
         while (Objects.nonNull(cause)) {
             error.getDetails().add(cause.getMessage());
@@ -148,18 +148,17 @@ public abstract class AbstractGlobalExceptionHandler extends ResponseEntityExcep
         HttpHeaders headers,
         HttpStatusCode status,
         WebRequest request) {
-        var error = this.handlerHelper(ex, ex.getMessage());
+        var error = this.handlerHelper(ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     /**
      * Helper method to build and return an error response.
      *
-     * @param ex            The exception that occurred.
      * @param helperMessage The message passed in from our exception handler.
      * @return A populated error message.
      */
-    protected ErrorResponse handlerHelper(Exception ex, String helperMessage) {
+    protected ErrorResponse handlerHelper(String helperMessage) {
         var error = new ErrorResponse();
         error.setMessage(helperMessage);
         return error;

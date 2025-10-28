@@ -15,7 +15,9 @@ package org.ubiquia.acl.generated;
 
 
 import com.fasterxml.jackson.annotation.*;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +48,9 @@ public class PersonEntity extends BaseModelEntity {
 
     private ColorType hairColor;
     @jakarta.annotation.Nullable
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "name_id")
 
 
-    private NameEntity nameEntity;
+    private NameEntity name;
     @jakarta.annotation.Nullable
 
 
@@ -92,7 +92,7 @@ public class PersonEntity extends BaseModelEntity {
 
     public PersonEntity name(@jakarta.annotation.Nullable NameEntity nameEntity) {
 
-        this.nameEntity = nameEntity;
+        this.name = nameEntity;
         return this;
     }
 
@@ -108,14 +108,14 @@ public class PersonEntity extends BaseModelEntity {
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
     public NameEntity getName() {
-        return nameEntity;
+        return name;
     }
 
 
     @JsonProperty(JSON_PROPERTY_NAME)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
     public void setName(@jakarta.annotation.Nullable NameEntity nameEntity) {
-        this.nameEntity = nameEntity;
+        this.name = nameEntity;
     }
 
     public PersonEntity pets(@jakarta.annotation.Nullable List<@Valid AnimalEntity> pets) {
@@ -164,14 +164,14 @@ public class PersonEntity extends BaseModelEntity {
         }
         PersonEntity personEntity = (PersonEntity) o;
         return Objects.equals(this.hairColor, personEntity.hairColor) &&
-            Objects.equals(this.nameEntity, personEntity.nameEntity) &&
+            Objects.equals(this.name, personEntity.name) &&
             Objects.equals(this.pets, personEntity.pets) &&
             super.equals(o);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(hairColor, nameEntity, pets, super.hashCode());
+        return Objects.hash(hairColor, name, pets, super.hashCode());
     }
 
     @Override
@@ -180,7 +180,7 @@ public class PersonEntity extends BaseModelEntity {
         sb.append("class Person {\n");
         sb.append("    ").append(toIndentedString(super.toString())).append("\n");
         sb.append("    hairColor: ").append(toIndentedString(hairColor)).append("\n");
-        sb.append("    name: ").append(toIndentedString(nameEntity)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    pets: ").append(toIndentedString(pets)).append("\n");
         sb.append("}");
         return sb.toString();

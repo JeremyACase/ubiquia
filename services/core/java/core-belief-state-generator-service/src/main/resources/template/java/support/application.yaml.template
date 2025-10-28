@@ -1,6 +1,6 @@
 logging:
   level:
-    org.ubiquia: INFO
+    org.ubiquia: DEBUG
     # org.hibernate.SQL: DEBUG                 # executed SQL (DML + DDL)
     # org.hibernate.orm.jdbc.bind: TRACE       # bind parameters (Hibernate 6)
     # org.hibernate.orm.jdbc.extract: TRACE    # extracted column values (Hibernate 6)

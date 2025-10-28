@@ -29,7 +29,7 @@ import org.ubiquia.common.model.acl.dto.AbstractAclModel;
     Name.JSON_PROPERTY_LAST_NAME
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
-public class Name extends AbstractAclModel {
+public class Name {
     public static final String JSON_PROPERTY_FIRST_NAME = "firstName";
     public static final String JSON_PROPERTY_LAST_NAME = "lastName";
     @jakarta.annotation.Nonnull
@@ -130,11 +130,5 @@ public class Name extends AbstractAclModel {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
-    @Override
-    public String getModelType() {
-        return "Name";
-    }
-
 
 }
