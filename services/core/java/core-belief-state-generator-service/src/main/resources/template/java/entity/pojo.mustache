@@ -472,10 +472,11 @@ public boolean equals(Object o) {
     {{>javaBuilder}}
 {{/generateBuilders}}
 
+{{^vendorExtensions.x-embeddable}}
     @Override
     public String getModelType() {
         // TODO: It's probably better to replace this via the code gen, but this works for now
         return "{{classname}}".replace("Entity", "");
     }
-
+{{/vendorExtensions.x-embeddable}}
 }

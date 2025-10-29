@@ -14,16 +14,10 @@
 package org.ubiquia.test.belief.state.generator.model;
 
 
-import org.ubiquia.common.model.acl.dto.AbstractAclModel;
+public class Name {
 
-public class Name extends AbstractAclModel {
     private String firstName;
     private String lastName;
-
-    public String getModelType() {
-        return "Name";
-    }
-
 
     public String getFirstName() {
         return firstName;
