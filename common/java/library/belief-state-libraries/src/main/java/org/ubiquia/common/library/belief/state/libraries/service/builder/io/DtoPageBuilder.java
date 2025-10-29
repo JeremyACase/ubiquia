@@ -34,7 +34,7 @@ public class DtoPageBuilder<T extends AbstractAclModelEntity, D extends Abstract
      */
     @SuppressWarnings("unchecked")
     public GenericPageImplementation<D> buildPageFrom(Page<T> records)
-        throws IllegalAccessException {
+        throws Exception {
 
         GenericPageImplementation<D> convertedPage;
 

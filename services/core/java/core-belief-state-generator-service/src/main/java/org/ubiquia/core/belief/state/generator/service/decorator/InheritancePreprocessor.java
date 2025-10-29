@@ -30,7 +30,7 @@ public class InheritancePreprocessor {
 
         logger.debug("Appending inheritance to: {}...", jsonSchema);
         var root = this.objectMapper.readTree(jsonSchema);
-        var transformed = transform(root);
+        var transformed = this.transform(root);
         var modified =
             this.objectMapper
                 .writerWithDefaultPrettyPrinter()

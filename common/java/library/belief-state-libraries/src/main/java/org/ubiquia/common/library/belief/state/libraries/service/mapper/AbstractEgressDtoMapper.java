@@ -1,5 +1,8 @@
 package org.ubiquia.common.library.belief.state.libraries.service.mapper;
 
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -68,7 +71,7 @@ public abstract class AbstractEgressDtoMapper<
      */
     @Transactional
     public List<AbstractAclModel> map(final List<F> froms)
-        throws IllegalAccessException {
+        throws Exception {
 
         var tos = new ArrayList<AbstractAclModel>();
 
@@ -91,7 +94,7 @@ public abstract class AbstractEgressDtoMapper<
      */
     @Transactional
     public AbstractAclModel map(final F from)
-        throws IllegalAccessException {
+        throws Exception {
 
         var to = this.getNewDto();
         to.setModelType(this.getModelType());
@@ -217,7 +220,7 @@ public abstract class AbstractEgressDtoMapper<
      */
     @Transactional
     private void tryHydrateObject(final F from, T to)
-        throws IllegalAccessException {
+        throws Exception {
 
         var unproxied = Hibernate.unproxy(from);
         if (Objects.nonNull(unproxied)) {
@@ -226,10 +229,98 @@ public abstract class AbstractEgressDtoMapper<
 
                 var value = field.get(unproxied);
                 if (Objects.nonNull(field.get(unproxied))) {
-                    this.hydrateObject(to, value, dtoField);
+                    if (field.isAnnotationPresent(Embedded.class) ||
+                        field.getType().isAnnotationPresent(Embeddable.class)) {
+
+                        this.tryHydrateEmbeddable(to, value, dtoField);
+                    } else if (field.isAnnotationPresent(ElementCollection.class)) {
+                        this.tryHydrateEmbeddables(to, value, dtoField);
+                    }
+                    else {
+                        this.hydrateObject(to, value, dtoField);
+                    }
                 } else {
                     dtoField.set(to, null);
                 }
+            }
+        }
+    }
+
+    /**
+     * Attempt to hydrate embedded objects without bidirectional relationships.
+     * @param to The parent object we're hydrating.
+     * @param value The embedded object.
+     * @param dtoField The DTO field representing the embedded object.
+     * @throws Exception The usual exception clause.
+     */
+    private void tryHydrateEmbeddable(T to, Object value, final Field dtoField) throws Exception {
+        var embeddedEntityClass = value.getClass();
+        this.getLogger().debug("Hydrating embeddable object of class: {}",
+            embeddedEntityClass);
+
+        dtoField.setAccessible(true);
+        var embeddedDtoType = dtoField.getType();
+        var embeddedDto = embeddedDtoType.getDeclaredConstructor().newInstance();
+        dtoField.set(to, embeddedDto);
+
+        while (embeddedEntityClass != null && embeddedEntityClass != Object.class) {
+            for (var embeddedField : embeddedEntityClass.getDeclaredFields()) {
+                embeddedField.setAccessible(true);
+
+                // ---- guard: skip things we should not copy ----
+                var mods = embeddedField.getModifiers();
+                var skip = java.lang.reflect.Modifier.isStatic(mods)
+                    || embeddedField.isSynthetic();
+
+                if (!skip) {
+                    try {
+                        // read from entity
+                        var fieldValue = embeddedField.get(value);
+
+                        // find same-named field on DTO
+                        try {
+                            var dtoSideField = embeddedDto.getClass().getDeclaredField(embeddedField.getName());
+                            dtoSideField.setAccessible(true);
+
+                            var dtoMods = dtoSideField.getModifiers();
+                            var dtoSideSkippable = java.lang.reflect.Modifier.isStatic(dtoMods)
+                                || dtoSideField.isSynthetic()
+                                || java.lang.reflect.Modifier.isFinal(dtoMods);
+
+                            if (!dtoSideSkippable) {
+                                dtoSideField.set(embeddedDto, fieldValue);
+                                this.getLogger().debug("Embedded field: {} = {}",
+                                    dtoSideField.getName(), fieldValue);
+                            }
+                        } catch (NoSuchFieldException ignored) {
+                            // DTO doesn’t declare this field—intentionally ignore
+                        }
+
+                    } catch (IllegalAccessException e) {
+                        this.getLogger().warn("ERROR: Unable to copy embedded field {}",
+                            embeddedField.getName(), e);
+                    }
+                }
+            }
+            embeddedEntityClass = embeddedEntityClass.getSuperclass();
+        }
+    }
+
+
+    private void tryHydrateEmbeddables(T to, Object value, final Field dtoField) throws Exception {
+
+        dtoField.setAccessible(true);
+        if (Objects.isNull(value)) {
+            dtoField.set(to, null);
+        } else {
+            if (List.class.isAssignableFrom(value.getClass())) {
+                var embeddedDtoList = new ArrayList<>();
+                embeddedDtoList.addAll((List<Object>) value);
+                dtoField.set(to, embeddedDtoList);
+            } else if (Set.class.isAssignableFrom(value.getClass())) {
+                var embeddedDtoSet = new HashSet<>();
+                embeddedDtoSet.addAll((Set<Object>) value);
+                dtoField.set(to, embeddedDtoSet);
             }
         }
     }
@@ -243,7 +334,7 @@ public abstract class AbstractEgressDtoMapper<
      * @throws IllegalAccessException Exceptions from Reflection.
      */
     private void hydrateObject(T to, Object value, final Field dtoField)
-        throws IllegalAccessException {
+        throws Exception {
 
         value = Hibernate.unproxy(value);
 
@@ -281,7 +372,7 @@ public abstract class AbstractEgressDtoMapper<
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Transactional
     private void trySetDtoField(T dto, final Field dtoField, final Object value)
-        throws IllegalAccessException {
+        throws Exception {
 
         var unproxied = Hibernate.unproxy(value);
         if (Objects.nonNull(unproxied)) {

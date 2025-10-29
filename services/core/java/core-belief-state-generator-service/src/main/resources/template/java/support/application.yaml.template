@@ -1,7 +1,14 @@
-
 logging:
   level:
-    org.ubiquia: INFO
+    org.ubiquia: DEBUG
+    # org.hibernate.SQL: DEBUG                 # executed SQL (DML + DDL)
+    # org.hibernate.orm.jdbc.bind: TRACE       # bind parameters (Hibernate 6)
+    # org.hibernate.orm.jdbc.extract: TRACE    # extracted column values (Hibernate 6)
+    # org.hibernate.type.descriptor.sql: TRACE # (fallback for older logs emitted by libs)
+    # org.hibernate.tool.schema.internal: DEBUG
+    # org.hibernate.orm.boot: DEBUG
+    # org.hibernate.mapping: DEBUG
+    # org.hibernate.persister.entity: DEBUG
 
 management:
   endpoint:
@@ -43,6 +50,7 @@ spring:
     password: {DB_PASSWORD}
     hikari:
       transaction-isolation: TRANSACTION_READ_COMMITTED
+
   h2:
     console:
       enabled: true
@@ -54,12 +62,15 @@ spring:
       fail-on-unknown-properties: true
 
   jpa:
+    show-sql: true   # print SQL to logs
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-        generate_statistics: false
         format_sql: true
+        highlight_sql: true
+        use_sql_comments: true
+        generate_statistics: false
 
 ubiquia:
   agent:

@@ -1,12 +1,12 @@
 package org.ubiquia.common.library.belief.state.libraries.service.mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embeddable;
 import jakarta.transaction.Transactional;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
-
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
@@ -87,14 +87,19 @@ public abstract class AbstractIngressDtoMapper<
             for (var field : FieldUtils.getAllFields(clazz)) {
                 field.setAccessible(true);
 
-                // Only bother to hydrate our relationship if the value isn't null....
-                if (Objects.nonNull(field.get(to))) {
+                var fieldType = field.getType();
 
+                if (field.isAnnotationPresent(Embeddable.class)
+                    || fieldType.isAnnotationPresent(Embeddable.class)) {
+
+                    // No Op for code readabilitty
+
+                } else {
                     // ...if we have a single Ubiquia entity...
                     if (AbstractAclModelEntity.class.isAssignableFrom(field.getType())) {
                         this.tryHydrateOneToOneRelationship(to, field);
 
-                    // ...else if we have a list of Ubiquia entities...
+                        // ...else if we have a list of Ubiquia entities...
                     } else if (List.class.isAssignableFrom(field.getType())) {
                         this.tryHydrateOneToManyRelationship(to, field);
                     }
@@ -131,34 +136,40 @@ public abstract class AbstractIngressDtoMapper<
                 var entity = (AbstractAclModelEntity)
                     Hibernate.unproxy(element);
 
-                this.getLogger().debug("...processing entity: {}", entity);
+                if (field.isAnnotationPresent(ElementCollection.class)
+                    && entity.getClass().isAnnotationPresent(Embeddable.class)) {
 
-                var repository = this
-                    .entityRepositoryFinder
-                    .findRepositoryFor(entity);
-
-                // ...use any provided ID's to create our database relationships.
-                if (Objects.nonNull(entity.getUbiquiaId())) {
-                    var record = repository.findById(entity.getUbiquiaId());
-                    if (record.isEmpty()) {
-                        throw new IllegalArgumentException("ERROR: Entity not found: "
-                            + entity.getUbiquiaId());
-                    }
-                    var hydrated = (AbstractAclModelEntity) Hibernate.unproxy(record.get());
-                    hydratedList.add(hydrated);
+                    field.set(to, elementList);
                 } else {
-                    var hydrated = (AbstractAclModelEntity) Hibernate.unproxy(element);
-                    hydratedList.add(hydrated);
+                    this.getLogger().debug("...processing entity: {}", entity);
+
+                    var repository = this
+                        .entityRepositoryFinder
+                        .findRepositoryFor(entity);
+
+                    // ...use any provided ID's to create our database relationships.
+                    if (Objects.nonNull(entity.getUbiquiaId())) {
+                        var record = repository.findById(entity.getUbiquiaId());
+                        if (record.isEmpty()) {
+                            throw new IllegalArgumentException("ERROR: Entity not found: "
+                                + entity.getUbiquiaId());
+                        }
+                        var hydrated = (AbstractAclModelEntity) Hibernate.unproxy(record.get());
+                        hydratedList.add(hydrated);
+                    } else {
+                        var hydrated = (AbstractAclModelEntity) Hibernate.unproxy(element);
+                        hydratedList.add(hydrated);
+                    }
+                    field.set(to, hydratedList);
                 }
             }
-            field.set(to, hydratedList);
         }
     }
 
     /**
      * Attempt to hydrate an object's field representing a 1:1 database relationship.
      *
-     * @param to The object we're hydrating.
+     * @param to    The object we're hydrating.
      * @param field The object's field we're hydrating.
      * @throws IllegalAccessException Reflection exceptions.
      */
@@ -168,20 +179,23 @@ public abstract class AbstractIngressDtoMapper<
 
         var entity = (AbstractAclModelEntity) field.get(to);
 
-        // we have been provided an ID, use it to create to associate our entities.
-        if (Objects.nonNull(entity.getUbiquiaId())) {
-            var repository = this
-                .entityRepositoryFinder
-                .findRepositoryFor(entity);
+        if (Objects.nonNull(entity)) {
 
-            var record = repository.findById(entity.getUbiquiaId());
-            if (record.isEmpty()) {
-                throw new IllegalArgumentException("ERROR: Entity not found: "
-                    + entity.getUbiquiaId());
+            // we have been provided an ID, use it to create to associate our entities.
+            if (Objects.nonNull(entity.getUbiquiaId())) {
+                var repository = this
+                    .entityRepositoryFinder
+                    .findRepositoryFor(entity);
+
+                var record = repository.findById(entity.getUbiquiaId());
+                if (record.isEmpty()) {
+                    throw new IllegalArgumentException("ERROR: Entity not found: "
+                        + entity.getUbiquiaId());
+                }
+
+                var hydrated = Hibernate.unproxy(record.get());
+                field.set(to, hydrated);
             }
-
-            var hydrated = Hibernate.unproxy(record.get());
-            field.set(to, hydrated);
         }
     }
 }

@@ -2476,6 +2476,9 @@
             "description": "Time the row was created in the database, auto-populated by the system",
             "example": "2018-01-01T16:00:00.123Z"
           },
+          "intent": {
+            "$ref": "#/components/schemas/Intent"
+          },
           "createdBy": {
             "type": "string",
             "description": "Application user who created the row in the database, auto-populated by the system",

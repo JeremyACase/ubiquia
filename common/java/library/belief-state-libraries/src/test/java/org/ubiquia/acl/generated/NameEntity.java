@@ -17,10 +17,9 @@ package org.ubiquia.acl.generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import jakarta.persistence.Entity;
+import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
-import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
 
 /**
  * A model with some name information.
@@ -30,8 +29,8 @@ import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
     NameEntity.JSON_PROPERTY_LAST_NAME
 })
 @jakarta.annotation.Generated(value = "org.ubiquia.core.belief.state.generator.service.generator.acl.UbiquiaAclEntityCodegen", date = "2025-06-18T01:59:36.137342500Z[UTC]", comments = "Generator version: 7.13.0")
-@Entity
-public class NameEntity extends AbstractAclModelEntity {
+@Embeddable
+public class NameEntity {
     public static final String JSON_PROPERTY_FIRST_NAME = "firstName";
     public static final String JSON_PROPERTY_LAST_NAME = "lastName";
     @jakarta.annotation.Nonnull
@@ -139,10 +138,4 @@ public class NameEntity extends AbstractAclModelEntity {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
-    @Override
-    public String getModelType() {
-        return "Name";
-    }
-
 }

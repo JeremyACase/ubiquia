@@ -50,9 +50,6 @@ public class PersonTestModule extends AbstractHelmTestModule {
 
         var name = Instancio
             .of(Name.class)
-            .ignore(field(AbstractAclModel::getUbiquiaId))
-            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
-            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
             .create();
 
         var pets = new ArrayList<>();
@@ -68,7 +65,7 @@ public class PersonTestModule extends AbstractHelmTestModule {
             .create();
 
         try {
-            logger.debug("...generated model: {}",
+            this.getLogger().info("...generated model: {}",
                 this.objectMapper.writeValueAsString(person));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

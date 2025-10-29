@@ -41,7 +41,7 @@ public class GlobalExceptionHandler extends AbstractGlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleClientError(
         Exception ex,
         WebRequest request) {
-        var error = super.handlerHelper(ex, ex.getMessage());
+        var error = super.handlerHelper(ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

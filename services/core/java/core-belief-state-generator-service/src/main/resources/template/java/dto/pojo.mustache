@@ -29,7 +29,7 @@
 {{#vendorExtensions.x-class-extra-annotation}}
     {{{vendorExtensions.x-class-extra-annotation}}}
 {{/vendorExtensions.x-class-extra-annotation}}
-public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}}{{^parent}}extends AbstractAclModel {{/parent}}{{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}}{
+public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}}{{^parent}}{{^vendorExtensions.x-embeddable}}extends AbstractAclModel{{/vendorExtensions.x-embeddable}}{{/parent}}{{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}}{
 {{#serializableModel}}
     private static final long serialVersionUID = 1L;
 
@@ -417,11 +417,10 @@ public boolean equals(Object o) {
 
     {{>javaBuilder}}
 {{/generateBuilders}}
-
+{{^vendorExtensions.x-embeddable}}
     @Override
     public String getModelType() {
         return "{{classname}}";
     }
-
-
+{{/vendorExtensions.x-embeddable}}
 }
