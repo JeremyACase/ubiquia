@@ -34,9 +34,31 @@ class LlamaInput(BaseModel):
 router = APIRouter(tags=["dag"])
 
 # ---------------------------
-# Defaults
+# Model resolution
 # ---------------------------
-DEFAULT_MODEL = os.getenv("WORKBENCH_LLM_MODEL", "llama3.2")
+def _resolve_model() -> str:
+    """
+    Decide which model to use with easy swapping via env:
+      - WORKBENCH_LLM_FAMILY: preset family key ('gemma2' default, 'llama3', etc.)
+      - WORKBENCH_LLM_MODEL : explicit model tag/name override (takes precedence)
+    """
+    override = os.getenv("WORKBENCH_LLM_MODEL")
+    if override and override.strip():
+        return override.strip()
+
+    family = (os.getenv("WORKBENCH_LLM_FAMILY", "gemma2") or "gemma2").strip().lower()
+
+    # Minimal, opinionated defaults; extend as you add runners/images.
+    family_defaults = {
+        "gemma2": "gemma2:latest",   # e.g., gemma2:9b-instruct-q4_K_M
+        "llama3": "llama3.2",        # e.g., llama3.2:latest
+        # Add more here as needed:
+        # "mistral": "mistral-nemo:latest",
+        # "phi4": "phi4:latest",
+    }
+    return family_defaults.get(family, family_defaults["gemma2"])
+
+DEFAULT_MODEL = _resolve_model()
 
 # ---------------------------
 # Helpers

@@ -83,12 +83,15 @@ async def health() -> dict:
     return {"status": "ok"}
 
 # ---------- Routers ----------
-from .generator import router as generator_router
-from .linter import router as linter_router
+from .acl_generator import router as generator_router
 from .acl_wrapper import router as acl_router
 from .acl_ingress_relay import router as relay_ingress_router
 from .belief_state_extractor import router as belief_state_router 
 from .dag_wrapper import router as dag_wrapper_router 
+from .dag_generator import router as dag_generator_router
+from .dag_generator_wrapper import router as dag_generator_wrapper_router
+from .dag_visualizer import router as dag_visualizer_router
+from .linter import router as linter_router
 
 app.include_router(generator_router, tags=["schema-generate"])
 app.include_router(linter_router, tags=["schema-lint"])
@@ -96,6 +99,9 @@ app.include_router(acl_router, tags=["acl"])
 app.include_router(relay_ingress_router)
 app.include_router(belief_state_router, tags=["belief-state"]) 
 app.include_router(dag_wrapper_router) 
+app.include_router(dag_generator_router, tags=["dag-generate"])
+app.include_router(dag_generator_wrapper_router, tags=["dag-generate-wrapper"])
+app.include_router(dag_visualizer_router, tags=["dag-visualizer"])
 
 if __name__ == "__main__":
     import uvicorn
