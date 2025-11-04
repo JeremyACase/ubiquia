@@ -2,7 +2,7 @@ import os
 import re
 import textwrap
 import logging
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Tuple
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
@@ -18,6 +18,54 @@ def squish(text: str) -> str:
     t = textwrap.dedent(text).strip()
     t = re.sub(r'\s+', ' ', t)
     return t
+
+def resolve_llm() -> Tuple[str, Dict[str, Any]]:
+    """
+    Decide which model to use and supply sensible default options,
+    with easy swapping via env:
+      - MODEL_FAMILY: 'gemma3' (default) or 'llama3'
+      - OLLAMA_MODEL: explicit model tag/name override
+    """
+    family = os.getenv("MODEL_FAMILY", "llama3").strip().lower()
+
+    # Sensible defaults per family; OLLAMA_MODEL can override the name.
+    if family == "llama3":
+        default_name = "llama3.2"
+        default_opts = {
+            "temperature": 0.1,
+            "top_p": 0.9,
+            "top_k": 40,
+            "repeat_penalty": 1.05,
+            "num_predict": 4096,
+            "num_ctx": 8192,
+        }
+    else:
+        # Default to gemma3
+        family = "gemma3"
+        # Common Ollama tags: 'gemma3:latest', 'gemma3:9b-instruct-q4_K_M', etc.
+        default_name = "gemma3"
+        default_opts = {
+            "temperature": 0.1,
+            "top_p": 0.9,
+            "top_k": 40,
+            "repeat_penalty": 1.05,
+            "num_predict": 4096,
+            "num_ctx": 8192,
+        }
+
+    model_name = os.getenv("OLLAMA_MODEL", default_name)
+
+    # Allow fine-grained overrides while keeping family defaults.
+    opts = {
+        **default_opts,
+        "temperature": float(os.getenv("OLLAMA_TEMPERATURE", str(default_opts["temperature"]))),
+        "top_p": float(os.getenv("OLLAMA_TOP_P", str(default_opts["top_p"]))),
+        "top_k": int(os.getenv("OLLAMA_TOP_K", str(default_opts["top_k"]))),
+        "repeat_penalty": float(os.getenv("OLLAMA_REPEAT_PENALTY", str(default_opts["repeat_penalty"]))),
+        "num_predict": int(os.getenv("OLLAMA_NUM_PREDICT", str(default_opts["num_predict"]))),
+        "num_ctx": int(os.getenv("OLLAMA_NUM_CTX", str(default_opts["num_ctx"]))),
+    }
+    return model_name, opts
 
 # ---------- Prompt scaffolding (Schema-only) ----------
 SCHEMA_ONLY_SYSTEM = squish("""
@@ -71,8 +119,6 @@ async def wrap_prompt(req: PromptRequest, request: Request) -> LlamaInput:
     user_prompt = req.userPrompt.strip()
     logger.info("Wrapping prompt (length=%s)", len(user_prompt), extra={"request_id": request_id})
 
-    # Build a compact, schema-only instruction that includes the user's prompt
-    # and requires a top-level "definition" string summarizing the prompt.
     raw_prompt = (
         SCHEMA_PROMPT_PREAMBLE + " "
         + SCHEMA_CONTRACT + " "
@@ -80,20 +126,14 @@ async def wrap_prompt(req: PromptRequest, request: Request) -> LlamaInput:
     )
     final_prompt = squish(raw_prompt)
 
-    model_name = os.getenv("OLLAMA_MODEL", "llama3.2")
+    # ---- Model selection (defaults to gemma3) ----
+    model_name, options = resolve_llm()
 
     return LlamaInput(
         model=model_name,
         stream=False,
         prompt=final_prompt,
-        format="json",                         # Request strict JSON output
-        system=SCHEMA_ONLY_SYSTEM,             # Squished system message
-        options={
-            "temperature": float(os.getenv("OLLAMA_TEMPERATURE", "0.1")),
-            "top_p": float(os.getenv("OLLAMA_TOP_P", "0.9")),
-            "top_k": int(os.getenv("OLLAMA_TOP_K", "40")),
-            "repeat_penalty": float(os.getenv("OLLAMA_REPEAT_PENALTY", "1.05")),
-            "num_predict": int(os.getenv("OLLAMA_NUM_PREDICT", "4096")),
-            "num_ctx": int(os.getenv("OLLAMA_NUM_CTX", "8192")),
-        },
+        format="json",                 # Request strict JSON output
+        system=SCHEMA_ONLY_SYSTEM,     # Squished system message
+        options=options,
     )
