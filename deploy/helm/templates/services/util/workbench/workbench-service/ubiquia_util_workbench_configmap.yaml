@@ -1,0 +1,75 @@
+{{ if .Values.ubiquia.components.util.workbench.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-util-workbench-config
+data:
+  application.yaml: |
+
+    management:
+      endpoint:
+        info:
+          enabled: true
+          java:
+            enabled: true
+          build:
+            enabled: true
+          health:
+            probes:
+              enabled: true
+            show-components: always
+            show-details: always
+          prometheus:
+            enabled: true
+      endpoints:
+        web:
+          exposure:
+            include: info, prometheus, health
+      metrics:
+        tags:
+          application: ${spring.application.name}
+
+    spring:
+      server:
+      port: {{ .Values.convenience.variables.spring.port }}
+
+      application:
+        name: ubiquia-util-workbench-service
+{{ if .Values.ubiquia.agent.database.h2.enabled }}
+      datasource:
+        driverClassName: org.h2.Driver
+        url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
+        username: sa
+        password: sa
+        hikari:
+          transaction-isolation: {{ .Values.ubiquia.agent.database.transactionIsolation }}
+      h2:
+        console:
+          enabled: true
+          path: /h2-console
+{{ else if .Values.ubiquia.agent.database.yugabyte.enabled }}
+      datasource:
+        driverClassName: com.yugabyte.Driver
+        url: jdbc:yugabytedb://yb-tservers:5433/yugabyte?autoReconnect=true
+        username: yugabyte
+        password: yugabyte
+        hikari:
+          transaction-isolation: {{ .Values.ubiquia.agent.database.transactionIsolation }}
+{{ end }}
+      jackson:
+        date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+        deserialization:
+          fail-on-unknown-properties: true
+      jpa:
+        hibernate:
+          ddl-auto: {{ .Values.ubiquia.agent.database.ddlAutoSetting }}
+        properties:
+          hibernate:
+            generate_statistics: false
+            format_sql: true
+
+    springdoc:
+      swagger-ui:
+        path: {{ .Values.convenience.variables.spring.swaggerDocs }}
+        enabled: true
+{{ end }}
