@@ -1,0 +1,17 @@
+{{ if .Values.ubiquia.components.util.workbench.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubiquia-util-workbench-service
+  labels:
+    component: ubiquia-util-workbench-service
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: {{ .Values.convenience.variables.spring.port }}
+      targetPort: http
+      protocol: TCP
+  selector:
+    component: ubiquia-util-workbench-service
+{{ end }}

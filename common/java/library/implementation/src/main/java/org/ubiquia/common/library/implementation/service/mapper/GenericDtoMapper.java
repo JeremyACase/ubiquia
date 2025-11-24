@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
+import org.ubiquia.common.model.ubiquia.entity.AbstractModelEntity;
 
 /**
  * A class dedicated to mapping from Amigos Event entities from the database to Data Transfer
@@ -16,14 +17,13 @@ import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
  */
 @Service
 public abstract class GenericDtoMapper<
-    F extends org.ubiquia.common.model.ubiquia.entity.AbstractModelEntity,
+    F extends AbstractModelEntity,
     T extends AbstractModel>
     implements InterfaceEntityToDtoMapper<F, T> {
 
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @Override
     public List<T> map(final List<F> froms) throws JsonProcessingException {
         var tos = new ArrayList<T>();
         for (var from : froms) {
@@ -39,7 +39,7 @@ public abstract class GenericDtoMapper<
      * @param from The entity model to map from.
      * @param to   The DTO to map to.
      */
-    protected void setAbstractEntityFields(F from, T to) {
+    public void setAbstractEntityFields(F from, T to) {
 
         if (Objects.nonNull(from) && Objects.nonNull(to)) {
             to.setCreatedAt(from.getCreatedAt());

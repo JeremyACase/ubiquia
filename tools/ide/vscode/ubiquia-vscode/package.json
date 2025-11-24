@@ -1,0 +1,44 @@
+{
+  "name": "ubiquia-vscode",
+  "displayName": "Ubiquia",
+  "description": "Bare-bones starter extension to integrate Ubiquia with VS Code.",
+  "version": "0.0.1",
+  "publisher": "Ubiquia",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [],
+  "activationEvents": [
+    "onCommand:ubiquia.install",
+    "onCommand:ubiquia.visualizeDag"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "ubiquia.install",
+        "title": "Ubiquia: Install Ubiquia",
+        "category": "Ubiquia"
+      },
+      {
+        "command": "ubiquia.visualizeDag",
+        "title": "Ubiquia: Show DAG Visualizer",
+        "category": "Ubiquia"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "mermaid": "^11.12.1"
+  }
+}

@@ -3,6 +3,7 @@ package org.ubiquia.common.library.advice.exception;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.persistence.PersistenceException;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
 import java.sql.SQLException;
 import java.util.Objects;
 import org.springframework.dao.DataIntegrityViolationException;

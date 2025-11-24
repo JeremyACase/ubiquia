@@ -1,0 +1,7 @@
+
+# VS Code stuff
+.vscode
+.settings
+
+dist/
+node_modules/

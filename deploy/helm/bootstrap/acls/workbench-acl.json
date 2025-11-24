@@ -235,6 +235,13 @@
             "payloadModelType": "GeneratedAgentCommunicationLanguage"
           }
         ]
+      },
+      "MermaidDag": {
+        "description": "A raw Mermaid diagram definition string used to visualize DAGs in Workbench UI.",
+        "type": "string",
+        "minLength": 5,
+        "maxLength": 500000,
+        "contentMediaType": "text/vnd.mermaid"
       }
     },
     "properties": {
@@ -257,6 +264,10 @@
       "ingressResponse": {
         "$ref": "#/definitions/IngressResponse",
         "description": "Top-level IngressResponse object."
+      },
+      "mermaidDag": {
+        "$ref": "#/definitions/MermaidDag",
+        "description": "Top-level Mermaid DAG string."
       }
     }
   }
