@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.belief.state.libraries.interfaces.service.mapper.InterfaceEgressDtoMapper;
-import org.ubiquia.common.model.acl.dto.AbstractAclModel;
-import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
+import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
+import org.ubiquia.common.model.domain.entity.AbstractDomainModelEntity;
 
 /**
  * An abstract class defining how DTO mappers should map ACL entities to DTO's. It will be
@@ -29,8 +29,8 @@ import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
  */
 @Service
 public abstract class AbstractEgressDtoMapper<
-    F extends AbstractAclModelEntity,
-    T extends AbstractAclModel>
+    F extends AbstractDomainModelEntity,
+    T extends AbstractDomainModel>
     implements InterfaceEgressDtoMapper<F, T>,
     InterfaceLogger {
 
@@ -70,10 +70,10 @@ public abstract class AbstractEgressDtoMapper<
      * @throws IllegalAccessException Exceptions from reflection.
      */
     @Transactional
-    public List<AbstractAclModel> map(final List<F> froms)
+    public List<AbstractDomainModel> map(final List<F> froms)
         throws Exception {
 
-        var tos = new ArrayList<AbstractAclModel>();
+        var tos = new ArrayList<AbstractDomainModel>();
 
         if (Objects.nonNull(froms)) {
             for (var from : froms) {
@@ -93,7 +93,7 @@ public abstract class AbstractEgressDtoMapper<
      * @throws IllegalAccessException Exceptions from reflection.
      */
     @Transactional
-    public AbstractAclModel map(final F from)
+    public AbstractDomainModel map(final F from)
         throws Exception {
 
         var to = this.getNewDto();
@@ -185,7 +185,7 @@ public abstract class AbstractEgressDtoMapper<
 
                 if (arg instanceof Class<?> elementClass) {
                     isCollectionOfAclEntities =
-                        AbstractAclModelEntity.class.isAssignableFrom(elementClass);
+                        AbstractDomainModelEntity.class.isAssignableFrom(elementClass);
                 }
 
             } catch (Exception e) {
@@ -383,7 +383,7 @@ public abstract class AbstractEgressDtoMapper<
                 dtoField.getName(),
                 type.getSimpleName());
 
-            if (AbstractAclModelEntity.class.isAssignableFrom(type)) {
+            if (AbstractDomainModelEntity.class.isAssignableFrom(type)) {
                 var lowerCase = Character.toLowerCase(type.getSimpleName().charAt(0));
                 var simpleName = lowerCase + type.getSimpleName().substring(1);
 
@@ -400,8 +400,8 @@ public abstract class AbstractEgressDtoMapper<
                         this.applicationContext
                             .getBean(fullTypeCamelCase);
 
-                    var mapped = mapperBean.map((AbstractAclModelEntity) unproxied);
-                    mapped = (AbstractAclModel) Hibernate.unproxy(mapped);
+                    var mapped = mapperBean.map((AbstractDomainModelEntity) unproxied);
+                    mapped = (AbstractDomainModel) Hibernate.unproxy(mapped);
                     dtoField.set(dto, mapped);
 
                 } else if (this.applicationContext.containsBean(fullType)) {
@@ -413,8 +413,8 @@ public abstract class AbstractEgressDtoMapper<
                         this.applicationContext
                             .getBean(fullType);
 
-                    var mapped = mapperBean.map((AbstractAclModelEntity) unproxied);
-                    mapped = (AbstractAclModel) Hibernate.unproxy(mapped);
+                    var mapped = mapperBean.map((AbstractDomainModelEntity) unproxied);
+                    mapped = (AbstractDomainModel) Hibernate.unproxy(mapped);
                     dtoField.set(dto, mapped);
                 }
             } else {

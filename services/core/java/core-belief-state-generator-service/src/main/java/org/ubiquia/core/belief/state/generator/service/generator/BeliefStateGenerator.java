@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
 import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateCompiler;
 import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateUberizer;
 import org.ubiquia.core.belief.state.generator.service.decorator.EnumNormalizer;
@@ -71,7 +71,7 @@ public class BeliefStateGenerator {
     @Autowired
     private BeliefStateUberizer beliefStateUberizer;
 
-    public void generateBeliefStateFrom(final AgentCommunicationLanguage acl)
+    public void generateBeliefStateFrom(final DomainDataContract acl)
         throws Exception {
 
         logger.info("Generating new Belief State from: {}",
@@ -99,7 +99,7 @@ public class BeliefStateGenerator {
             beliefStateLibraries);
 
         var beliefStateName =
-            acl.getDomain().toLowerCase()
+            acl.getName().toLowerCase()
                 + "-"
                 + acl.getVersion().toString()
                 + ".jar";
@@ -116,7 +116,7 @@ public class BeliefStateGenerator {
         }
     }
 
-    private String getJsonSchemaFrom(final AgentCommunicationLanguage acl)
+    private String getJsonSchemaFrom(final DomainDataContract acl)
         throws IOException {
 
         var jsonSchema = this.objectMapper.writeValueAsString(acl.getJsonSchema());

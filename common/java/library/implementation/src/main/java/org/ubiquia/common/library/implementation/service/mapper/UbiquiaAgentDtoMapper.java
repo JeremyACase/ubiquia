@@ -6,7 +6,7 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.UbiquiaAgent;
-import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgentEntity;
+import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 
 @Service
 public class UbiquiaAgentDtoMapper {
@@ -14,7 +14,7 @@ public class UbiquiaAgentDtoMapper {
     @Autowired
     private GraphDtoMapper graphDtoMapper;
 
-    public UbiquiaAgent map(final UbiquiaAgentEntity from) throws JsonProcessingException {
+    public UbiquiaAgent map(final AgentEntity from) throws JsonProcessingException {
 
         UbiquiaAgent to = null;
         if (Objects.nonNull(from)) {

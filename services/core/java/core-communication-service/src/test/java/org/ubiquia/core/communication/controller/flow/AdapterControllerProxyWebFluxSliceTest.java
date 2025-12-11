@@ -33,7 +33,7 @@ import org.ubiquia.core.communication.service.io.flow.DeployedGraphPoller;
     properties = "spring.task.scheduling.enabled=false"
 )
 @Import(MockWebServerTestConfig.class) // provides WebClient bean used by the controller
-class AdapterControllerProxyWebMvcSliceTest {
+class NodeControllerProxyWebMvcSliceTest {
 
     @Autowired
     private MockMvc mockMvc;

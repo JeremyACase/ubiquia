@@ -14,7 +14,7 @@ import org.ubiquia.common.library.belief.state.libraries.service.mapper.Abstract
 
 @RestController
 @RequestMapping("/ubiquia/belief-state-service/cat")
-public class CatController extends AbstractAclModelController<CatEntity, Cat> {
+public class CatController extends AbstractDomainModelController<CatEntity, Cat> {
 
 
     private static final Logger logger = LoggerFactory.getLogger(CatController.class);

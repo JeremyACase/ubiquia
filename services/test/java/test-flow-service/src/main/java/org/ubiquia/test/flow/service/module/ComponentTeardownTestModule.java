@@ -85,7 +85,7 @@ public class ComponentTeardownTestModule extends AbstractHelmTestModule {
         logger.info("Proceeding with tests...");
 
         var graphDeployment = new GraphDeployment();
-        graphDeployment.setName("pets");
+        graphDeployment.setGraphName("pets");
 
         var version = new SemanticVersion();
         version.setMajor(1);

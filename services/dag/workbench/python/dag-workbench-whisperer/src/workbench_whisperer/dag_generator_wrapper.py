@@ -81,7 +81,7 @@ def _build_dag_prompt(user_prompt: str) -> str:
       patch: 0
     tags: []
     capabilities: []
-    agentCommunicationLanguage:
+    domainDataContract:
       name: example-domain
       version:
         major: 1
@@ -98,17 +98,17 @@ def _build_dag_prompt(user_prompt: str) -> str:
           repository: example
           tag: latest
         overrideSettings: {}
-    componentlessAdapters:
+    componentlessNodes:
       - modelType: Adapter
-        adapterType: PUSH
+        nodeType: PUSH
         name: Example-Input-Adapter
-        description: Example adapter
+        description: Example node
         endpoint: http://example:8080/input
         inputSubSchemas:
           - modelName: InputModel
         outputSubSchema:
           modelName: OutputModel
-        adapterSettings:
+        nodeSettings:
           persistInputPayload: true
           persistOutputPayload: true
           validateInputPayload: true
@@ -127,11 +127,11 @@ def _build_dag_prompt(user_prompt: str) -> str:
     - Do NOT include any explanatory text.
     - The top-level keys must include:
         name, modelType, author, description, version, tags, capabilities,
-        agentCommunicationLanguage, components, componentlessAdapters, edges.
+        domainDataContract, components, componentlessNodes, edges.
     - modelType MUST be "Graph".
-    - agentCommunicationLanguage MUST contain a name and version (major/minor/patch).
-    - Every adapter in componentlessAdapters must be referenced in at least one edge.
-    - Every edge.leftAdapterName and rightAdapterNames[] must reference defined adapters.
+    - domainDataContract MUST contain a name and version (major/minor/patch).
+    - Every node in componentlessNodes must be referenced in at least one edge.
+    - Every edge.leftAdapterName and rightAdapterNames[] must reference defined nodes.
     - Do not include unrecognized keys like nodes, graph, pipeline, or scripts.
     - The YAML must parse cleanly.
     """)
@@ -141,7 +141,7 @@ You are a Ubiquia DAG architect.
 
 TASK:
 Given the user's workflow description, design a valid, complete DAG in Ubiquia YAML format
-that would orchestrate components and adapters to accomplish the workflow.
+that would orchestrate components and nodes to accomplish the workflow.
 
 USER DESCRIPTION:
 {_squish(user_prompt)}

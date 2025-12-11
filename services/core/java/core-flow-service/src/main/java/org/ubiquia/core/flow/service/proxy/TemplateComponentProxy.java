@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
-import org.ubiquia.core.flow.repository.AdapterRepository;
+import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.service.io.Outbox;
 import org.ubiquia.core.flow.service.visitor.StamperVisitor;
 
@@ -37,9 +37,9 @@ public class TemplateComponentProxy {
     private static final Logger logger = LoggerFactory.getLogger(TemplateComponentProxy.class);
 
     @Autowired
-    private AdapterRepository adapterRepository;
+    private NodeRepository nodeRepository;
 
-    private HashMap<String, Schema> cachedAdapterSchemas;
+    private HashMap<String, Schema> cachedNodeSchemas;
 
     private DefaultConfig jsonSchemaGeneratorConfiguration;
 
@@ -54,7 +54,7 @@ public class TemplateComponentProxy {
      * Constructor time.
      */
     public TemplateComponentProxy() {
-        this.cachedAdapterSchemas = new HashMap<>();
+        this.cachedNodeSchemas = new HashMap<>();
         this.jsonSchemaGeneratorConfiguration = DefaultConfig.build()
             .setGenerateMinimal(false)
             .setNonRequiredPropertyChance(0.5f)
@@ -71,15 +71,15 @@ public class TemplateComponentProxy {
      * @throws ClassNotFoundException  Exceptions from being unable to find a valid class.
      */
     @Transactional
-    public void proxyAsComponentFor(FlowEventEntity flowEventEntity)
+    public void proxyAsComponentWith(FlowEventEntity flowEventEntity)
         throws JsonProcessingException,
         GenerationException,
         JsonGeneratorException {
 
         var eventTimes = flowEventEntity.getFlowEventTimes();
         eventTimes.setPayloadSentToComponentTime(OffsetDateTime.now());
-        this.tryInitializeSchema(flowEventEntity.getAdapter().getId());
-        var jsonSchema = this.cachedAdapterSchemas.get(flowEventEntity.getAdapter().getId());
+        this.tryInitializeSchema(flowEventEntity.getNode().getId());
+        var jsonSchema = this.cachedNodeSchemas.get(flowEventEntity.getNode().getId());
         var schemaStore = new SchemaStore(true);
         var generator = new Generator(
             this.jsonSchemaGeneratorConfiguration,
@@ -90,30 +90,31 @@ public class TemplateComponentProxy {
         logger.debug("Generated dummy data: {}", stringifiedPayload);
         eventTimes.setComponentResponseTime(OffsetDateTime.now());
         this.stamperVisitor.tryStampOutputs(flowEventEntity, stringifiedPayload);
-        if (flowEventEntity.getAdapter().getAdapterSettings().getPersistOutputPayload()) {
+        if (flowEventEntity.getNode().getNodeSettings().getPersistOutputPayload()) {
             flowEventEntity.setOutputPayload(stringifiedPayload);
         }
-        this.outbox.tryQueueComponentResponse(flowEventEntity, stringifiedPayload);
+        this.outbox.tryQueueMessage(flowEventEntity, stringifiedPayload);
     }
 
     /**
      * Attempt to initialize the JSON schema for the specific adapter.
      *
-     * @param adapterId The id of the adapter to initialize a schema for.
+     * @param nodeId The id of the adapter to initialize a schema for.
      * @throws GenerationException Exception from generating dummy data.
      */
-    private void tryInitializeSchema(final String adapterId) throws GenerationException {
+    private void tryInitializeSchema(final String nodeId) throws GenerationException {
 
-        if (!this.cachedAdapterSchemas.containsKey(adapterId)) {
-            var record = this.adapterRepository.findById(adapterId);
+        if (!this.cachedNodeSchemas.containsKey(nodeId)) {
+            var record = this.nodeRepository.findById(nodeId);
             if (record.isEmpty()) {
-                throw new RuntimeException("ERROR: Cannot find adapter with id: " + adapterId);
+                throw new RuntimeException("ERROR: Cannot find node with id: " + nodeId);
             }
 
             var entity = record.get();
             var jsonSchema = entity
                 .getGraph()
-                .getAgentCommunicationLanguage()
+                .getDomainOntology()
+                .getDomainDataContract()
                 .getJsonSchema();
 
             var schemaStore = new SchemaStore(true);
@@ -130,11 +131,11 @@ public class TemplateComponentProxy {
                 throw new RuntimeException("ERROR: Cannot find subschema named  '"
                     + entity.getOutputSubSchema().getModelName()
                     + "' in agent communication language named '"
-                    + entity.getGraph().getAgentCommunicationLanguage().getDomain()
+                    + entity.getGraph().getDomainOntology().getName()
                     + "'!");
             }
             var jsonSubSchema = schema.getSubSchemas().get(match.get());
-            this.cachedAdapterSchemas.put(adapterId, jsonSubSchema);
+            this.cachedNodeSchemas.put(nodeId, jsonSubSchema);
         }
     }
 }

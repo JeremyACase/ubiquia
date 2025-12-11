@@ -18,10 +18,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
-import org.ubiquia.common.model.ubiquia.enums.AdapterType;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
+import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.TestHelper;
-import org.ubiquia.core.flow.component.adapter.PushAdapter;
+import org.ubiquia.core.flow.component.node.PushNode;
+import org.ubiquia.core.flow.controller.DomainOntologyController;
 import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
@@ -29,6 +30,9 @@ import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class PayloadModelValidatorTest {
+
+    @Autowired
+    private DomainOntologyController domainOntologyController;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -57,7 +61,8 @@ public class PayloadModelValidatorTest {
     public void assertInvalidPayloadThrowsClientException_isValid()
         throws Exception {
 
-        var graph = this.dummyFactory.generateGraph();
+        var domainOntology = this.dummyFactory.generateDomainOntology();
+        var graph = domainOntology.getGraphs().get(0);
 
         var ingressComponent = this.dummyFactory.generateComponent();
         var hiddenComponent = this.dummyFactory.generateComponent();
@@ -65,41 +70,43 @@ public class PayloadModelValidatorTest {
         graph.getComponents().add(ingressComponent);
         graph.getComponents().add(hiddenComponent);
 
-        var ingressAdapter = this.dummyFactory.generateAdapter();
-        ingressAdapter.getAdapterSettings().setValidateInputPayload(true);
-        ingressAdapter.setAdapterType(AdapterType.PUSH);
+        var ingressNode = this.dummyFactory.generateNode();
+        ingressNode.getNodeSettings().setValidateInputPayload(true);
+        ingressNode.setNodeType(NodeType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
-        ingressAdapter.getInputSubSchemas().add(subSchema);
-        ingressAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        ingressNode.getInputSubSchemas().add(subSchema);
+        ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
 
-        ingressComponent.setAdapter(ingressAdapter);
+        ingressComponent.setNode(ingressNode);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getName());
-        edge.setRightAdapterNames(new ArrayList<>());
+        edge.setLeftNodeName(ingressNode.getName());
+        edge.setRightNodeNames(new ArrayList<>());
         graph.getEdges().add(edge);
 
-        this.graphController.register(graph);
+        this.domainOntologyController.register(domainOntology);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getName());
-        deployment.setVersion(graph.getVersion());
+        deployment.setGraphName(graph.getName());
+        deployment.setDomainVersion(domainOntology.getVersion());
+        deployment.setDomainOntologyName(domainOntology.getName());
         this.graphController.tryDeployGraph(deployment);
 
-        var adapter = (PushAdapter) this
+        var node = (PushNode) this
             .testHelper
-            .findAdapter(ingressAdapter.getName(), graph.getName());
+            .findNode(ingressNode.getName(), graph.getName());
 
-        var invalidPayload = this.dummyFactory.generateAdapter();
+        var invalidPayload = this.dummyFactory.generateNode();
         var json = this.objectMapper.writeValueAsString(invalidPayload);
 
-        Assertions.assertThrows(ValidationException.class, () -> adapter.push(json));
+        Assertions.assertThrows(ValidationException.class, () -> node.push(json));
     }
 
     @Test
     public void assertPostInvalidPayloadThrowsClientException_isValid()
         throws Exception {
 
-        var graph = this.dummyFactory.generateGraph();
+        var domainOntology = this.dummyFactory.generateDomainOntology();
+        var graph = domainOntology.getGraphs().get(0);
 
         var ingressComponent = this.dummyFactory.generateComponent();
         var hiddenComponent = this.dummyFactory.generateComponent();
@@ -107,38 +114,39 @@ public class PayloadModelValidatorTest {
         graph.getComponents().add(ingressComponent);
         graph.getComponents().add(hiddenComponent);
 
-        var ingressAdapter = this.dummyFactory.generateAdapter();
-        ingressAdapter.getAdapterSettings().setValidateInputPayload(true);
-        ingressAdapter.setAdapterType(AdapterType.PUSH);
+        var ingressNode = this.dummyFactory.generateNode();
+        ingressNode.getNodeSettings().setValidateInputPayload(true);
+        ingressNode.setNodeType(NodeType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
-        ingressAdapter.getInputSubSchemas().add(subSchema);
-        ingressAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        ingressNode.getInputSubSchemas().add(subSchema);
+        ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
 
-        ingressComponent.setAdapter(ingressAdapter);
+        ingressComponent.setNode(ingressNode);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getName());
-        edge.setRightAdapterNames(new ArrayList<>());
+        edge.setLeftNodeName(ingressNode.getName());
+        edge.setRightNodeNames(new ArrayList<>());
         graph.getEdges().add(edge);
 
-        this.graphController.register(graph);
+        this.domainOntologyController.register(domainOntology);
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getName());
-        deployment.setVersion(graph.getVersion());
+        deployment.setGraphName(graph.getName());
+        deployment.setDomainVersion(domainOntology.getVersion());
+        deployment.setDomainOntologyName(domainOntology.getName());
         this.graphController.tryDeployGraph(deployment);
 
-        var adapter = (PushAdapter) this
+        var node = (PushNode) this
             .testHelper
-            .findAdapter(ingressAdapter.getName(), graph.getName());
+            .findNode(ingressNode.getName(), graph.getName());
 
-        var adapterContext = adapter.getAdapterContext();
-        adapterContext.setEndpointUri(URI.create("http://localhost:8080/test"));
+        var nodeContext = node.getNodeContext();
+        nodeContext.setEndpointUri(URI.create("http://localhost:8080/test"));
 
-        var invalidPayload = this.dummyFactory.generateAdapter();
+        var invalidPayload = this.dummyFactory.generateNode();
         var json = this.objectMapper.writeValueAsString(invalidPayload);
 
         this.mockMvc.perform(MockMvcRequestBuilders
-                .post(adapterContext.getEndpointUri())
+                .post(nodeContext.getEndpointUri())
                 .content(json)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON))

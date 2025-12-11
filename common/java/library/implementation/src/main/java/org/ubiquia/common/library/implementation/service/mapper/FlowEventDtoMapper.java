@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.Adapter;
+import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
 import org.ubiquia.common.model.ubiquia.dto.KeyValuePair;
 import org.ubiquia.common.model.ubiquia.embeddable.FlowEventTimes;
@@ -18,6 +19,9 @@ public class FlowEventDtoMapper extends GenericDtoMapper<FlowEventEntity, FlowEv
 
     private static final Logger logger = LoggerFactory.getLogger(FlowEventDtoMapper.class);
 
+    @Autowired
+    private FlowDtoMapper flowDtoMapper;
+
     @Override
     public FlowEvent map(final FlowEventEntity from) throws JsonProcessingException {
 
@@ -26,7 +30,7 @@ public class FlowEventDtoMapper extends GenericDtoMapper<FlowEventEntity, FlowEv
 
             to = new FlowEvent();
             super.setAbstractEntityFields(from, to);
-            to.setFlowId(from.getFlowId());
+            to.setFlow(this.flowDtoMapper.map(from.getFlow()));
 
             this.setFlowEventTimes(from, to);
 
@@ -87,9 +91,9 @@ public class FlowEventDtoMapper extends GenericDtoMapper<FlowEventEntity, FlowEv
                 }
                 to.getOutputPayloadStamps().add(kvp);
             }
-            var adapter = new Adapter();
-            adapter.setName(from.getAdapter().getName());
-            adapter.setAdapterType(from.getAdapter().getAdapterType());
+            var adapter = new Node();
+            adapter.setName(from.getNode().getName());
+            adapter.setNodeType(from.getNode().getNodeType());
 
             to.setAdapter(adapter);
             to.setTags(from.getTags().stream().toList());

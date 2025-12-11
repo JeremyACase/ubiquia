@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.library.implementation.service.mapper.OverrideSettingsMapper;
 import org.ubiquia.common.model.ubiquia.dto.Component;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.model.ubiquia.embeddable.CommunicationServiceSettings;
@@ -22,7 +23,6 @@ import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.core.flow.repository.ComponentRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
-import org.ubiquia.common.library.implementation.service.mapper.OverrideSettingsMapper;
 
 /**
  * A service dedicated to registering components in Ubiquia.
@@ -43,25 +43,24 @@ public class ComponentRegistrar {
     /**
      * Register components for a graph.
      *
-     * @param graphEntity       The graph entity to register components for.
-     * @param graphRegistration The object representing the graph registration.
+     * @param graphEntity The graph entity to register components for.
+     * @param graph       The object representing the graph registration.
      * @return A list of newly-registered components.
      * @throws JsonProcessingException Exceptions from parsing component configuration.
      */
     @Transactional
     public List<ComponentEntity> registerComponentsFor(
         GraphEntity graphEntity,
-        final Graph graphRegistration)
+        final Graph graph)
         throws JsonProcessingException {
 
         logger.info("...registering components for graph: {}...",
-            graphRegistration.getName());
+            graph.getName());
 
         // TODO: Verify component subschema is valid
         var componentEntities = new ArrayList<ComponentEntity>();
-        for (var component : graphRegistration.getComponents()) {
+        for (var component : graph.getComponents()) {
             var componentEntity = this.tryGetComponentEntityFrom(
-                graphRegistration,
                 component);
             componentEntity = this.persistComponentWithParentGraph(
                 componentEntity,
@@ -69,7 +68,7 @@ public class ComponentRegistrar {
             componentEntities.add(componentEntity);
         }
         logger.info("...registered components for graph: {}...",
-            graphRegistration.getName());
+            graph.getName());
         return componentEntities;
     }
 
@@ -128,11 +127,8 @@ public class ComponentRegistrar {
         GraphEntity graphEntity) {
 
         if (Objects.isNull(graphEntity.getComponents())) {
-            graphEntity.setComponents(new ArrayList<>());
+            graphEntity.setComponents(new HashSet<>());
         }
-        graphEntity.getComponents().add(componentEntity);
-        graphEntity = this.graphRepository.save(graphEntity);
-
         componentEntity.setGraph(graphEntity);
         componentEntity = this.componentRepository.save(componentEntity);
 
@@ -142,7 +138,6 @@ public class ComponentRegistrar {
     /**
      * Attempt to get a component entity for a graph and an associated registration object.
      *
-     * @param graphRegistration     The graph to get an component for.
      * @param componentRegistration The object representing the component to be
      *                              registered.
      * @return A newly-registered component.
@@ -150,28 +145,8 @@ public class ComponentRegistrar {
      */
     @Transactional
     private ComponentEntity tryGetComponentEntityFrom(
-        final Graph graphRegistration,
         final Component componentRegistration)
         throws JsonProcessingException {
-
-        var record = this.componentRepository
-            .findByGraphNameAndNameAndGraphVersionMajorAndGraphVersionMinorAndGraphVersionPatch(
-                graphRegistration.getName(),
-                componentRegistration.getName(),
-                graphRegistration.getVersion().getMajor(),
-                graphRegistration.getVersion().getMinor(),
-                graphRegistration.getVersion().getPatch()
-            );
-
-        if (record.isPresent()) {
-            throw new IllegalArgumentException("ERROR: An component with name "
-                + componentRegistration.getName()
-                + " already exists for a graph named "
-                + graphRegistration.getVersion()
-                + " with version "
-                + graphRegistration.getVersion()
-                + "!");
-        }
 
         var componentEntity = new ComponentEntity();
 

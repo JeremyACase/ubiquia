@@ -11,9 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.library.api.config.MinioConfig;
 import org.ubiquia.common.library.implementation.service.builder.BeliefStateNameBuilder;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 
 @ConditionalOnProperty(
     value = "ubiquia.kubernetes.enabled",
@@ -42,13 +41,13 @@ public class BeliefStateDeploymentBuilder {
         this.ubiquiaDeployment = ubiquiaDeployment;
     }
 
-    public V1Service buildServiceFrom(final AgentCommunicationLanguage acl) {
+    public V1Service buildServiceFrom(final DomainOntology domainOntology) {
         var service = new V1Service();
         service.setApiVersion("v1");
         service.setKind("Service");
 
         service.setMetadata(new V1ObjectMeta());
-        var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(acl);
+        var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(domainOntology);
         service.getMetadata().setName(beliefStateName);
 
         service.getMetadata().setLabels(new HashMap<>());
@@ -57,7 +56,7 @@ public class BeliefStateDeploymentBuilder {
         service.getMetadata().getLabels().remove("app.kubernetes.io/managed-by");
         service.getMetadata().getLabels().put(
             "domain",
-            acl.getDomain().toLowerCase());
+            domainOntology.getName().toLowerCase());
         service.getMetadata().getLabels().put(
             "belief-state",
             beliefStateName);
@@ -68,7 +67,7 @@ public class BeliefStateDeploymentBuilder {
         serviceSpec.setSelector(new HashMap<>());
         serviceSpec.getSelector().put(
             "domain",
-            acl.getDomain().toLowerCase());
+            domainOntology.getName().toLowerCase());
         serviceSpec.getSelector().put(
             "belief-state",
             beliefStateName);
@@ -84,32 +83,32 @@ public class BeliefStateDeploymentBuilder {
         return service;
     }
 
-    public V1Deployment buildDeploymentFrom(final AgentCommunicationLanguage acl) {
+    public V1Deployment buildDeploymentFrom(final DomainOntology domainOntology) {
 
         var deployment = new V1Deployment();
         deployment.setApiVersion("apps/v1");
         deployment.setKind("Deployment");
 
-        var metadata = this.getMetadataFrom(acl);
+        var metadata = this.getMetadataFrom(domainOntology);
         deployment.setMetadata(metadata);
 
-        var spec = this.getDeploymentSpecFrom(acl);
+        var spec = this.getDeploymentSpecFrom(domainOntology);
         deployment.setSpec(spec);
 
         return deployment;
     }
 
-    private V1ObjectMeta getMetadataFrom(final AgentCommunicationLanguage acl) {
+    private V1ObjectMeta getMetadataFrom(final DomainOntology domainOntology) {
         var metadata = new V1ObjectMeta();
 
-        var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(acl);
+        var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(domainOntology);
         metadata.setName(beliefStateName);
 
         metadata.setLabels(new HashMap<>());
         metadata.getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
         metadata.getLabels().remove("component");
         metadata.getLabels().remove("app.kubernetes.io/managed-by");
-        metadata.getLabels().put("component", acl.getDomain().toLowerCase());
+        metadata.getLabels().put("component", domainOntology.getName().toLowerCase());
         metadata.getLabels().put("app.kubernetes.io/managed-by", "ubiquia");
         metadata.getLabels().put(
             "belief-state",
@@ -121,35 +120,39 @@ public class BeliefStateDeploymentBuilder {
         return metadata;
     }
 
-    private V1DeploymentSpec getDeploymentSpecFrom(final AgentCommunicationLanguage acl) {
+    private V1DeploymentSpec getDeploymentSpecFrom(final DomainOntology domainOntology) {
 
-        var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(acl);
+        var beliefStateName = this
+            .beliefStateNameBuilder
+            .getKubernetesBeliefStateNameFrom(domainOntology);
 
         var spec = new V1DeploymentSpec();
         spec.setReplicas(1);
         spec.setSelector(this.ubiquiaDeployment.getSpec().getSelector());
         spec.getSelector().getMatchLabels().put(
             "domain",
-            acl.getDomain().toLowerCase());
+            domainOntology.getName().toLowerCase());
         spec.getSelector().getMatchLabels().put(
             "belief-state",
             beliefStateName);
 
-        var template = this.getPodTemplateSpec(acl);
+        var template = this.getPodTemplateSpec(domainOntology);
         spec.setTemplate(template);
 
         return spec;
     }
 
-    private V1PodTemplateSpec getPodTemplateSpec(final AgentCommunicationLanguage acl) {
+    private V1PodTemplateSpec getPodTemplateSpec(final DomainOntology domainOntology) {
 
-        var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(acl);
+        var beliefStateName = this
+            .beliefStateNameBuilder
+            .getKubernetesBeliefStateNameFrom(domainOntology);
 
         var template = new V1PodTemplateSpec();
         template.setMetadata(new V1ObjectMeta());
         template.getMetadata().setLabels(new HashMap<>());
         template.getMetadata().getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
-        template.getMetadata().getLabels().put("domain", acl.getDomain().toLowerCase());
+        template.getMetadata().getLabels().put("domain", domainOntology.getName().toLowerCase());
         template.getMetadata().getLabels().put("belief-state", beliefStateName);
         template.getMetadata().getLabels().remove("app.kubernetes.io/managed-by");
         template.getMetadata().getLabels().put("app.kubernetes.io/managed-by", "ubiquia");
@@ -164,7 +167,7 @@ public class BeliefStateDeploymentBuilder {
             .getImagePullSecrets());
 
         // Create container with updated volume mount
-        var container = this.getContainer(acl);
+        var container = this.getContainer(domainOntology);
         podSpec.getContainers().add(container);
 
         // PVC volume
@@ -178,10 +181,10 @@ public class BeliefStateDeploymentBuilder {
         return template;
     }
 
-    private V1Container getContainer(final AgentCommunicationLanguage acl) {
+    private V1Container getContainer(final DomainOntology domainOntology) {
 
         var container = new V1Container();
-        container.setName(acl.getDomain().toLowerCase());
+        container.setName(domainOntology.getName().toLowerCase());
         container.setImagePullPolicy("IfNotPresent");
         container.setImage("eclipse-temurin:" + this.jdkVersion);
 
@@ -212,7 +215,9 @@ public class BeliefStateDeploymentBuilder {
             .protocol("TCP");
         container.setPorts(List.of(port));
 
-        var beliefStateJarName = this.beliefStateNameBuilder.getJarBeliefStateNameFrom(acl);
+        var beliefStateJarName = this
+            .beliefStateNameBuilder
+            .getJarBeliefStateNameFrom(domainOntology);
         var mountPath = this.uberJarsPath + beliefStateJarName;
 
         // Volume mount with subPath

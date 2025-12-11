@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.component.adapter.PublishAdapter;
+import org.ubiquia.core.flow.component.node.PublishNode;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.service.io.broker.kafka.KafkaEgress;
@@ -27,9 +27,9 @@ public class BrokerEgress {
     @Transactional
     public void tryPublishFor(
         FlowMessage flowMessage,
-        final PublishAdapter adapter) {
+        final PublishNode adapter) {
 
-        var adapterContext = adapter.getAdapterContext();
+        var adapterContext = adapter.getNodeContext();
         logger.debug("Got a request to publish the output of an event for adapter of graph {} "
                 + " and component {}",
             adapterContext.getGraphName(),

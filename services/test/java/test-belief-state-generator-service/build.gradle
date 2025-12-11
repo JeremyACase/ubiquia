@@ -25,7 +25,7 @@ dependencies {
     // Import the Page implementation stuff without having to have a database
     implementation "org.springframework.data:spring-data-commons"
 
-    implementation project(':common:java:model:acl')
+    implementation project(':common:java:model:domain')
     implementation project(':common:java:model:ubiquia')
     implementation project(':common:java:library:advice')
     implementation project(':common:java:library:api')

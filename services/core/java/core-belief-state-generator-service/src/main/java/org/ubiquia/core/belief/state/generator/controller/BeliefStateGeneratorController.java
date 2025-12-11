@@ -17,7 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.common.library.implementation.service.builder.BeliefStateNameBuilder;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
 import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
 import org.ubiquia.core.belief.state.generator.service.generator.BeliefStateGenerator;
 import org.ubiquia.core.belief.state.generator.service.k8s.BeliefStateOperator;
@@ -71,7 +71,7 @@ public class BeliefStateGeneratorController {
         logger.debug("...querying URL: {}...", uri);
 
         var responseType = new ParameterizedTypeReference
-            <GenericPageImplementation<AgentCommunicationLanguage>>() {
+            <GenericPageImplementation<DomainDataContract>>() {
         };
 
         var response = this.restTemplate.exchange(

@@ -2,9 +2,8 @@ package org.ubiquia.common.model.ubiquia.dto;
 
 
 import jakarta.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.List;
-import org.ubiquia.common.model.ubiquia.embeddable.NameAndVersionPair;
-import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 
 public class Graph extends AbstractModel {
 
@@ -16,15 +15,13 @@ public class Graph extends AbstractModel {
 
     private List<String> capabilities;
 
-    private NameAndVersionPair agentCommunicationLanguage;
-
     private List<GraphEdge> edges;
 
-    private SemanticVersion version;
+    private DomainOntology domainOntology;
 
-    private List<Adapter> adapters;
+    private List<Node> nodes;
 
-    private List<Adapter> componentlessAdapters;
+    private HashSet<Flow> flows;
 
     private List<Component> components;
 
@@ -60,21 +57,12 @@ public class Graph extends AbstractModel {
         this.description = description;
     }
 
-    @NotNull
-    public SemanticVersion getVersion() {
-        return version;
+    public List<Node> getNodes() {
+        return nodes;
     }
 
-    public void setVersion(SemanticVersion version) {
-        this.version = version;
-    }
-
-    public List<Adapter> getAdapters() {
-        return adapters;
-    }
-
-    public void setAdapters(List<Adapter> adapters) {
-        this.adapters = adapters;
+    public void setNodes(List<Node> nodes) {
+        this.nodes = nodes;
     }
 
     public List<Component> getComponents() {
@@ -101,21 +89,20 @@ public class Graph extends AbstractModel {
         this.edges = edges;
     }
 
-    public List<Adapter> getComponentlessAdapters() {
-        return componentlessAdapters;
+    public HashSet<Flow> getFlows() {
+        return flows;
     }
 
-    public void setComponentlessAdapters(List<Adapter> componentlessAdapters) {
-        this.componentlessAdapters = componentlessAdapters;
+    public void setFlows(HashSet<Flow> flows) {
+        this.flows = flows;
     }
 
-    @NotNull
-    public NameAndVersionPair getAgentCommunicationLanguage() {
-        return agentCommunicationLanguage;
+    public DomainOntology getDomainOntology() {
+        return domainOntology;
     }
 
-    public void setAgentCommunicationLanguage(NameAndVersionPair agentCommunicationLanguage) {
-        this.agentCommunicationLanguage = agentCommunicationLanguage;
+    public void setDomainOntology(DomainOntology domainOntology) {
+        this.domainOntology = domainOntology;
     }
 }
 

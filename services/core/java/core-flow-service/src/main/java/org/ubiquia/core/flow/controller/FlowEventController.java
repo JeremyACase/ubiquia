@@ -13,7 +13,7 @@ import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 
 @RestController
-@RequestMapping("/ubiquia/flow-service/event")
+@RequestMapping("/ubiquia/flow-service/flow-event")
 public class FlowEventController extends GenericUbiquiaDaoController<FlowEventEntity, FlowEvent> {
 
     private static final Logger logger = LoggerFactory.getLogger(FlowEventController.class);

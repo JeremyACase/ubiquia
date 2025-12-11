@@ -24,10 +24,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.containers.MinIOContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.ubiquia.common.library.api.config.UbiquiaAgentConfig;
-import org.ubiquia.common.library.api.repository.UbiquiaAgentRepository;
+import org.ubiquia.common.library.api.config.AgentConfig;
+import org.ubiquia.common.library.api.repository.AgentRepository;
 import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
-import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgentEntity;
+import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 
 @SpringBootTest
 @Testcontainers
@@ -46,9 +46,9 @@ public class ObjectControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private UbiquiaAgentConfig ubiquiaAgentConfig;
+    private AgentConfig agentConfig;
     @Autowired
-    private UbiquiaAgentRepository ubiquiaAgentRepository;
+    private AgentRepository agentRepository;
 
     @DynamicPropertySource
     static void configureMinio(DynamicPropertyRegistry registry) {
@@ -60,13 +60,13 @@ public class ObjectControllerTest {
     @BeforeEach
     @Transactional
     public void setup() {
-        var record = this.ubiquiaAgentRepository.findById(this.ubiquiaAgentConfig.getId());
+        var record = this.agentRepository.findById(this.agentConfig.getId());
         if (record.isEmpty()) {
 
-            var entity = new UbiquiaAgentEntity();
+            var entity = new AgentEntity();
             entity.setDeployedGraphs(new ArrayList<>());
-            entity.setId(this.ubiquiaAgentConfig.getId());
-            entity = this.ubiquiaAgentRepository.save(entity);
+            entity.setId(this.agentConfig.getId());
+            entity = this.agentRepository.save(entity);
         }
     }
 

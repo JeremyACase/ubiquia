@@ -10,7 +10,7 @@ public class ObjectMetadataEntity extends AbstractModelEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "metadata_agent_join_id", nullable = false)
-    private UbiquiaAgentEntity ubiquiaAgent;
+    private AgentEntity agent;
 
     private String originalFilename;
 
@@ -31,12 +31,12 @@ public class ObjectMetadataEntity extends AbstractModelEntity {
         this.bucketName = bucketName;
     }
 
-    public UbiquiaAgentEntity getUbiquiaAgent() {
-        return ubiquiaAgent;
+    public AgentEntity getAgent() {
+        return agent;
     }
 
-    public void setUbiquiaAgent(UbiquiaAgentEntity ubiquiaAgent) {
-        this.ubiquiaAgent = ubiquiaAgent;
+    public void setAgent(AgentEntity agent) {
+        this.agent = agent;
     }
 
     public String getOriginalFilename() {

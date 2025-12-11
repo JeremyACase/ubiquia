@@ -16,17 +16,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
-import org.ubiquia.core.flow.repository.AdapterRepository;
+import org.ubiquia.core.flow.component.node.AbstractNode;
+import org.ubiquia.core.flow.repository.NodeRepository;
 
 @Service
 public class StimulatedPayloadBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(StimulatedPayloadBuilder.class);
     @Autowired
-    private AdapterRepository adapterRepository;
+    private NodeRepository nodeRepository;
 
-    private HashMap<String, Schema> cachedAdapterSchemas;
+    private HashMap<String, Schema> cachedNodeSchemas;
 
     private DefaultConfig jsonSchemaGeneratorConfiguration;
 
@@ -37,21 +37,21 @@ public class StimulatedPayloadBuilder {
      * Constructor time.
      */
     public StimulatedPayloadBuilder() {
-        this.cachedAdapterSchemas = new HashMap<>();
+        this.cachedNodeSchemas = new HashMap<>();
         this.jsonSchemaGeneratorConfiguration = DefaultConfig.build()
             .setGenerateMinimal(false)
             .setNonRequiredPropertyChance(0.5f)
             .get();
     }
 
-    public String buildStimulatedPayloadFor(final AbstractAdapter adapter)
+    public String buildStimulatedPayloadFor(final AbstractNode adapter)
         throws GenerationException, JsonProcessingException, JsonGeneratorException {
 
         logger.info("Building a dummy stimulation payload for adapter: {}...",
-            adapter.getAdapterContext().getAdapterName());
+            adapter.getNodeContext().getNodeName());
 
-        var adapterContext = adapter.getAdapterContext();
-        var jsonSchema = this.cachedAdapterSchemas.get(adapterContext.getAdapterId());
+        var adapterContext = adapter.getNodeContext();
+        var jsonSchema = this.cachedNodeSchemas.get(adapterContext.getNodeId());
         var schemaStore = new SchemaStore(true);
         var generator = new Generator(
             this.jsonSchemaGeneratorConfiguration,
@@ -66,30 +66,31 @@ public class StimulatedPayloadBuilder {
     /**
      * Attempt to initialize the JSON schema for the specific adapter.
      *
-     * @param adapterId The id of the adapter to initialize a schema for.
+     * @param nodeId The id of the adapter to initialize a schema for.
      * @throws GenerationException Exception from generating dummy data.
      */
     @Transactional
-    public void initializeSchema(final String adapterId) throws GenerationException {
+    public void initializeSchema(final String nodeId) throws GenerationException {
 
-        if (!this.cachedAdapterSchemas.containsKey(adapterId)) {
-            var record = this.adapterRepository.findById(adapterId);
+        if (!this.cachedNodeSchemas.containsKey(nodeId)) {
+            var record = this.nodeRepository.findById(nodeId);
             if (record.isEmpty()) {
-                throw new RuntimeException("ERROR: Cannot find adapter with id: " + adapterId);
+                throw new RuntimeException("ERROR: Cannot find node with id: " + nodeId);
             }
 
-            var entity = record.get();
+            var nodeEntity = record.get();
 
-            var jsonSchema = entity
+            var jsonSchema = nodeEntity
                 .getGraph()
-                .getAgentCommunicationLanguage()
+                .getDomainOntology()
+                .getDomainDataContract()
                 .getJsonSchema();
 
             var schemaStore = new SchemaStore(true);
             var schema = schemaStore.loadSchemaJson(jsonSchema);
 
             // Only assuming a single input for now; will need to update for MERGE adapters.
-            var inputSchema = entity
+            var inputSchema = nodeEntity
                 .getInputSubSchemas()
                 .stream()
                 .toList()
@@ -105,12 +106,12 @@ public class StimulatedPayloadBuilder {
             if (match.isEmpty()) {
                 throw new RuntimeException("ERROR: Cannot find subschema named  '"
                     + inputSchema.getModelName()
-                    + "' in agent communication language named '"
-                    + entity.getGraph().getAgentCommunicationLanguage().getDomain()
+                    + "' in domain ontology named '"
+                    + nodeEntity.getGraph().getDomainOntology().getName()
                     + "'!");
             }
             var jsonSubSchema = schema.getSubSchemas().get(match.get());
-            this.cachedAdapterSchemas.put(adapterId, jsonSubSchema);
+            this.cachedNodeSchemas.put(nodeId, jsonSubSchema);
         }
     }
 }

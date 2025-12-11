@@ -9,7 +9,7 @@
 Modern agent-based systems often rely on brittle glue code: ad-hoc APIs, hand-rolled orchestration, and inconsistent state handling. **Ubiquia replaces that mess with clean, declarative infrastructure**:
 
 - 🔁 **Composable DAGs**  
-  Describe workflows as YAML-based DAGs. Ubiquia spins up agents, components, adapters, belief states, and communication services on demand.
+  Describe workflows as YAML-based DAGs. Ubiquia spins up agents, components, nodes, belief states, and communication services on demand.
 
 - 📦 **Schema-to-Belief Pipelines**  
   Provide an Agent Communication Language (i.e., JSON Schema), and Ubiquia will deploy a **RESTful Belief State service** with:  
@@ -61,7 +61,7 @@ Unlike most MAS (Multi-Agent System) frameworks, **Ubiquia is designed from the 
   * [For Devs: Building Ubiquia](#for-devs-building-ubiquia)
   * [For Devs: Building Subprojects](#for-devs-building-subprojects)
 * [Advanced Topics](#advanced-topics)
-  * [Advanced Topics: Adapter Backpressure](#advanced-topics-adapter-backpressure)
+  * [Advanced Topics: Adapter Backpressure](#advanced-topics-node-backpressure)
   * [Advanced Topics: PostStartExecCommand](#advanced-topics-poststartexeccommands)
 * [Contributors](#contributors)
 * [Who Is This For?](#who-is-this-for)
@@ -477,7 +477,7 @@ capabilities:
   - ImACapability!
 
 # This is the "Agent Communication Language" that this graph is associated with.
-agentCommunicationLanguage:
+domainDataContract:
   name: pets
   version:
     major: 1
@@ -551,19 +551,19 @@ components:
                 value: demo-value
           configMountPath: /example/mountpath
 
-    # This is an "adapter" for the component; Ubiquia will use this to manage DAG network 
+    # This is an "node" for the component; Ubiquia will use this to manage DAG network 
     # traffic to/from the component.
-    adapter:
+    node:
       modelType: Adapter
-      adapterType: PUSH
+      nodeType: PUSH
       adapterName: Pet-Store-Image-Classifier-Adapter
-      description: This is an example adapter.
+      description: This is an example node.
 
       communicationServiceSettings:
-        # Ensure the Communication Service exposes this adapter's endpoints  
+        # Ensure the Communication Service exposes this node's endpoints  
         exposeViaCommService: true
 
-      # This is the endpoint of the component that the adapter will interact with when it 
+      # This is the endpoint of the component that the node will interact with when it 
       # receives upstream traffic.
       endpoint: /upload-image
 
@@ -575,9 +575,9 @@ components:
       outputSubSchema:
         modelName: ClassificationResult
       
-      # Various configuration for the adapter, such as whether to persist payload traffic in the 
+      # Various configuration for the node, such as whether to persist payload traffic in the 
       # Ubiquia database for later diagnostics/analysis.
-      adapterSettings:
+      nodeSettings:
         persistInputPayload: true
         persistOutputPayload: true
         validateOutputPayload: false
@@ -586,7 +586,7 @@ components:
       # Like components, Adapters can have overridesettings.
       overrideSettings:
         - flag: demo
-          key: adapterSettings
+          key: nodeSettings
           value:
             persistInputPayload: false
             persistOutputPayload: false
@@ -608,11 +608,11 @@ components:
         key: componentType
         value: POD
 
-    adapter:
+    node:
       modelType: Adapter
-      adapterType: HIDDEN
+      nodeType: HIDDEN
       adapterName: Pet-Generator-Adapter
-      description: This is an example adapter.
+      description: This is an example node.
 
       communicationServiceSettings:
         exposeViaCommService: true
@@ -624,7 +624,7 @@ components:
 
       outputSubSchema:
         modelName: Animal
-      adapterSettings:
+      nodeSettings:
         persistInputPayload: true
         persistOutputPayload: true
         validateOutputPayload: false
@@ -632,7 +632,7 @@ components:
 
       overrideSettings:
         - flag: demo
-          key: adapterSettings
+          key: nodeSettings
           value:
             persistInputPayload: true
             persistOutputPayload: true
@@ -640,14 +640,14 @@ components:
             validateOutputPayload: true
             stimulateInputPayload: true
 
-# This is a list of adapters that should be deployed with the graph that are not to be associated
+# This is a list of nodes that should be deployed with the graph that are not to be associated
 # with components. These are typically useful as ingress/egress components to a DAG.
-componentlessAdapters:
+componentlessNodes:
 
   - modelType: Adapter
-    adapterType: EGRESS
+    nodeType: EGRESS
     adapterName: Pet-Egress-Adapter
-    description: This is an example adapter that POSTs incoming payloads to a belief state.
+    description: This is an example node that POSTs incoming payloads to a belief state.
 
     endpoint: http://pets-belief-state-1-2-3:8080/ubiquia/Animal/add
 
@@ -659,7 +659,7 @@ componentlessAdapters:
       egressType: SYNCHRONOUS
       egressConcurrency: 1
 
-    adapterSettings:
+    nodeSettings:
       persistInputPayload: true
       persistOutputPayload: true
       validateOutputPayload: false
@@ -667,17 +667,17 @@ componentlessAdapters:
 
     overrideSettings:
       - flag: demo
-        key: adapterSettings
+        key: nodeSettings
         value:
           persistInputPayload: true
           persistOutputPayload: true
           validateInputPayload: true
           validateOutputPayload: true
 
-# This is how Ubiquia knows how to connect adapters together into a Directed Acyclic Graph. Conceptually, 
-# data flows from left-to-right. As adapters receive payloads, they will send them to their respective 
+# This is how Ubiquia knows how to connect nodes together into a Directed Acyclic Graph. Conceptually, 
+# data flows from left-to-right. As nodes receive payloads, they will send them to their respective 
 # components (if they have them), package up the component response (if applicable), and send
-# the payload "downstream" (i.e., to any adapters "immediately on the right.")
+# the payload "downstream" (i.e., to any nodes "immediately on the right.")
 edges:
   - leftAdapterName: Pet-Store-Image-Classifier-Adapter
     rightAdapterNames:
@@ -692,7 +692,7 @@ edges:
 In Ubiquia, a "flow" is considered a discrete unit of work that starts when the first node of a DAG ingests data. All subsequent events within that flow will be considered to be a part of that parent "flow" - they will have the same "FlowId." This flow can occur entirely within a single DAG, or across multiple DAGs across multiple Ubiquia Agents.
 
 ### DAGs: Cardinality
-DAGs can be deployed by individual Ubiquia agents with "Cardinality" - or the ability to toggle on/off components/adapters of the DAG at "deploy time." This allows multiple Ubiquia agents to coordinate on a distributed DAG such that the agents can optimize the execution of the DAG internals in a way best-suited to the compute resources available to those Ubiquia agents.
+DAGs can be deployed by individual Ubiquia agents with "Cardinality" - or the ability to toggle on/off components/nodes of the DAG at "deploy time." This allows multiple Ubiquia agents to coordinate on a distributed DAG such that the agents can optimize the execution of the DAG internals in a way best-suited to the compute resources available to those Ubiquia agents.
 
 The "Cardinality" is defined at deploy time, either as a part of the bootstrapping process (defined in Helm), or when a RESTful GraphDeployment payload is set to Ubiquia instructing it to instantiate a new DAG. 
 
@@ -715,13 +715,13 @@ ubiquia:
                 - name: component-b
                   enabled: false
                 componentlessAdapterSettings:
-                - name: adapter-a
+                - name: node-a
                   enabled: false
-                - name: adapter-b
+                - name: node-b
                   enabled: true
 ```
 
-If the cardinality is not explicitly defined at deploy time, Ubiquia will default to "enabled = true" for every component and adapter.
+If the cardinality is not explicitly defined at deploy time, Ubiquia will default to "enabled = true" for every component and node.
 
 
 ## Belief States
@@ -965,9 +965,9 @@ $ ./gradlew :services:core:java:core-flow-service:build
 ## Advanced Topics
 
 ### Advanced Topics: Adapter Backpressure
-Ubiquia adapters leverage an inbox/outbox mechanism to ensure that they can "pop" messages off of the database queue. This is especially important when the database is distributed. Adapters provide a "backpressure" endpoint that can be used to show how how many records are in this queue, and the rate at which this queue is growing (or shrinking.)
+Ubiquia nodes leverage an inbox/outbox mechanism to ensure that they can "pop" messages off of the database queue. This is especially important when the database is distributed. Adapters provide a "backpressure" endpoint that can be used to show how how many records are in this queue, and the rate at which this queue is growing (or shrinking.)
 
-The adapters themselves provide this information, it is up to external entities to act upon that information. As of now, the plan is to have the Ubiquia Executive Command and/or Kubernetes autoscaling "scale up" adapters as necessary to alleviate this backpressure should a queue grow.
+The nodes themselves provide this information, it is up to external entities to act upon that information. As of now, the plan is to have the Ubiquia Executive Command and/or Kubernetes autoscaling "scale up" nodes as necessary to alleviate this backpressure should a queue grow.
 
 ### Advanced Topics: PostStartExecCommands
 It is sometimes necessary for components deployed within Ubiquia DAGs to have some form of "post start" hook. Ubiquia leverages the Kubernetes "PostStartExecComand" by allowing developers to configure an array of arguments that the component should invoke after it has come alive as a Kubernetes pod. 
@@ -1013,16 +1013,16 @@ name: Workbench-LLM
 | **ACL (Agent Communication Language)** | A JSON Schema-based contract that defines the types of messages components and agents can send or receive. Enforces runtime validation of component I/O. |
 | **Adapter** | A software component that connects nodes in a DAG and defines how messages are transported or transformed (e.g., `publish`, `merge`, `poll`). |
 | **Component** | A stateful microservice deployed as part of a DAG, capable of sending, receiving, and acting on messages according to ACLs. |
-| **Componentless Adapter** | An adapter node in a DAG that performs flow control (e.g., routing, polling, merging) but does not host an component implementation. |
+| **Componentless Adapter** | An node node in a DAG that performs flow control (e.g., routing, polling, merging) but does not host an component implementation. |
 | **Belief State** | A shared, distributed, and SQL-backed representation of the system’s current knowledge. Agents can read from and write to it, supporting coordination and memory across the system. |
 | **Belief State Generator** | A codegen service that transforms ACLs into typed Java classes and Spring Boot REST services, enabling components to interact with the belief state in a schema-safe way. |
-| **Communication Service** | A reverse proxy and routing gateway that dynamically exposes core services and component/adapters based on DAG configuration. |
+| **Communication Service** | A reverse proxy and routing gateway that dynamically exposes core services and component/nodes based on DAG configuration. |
 | **DAO (Data Access Object)** | A component that abstracts and encapsulates database interactions, commonly used to query or persist belief state entities. |
 | **DAG (Directed Acyclic Graph)** | A directed graph with no cycles, used to define component topologies and message flow in Ubiquia. DAGs are authored in YAML and compiled into orchestrated services. |
-| **DAG Manifest** | A YAML configuration file that declares how a DAG and its components/adapters should be deployed, configured, and interconnected. |
+| **DAG Manifest** | A YAML configuration file that declares how a DAG and its components/nodes should be deployed, configured, and interconnected. |
 | **DTO (Data Transfer Object)** | A simple object used to encapsulate data transferred between layers or services in Ubiquia. Used heavily in REST APIs. |
-| **Flow Service** | A core Ubiquia microservice responsible for materializing DAGs into running components and adapters. Manages lifecycle, registration, and event querying. |
-| **MAO (Multi-Agent Orchestration)** | The process of managing and coordinating interactions among components and agents in a MAS. Ubiquia handles MAO through DAG deployment and adapter coordination. |
+| **Flow Service** | A core Ubiquia microservice responsible for materializing DAGs into running components and nodes. Manages lifecycle, registration, and event querying. |
+| **MAO (Multi-Agent Orchestration)** | The process of managing and coordinating interactions among components and agents in a MAS. Ubiquia handles MAO through DAG deployment and node coordination. |
 | **MAS (Multi-Agent System)** | A system composed of multiple intelligent agents that interact or work together to perform tasks or solve problems. Ubiquia provides runtime infrastructure for these systems. |
 | **Schema Registry** | A repository of JSON Schemas (ACLs) that define I/O contracts for components and services. Used for validation, code generation, and schema evolution. |
 ---

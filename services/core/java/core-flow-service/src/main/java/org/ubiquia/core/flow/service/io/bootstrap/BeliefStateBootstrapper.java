@@ -12,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.library.api.config.BeliefStateGeneratorServiceConfig;
 import org.ubiquia.core.flow.component.config.bootstrap.BeliefStateBootstrapConfig;
 import org.ubiquia.core.flow.interfaces.InterfaceBootstrapper;
-import org.ubiquia.core.flow.service.registrar.AgentCommunicationLanguageRegistrar;
 
 /**
  * This is a service that can "bootstrap" a Ubiquia instance using graphs and agent communication
@@ -27,9 +26,6 @@ import org.ubiquia.core.flow.service.registrar.AgentCommunicationLanguageRegistr
 public class BeliefStateBootstrapper implements InterfaceBootstrapper {
 
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateBootstrapper.class);
-
-    @Autowired
-    private AgentCommunicationLanguageRegistrar aclRegistrar;
 
     @Autowired
     private BeliefStateGeneratorServiceConfig beliefStateGeneratorServiceConfig;

@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
 import org.ubiquia.common.test.helm.component.GenericUbiquiaPostAndRetriever;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
 import org.ubiquia.test.belief.state.generator.service.Cache;
@@ -38,7 +38,7 @@ public class AclRegistrationTestModule extends AbstractHelmTestModule {
     private FlowServiceConfig flowServiceConfig;
 
     @Autowired
-    private GenericUbiquiaPostAndRetriever<AgentCommunicationLanguage> postAndRetriever;
+    private GenericUbiquiaPostAndRetriever<DomainDataContract> postAndRetriever;
 
     @Value("${ubiquia.test.acl.filepath}")
     private String schemaFilepath;
@@ -53,12 +53,12 @@ public class AclRegistrationTestModule extends AbstractHelmTestModule {
         logger.info("Proceeding to read in an ACL...");
 
         var aclPath = Paths.get(this.schemaFilepath);
-        AgentCommunicationLanguage acl = null;
+        DomainDataContract acl = null;
 
         try {
             acl = this.objectMapper.readValue(
                 aclPath.toFile(),
-                AgentCommunicationLanguage.class);
+                DomainDataContract.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -118,7 +118,7 @@ public class AclRegistrationTestModule extends AbstractHelmTestModule {
             .path("/ubiquia/flow-service/agent-communication-language/query/params")
             .queryParam("page", "0")
             .queryParam("size", "1")
-            .queryParam("domain", acl.getDomain())
+            .queryParam("domain", acl.getName())
             .queryParam("version.major", acl.getVersion().getMajor())
             .queryParam("version.minor", acl.getVersion().getMinor())
             .queryParam("version.patch", acl.getVersion().getPatch())
@@ -128,7 +128,7 @@ public class AclRegistrationTestModule extends AbstractHelmTestModule {
 
         var typeReference = new ParameterizedTypeReference<
             GenericPageImplementation<
-                AgentCommunicationLanguage>>() {};
+                DomainDataContract>>() {};
 
         var response = this.restTemplate.exchange(
             uri,

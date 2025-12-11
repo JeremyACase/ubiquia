@@ -144,7 +144,7 @@ This enables horizontal scaling and flexible placement of computational tasks.
 ### Flow Service
 - **Responsibilies**
   - **Agent Communication Language Registration**: The Flow Service will be able to handle "Agent Communication Language" (ACL) registration.
-  - **Direct Acylic Graph Registration**: The Flow Service will be able to allow registration of Directed Acyclic Graph workflows comprised of components and adapters.
+  - **Direct Acylic Graph Registration**: The Flow Service will be able to allow registration of Directed Acyclic Graph workflows comprised of components and nodes.
   - **Direct Acylic Graph Orchestration**: The Flow Service will double as a Kubernetes operator capable of orchestrating DAG's across Kubernetes clusters dynamically and at runtime.
   - **Schema Validation**: The Flow Service will be able to verify input/output of components based on an ACL. This is especially important for LLM-based components.
   - **Back Pressure**: Leveraging queues and the inbox/outbox pattern, Flow Service will provide a "back pressure" endpoint allowing for the Executive Service to be able to actuate Flow Service DAG's across ubiquia Agents to alleviate pressure.
@@ -152,8 +152,8 @@ This enables horizontal scaling and flexible placement of computational tasks.
 - **API**:
   - **ACL**: The ability to register, query, and delete ACL's
   - **DAGs**: The ability to register, deploy, teardown, query, and delete DAG's
-  - **Agent Adapters**: The ability to interface with the adapter deployed for any given component depending on the type (e.g., Push, Merge, etc.)
-  - **Back Pressure**: The ability to query for back pressure for any given adapter.
+  - **Agent Adapters**: The ability to interface with the node deployed for any given component depending on the type (e.g., Push, Merge, etc.)
+  - **Back Pressure**: The ability to query for back pressure for any given node.
 - **Dependencies**
   - **SQL Database**: Either H2 (for testing) or YugabyteDB.
 
@@ -183,7 +183,7 @@ This enables horizontal scaling and flexible placement of computational tasks.
 - **Inbox/Outbox Queue Design**: Messages flowing over Flow Service DAG's can be treated as queue, where messages can be popped faster or slower depending on compute requirements.
 - **Rate Limiting**: API Gateway enforces rate limits per user to protect backend services.
 - **Agent Weights**: Ubiquia instances will be configurable with different "weights" (e.g., light, heavy, etc.) so that heterogenous components of a cluster can be run across anything between edge devices and the cloud.
-- **DAG Cardinality**: DAGs deployed by Ubiquia agents can have cardinality configured at deployment time. This means that components and adapters within a DAG can be "toggled" on/off within a specific Ubiquia Agent.
+- **DAG Cardinality**: DAGs deployed by Ubiquia agents can have cardinality configured at deployment time. This means that components and nodes within a DAG can be "toggled" on/off within a specific Ubiquia Agent.
 
 ### Resilience
 
@@ -386,7 +386,7 @@ helm/
 
 **Pros:**
 - DAGs can be authored and deployed at runtime without needing redeploys.
-- Enables dynamic component and adapter instantiation based on load and mission profile.
+- Enables dynamic component and node instantiation based on load and mission profile.
 - Backpressure system allows compute-aware routing and rebalancing.
 
 **Cons:**

@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
-import org.ubiquia.common.model.ubiquia.dto.Graph;
+import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
 import reactor.core.publisher.Mono;
 
 /**
@@ -36,7 +35,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/ubiquia/communication-service/flow-service/agent-communication-language")
 public class AgentCommunicationLanguageControllerProxy
-    extends AbstractUbiquiaDaoControllerProxy<AgentCommunicationLanguage> {
+    extends AbstractUbiquiaDaoControllerProxy<DomainDataContract> {
 
     /** Flow Service host/port configuration used to build the downstream base URL. */
     @Autowired
@@ -48,14 +47,14 @@ public class AgentCommunicationLanguageControllerProxy
      * <p>Forwards the incoming POST (including headers and query parameters) to the
      * downstream {@code /register/post} endpoint and returns the downstream response as-is.</p>
      *
-     * @param body    the {@link AgentCommunicationLanguage} payload to register
+     * @param body    the {@link DomainDataContract} payload to register
      * @param request the original reactive request whose method/headers/query are mirrored
      * @return a {@link Mono} emitting the downstream {@link ResponseEntity} containing an
      *         {@link IngressResponse}, or an error if the call fails
      */
     @PostMapping("/register/post")
     public Mono<ResponseEntity<IngressResponse>> proxyGraphPost(
-        @RequestBody AgentCommunicationLanguage body,
+        @RequestBody DomainDataContract body,
         ServerHttpRequest request) {
 
         var proxied = super.proxyToPostEndpoint("/register/post", request, body);

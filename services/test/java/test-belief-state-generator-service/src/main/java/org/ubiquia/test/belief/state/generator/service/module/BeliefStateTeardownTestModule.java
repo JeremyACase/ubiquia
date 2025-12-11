@@ -101,7 +101,7 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
             logger.info("Proceeding with tests...");
 
             var generation = new BeliefStateGeneration();
-            generation.setDomainName(this.cache.getAcl().getDomain());
+            generation.setDomainName(this.cache.getAcl().getName());
             generation.setVersion(this.cache.getAcl().getVersion());
 
             var postUrl = this.beliefStateGeneratorServiceConfig.getUrl()

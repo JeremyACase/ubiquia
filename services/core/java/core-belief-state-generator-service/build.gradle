@@ -100,7 +100,7 @@ task copyRuntimeLibs(type: Copy) {
     from configurations.runtimeClasspath
 
     def projectJars = [
-        ':common:java:model:acl',
+        ':common:java:model:domain',
         ':common:java:model:ubiquia',
         ':common:java:library:advice',
         ':common:java:library:api',

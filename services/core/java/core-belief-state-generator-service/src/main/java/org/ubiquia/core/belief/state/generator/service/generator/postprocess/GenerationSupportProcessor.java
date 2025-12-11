@@ -13,8 +13,8 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.library.api.config.UbiquiaAgentConfig;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
+import org.ubiquia.common.library.api.config.AgentConfig;
+import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
 
 @Service
 public class GenerationSupportProcessor {
@@ -29,9 +29,9 @@ public class GenerationSupportProcessor {
     private boolean yugabyteEnabled;
 
     @Autowired
-    private UbiquiaAgentConfig ubiquiaAgentConfig;
+    private AgentConfig agentConfig;
 
-    public void postProcess(final AgentCommunicationLanguage acl) throws IOException {
+    public void postProcess(final DomainDataContract acl) throws IOException {
         this.copyResourceFromClasspath(
             "template/java/support/Application.java.template",
             "generated/src/main/java/org/ubiquia/acl/generated/Application.java");
@@ -49,9 +49,9 @@ public class GenerationSupportProcessor {
             "generated/src/main/java/org/ubiquia/acl/generated/ObjectController.java");
 
         var tokenMap = new HashMap<String, String>();
-        tokenMap.put("{DOMAIN_NAME}", acl.getDomain());
+        tokenMap.put("{DOMAIN_NAME}", acl.getName());
         tokenMap.put("{MINIO_ENABLED}", String.valueOf(this.minioEnabled));
-        tokenMap.put("{UBIQUIA_AGENT_ID}", this.ubiquiaAgentConfig.getId());
+        tokenMap.put("{UBIQUIA_AGENT_ID}", this.agentConfig.getId());
 
         tokenMap.putAll(this.resolveDbTokensFromBooleans());
 

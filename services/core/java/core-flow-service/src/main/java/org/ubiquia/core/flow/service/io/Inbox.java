@@ -13,11 +13,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.implementation.service.mapper.FlowMessageDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
-import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
-import org.ubiquia.core.flow.component.adapter.QueueAdapter;
-import org.ubiquia.core.flow.repository.AdapterRepository;
+import org.ubiquia.core.flow.component.node.AbstractNode;
+import org.ubiquia.core.flow.component.node.QueueNode;
+import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
-import org.ubiquia.core.flow.service.calculator.AdapterConcurrencyCalculator;
+import org.ubiquia.core.flow.service.calculator.NodeConcurrencyCalculator;
 
 /**
  * A serviced dedicated to polling for incoming messages from the database on behalf
@@ -29,11 +29,11 @@ public class Inbox {
 
     private static final Logger logger = LoggerFactory.getLogger(Inbox.class);
     @Autowired
-    private AdapterConcurrencyCalculator adapterConcurrencyCalculator;
+    private NodeConcurrencyCalculator nodeConcurrencyCalculator;
     @Autowired
     private FlowMessageDtoMapper flowMessageDtoMapper;
     @Autowired
-    private AdapterRepository adapterRepository;
+    private NodeRepository nodeRepository;
     @Autowired
     private FlowMessageRepository flowMessageRepository;
 
@@ -44,20 +44,20 @@ public class Inbox {
      * @return An event associated with the query.
      * @throws JsonProcessingException Exceptions from parsing payloads.
      */
-    public FlowMessage tryQueryInboxMessagesFor(final QueueAdapter adapter)
+    public FlowMessage tryQueryInboxMessagesFor(final QueueNode adapter)
         throws JsonProcessingException {
 
-        var adapterContext = adapter.getAdapterContext();
+        var adapterContext = adapter.getNodeContext();
         logger.debug("Querying inbox records for adapter {}...",
-            adapterContext.getAdapterName());
+            adapterContext.getNodeName());
 
         var sort = Sort.by("createdAt").ascending();
         var pageRequest = PageRequest
             .of(0, 1)
             .withSort(sort);
-        var query = this.flowMessageRepository.findAllByTargetAdapterId(
+        var query = this.flowMessageRepository.findAllByTargetNodeId(
             pageRequest,
-            adapterContext.getAdapterId());
+            adapterContext.getNodeId());
 
         FlowMessage flowMessage = null;
         if (query.hasContent()) {
@@ -71,24 +71,25 @@ public class Inbox {
     /**
      * Provided an adapter, query the inbox for any of the adapter's inbox messages.
      *
-     * @param adapter The adapter to query for.
+     * @param node The adapter to query for.
      * @throws JsonProcessingException Exceptions from parsing payloads.
      */
-    public List<FlowMessage> tryQueryInboxMessagesFor(final AbstractAdapter adapter)
+    public List<FlowMessage> tryQueryInboxMessagesFor(final AbstractNode node)
         throws JsonProcessingException {
 
-        var adapterContext = adapter.getAdapterContext();
-        logger.debug("Querying inbox records for adapter {}...", adapterContext.getAdapterName());
+        var nodeContext = node.getNodeContext();
+        logger.debug("Querying inbox records for node {}...",
+            nodeContext.getNodeName());
 
         var sort = Sort.by("createdAt").ascending();
-        var pageSize = this.adapterConcurrencyCalculator.getInboxQueryPageSizeFor(adapter);
+        var pageSize = this.nodeConcurrencyCalculator.getInboxQueryPageSizeFor(node);
         var pageRequest = PageRequest
             .of(0, pageSize)
             .withSort(sort);
 
-        var query = this.flowMessageRepository.findAllByTargetAdapterId(
+        var query = this.flowMessageRepository.findAllByTargetNodeId(
             pageRequest,
-            adapterContext.getAdapterId());
+            nodeContext.getNodeId());
 
         var messages = new ArrayList<FlowMessage>();
         for (var flowMessageEntity : query.getContent()) {

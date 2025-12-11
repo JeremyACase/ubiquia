@@ -23,7 +23,7 @@ import org.ubiquia.common.library.belief.state.libraries.model.association.Assoc
 import org.ubiquia.common.library.belief.state.libraries.model.association.ChildAssociation;
 import org.ubiquia.common.library.belief.state.libraries.model.association.ParentAssociation;
 import org.ubiquia.common.library.belief.state.libraries.service.factory.MockFactory;
-import org.ubiquia.common.model.acl.embeddable.KeyValuePair;
+import org.ubiquia.common.model.domain.embeddable.KeyValuePair;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 

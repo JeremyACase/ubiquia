@@ -15,7 +15,7 @@ package org.ubiquia.acl.generated;
 
 
 import com.fasterxml.jackson.annotation.*;
-import org.ubiquia.common.model.acl.dto.AbstractAclModel;
+import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
 
 /**
  * A base model.
@@ -37,7 +37,7 @@ import org.ubiquia.common.model.acl.dto.AbstractAclModel;
     @JsonSubTypes.Type(value = Shark.class, name = "Shark"),
 })
 
-public class BaseModel extends AbstractAclModel {
+public class BaseModel extends AbstractDomainModel {
 
 
     /**

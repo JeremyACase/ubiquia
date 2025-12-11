@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 import org.ubiquia.common.model.ubiquia.entity.FlowMessageEntity;
-import org.ubiquia.core.flow.repository.AdapterRepository;
+import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 
@@ -25,7 +25,7 @@ public class Outbox {
 
     private static final Logger logger = LoggerFactory.getLogger(Outbox.class);
     @Autowired
-    private AdapterRepository adapterRepository;
+    private NodeRepository nodeRepository;
     @Autowired
     private FlowEventRepository flowEventRepository;
     @Autowired
@@ -42,7 +42,7 @@ public class Outbox {
      * @throws JsonProcessingException Exceptions from processing payloads.
      */
     @Transactional
-    public void tryQueueComponentResponse(
+    public void tryQueueMessage(
         FlowEventEntity flowEventEntity,
         final String componentResponse) {
 
@@ -50,32 +50,32 @@ public class Outbox {
             flowEventEntity.getId());
 
         var targetAdapterRecord = this
-            .adapterRepository
-            .findById(flowEventEntity.getAdapter().getId());
+            .nodeRepository
+            .findById(flowEventEntity.getNode().getId());
 
-        if (!targetAdapterRecord.get().getDownstreamAdapters().isEmpty()) {
+        if (!targetAdapterRecord.get().getDownstreamNodes().isEmpty()) {
 
             var eventTimes = flowEventEntity.getFlowEventTimes();
             eventTimes.setSentToOutboxTime(OffsetDateTime.now());
-            for (var adapter : targetAdapterRecord.get().getDownstreamAdapters()) {
-                logger.debug("Creating an outbox message for event id {} for target adapter {}",
+            for (var adapter : targetAdapterRecord.get().getDownstreamNodes()) {
+                logger.debug("Creating an outbox message for event id {} for target node {}",
                     flowEventEntity.getId(),
                     adapter.getName());
                 var message = new FlowMessageEntity();
                 message.setFlowEvent(flowEventEntity);
                 message.setPayload(componentResponse);
                 message.setTags(new HashSet<>());
-                message.setTargetAdapter(adapter);
+                message.setTargetNode(adapter);
                 message = this.flowMessageRepository.save(message);
-                adapter.getOutboxMessages().add(message);
-                this.adapterRepository.save(adapter);
+                adapter.getOutboxFlowMessages().add(message);
+                this.nodeRepository.save(adapter);
                 flowEventEntity.getFlowMessages().add(message);
             }
             eventTimes.setEventCompleteTime(OffsetDateTime.now());
         } else {
-            logger.debug("No downstream adapters for adapter with id {}; not creating "
+            logger.debug("No downstream nodes for nodes named {}; not creating "
                     + "an outbox message...",
-                flowEventEntity.getAdapter().getId());
+                flowEventEntity.getNode().getName());
         }
         this.flowEventRepository.save(flowEventEntity);
         logger.debug("...Completed processing of event.");

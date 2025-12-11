@@ -1,7 +1,7 @@
 package org.ubiquia.common.library.belief.state.libraries.interfaces.service.mapper;
 
-import org.ubiquia.common.model.acl.dto.AbstractAclModel;
-import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
+import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
+import org.ubiquia.common.model.domain.entity.AbstractDomainModelEntity;
 
 /**
  * An interface defining how DTO mappers should map entities to DTO's.
@@ -10,8 +10,8 @@ import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
  * @param <T> The DTO class we're mapping to.
  */
 public interface InterfaceEgressDtoMapper<
-    F extends AbstractAclModelEntity,
-    T extends AbstractAclModel> {
+    F extends AbstractDomainModelEntity,
+    T extends AbstractDomainModel> {
 
     /**
      * Get the model type of the entity we're mapping.

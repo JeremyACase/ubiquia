@@ -14,7 +14,7 @@ import org.ubiquia.common.library.belief.state.libraries.service.mapper.Abstract
 
 @RestController
 @RequestMapping("/ubiquia/belief-state-service/shark")
-public class SharkController extends AbstractAclModelController<SharkEntity, Shark> {
+public class SharkController extends AbstractDomainModelController<SharkEntity, Shark> {
 
 
     private static final Logger logger = LoggerFactory.getLogger(SharkController.class);

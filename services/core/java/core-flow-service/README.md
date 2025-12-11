@@ -3,17 +3,17 @@
 
 > **A Kubernetes-native component deployment and coordination engine for DAG-based orchestration in Ubiquia.**
 
-The `flow-service` is a core microservice in Ubiquia that handles **component lifecycle, communication, and orchestration logic** via Directed Acyclic Graphs (DAG's). It exposes RESTful endpoints to deploy, manage, and inspect components and adapters within a live Kubernetes cluster, enabling dynamic orchestration of multi-component workflows as well as enabling clients to query, inspect, and trace data as it **flows** across Ubiquia DAG's. 
+The `flow-service` is a core microservice in Ubiquia that handles **component lifecycle, communication, and orchestration logic** via Directed Acyclic Graphs (DAG's). It exposes RESTful endpoints to deploy, manage, and inspect components and nodes within a live Kubernetes cluster, enabling dynamic orchestration of multi-component workflows as well as enabling clients to query, inspect, and trace data as it **flows** across Ubiquia DAG's. 
 
 ---
 
 ## 🚀 Responsibilities
 
 - 🧭 Interpret and deploy **Directed Acyclic Graphs (DAGs)** that define agentic data workflows  
-- ⚙️ Dynamically configure DAG behavior via dev-provided flags (e.g., adapter types, property overrides, etc.)  
+- ⚙️ Dynamically configure DAG behavior via dev-provided flags (e.g., node types, property overrides, etc.)  
 - 🧠 Deploy components as DAG nodes with schema-validated I/O contracts  
-- 🪝 Instantiate both **component-based** and **agentless** adapters for routing, queuing, or transforming data  
-- 🔌 Expose REST APIs via adapters — each adapter type (e.g., `publish`, `subscribe`, `poll`) defines its own interaction model  
+- 🪝 Instantiate both **component-based** and **agentless** nodes for routing, queuing, or transforming data  
+- 🔌 Expose REST APIs via nodes — each node type (e.g., `publish`, `subscribe`, `poll`) defines its own interaction model  
 - 📡 Register and inspect Agent Communication Languages (ACLs) for type-safe component communication  
 - 📘 Serve dynamic, strongly-typed REST endpoints defined by the DAG and ACLs  
 - 📈 Expose an API for querying **flow events**, enabling inspection of messages as they propagate (flow) through DAGs  
@@ -27,7 +27,7 @@ The `flow-service` is a core microservice in Ubiquia that handles **component li
   Deploy, start, stop, and inspect components as DAG nodes via `AgentController`
 
 - **Adapter System**  
-  Each edge in the DAG is represented as an **adapter** (e.g. `PushAdapter`, `MergeAdapter`, `SubscribeAdapter`, etc.) responsible for message transport and control logic
+  Each edge in the DAG is represented as an **node** (e.g. `PushAdapter`, `MergeAdapter`, `SubscribeAdapter`, etc.) responsible for message transport and control logic
 
 - **Dynamic DAG Realization**  
   DAGs defined in YAML are materialized into active services through a series of controller endpoints and dependency injection via Spring Boot
@@ -57,7 +57,7 @@ To run `flow-service` locally with Spring Boot:
 src/main/java/org/ubiquia/core/flow
 ├── component/             # Adapters and other code living as Spring Boot components
 ├── config/                # Data structures representing configuration
-├── controller/            # REST controllers for components, adapters, and schemas
+├── controller/            # REST controllers for components, nodes, and schemas
 ├── interfaces/            # Java Interfaces for use internally by the Flow Service
 ├── model/                 # Models for use internally by the Flow Service
 ├── repository/            # JPA repositories for the flow-service to communicate with the back-end database
@@ -74,7 +74,7 @@ src/main/java/org/ubiquia/core/flow
 
 ## 🧬 Relationship to Ubiquia
 
-`flow-service` is one of the core orchestration microservices inside Ubiquia. It realizes DAGs into Kubernetes-native components and adapters, enforcing ACL contracts and routing messages based on YAML-defined topologies and schema metadata.
+`flow-service` is one of the core orchestration microservices inside Ubiquia. It realizes DAGs into Kubernetes-native components and nodes, enforcing ACL contracts and routing messages based on YAML-defined topologies and schema metadata.
 
 ---
 

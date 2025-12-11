@@ -7,25 +7,25 @@ import jakarta.validation.constraints.NotNull;
 @Embeddable
 public class CardinalitySetting {
 
-    private String name;
+    private String componentName;
 
-    private Boolean enabled = true;
-
-    @NotNull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    private Integer replicas = 1;
 
     @NotNull
-    public Boolean getEnabled() {
-        return enabled;
+    public String getComponentName() {
+        return componentName;
     }
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    public void setComponentName(String componentName) {
+        this.componentName = componentName;
+    }
+
+    @NotNull
+    public Integer getReplicas() {
+        return replicas;
+    }
+
+    public void setReplicas(Integer replicas) {
+        this.replicas = replicas;
     }
 }

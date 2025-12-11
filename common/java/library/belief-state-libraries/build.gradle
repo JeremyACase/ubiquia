@@ -19,7 +19,7 @@ dependencies {
     implementation "org.reflections:reflections:${REFLECTIONS_VERSION}"
     implementation "io.minio:minio:${MINIO_VERSION}"
 
-    implementation project(":common:java:model:acl")
+    implementation project(":common:java:model:domain")
     implementation project(":common:java:model:ubiquia")
     implementation project(":common:java:library:advice")
     implementation project(":common:java:library:api")

@@ -14,7 +14,7 @@ import org.ubiquia.common.library.belief.state.libraries.service.mapper.Abstract
 
 @RestController
 @RequestMapping("/ubiquia/belief-state-service/animal")
-public class AnimalController extends AbstractAclModelController<AnimalEntity, Animal> {
+public class AnimalController extends AbstractDomainModelController<AnimalEntity, Animal> {
 
 
     private static final Logger logger = LoggerFactory.getLogger(AnimalController.class);

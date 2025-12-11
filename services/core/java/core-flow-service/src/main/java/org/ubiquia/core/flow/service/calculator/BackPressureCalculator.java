@@ -2,12 +2,12 @@ package org.ubiquia.core.flow.service.calculator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.adapter.backpressure.BackPressure;
-import org.ubiquia.common.model.ubiquia.adapter.backpressure.Egress;
-import org.ubiquia.common.model.ubiquia.adapter.backpressure.Ingress;
-import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
-import org.ubiquia.core.flow.model.adapter.AdapterContext;
-import org.ubiquia.core.flow.service.logic.adapter.AdapterTypeLogic;
+import org.ubiquia.common.model.ubiquia.node.backpressure.BackPressure;
+import org.ubiquia.common.model.ubiquia.node.backpressure.Egress;
+import org.ubiquia.common.model.ubiquia.node.backpressure.Ingress;
+import org.ubiquia.core.flow.component.node.AbstractNode;
+import org.ubiquia.core.flow.model.node.NodeContext;
+import org.ubiquia.core.flow.service.logic.node.NodeTypeLogic;
 
 /**
  * This is a service dedicated to calculating back pressure for adapters.
@@ -16,7 +16,7 @@ import org.ubiquia.core.flow.service.logic.adapter.AdapterTypeLogic;
 public class BackPressureCalculator {
 
     @Autowired
-    private AdapterTypeLogic adapterTypeLogic;
+    private NodeTypeLogic nodeTypeLogic;
 
 
     /**
@@ -25,16 +25,16 @@ public class BackPressureCalculator {
      * @param adapter The adapter to calculate back pressure for.
      * @return An object containing back pressure data.
      */
-    public BackPressure calculateBackPressureFor(final AbstractAdapter adapter) {
+    public BackPressure calculateBackPressureFor(final AbstractNode adapter) {
         var ingress = new Ingress();
 
         var backpressure = new BackPressure();
         backpressure.setIngress(ingress);
 
-        var adapterContext = adapter.getAdapterContext();
+        var adapterContext = adapter.getNodeContext();
         if (this
-            .adapterTypeLogic
-            .adapterTypeRequiresEgressSettings(adapterContext.getAdapterType())) {
+            .nodeTypeLogic
+            .nodeTypeRequiresEgressSettings(adapterContext.getNodeType())) {
 
             var egress = new Egress();
             backpressure.setEgress(egress);
@@ -64,15 +64,15 @@ public class BackPressureCalculator {
     /**
      * A method to return the back pressure "queue rate."
      *
-     * @param adapterContext The adapter to calculate back pressure queue rate for.
+     * @param nodeContext The adapter to calculate back pressure queue rate for.
      * @return The back pressure queue rate.
      */
-    private float getRate(final AdapterContext adapterContext) {
+    private float getRate(final NodeContext nodeContext) {
 
         // Gather variables for code readability.
-        var x = adapterContext.getBackPressureSamplings().get(1);
-        var y = adapterContext.getBackPressureSamplings().get(0);
-        var z = adapterContext.getBackpressurePollRatePerMinute();
+        var x = nodeContext.getBackPressureSamplings().get(1);
+        var y = nodeContext.getBackPressureSamplings().get(0);
+        var z = nodeContext.getBackpressurePollRatePerMinute();
         Long r = null;
 
         // Get our rate of change over our two data points and multiply times the

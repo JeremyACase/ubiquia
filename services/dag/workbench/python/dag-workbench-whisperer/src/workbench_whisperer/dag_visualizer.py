@@ -79,7 +79,7 @@ You are a Ubiquia DAG visualization assistant.
 
 TASK:
 Given the YAML definition of a Ubiquia DAG, generate a Mermaid graph definition
-that visualizes the DAG's adapters and their edges.
+that visualizes the DAG's nodes and their edges.
 
 INPUT DAG (YAML):
 {dag_yaml}
@@ -87,10 +87,10 @@ INPUT DAG (YAML):
 OUTPUT RULES:
 - Output ONLY a Mermaid diagram (no prose, no backticks, no markdown code fences).
 - Use 'graph LR' as the root directive (left-to-right layout).
-- Treat each adapter in 'componentlessAdapters' as a node.
+- Treat each node in 'componentlessNodes' as a node.
 - For each entry in 'edges', generate links of the form:
     leftAdapterName --> rightAdapterName
-- Use adapter names as both the node ID (sanitized to be Mermaid-safe) and the human-readable label, e.g.:
+- Use node names as both the node ID (sanitized to be Mermaid-safe) and the human-readable label, e.g.:
     someId["Adapter Name"]
 - Ensure the output is valid Mermaid syntax that can be rendered as a diagram.
 - Do NOT include any explanation or commentary, only the Mermaid graph.

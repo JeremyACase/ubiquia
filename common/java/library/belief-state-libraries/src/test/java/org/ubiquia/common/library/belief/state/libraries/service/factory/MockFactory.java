@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import org.instancio.Instancio;
 import org.springframework.stereotype.Service;
 import org.ubiquia.acl.generated.*;
-import org.ubiquia.common.model.acl.dto.AbstractAclModel;
+import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
 
 @Service
 public class MockFactory {
@@ -19,11 +19,11 @@ public class MockFactory {
     public Person generatePerson() {
         var model = Instancio
             .of(Person.class)
-            .ignore(field(AbstractAclModel::getUbiquiaId))
-            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
-            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
+            .ignore(field(AbstractDomainModel::getUbiquiaId))
+            .ignore(field(AbstractDomainModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractDomainModel::getUbiquiaUpdatedAt))
             .set(field(Person::getPets), new ArrayList<>())
-            .set(field(AbstractAclModel::getModelType), "Person")
+            .set(field(AbstractDomainModel::getModelType), "Person")
             .create();
         return model;
     }
@@ -36,9 +36,9 @@ public class MockFactory {
     public Cat generateCat() {
         var model = Instancio
             .of(Cat.class)
-            .ignore(field(AbstractAclModel::getUbiquiaId))
-            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
-            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
+            .ignore(field(AbstractDomainModel::getUbiquiaId))
+            .ignore(field(AbstractDomainModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractDomainModel::getUbiquiaUpdatedAt))
             .ignore(field(Animal::getOwner))
             .create();
         return model;
@@ -52,9 +52,9 @@ public class MockFactory {
     public Shark generateShark() {
         var model = Instancio
             .of(Shark.class)
-            .ignore(field(AbstractAclModel::getUbiquiaId))
-            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
-            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
+            .ignore(field(AbstractDomainModel::getUbiquiaId))
+            .ignore(field(AbstractDomainModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractDomainModel::getUbiquiaUpdatedAt))
             .ignore(field(Animal::getOwner))
             .create();
         return model;
@@ -68,9 +68,9 @@ public class MockFactory {
     public Dachschund generateWienerDog() {
         var warWeen = Instancio
             .of(Dachschund.class)
-            .ignore(field(AbstractAclModel::getUbiquiaId))
-            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
-            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
+            .ignore(field(AbstractDomainModel::getUbiquiaId))
+            .ignore(field(AbstractDomainModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractDomainModel::getUbiquiaUpdatedAt))
             .ignore(field(Animal::getOwner))
             .create();
         return warWeen;

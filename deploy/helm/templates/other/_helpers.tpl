@@ -81,6 +81,7 @@ Create the name of the service account to use
 
 {{- define "ubiquia.core.flowService.image" -}}
 {{ .Values.ubiquia.components.core.flowService.image.registry }}/{{ .Values.ubiquia.components.core.flowService.image.repository }}:{{ .Values.ubiquia.components.core.flowService.image.tag }}
+{{- end }}
 
 {{- define "ubiquia.test.beliefStateGeneratorService.image" -}}
 {{ .Values.ubiquia.components.test.beliefStateGeneratorService.image.registry }}/{{ .Values.ubiquia.components.test.beliefStateGeneratorService.image.repository }}:{{ .Values.ubiquia.components.test.beliefStateGeneratorService.image.tag }}

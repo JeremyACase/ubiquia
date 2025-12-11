@@ -16,13 +16,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.belief.state.libraries.service.finder.EntityRepositoryFinder;
-import org.ubiquia.common.model.acl.dto.AbstractAclModel;
-import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
+import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
+import org.ubiquia.common.model.domain.entity.AbstractDomainModelEntity;
 
 @Service
 public abstract class AbstractIngressDtoMapper<
-    F extends AbstractAclModel,
-    T extends AbstractAclModelEntity>
+    F extends AbstractDomainModel,
+    T extends AbstractDomainModelEntity>
     implements InterfaceLogger {
 
     private static final Logger logger = LoggerFactory.getLogger(EntityRepositoryFinder.class);
@@ -76,9 +76,9 @@ public abstract class AbstractIngressDtoMapper<
         throws ClassNotFoundException,
         IllegalAccessException {
 
-        if (AbstractAclModelEntity.class.isAssignableFrom(to.getClass())) {
+        if (AbstractDomainModelEntity.class.isAssignableFrom(to.getClass())) {
 
-            var cast = (AbstractAclModelEntity) to;
+            var cast = (AbstractDomainModelEntity) to;
 
             var clazz = Class.forName("org.ubiquia.acl.generated."
                 + cast.getModelType()
@@ -96,7 +96,7 @@ public abstract class AbstractIngressDtoMapper<
 
                 } else {
                     // ...if we have a single Ubiquia entity...
-                    if (AbstractAclModelEntity.class.isAssignableFrom(field.getType())) {
+                    if (AbstractDomainModelEntity.class.isAssignableFrom(field.getType())) {
                         this.tryHydrateOneToOneRelationship(to, field);
 
                         // ...else if we have a list of Ubiquia entities...
@@ -123,17 +123,17 @@ public abstract class AbstractIngressDtoMapper<
         var elementClass = (Class<?>) elementType.getActualTypeArguments()[0];
         var elementList = field.get(to);
 
-        if (AbstractAclModelEntity.class.isAssignableFrom(elementClass)
+        if (AbstractDomainModelEntity.class.isAssignableFrom(elementClass)
             && Objects.nonNull(elementList)) {
 
             this.getLogger().debug("...iterating through field '{}' for model type '{}'",
                 field.getName(),
                 to.getModelType());
 
-            var hydratedList = new ArrayList<AbstractAclModelEntity>();
+            var hydratedList = new ArrayList<AbstractDomainModelEntity>();
             for (var element : (List<?>) elementList) {
 
-                var entity = (AbstractAclModelEntity)
+                var entity = (AbstractDomainModelEntity)
                     Hibernate.unproxy(element);
 
                 if (field.isAnnotationPresent(ElementCollection.class)
@@ -154,10 +154,10 @@ public abstract class AbstractIngressDtoMapper<
                             throw new IllegalArgumentException("ERROR: Entity not found: "
                                 + entity.getUbiquiaId());
                         }
-                        var hydrated = (AbstractAclModelEntity) Hibernate.unproxy(record.get());
+                        var hydrated = (AbstractDomainModelEntity) Hibernate.unproxy(record.get());
                         hydratedList.add(hydrated);
                     } else {
-                        var hydrated = (AbstractAclModelEntity) Hibernate.unproxy(element);
+                        var hydrated = (AbstractDomainModelEntity) Hibernate.unproxy(element);
                         hydratedList.add(hydrated);
                     }
                     field.set(to, hydratedList);
@@ -177,7 +177,7 @@ public abstract class AbstractIngressDtoMapper<
     private void tryHydrateOneToOneRelationship(T to, final Field field)
         throws IllegalAccessException {
 
-        var entity = (AbstractAclModelEntity) field.get(to);
+        var entity = (AbstractDomainModelEntity) field.get(to);
 
         if (Objects.nonNull(entity)) {
 

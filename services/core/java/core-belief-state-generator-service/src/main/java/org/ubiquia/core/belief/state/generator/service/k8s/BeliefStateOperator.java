@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.core.belief.state.generator.service.builder.BeliefStateDeploymentBuilder;
 
 @ConditionalOnProperty(
@@ -126,23 +126,23 @@ public class BeliefStateOperator {
         factory.startAllRegisteredInformers();
     }
 
-    public void tryDeployBeliefState(final AgentCommunicationLanguage acl)
+    public void tryDeployBeliefState(final DomainOntology domainOntology)
         throws JsonProcessingException {
 
-        logger.info("Trying to deploy a belief state for ACL: \nDomain: {} \nVersion: {}",
-            acl.getDomain(),
-            acl.getVersion());
+        logger.info("Trying to deploy a belief state for domain: \nName: {} \nVersion: {}",
+            domainOntology.getName(),
+            domainOntology.getVersion());
 
         var currentDeployment = this.deploymentClient.get(
             this.namespace,
-            acl.getDomain().toLowerCase() + acl.getVersion());
+            domainOntology.getName().toLowerCase() + domainOntology.getVersion());
 
         if (Objects.isNull(currentDeployment.getObject())) {
             logger.info("...no current deployment exists, attempting to deploy...");
 
             var deployment = this
                 .beliefStateDeploymentBuilder
-                .buildDeploymentFrom(acl);
+                .buildDeploymentFrom(domainOntology);
 
             logger.debug("...deploying deployment: {}...",
                 this.objectMapper.writeValueAsString(deployment));
@@ -161,7 +161,7 @@ public class BeliefStateOperator {
                     deploymentResponse.getHttpStatusCode());
             }
 
-            var service = this.beliefStateDeploymentBuilder.buildServiceFrom(acl);
+            var service = this.beliefStateDeploymentBuilder.buildServiceFrom(domainOntology);
             logger.debug("...deploying service: {}...",
                 this.objectMapper.writeValueAsString(service));
             var serviceResponse = this.serviceClient.create(

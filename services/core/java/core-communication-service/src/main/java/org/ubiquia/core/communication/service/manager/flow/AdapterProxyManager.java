@@ -71,7 +71,7 @@ public class AdapterProxyManager {
     public void tryProcessNewlyDeployedGraph(final Graph graph) {
 
         var adaptersToProxy = graph
-            .getAdapters()
+            .getNodes()
             .stream()
             .filter(adapter ->
                 Boolean.TRUE.equals(
@@ -105,7 +105,7 @@ public class AdapterProxyManager {
      * @param graph the torn-down graph whose adapters should be unproxied
      */
     public void tryProcessNewlyTornDownGraph(final Graph graph) {
-        var adaptersToUnproxy = graph.getAdapters().stream()
+        var adaptersToUnproxy = graph.getNodes().stream()
             .filter(adapter -> Boolean.TRUE.equals(
                 adapter.getCommunicationServiceSettings().getExposeViaCommService()))
             .toList();

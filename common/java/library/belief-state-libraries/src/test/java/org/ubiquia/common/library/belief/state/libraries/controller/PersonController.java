@@ -14,7 +14,7 @@ import org.ubiquia.common.library.belief.state.libraries.service.mapper.Abstract
 
 @RestController
 @RequestMapping("/ubiquia/belief-state-service/person")
-public class PersonController extends AbstractAclModelController<PersonEntity, Person> {
+public class PersonController extends AbstractDomainModelController<PersonEntity, Person> {
 
 
     private static final Logger logger = LoggerFactory.getLogger(PersonController.class);

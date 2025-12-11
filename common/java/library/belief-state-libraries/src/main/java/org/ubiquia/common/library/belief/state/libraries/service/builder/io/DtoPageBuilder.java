@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.belief.state.libraries.service.finder.EgressMapperFinder;
-import org.ubiquia.common.model.acl.dto.AbstractAclModel;
-import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
+import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
+import org.ubiquia.common.model.domain.entity.AbstractDomainModelEntity;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 
 /**
@@ -17,7 +17,7 @@ import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
  * @param <D> The DTO class we're egressing in the paginated responses.
  */
 @Service
-public class DtoPageBuilder<T extends AbstractAclModelEntity, D extends AbstractAclModel> {
+public class DtoPageBuilder<T extends AbstractDomainModelEntity, D extends AbstractDomainModel> {
 
     @Autowired
     private EgressMapperFinder egressMapperFinder;

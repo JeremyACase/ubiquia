@@ -12,8 +12,8 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.acl.embeddable.KeyValuePair;
-import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
+import org.ubiquia.common.model.domain.embeddable.KeyValuePair;
+import org.ubiquia.common.model.domain.entity.AbstractDomainModelEntity;
 
 /**
  * A service dedicated to updating fields for entity models.
@@ -32,7 +32,7 @@ public class EntityUpdater {
      * @throws IllegalAccessException Reflection exceptions.
      */
     public void trySetValue(
-        AbstractAclModelEntity entity,
+        AbstractDomainModelEntity entity,
         final List<KeyValuePair> keyValuePairs) throws IllegalAccessException {
 
         logger.debug("Attempting to set entity of type {} with id {} with key-value-pair {}",
@@ -63,7 +63,7 @@ public class EntityUpdater {
      * @throws IllegalAccessException Reflection exceptions.
      */
     private void trySetValueViaType(
-        AbstractAclModelEntity entity,
+        AbstractDomainModelEntity entity,
         final Field field,
         final KeyValuePair keyValuePair) throws IllegalAccessException {
 
@@ -99,7 +99,7 @@ public class EntityUpdater {
                 field.set(entity, list);
             }
             list.add(keyValuePair.getValue());
-        } else if (AbstractAclModelEntity.class.isAssignableFrom(field.getType())) {
+        } else if (AbstractDomainModelEntity.class.isAssignableFrom(field.getType())) {
             throw new IllegalArgumentException("ERROR: Cannot update an entire AEntity entity; "
                 + "; maybe try updating the child entity instead?");
         }

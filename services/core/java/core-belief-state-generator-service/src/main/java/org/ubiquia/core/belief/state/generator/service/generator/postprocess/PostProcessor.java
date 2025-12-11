@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
 
 @Service
 public class PostProcessor {
@@ -15,7 +15,7 @@ public class PostProcessor {
     @Autowired
     private GenerationSupportProcessor generationSupportProcessor;
 
-    public void postProcess(final AgentCommunicationLanguage acl) throws IOException {
+    public void postProcess(final DomainDataContract acl) throws IOException {
 
         this.generationCleanupProcessor.removeBlacklistedFiles(Paths.get("generated"));
         this.generationSupportProcessor.postProcess(acl);

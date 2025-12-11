@@ -5,21 +5,21 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.ubiquia.common.model.ubiquia.dto.Adapter;
+import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.common.model.ubiquia.record.EndpointRecord;
 
 @Service
 public class AdapterEndpointRecordBuilder {
 
-    public URI getComponentUriFrom(final Adapter adapter)
+    public URI getComponentUriFrom(final Node node)
         throws URISyntaxException {
 
         return new URI(
             "http",
             null,
-            adapter.getComponent().getName().toLowerCase(),
-            adapter.getComponent().getPort(),
-            adapter.getEndpoint(),
+            node.getComponent().getName().toLowerCase(),
+            node.getComponent().getPort(),
+            node.getEndpoint(),
             null,
             null
         );
