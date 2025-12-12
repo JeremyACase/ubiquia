@@ -17,6 +17,7 @@ import org.ubiquia.common.model.ubiquia.entity.ComponentEntity;
 import org.ubiquia.common.model.ubiquia.entity.DomainOntologyEntity;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
+import org.ubiquia.core.flow.repository.ComponentRepository;
 import org.ubiquia.core.flow.repository.DomainDataContractRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.repository.NodeRepository;
@@ -41,6 +42,8 @@ public class GraphRegistrar {
     private ComponentRegistrar componentRegistrar;
     @Autowired
     private ComponentManager componentManager;
+    @Autowired
+    private ComponentRepository componentRepository;
     @Autowired
     private DomainDataContractRepository domainDataContractRepository;
     @Autowired
@@ -98,7 +101,7 @@ public class GraphRegistrar {
             .registerNodesFor(graphEntity, graph);
         graphEntity.getNodes().addAll(nodeEntities);
 
-        this.tryAdaptComponentsToNodes(componentEntities, nodeEntities);
+        this.tryAdaptComponentsToNodes(componentEntities, nodeEntities, graph);
 
         var dto = this.graphDtoMapper.map(graphEntity);
         this.graphValidator.tryValidate(dto);
@@ -112,26 +115,29 @@ public class GraphRegistrar {
     @Transactional
     private void tryAdaptComponentsToNodes(
         List<ComponentEntity> componentEntities,
-        List<NodeEntity> nodeEntities) {
+        List<NodeEntity> nodeEntities,
+        final Graph graph) {
 
         logger.info("...attempting to adapt nodes to components...");
 
-        for (var componentEntity : componentEntities) {
-            if (Objects.nonNull(componentEntity.getNode())) {
+        for (var component : graph.getComponents()) {
+            if (Objects.nonNull(component.getNode())) {
 
-                var nodeRecord = nodeEntities.stream().filter(x -> x
-                    .getName()
-                    .equals(componentEntity.getNode().getName()))
+                var nodeRecord = nodeEntities
+                    .stream()
+                    .filter(x -> x
+                        .getName()
+                        .equals(component.getNode().getName()))
                     .findFirst();
 
                 if (nodeRecord.isEmpty()) {
                     throw new IllegalArgumentException("ERROR: Could not find node named: "
-                        + componentEntity.getNode().getName());
+                        + component.getNode().getName());
                 }
                 var nodeEntity = nodeRecord.get();
 
                 logger.info("...component named {} is adapted to node {}; connecting...",
-                    componentEntity.getName(),
+                    component.getName(),
                     nodeEntity.getName());
 
                 if (Objects.nonNull(nodeEntity.getComponent())) {
@@ -140,9 +146,23 @@ public class GraphRegistrar {
                         + nodeEntity.getComponent().getNode());
                 }
 
+                var componentRecord = componentEntities
+                    .stream()
+                    .filter(x -> x
+                        .getName()
+                        .equals(component.getName()))
+                    .findFirst();
+
+                if (componentRecord.isEmpty()) {
+                    throw new IllegalArgumentException("ERROR: Could not find component named: "
+                        + component.getNode().getName());
+                }
+                var componentEntity = componentRecord.get();
+
                 nodeEntity.setComponent(componentEntity);
                 nodeEntity = this.nodeRepository.save(nodeEntity);
                 componentEntity.setNode(nodeEntity);
+                this.componentRepository.save(componentEntity);
                 logger.info("...completed adapting node to component.");
             }
         }

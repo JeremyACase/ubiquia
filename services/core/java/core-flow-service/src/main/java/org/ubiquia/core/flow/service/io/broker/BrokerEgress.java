@@ -25,18 +25,14 @@ public class BrokerEgress {
     private KafkaEgress kafkaEgress;
 
     @Transactional
-    public void tryPublishFor(
-        FlowMessage flowMessage,
-        final PublishNode adapter) {
+    public void tryPublishFor(FlowMessage flowMessage, final PublishNode node) {
 
-        var adapterContext = adapter.getNodeContext();
-        logger.debug("Got a request to publish the output of an event for adapter of graph {} "
-                + " and component {}",
-            adapterContext.getGraphName(),
-            adapterContext.getComponentName());
+        var nodeContext = node.getNodeContext();
+        logger.debug("Got a request to publish the output of an event for node {} of graph {}",
+            nodeContext.getNodeName(),
+            nodeContext.getGraph().getName());
 
-
-        switch (adapterContext.getBrokerSettings().getType()) {
+        switch (nodeContext.getBrokerSettings().getType()) {
 
             case KAFKA: {
                 if (Objects.isNull(this.kafkaEgress)) {
@@ -44,13 +40,13 @@ public class BrokerEgress {
                         + " Kafka isn't enabled!");
                 }
                 var egressTime = OffsetDateTime.now();
-                this.kafkaEgress.tryPublishPayload(flowMessage.getPayload(), adapter);
+                this.kafkaEgress.tryPublishPayload(flowMessage.getPayload(), node);
                 this.egressHelper(flowMessage, egressTime);
             }
             break;
 
             default: {
-                throw new RuntimeException("ERROR: No broker configured for adapter!");
+                throw new RuntimeException("ERROR: No broker configured for node!");
             }
         }
     }

@@ -27,11 +27,11 @@ public class FlowBuilder {
         var context = node.getNodeContext();
         var graphRecord = this
             .graphRepository
-            .findById(context.getGraphId());
+            .findById(context.getGraph().getId());
 
         if (graphRecord.isEmpty()) {
             throw new IllegalArgumentException("ERROR: Could not find graph with id: "
-                + context.getGraphId());
+                + context.getGraph().getId());
         }
 
         var graphEntity = graphRecord.get();

@@ -33,7 +33,7 @@ public class NodeManagerCommand implements InterfaceLogger {
 
         logger.info("...destroying {} for graph {}...",
             nodeContext.getNodeName(),
-            nodeContext.getGraphName());
+            nodeContext.getGraph().getName());
 
         for (var task : nodeContext.getTasks()) {
             logger.info("...cancelling recurring task: {}...", task);

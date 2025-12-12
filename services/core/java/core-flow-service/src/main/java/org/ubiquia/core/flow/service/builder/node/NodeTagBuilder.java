@@ -14,21 +14,29 @@ public class NodeTagBuilder {
     /**
      * Build tags for a provided adapter.
      *
-     * @param adapter The adapter to build tags for.
+     * @param node The adapter to build tags for.
      * @return The list of tags.
      */
-    public List<KeyValuePair> buildAdapterTags(final AbstractNode adapter) {
+    public List<KeyValuePair> buildNodeTags(final AbstractNode node) {
 
         var tags = new ArrayList<KeyValuePair>();
 
-        var context = adapter.getNodeContext();
-        tags.add(new KeyValuePair("nodeType", context.getNodeType().toString()));
-        tags.add(new KeyValuePair("graphName", context.getGraphName()));
-        tags.add(new KeyValuePair("nodeName", context.getNodeName()));
+        var context = node.getNodeContext();
+        tags.add(new KeyValuePair(
+            "nodeType",
+            context.getNodeType().toString()));
+        tags.add(new KeyValuePair(
+            "graphName",
+            context.getGraph().getName()));
+        tags.add(new KeyValuePair(
+            "nodeName",
+            context.getNodeName()));
 
-        if (Objects.nonNull(context.getComponentName())) {
-            tags.add(new KeyValuePair("componentName",
-                context.getComponentName()));
+        if (Objects.nonNull(context.getComponent())) {
+            var kvp = new KeyValuePair(
+                "componentName",
+                context.getComponent().getName());
+            tags.add(kvp);
         }
 
         return tags;

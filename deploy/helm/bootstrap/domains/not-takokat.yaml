@@ -39,6 +39,11 @@ graphs:
         minor: 2
         patch: 3
 
+    nodes:
+      - name: Ingress-Node
+        component:
+          name: Ingess-Component
+
     # These are a list of components that comprise this graph.
     components:
 

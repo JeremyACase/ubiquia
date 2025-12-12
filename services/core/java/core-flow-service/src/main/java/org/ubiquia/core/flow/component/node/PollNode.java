@@ -40,7 +40,7 @@ public class PollNode extends AbstractNode {
 
         this.getLogger().info("Adapter {} of graph {} is polling...",
             nodeContext.getNodeName(),
-            nodeContext.getGraphName());
+            nodeContext.getGraph().getName());
 
         Timer.Sample sample = null;
         if (Objects.nonNull(super.microMeterHelper)) {
@@ -82,10 +82,9 @@ public class PollNode extends AbstractNode {
                 flowEvent.setInputPayload(stringifiedPayload);
             }
 
-            super.nodePayloadOrchestrator.forwardPayload(
-                flowEvent,
-                this,
-                stringifiedPayload);
+            super
+                .nodePayloadOrchestrator
+                .forwardPayload(flowEvent, this, stringifiedPayload);
         } catch (Exception e) {
             logger.error("Could not successfully forward polled response to agent: {}",
                 e.getMessage());

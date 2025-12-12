@@ -67,15 +67,12 @@ public class PublishNodeTest {
         var domainOntology = this.dummyFactory.generateDomainOntology();
         var graph = domainOntology.getGraphs().get(0);
 
-        var ingressComponent = this.dummyFactory.generateComponent();
-        graph.getComponents().add(ingressComponent);
-
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressNode.getInputSubSchemas().add(subSchema);
         ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-        ingressComponent.setNode(ingressNode);
+        graph.getNodes().add(ingressNode);
 
         var publishNode = this.dummyFactory.generateNode();
         publishNode.setNodeType(NodeType.PUBLISH);
@@ -91,12 +88,7 @@ public class PublishNodeTest {
         edge.getRightNodeNames().add(publishNode.getName());
         graph.getEdges().add(edge);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var node = (PushNode) this
             .testHelper

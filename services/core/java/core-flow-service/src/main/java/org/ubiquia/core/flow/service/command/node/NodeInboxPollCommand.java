@@ -40,7 +40,7 @@ public class NodeInboxPollCommand {
         var nodeContext = node.getNodeContext();
         this.getLogger().debug("Node {} of graph {} with is polling inbox...",
             nodeContext.getNodeName(),
-            nodeContext.getGraphName());
+            nodeContext.getGraph().getName());
 
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterHelper)) {

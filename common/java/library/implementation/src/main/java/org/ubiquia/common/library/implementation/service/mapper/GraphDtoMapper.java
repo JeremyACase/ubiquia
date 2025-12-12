@@ -12,6 +12,7 @@ import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 
 @Service
+@Transactional
 public class GraphDtoMapper extends GenericDtoMapper<GraphEntity, Graph> {
 
     @Autowired
@@ -40,7 +41,6 @@ public class GraphDtoMapper extends GenericDtoMapper<GraphEntity, Graph> {
         return to;
     }
 
-    @Transactional
     private List<GraphEdge> getEdges(final GraphEntity from) {
         var edges = new ArrayList<GraphEdge>();
 
@@ -52,7 +52,7 @@ public class GraphDtoMapper extends GenericDtoMapper<GraphEntity, Graph> {
                 edge.setLeftNodeName(node.getName());
                 edge.setRightNodeNames(new ArrayList<>());
 
-                for (var downstreamNode: node.getDownstreamNodes()) {
+                for (var downstreamNode : node.getDownstreamNodes()) {
                     edge.getRightNodeNames().add(downstreamNode.getName());
                 }
 

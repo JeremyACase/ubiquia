@@ -66,14 +66,10 @@ public class PollNodeTest {
         pollNode.setPollSettings(new PollSettings());
         pollNode.getPollSettings().setPollFrequencyInMilliseconds(1000L);
         pollNode.getPollSettings().setPollEndpoint("http://localhost:8080/test");
+        graph.getNodes().add(pollNode);
         pollComponent.setNode(pollNode);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var mockServer = MockRestServiceServer.createServer(this.restTemplate);
         mockServer.expect(ExpectedCount.manyTimes(), requestTo(new URI(pollNode

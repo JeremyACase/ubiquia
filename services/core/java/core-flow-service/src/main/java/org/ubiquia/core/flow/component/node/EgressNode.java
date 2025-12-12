@@ -2,6 +2,7 @@ package org.ubiquia.core.flow.component.node;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import net.jimblackler.jsonschemafriend.GenerationException;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ public class EgressNode extends AbstractNode {
     }
 
     @Override
+    @Transactional
     protected void tryProcessInboxMessages(List<FlowMessage> messages) {
         for (var message : messages) {
             this.egressNodeCommand.tryProcessInboxMessageFor(message, this);

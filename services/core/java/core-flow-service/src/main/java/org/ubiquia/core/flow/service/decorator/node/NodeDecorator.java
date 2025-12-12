@@ -14,7 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.ubiquia.common.library.implementation.service.builder.AdapterEndpointRecordBuilder;
+import org.ubiquia.common.library.implementation.service.builder.NodeEndpointRecordBuilder;
 import org.ubiquia.core.flow.component.node.AbstractNode;
 import org.ubiquia.core.flow.component.node.PollNode;
 import org.ubiquia.core.flow.component.node.QueueNode;
@@ -39,7 +39,7 @@ public class NodeDecorator {
     @Autowired
     private NodeBrokerDecorator nodeBrokerDecorator;
     @Autowired
-    private AdapterEndpointRecordBuilder adapterEndpointRecordBuilder;
+    private NodeEndpointRecordBuilder nodeEndpointRecordBuilder;
     @Autowired
     private PayloadModelValidator payloadModelValidator;
     @Autowired
@@ -58,7 +58,7 @@ public class NodeDecorator {
 
         logger.info("...Initializing polling of back pressure for adapter {} of graph {}...",
             nodeContext.getNodeName(),
-            nodeContext.getGraphName());
+            nodeContext.getGraph().getName());
 
         var executor = new ScheduledThreadPoolExecutor(1);
         var task = executor.scheduleAtFixedRate(
@@ -76,7 +76,7 @@ public class NodeDecorator {
         var nodeContext = node.getNodeContext();
         logger.info("...Initializing output logic for node {} of graph {}...",
             nodeContext.getNodeName(),
-            nodeContext.getGraphName());
+            nodeContext.getGraph().getName());
 
         this.payloadModelValidator.tryInitializeOutputSchema(nodeContext);
         logger.info("...completed egress logic initialization...");
@@ -90,9 +90,9 @@ public class NodeDecorator {
     public void initializeInboxPollingFor(AbstractNode node)
         throws GenerationException, JsonProcessingException {
         var nodeContext = node.getNodeContext();
-        logger.info("...Initializing polling of inbox for adapter {} of graph {}...",
+        logger.info("...Initializing polling of inbox for node {} of graph {}...",
             nodeContext.getNodeName(),
-            nodeContext.getGraphName());
+            nodeContext.getGraph().getName());
 
         this.payloadModelValidator.tryInitializeInputPayloadSchema(nodeContext);
         var executor = new ScheduledThreadPoolExecutor(1);
@@ -114,9 +114,9 @@ public class NodeDecorator {
         throws GenerationException,
         JsonProcessingException {
         var nodeContext = node.getNodeContext();
-        logger.info("...Initializing polling for adapter {} of graph {}... ",
+        logger.info("...Initializing polling for node {} of graph {}... ",
             nodeContext.getNodeName(),
-            nodeContext.getGraphName());
+            nodeContext.getGraph().getName());
 
         this.payloadModelValidator.tryInitializeInputPayloadSchema(nodeContext);
 
@@ -137,9 +137,9 @@ public class NodeDecorator {
         var settings = node.getNodeContext().getNodeSettings();
 
         if (settings.getStimulateInputPayload()) {
-            logger.info("...Initializing periodic input stimulation for adapter {} of graph {}...",
+            logger.info("...Initializing periodic input stimulation for node {} of graph {}...",
                 nodeContext.getNodeName(),
-                nodeContext.getGraphName());
+                nodeContext.getGraph().getName());
 
             this.stimulatedPayloadBuilder.initializeSchema(nodeContext.getNodeId());
             var executor = new ScheduledThreadPoolExecutor(1);
@@ -151,7 +151,7 @@ public class NodeDecorator {
             nodeContext.getTasks().add(task);
             logger.info("...completed back pressure polling initialization...");
         } else {
-            logger.debug("...Adapter not configured for input stimulation; "
+            logger.debug("...node not configured for input stimulation; "
                 + "not initializing stimulation.");
         }
     }
@@ -165,7 +165,7 @@ public class NodeDecorator {
         var nodeContext = node.getNodeContext();
         logger.info("...Initializing broker subscription for adapter {} of graph {}...",
             nodeContext.getNodeName(),
-            nodeContext.getGraphName());
+            nodeContext.getGraph().getName());
 
         this.nodeBrokerDecorator.initializeBrokerSubscriptionFor(node);
         logger.info("...completed broker subscription initialization...");
@@ -181,9 +181,11 @@ public class NodeDecorator {
 
         var nodeContext = node.getNodeContext();
 
-        var endpointRecord = this.adapterEndpointRecordBuilder.getBackpressureEndpointFor(
-            nodeContext.getGraphName(),
-            nodeContext.getNodeName());
+        var endpointRecord = this
+            .nodeEndpointRecordBuilder
+            .getBackpressureEndpointFor(
+                nodeContext.getGraph().getName(),
+                nodeContext.getNodeName());
         logger.info("...building endpoint: {}", endpointRecord.path());
         var mappingInfo = RequestMappingInfo
             .paths(endpointRecord.path())
@@ -205,9 +207,12 @@ public class NodeDecorator {
 
         var nodeContext = node.getNodeContext();
 
-        var endpointRecord = this.adapterEndpointRecordBuilder.getPeekEndpointFor(
-            nodeContext.getGraphName(),
-            nodeContext.getNodeName());
+        var endpointRecord = this
+            .nodeEndpointRecordBuilder
+            .getPeekEndpointFor(
+                nodeContext.getGraph().getName(),
+                nodeContext.getNodeName());
+
         logger.info("...generating endpoint: {}", endpointRecord.path());
         var mappingInfo = RequestMappingInfo
             .paths(endpointRecord.path())
@@ -229,9 +234,11 @@ public class NodeDecorator {
 
         var nodeContext = node.getNodeContext();
 
-        var endpointRecord = this.adapterEndpointRecordBuilder.getPopEndpointFor(
-            nodeContext.getGraphName(),
-            nodeContext.getNodeName());
+        var endpointRecord = this
+            .nodeEndpointRecordBuilder
+            .getPopEndpointFor(
+                nodeContext.getGraph().getName(),
+                nodeContext.getNodeName());
         logger.info("...generating endpoint: {}", endpointRecord.path());
         var mappingInfo = RequestMappingInfo
             .paths(endpointRecord.path())
@@ -253,9 +260,12 @@ public class NodeDecorator {
 
         var nodeContext = node.getNodeContext();
 
-        var endpointRecord = this.adapterEndpointRecordBuilder.getPushEndpointFor(
-            nodeContext.getGraphName(),
-            nodeContext.getNodeName());
+        var endpointRecord = this
+            .nodeEndpointRecordBuilder
+            .getPushEndpointFor(
+                nodeContext.getGraph().getName(),
+                nodeContext.getNodeName());
+
         logger.info("...generating endpoint: {}", endpointRecord.path());
         var mappingInfo = RequestMappingInfo
             .paths(endpointRecord.path())

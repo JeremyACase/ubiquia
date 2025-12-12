@@ -9,7 +9,7 @@ import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.common.model.ubiquia.record.EndpointRecord;
 
 @Service
-public class AdapterEndpointRecordBuilder {
+public class NodeEndpointRecordBuilder {
 
     public URI getComponentUriFrom(final Node node)
         throws URISyntaxException {
@@ -25,30 +25,33 @@ public class AdapterEndpointRecordBuilder {
         );
     }
 
-    public EndpointRecord getBackpressureEndpointFor(final String graphName, final String adapterName) {
-        var path = this.getBasePathFor(graphName, adapterName) + "/back-pressure";
+    public EndpointRecord getBackpressureEndpointFor(
+        final String graphName,
+        final String nodeName) {
+
+        var path = this.getBasePathFor(graphName, nodeName) + "/back-pressure";
         return new EndpointRecord(path, RequestMethod.GET);
     }
 
-    public EndpointRecord getPushEndpointFor(final String graphName, final String adapterName) {
-        var path = this.getBasePathFor(graphName, adapterName) + "/push";
+    public EndpointRecord getPushEndpointFor(final String graphName, final String nodeName) {
+        var path = this.getBasePathFor(graphName, nodeName) + "/push";
         return new EndpointRecord(path, RequestMethod.POST);
     }
 
-    public EndpointRecord getPeekEndpointFor(final String graphName, final String adapterName) {
-        var path = this.getBasePathFor(graphName, adapterName) + "/queue/peek";
+    public EndpointRecord getPeekEndpointFor(final String graphName, final String nodeName) {
+        var path = this.getBasePathFor(graphName, nodeName) + "/queue/peek";
         return new EndpointRecord(path, RequestMethod.GET);
     }
 
-    public EndpointRecord getPopEndpointFor(final String graphName, final String adapterName) {
-        var path = this.getBasePathFor(graphName, adapterName) + "/queue/pop";
+    public EndpointRecord getPopEndpointFor(final String graphName, final String nodeName) {
+        var path = this.getBasePathFor(graphName, nodeName) + "/queue/pop";
         return new EndpointRecord(path, RequestMethod.GET);
     }
 
-    public String getBasePathFor(final String graphName, final String adapterName) {
+    public String getBasePathFor(final String graphName, final String nodeName) {
         return "graph/"
             + graphName.toLowerCase()
-            + "/adapter/"
-            + adapterName.toLowerCase();
+            + "/node/"
+            + nodeName.toLowerCase();
     }
 }

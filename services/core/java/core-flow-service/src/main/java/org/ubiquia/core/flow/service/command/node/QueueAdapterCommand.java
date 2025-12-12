@@ -55,7 +55,7 @@ public class QueueAdapterCommand implements InterfaceLogger {
         this.getLogger()
             .info("Node {} for graph {} received a peek request...",
                 context.getNodeName(),
-                context.getGraphName());
+                context.getGraph().getName());
 
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterHelper)) {
@@ -88,7 +88,7 @@ public class QueueAdapterCommand implements InterfaceLogger {
         this.getLogger()
             .info("Node {} for graph {} received a pop request...",
                 context.getNodeName(),
-                context.getGraphName());
+                context.getGraph().getName());
 
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterHelper)) {

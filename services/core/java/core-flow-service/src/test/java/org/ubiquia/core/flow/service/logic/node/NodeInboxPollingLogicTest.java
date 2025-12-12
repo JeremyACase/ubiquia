@@ -10,7 +10,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
-import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.component.node.EgressNode;
@@ -59,7 +58,6 @@ public class NodeInboxPollingLogicTest {
         var nodeContext = new NodeContext();
         node.setNodeContext(nodeContext);
         nodeContext.setNodeType(NodeType.HIDDEN);
-        nodeContext.setTemplateComponent(true);
 
         var valid = this.nodeInboxPollingLogic.isValidToPollInbox(node);
         Assertions.assertTrue(valid);
@@ -72,7 +70,6 @@ public class NodeInboxPollingLogicTest {
         node.setNodeContext(nodeContext);
         nodeContext.setEgressSettings(new EgressSettings());
         nodeContext.setNodeType(NodeType.EGRESS);
-        nodeContext.setTemplateComponent(false);
 
         var valid = this.nodeInboxPollingLogic.isValidToPollInbox(node);
         Assertions.assertTrue(valid);
@@ -85,7 +82,6 @@ public class NodeInboxPollingLogicTest {
         node.setNodeContext(nodeContext);
         nodeContext.setEgressSettings(new EgressSettings());
         nodeContext.setNodeType(NodeType.EGRESS);
-        nodeContext.setTemplateComponent(false);
         ReflectionTestUtils.setField(nodeContext, "openMessages", 100);
 
         var valid = this.nodeInboxPollingLogic.isValidToPollInbox(node);
@@ -98,24 +94,17 @@ public class NodeInboxPollingLogicTest {
         var domainOntology = this.dummyFactory.generateDomainOntology();
         var graph = domainOntology.getGraphs().get(0);
 
-        var ingressComponent = this.dummyFactory.generateComponent();
-        var hiddenComponent = this.dummyFactory.generateComponent();
-        graph.getComponents().add(ingressComponent);
-        graph.getComponents().add(hiddenComponent);
-
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);
 
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressNode.getInputSubSchemas().add(subSchema);
         ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-        ingressComponent.setNode(ingressNode);
 
         var hiddenNode = this.dummyFactory.generateNode();
         hiddenNode.setNodeType(NodeType.HIDDEN);
         hiddenNode.setEndpoint("http://localhost:8080/test");
         hiddenNode.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
-        hiddenComponent.setNode(hiddenNode);
 
         var edge = new GraphEdge();
         edge.setLeftNodeName(ingressNode.getName());
@@ -123,18 +112,11 @@ public class NodeInboxPollingLogicTest {
         edge.getRightNodeNames().add(hiddenNode.getName());
         graph.getEdges().add(edge);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
-        var node = this.testHelper.findNode(
-            hiddenNode.getName(),
-            graph.getName());
-
-        node.getNodeContext().setTemplateComponent(false);
+        var node = this
+            .testHelper
+            .findNode(hiddenNode.getName(), graph.getName());
 
         var valid = this.nodeInboxPollingLogic.isValidToPollInbox(node);
         Assertions.assertTrue(valid);
@@ -146,23 +128,16 @@ public class NodeInboxPollingLogicTest {
         var domainOntology = this.dummyFactory.generateDomainOntology();
         var graph = domainOntology.getGraphs().get(0);
 
-        var ingressComponent = this.dummyFactory.generateComponent();
-        var hiddenComponent = this.dummyFactory.generateComponent();
-        graph.getComponents().add(ingressComponent);
-        graph.getComponents().add(hiddenComponent);
-
         var ingressAdapter = this.dummyFactory.generateNode();
         ingressAdapter.setNodeType(NodeType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressAdapter.getInputSubSchemas().add(subSchema);
         ingressAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-        ingressComponent.setNode(ingressAdapter);
 
         var hiddenNode = this.dummyFactory.generateNode();
         hiddenNode.setNodeType(NodeType.HIDDEN);
         hiddenNode.setEndpoint("http://localhost:8080/test");
         hiddenNode.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
-        hiddenComponent.setNode(hiddenNode);
 
         var edge = new GraphEdge();
         edge.setLeftNodeName(ingressAdapter.getName());
@@ -170,19 +145,13 @@ public class NodeInboxPollingLogicTest {
         edge.getRightNodeNames().add(hiddenNode.getName());
         graph.getEdges().add(edge);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
-        var node = this.testHelper.findNode(
-            hiddenNode.getName(),
-            graph.getName());
+        var node = this
+            .testHelper
+            .findNode(hiddenNode.getName(), graph.getName());
 
         var nodeContext = node.getNodeContext();
-        nodeContext.setTemplateComponent(false);
         ReflectionTestUtils.setField(nodeContext, "openMessages", 100);
 
         var valid = this.nodeInboxPollingLogic.isValidToPollInbox(node);

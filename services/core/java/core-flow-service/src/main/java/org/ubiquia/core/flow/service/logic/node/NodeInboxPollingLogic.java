@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.logic.node;
 
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,26 +15,29 @@ public class NodeInboxPollingLogic {
     private static final Logger logger = LoggerFactory.getLogger(NodeInboxPollingLogic.class);
 
     @Autowired
+    private NodePassthroughLogic nodePassthroughLogic;
+
+    @Autowired
     private NodeTypeLogic nodeTypeLogic;
 
     /**
      * Provided an adapter, determine whether or not it is a valid time for that
      * adapter to poll the inbox.
      *
-     * @param adapter The adapter to determine validity for.
+     * @param node The adapter to determine validity for.
      * @return If it's valid for the adapter to poll.
      */
-    public Boolean isValidToPollInbox(final AbstractNode adapter) {
+    public Boolean isValidToPollInbox(final AbstractNode node) {
 
-        var context = adapter.getNodeContext();
+        var context = node.getNodeContext();
 
         var valid = false;
-        if (context.hasTemplateComponent()) {
+        if (this.nodePassthroughLogic.isPassthrough(node)) {
             valid = true;
         } else {
             var type = context.getNodeType();
             if (this.nodeTypeLogic.nodeTypeRequiresEgressSettings(type)) {
-                valid = this.hasFewerOpenMessagesThanEgressConcurrency(adapter);
+                valid = this.hasFewerOpenMessagesThanEgressConcurrency(node);
             } else {
                 valid = true;
             }
@@ -47,17 +49,16 @@ public class NodeInboxPollingLogic {
      * Determine whether or not it's a valid time to poll the inbox for adapters
      * that have do not have agents.
      *
-     * @param adapter The adapter to determine validity for.
+     * @param node The adapter to determine validity for.
      * @return Whether or not it's a valid time to poll the inbox.
      */
-    @Transactional
-    private Boolean hasFewerOpenMessagesThanEgressConcurrency(final AbstractNode adapter) {
+    private Boolean hasFewerOpenMessagesThanEgressConcurrency(final AbstractNode node) {
         var valid = false;
 
-        var context = adapter.getNodeContext();
+        var context = node.getNodeContext();
         var maxConcurrency = context.getEgressSettings().getEgressConcurrency();
         if (context.getOpenMessages() >= maxConcurrency) {
-            logger.debug("Adapter named {} has {} open messages which is greater than or equal to "
+            logger.debug("node named {} has {} open messages which is greater than or equal to "
                     + " max concurrency of {}; not polling...",
                 context.getNodeName(),
                 context.getOpenMessages(),

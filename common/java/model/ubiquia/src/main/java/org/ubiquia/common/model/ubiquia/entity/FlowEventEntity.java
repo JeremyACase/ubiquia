@@ -15,7 +15,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 @Entity
 public class FlowEventEntity extends AbstractModelEntity {
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "node_event_join_id", nullable = false)
     private NodeEntity node;
 

@@ -56,7 +56,6 @@ public class NodePayloadOrchestrator implements InterfaceLogger {
         GenerationException,
         ValidationException {
 
-        var nodeContext = node.getNodeContext();
         if (this.nodePassthroughLogic.isPassthrough(node)) {
             this.outbox.tryQueueMessage(
                 flowEventEntity,

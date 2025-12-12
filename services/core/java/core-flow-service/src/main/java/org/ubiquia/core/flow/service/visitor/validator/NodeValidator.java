@@ -13,6 +13,7 @@ import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.common.model.ubiquia.embeddable.SubSchema;
 import org.ubiquia.common.model.ubiquia.enums.EgressType;
 import org.ubiquia.common.model.ubiquia.enums.HttpOutputType;
+import org.ubiquia.core.flow.service.logic.node.NodePassthroughLogic;
 
 /**
  * A service dedicated to validating nodes.
@@ -21,6 +22,8 @@ import org.ubiquia.common.model.ubiquia.enums.HttpOutputType;
 public class NodeValidator {
 
     private static final Logger logger = LoggerFactory.getLogger(NodeValidator.class);
+    @Autowired
+    private NodePassthroughLogic nodePassthroughLogic;
     @Autowired
     private SubSchemaValidator subSchemaValidator;
 
@@ -471,9 +474,10 @@ public class NodeValidator {
         logger.info("...validating node named {} is not configured as a passthrough node...",
             node.getName());
 
-        if (node.getNodeSettings().getIsPassthrough()) {
-            throw new IllegalArgumentException("ERROR: "
-                + " node is a passthrough, but this is invalid! ");
+        if (this.nodePassthroughLogic.isPassthrough(node)) {
+            throw new IllegalArgumentException("ERROR: node of type "
+                + node.getNodeType()
+                + " is configured as a passthrough, but this is invalid! ");
         }
     }
 
@@ -488,7 +492,7 @@ public class NodeValidator {
             node.getName());
 
 
-        if (node.getNodeSettings().getIsPassthrough()
+        if (this.nodePassthroughLogic.isPassthrough(node)
             && node.getDownstreamNodes().isEmpty()) {
             throw new IllegalArgumentException("ERROR: "
                 + " node is configured as a passthrough without downstream nodes! ");

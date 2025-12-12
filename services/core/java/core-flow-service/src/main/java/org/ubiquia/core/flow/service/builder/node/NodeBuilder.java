@@ -11,14 +11,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.library.implementation.service.builder.AdapterEndpointRecordBuilder;
+import org.ubiquia.common.library.implementation.service.builder.NodeEndpointRecordBuilder;
 import org.ubiquia.common.library.implementation.service.mapper.NodeDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
-import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
+import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
 import org.ubiquia.core.flow.component.node.AbstractNode;
 import org.ubiquia.core.flow.service.decorator.node.override.NodeOverrideDecorator;
+import org.ubiquia.core.flow.service.logic.node.NodePassthroughLogic;
 import org.ubiquia.core.flow.service.logic.node.NodeTypeLogic;
 
 @Service
@@ -34,16 +35,18 @@ public class NodeBuilder {
     @Autowired
     private NodeTagBuilder nodeTagBuilder;
     @Autowired
-    private AdapterEndpointRecordBuilder adapterEndpointRecordBuilder;
+    private NodePassthroughLogic nodePassthroughLogic;
+    @Autowired
+    private NodeEndpointRecordBuilder nodeEndpointRecordBuilder;
     @Autowired
     private NodeTypeLogic nodeTypeLogic;
 
     /**
      * Build the provided adapter by using data from the database.
      *
-     * @param node       The adapter to build.
-     * @param nodeEntity The adapter's data from the database.
-     * @param graphEntity   The graph's data from the database.
+     * @param node        The adapter to build.
+     * @param nodeEntity  The adapter's data from the database.
+     * @param graphEntity The graph's data from the database.
      * @throws URISyntaxException Exceptions from setting the URL that the adapter should
      *                            communicate with.
      */
@@ -58,7 +61,7 @@ public class NodeBuilder {
         IllegalAccessException,
         GenerationException {
 
-        logger.info("...building {} adapter named {} for graph {} with settings {}...",
+        logger.info("...building {} node named {} for graph {} with settings {}...",
             nodeEntity.getNodeType(),
             nodeEntity.getName(),
             graphEntity.getName(),
@@ -66,69 +69,90 @@ public class NodeBuilder {
 
         var nodeDatabaseData = this.nodeDtoMapper.map(nodeEntity);
 
-        this.nodeOverrideDecorator.tryOverrideBaselineValues(
-            nodeDatabaseData,
-            nodeEntity.getOverrideSettings().stream().toList(),
-            graphDeployment);
+        this
+            .nodeOverrideDecorator
+            .tryOverrideBaselineValues(
+                nodeDatabaseData,
+                nodeEntity.getOverrideSettings().stream().toList(),
+                graphDeployment);
 
-        var context = this.nodeContextBuilder.buildNodeContext(
-            nodeDatabaseData,
-            graphEntity,
-            graphDeployment);
+        var context = this
+            .nodeContextBuilder
+            .buildNodeContext(nodeDatabaseData, graphEntity, graphDeployment);
         node.setNodeContext(context);
 
-        var tags = this.nodeTagBuilder.buildAdapterTags(node);
+        var tags = this.nodeTagBuilder.buildNodeTags(node);
         context.setTags(tags);
 
-        this.trySetAdapterEndpoint(node, nodeDatabaseData);
+        this.trySetNodeEndpoint(node, nodeDatabaseData);
         node.initializeBehavior();
 
-        logger.info("...built adapter...");
+        logger.info("...built node...");
     }
 
-
     /**
-     * Attempt to set an adapter's endpoint.
+     * Attempt to set a node's endpoint.
      *
-     * @param adapter     The adapter to set.
+     * @param node     The adapter to set.
      * @param nodeData The adapter data from the database.
      * @throws URISyntaxException Exceptions from parsing endpoints.
      */
-    private void trySetAdapterEndpoint(AbstractNode adapter, final Node nodeData)
+    private void trySetNodeEndpoint(AbstractNode node, final Node nodeData)
         throws URISyntaxException {
 
+        logger.info("...determining if node has an endpoint to build...");
+
         var componentData = nodeData.getComponent();
-        var adapterContext = adapter.getNodeContext();
-        if (!nodeData.getNodeSettings().getIsPassthrough()) {
+        var nodeContext = node.getNodeContext();
+
+        var isPassthrough = this.nodePassthroughLogic.isPassthrough(node);
+        if (!isPassthrough) {
 
             if (Objects.nonNull(componentData)) {
-
-                switch (componentData.getComponentType()) {
+                var componentType = componentData.getComponentType();
+                switch (componentType) {
 
                     // If we have a Kubernetes service to use...
                     case POD: {
-                        adapterContext.setEndpointUri(
-                            this.adapterEndpointRecordBuilder.getComponentUriFrom(nodeData));
+                        logger.info("...building node endpoint for internal K8s service for "
+                            + "{} component...",
+                            componentType);
+                        nodeContext
+                            .setEndpointUri(this
+                                .nodeEndpointRecordBuilder
+                                .getComponentUriFrom(nodeData));
+                        logger.info("...built endpoint: {}...", nodeContext.getEndpointUri());
                     }
                     break;
 
                     // ...use full endpoint for NONE type...
                     case NONE: {
-                        adapterContext.setEndpointUri(new URI(nodeData.getEndpoint()));
+                        logger.info("...assuming user-defined endpoint for {} component...",
+                            componentType);
+                        var uri = new URI(nodeData.getEndpoint());
+                        nodeContext.setEndpointUri(uri);
+                        logger.info("...built endpoint: {}...", nodeContext.getEndpointUri());
                     }
                     break;
 
                     // ...else just set to null
                     default: {
-                        adapterContext.setEndpointUri(null);
+                        logger.info("...assuming no endpoint for {} component...",
+                            componentType);
+                        nodeContext.setEndpointUri(null);
                     }
 
                 }
-            } else if (this.nodeTypeLogic.nodeTypeRequiresEndpoint(
-                nodeData.getNodeType())) {
-
-                adapterContext.setEndpointUri(new URI(nodeData.getEndpoint()));
+            } else if (this.nodeTypeLogic.nodeTypeRequiresEndpoint(nodeData.getNodeType())) {
+                logger.info("...building user-provided endpoint for node...");
+                var uri = new URI(nodeData.getEndpoint());
+                nodeContext.setEndpointUri(uri);
+                logger.info("...built endpoint {}...", nodeContext.getEndpointUri());
             }
+        } else {
+            logger.info("...node is assumed to be passthrough; not setting an endpoint...");
+            nodeContext.setEndpointUri(null);
         }
+        logger.info("...completed building node endpoint.");
     }
 }

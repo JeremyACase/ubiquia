@@ -4,6 +4,7 @@ package org.ubiquia.core.flow.component.node;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.Timer;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import net.jimblackler.jsonschemafriend.GenerationException;
@@ -88,7 +89,7 @@ public abstract class AbstractNode implements InterfaceLogger {
         this.getLogger().info("...Initializing {} node named {} for graph {}...",
             adapterContext.getNodeType(),
             adapterContext.getNodeName(),
-            adapterContext.getGraphName());
+            adapterContext.getGraph().getName());
     }
 
     public void pollToSampleBackPressure() {
@@ -98,7 +99,7 @@ public abstract class AbstractNode implements InterfaceLogger {
         this.getLogger().debug("Node {} of graph {} is polling "
                 + "to calculate backpressure...",
             nodeContext.getNodeName(),
-            nodeContext.getGraphName());
+            nodeContext.getGraph().getName());
 
         var count = this
             .flowMessageRepository
@@ -116,6 +117,7 @@ public abstract class AbstractNode implements InterfaceLogger {
         }
     }
 
+    @Transactional
     public ResponseEntity<FlowEvent> push(@RequestBody final String inputPayload)
         throws Exception {
 
@@ -124,7 +126,8 @@ public abstract class AbstractNode implements InterfaceLogger {
             sample = this.microMeterHelper.startSample();
         }
 
-        this.getLogger().info("Received a payload to push to component...");
+        this.getLogger().info("Node {} received a payload to push to component...",
+            this.getNodeContext().getNodeName());
         this.payloadModelValidator.tryValidateInputPayloadFor(inputPayload, this);
         var event = this.flowEventBuilder.makeFlowAndEventFrom(inputPayload, this);
 
@@ -160,11 +163,12 @@ public abstract class AbstractNode implements InterfaceLogger {
         if (Objects.nonNull(sample)) {
             this.microMeterHelper.endSample(
                 sample,
-                "stimulateAgent",
+                "stimulateComponent",
                 this.nodeContext.getTags());
         }
     }
 
+    @Transactional
     public void tryPollInbox() {
 
         if (this.nodeInboxPollingLogic.isValidToPollInbox(this)) {
@@ -180,9 +184,11 @@ public abstract class AbstractNode implements InterfaceLogger {
         return response;
     }
 
+    @Transactional
     protected void tryProcessInboxMessages(final List<FlowMessage> messages) {
         for (var message : messages) {
-            this.nodeProcessInboxMessageCommand.tryProcessInboxMessageFor(message, this);
+            this.nodeProcessInboxMessageCommand
+                .tryProcessInboxMessageFor(message, this);
         }
     }
 }

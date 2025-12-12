@@ -3,6 +3,7 @@ package org.ubiquia.core.flow.service.command.node;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.Timer;
+import jakarta.transaction.Transactional;
 import java.util.Objects;
 import net.jimblackler.jsonschemafriend.GenerationException;
 import net.jimblackler.jsonschemafriend.ValidationException;
@@ -55,6 +56,7 @@ public class EgressNodeCommand implements InterfaceLogger {
         return logger;
     }
 
+    @Transactional
     public void tryProcessInboxMessageFor(
         final FlowMessage flowMessage,
         final EgressNode node) {
@@ -66,12 +68,11 @@ public class EgressNodeCommand implements InterfaceLogger {
 
         try {
             var inputPayload = flowMessage.getPayload();
-            this.payloadModelValidator.tryValidateInputPayloadFor(
-                inputPayload,
-                node);
-            var flowEvent = this.flowEventBuilder.makeEventFrom(
-                flowMessage,
-                node);
+            this.payloadModelValidator
+                .tryValidateInputPayloadFor(inputPayload, node);
+            var flowEvent = this
+                .flowEventBuilder
+                .makeEventFrom(flowMessage, node);
 
             this.tryEgressPayload(flowEvent, node, inputPayload);
         } catch (Exception e) {

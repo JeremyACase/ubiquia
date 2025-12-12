@@ -90,6 +90,7 @@ public class FlowEventBuilder {
         return flowEvent;
     }
 
+    @Transactional
     public FlowEventEntity makeEventFrom(
         FlowMessage flowMessage,
         final AbstractNode node)

@@ -38,10 +38,10 @@ public class KafkaSubscriptionNodeDecorator {
     /**
      * Initialize an adapter to have a subscription to a Kafka topic.
      *
-     * @param adapter The adapter to initialize.
+     * @param node The adapter to initialize.
      */
-    public void initializeKafkaSubscriptionFor(final SubscribeNode adapter) {
-        var listener = this.getKafkaListenerEndpointFor(adapter);
+    public void initializeKafkaSubscriptionFor(final SubscribeNode node) {
+        var listener = this.getKafkaListenerEndpointFor(node);
         this.kafkaListenerEndpointRegistry.registerListenerContainer(
             listener,
             this.kafkaListenerContainerFactory,
@@ -56,8 +56,14 @@ public class KafkaSubscriptionNodeDecorator {
      */
     private KafkaListenerEndpoint getKafkaListenerEndpointFor(final SubscribeNode node) {
 
-        var methods = Arrays.stream(node.getClass().getMethods()).toList();
-        var match = methods.stream().filter(x -> x.getName().contains("onMessage")).findFirst();
+        var methods = Arrays
+            .stream(node.getClass().getMethods())
+            .toList();
+
+        var match = methods
+            .stream()
+            .filter(x -> x.getName().contains("onMessage"))
+            .findFirst();
 
         if (match.isEmpty()) {
             throw new RuntimeException("ERROR: Unable to initialize - could not find an "
@@ -74,16 +80,16 @@ public class KafkaSubscriptionNodeDecorator {
     /**
      * A helper method to build a MethodKafkaListenerEndpoint.
      *
-     * @param adapter The adapter to use.
+     * @param node The adapter to use.
      * @return A MethodKafkaListenerEndpoint.
      */
     private MethodKafkaListenerEndpoint<String, String> getMethodKafkaListenerFor(
-        final SubscribeNode adapter) {
+        final SubscribeNode node) {
         var kafkaListenerEndpoint = new MethodKafkaListenerEndpoint<String, String>();
-        kafkaListenerEndpoint.setId(this.generateListenerIdFor(adapter));
-        kafkaListenerEndpoint.setGroupId("ubiquia-adapters");
+        kafkaListenerEndpoint.setId(this.generateListenerIdFor(node));
+        kafkaListenerEndpoint.setGroupId("ubiquia-nodes");
         kafkaListenerEndpoint.setAutoStartup(true);
-        kafkaListenerEndpoint.setTopics(adapter
+        kafkaListenerEndpoint.setTopics(node
             .getNodeContext()
             .getBrokerSettings()
             .getTopic());
@@ -101,9 +107,9 @@ public class KafkaSubscriptionNodeDecorator {
     private String generateListenerIdFor(final SubscribeNode adapter) {
         var context = adapter.getNodeContext();
         var id = context
-            .getGraphName()
+            .getGraph().getName()
             + "-"
-            + context.getComponentName()
+            + context.getComponent().getName()
             + "-"
             + endpointIdIndex.getAndIncrement();
         return id;

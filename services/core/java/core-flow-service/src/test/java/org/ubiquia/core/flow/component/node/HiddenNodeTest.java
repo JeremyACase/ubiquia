@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
-import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.common.model.ubiquia.enums.HttpOutputType;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
@@ -70,10 +69,8 @@ public class HiddenNodeTest {
         var domainOntology = this.dummyFactory.generateDomainOntology();
         var graph = domainOntology.getGraphs().get(0);
 
-        var ingressComponent = this.dummyFactory.generateComponent();
         var hiddenComponent = this.dummyFactory.generateComponent();
         hiddenComponent.setComponentType(ComponentType.NONE);
-        graph.getComponents().add(ingressComponent);
         graph.getComponents().add(hiddenComponent);
 
         var ingressNode = this.dummyFactory.generateNode();
@@ -81,6 +78,7 @@ public class HiddenNodeTest {
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressNode.getInputSubSchemas().add(subSchema);
         ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(ingressNode);
 
         var hiddenNode = this.dummyFactory.generateNode();
         hiddenNode.setNodeType(NodeType.HIDDEN);
@@ -88,9 +86,8 @@ public class HiddenNodeTest {
         hiddenNode.getEgressSettings().setHttpOutputType(HttpOutputType.POST);
         hiddenNode.setEndpoint("http://localhost:8080/test");
         hiddenNode.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
-
-        ingressComponent.setNode(ingressNode);
         hiddenComponent.setNode(hiddenNode);
+        graph.getNodes().add(hiddenNode);
 
         var edge = new GraphEdge();
         edge.setLeftNodeName(ingressNode.getName());
@@ -98,12 +95,7 @@ public class HiddenNodeTest {
         edge.getRightNodeNames().add(hiddenNode.getName());
         graph.getEdges().add(edge);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var node = (HiddenNode) this
             .testHelper
@@ -128,17 +120,13 @@ public class HiddenNodeTest {
         var domainOntology = this.dummyFactory.generateDomainOntology();
         var graph = domainOntology.getGraphs().get(0);
 
-        var ingressComponent = this.dummyFactory.generateComponent();
-        var hiddenComponent = this.dummyFactory.generateComponent();
-        hiddenComponent.setComponentType(ComponentType.NONE);
-        graph.getComponents().add(ingressComponent);
-        graph.getComponents().add(hiddenComponent);
 
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressNode.getInputSubSchemas().add(subSchema);
         ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(ingressNode);
 
         var hiddenNode = this.dummyFactory.generateNode();
         hiddenNode.setNodeType(NodeType.HIDDEN);
@@ -146,8 +134,11 @@ public class HiddenNodeTest {
         hiddenNode.getEgressSettings().setHttpOutputType(HttpOutputType.PUT);
         hiddenNode.setEndpoint("http://localhost:8080/test");
         hiddenNode.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(hiddenNode);
 
-        ingressComponent.setNode(ingressNode);
+        var hiddenComponent = this.dummyFactory.generateComponent();
+        hiddenComponent.setComponentType(ComponentType.NONE);
+        graph.getComponents().add(hiddenComponent);
         hiddenComponent.setNode(hiddenNode);
 
         var edge = new GraphEdge();
@@ -156,12 +147,7 @@ public class HiddenNodeTest {
         edge.getRightNodeNames().add(hiddenNode.getName());
         graph.getEdges().add(edge);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var node = (HiddenNode) this
             .testHelper

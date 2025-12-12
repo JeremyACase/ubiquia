@@ -24,6 +24,16 @@ public class NodeTypeLogic {
             || nodeType.equals(NodeType.MERGE);
     }
 
+    public Boolean isTerminalNodeType(final NodeType nodeType) {
+
+        var terminalNodeType =
+            nodeType.equals(NodeType.QUEUE)
+                || nodeType.equals(NodeType.PUBLISH)
+                || nodeType.equals(NodeType.EGRESS);
+
+        return terminalNodeType;
+    }
+
     public Boolean nodeTypeIsValidPassthrough(final NodeType nodeType) {
         return nodeType.equals(NodeType.HIDDEN)
             || nodeType.equals(NodeType.PUSH)
