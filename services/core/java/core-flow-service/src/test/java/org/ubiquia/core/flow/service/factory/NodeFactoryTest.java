@@ -31,12 +31,12 @@ public class NodeFactoryTest {
 
     @Test
     @Transactional
-    public void assertBuildsAdapters_isValid() {
+    public void assertBuildsNodes_isValid() {
         var allNodesBuild = true;
         for (var type : NodeType.values()) {
             var node = (AbstractNode) ReflectionTestUtils.invokeMethod(
                 this.nodeFactory,
-                "makeAdapterByType",
+                "makeNodeByType",
                 type);
             if (Objects.isNull(node)) {
                 allNodesBuild = false;

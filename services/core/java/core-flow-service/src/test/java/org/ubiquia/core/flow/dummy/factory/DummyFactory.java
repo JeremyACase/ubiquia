@@ -131,7 +131,7 @@ public class DummyFactory {
      *
      * @return A dummy graph.
      */
-    public Graph generateGraph() throws IOException {
+    public Graph generateGraph() {
 
         var graph = Instancio
             .of(Graph.class)

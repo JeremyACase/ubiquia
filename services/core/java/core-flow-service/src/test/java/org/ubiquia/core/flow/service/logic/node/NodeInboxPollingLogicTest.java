@@ -96,6 +96,7 @@ public class NodeInboxPollingLogicTest {
 
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);
+        graph.getNodes().add(ingressNode);
 
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressNode.getInputSubSchemas().add(subSchema);
@@ -105,6 +106,7 @@ public class NodeInboxPollingLogicTest {
         hiddenNode.setNodeType(NodeType.HIDDEN);
         hiddenNode.setEndpoint("http://localhost:8080/test");
         hiddenNode.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(hiddenNode);
 
         var edge = new GraphEdge();
         edge.setLeftNodeName(ingressNode.getName());
@@ -128,19 +130,25 @@ public class NodeInboxPollingLogicTest {
         var domainOntology = this.dummyFactory.generateDomainOntology();
         var graph = domainOntology.getGraphs().get(0);
 
-        var ingressAdapter = this.dummyFactory.generateNode();
-        ingressAdapter.setNodeType(NodeType.PUSH);
+        var ingressNode = this.dummyFactory.generateNode();
+        ingressNode.setNodeType(NodeType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
-        ingressAdapter.getInputSubSchemas().add(subSchema);
-        ingressAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        ingressNode.getInputSubSchemas().add(subSchema);
+        ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(ingressNode);
 
         var hiddenNode = this.dummyFactory.generateNode();
         hiddenNode.setNodeType(NodeType.HIDDEN);
         hiddenNode.setEndpoint("http://localhost:8080/test");
         hiddenNode.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(hiddenNode);
+
+        var hiddenComponent = this.dummyFactory.generateComponent();
+        hiddenComponent.setNode(hiddenNode);
+        graph.getComponents().add(hiddenComponent);
 
         var edge = new GraphEdge();
-        edge.setLeftNodeName(ingressAdapter.getName());
+        edge.setLeftNodeName(ingressNode.getName());
         edge.setRightNodeNames(new ArrayList<>());
         edge.getRightNodeNames().add(hiddenNode.getName());
         graph.getEdges().add(edge);

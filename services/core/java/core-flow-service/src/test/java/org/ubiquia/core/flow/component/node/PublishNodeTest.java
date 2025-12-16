@@ -11,15 +11,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.BrokerSettings;
-import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.BrokerType;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.TestHelper;
-import org.ubiquia.core.flow.controller.DomainOntologyController;
-import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
 
@@ -36,16 +32,7 @@ import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 public class PublishNodeTest {
 
     @Autowired
-    private GraphController graphController;
-
-    @Autowired
-    private DomainOntologyController domainOntologyController;
-
-    @Autowired
     private DummyFactory dummyFactory;
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     @Autowired
     private TestHelper testHelper;

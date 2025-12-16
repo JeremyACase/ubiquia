@@ -12,9 +12,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
-import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.common.model.ubiquia.enums.HttpOutputType;
+import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.controller.DomainOntologyController;
 import org.ubiquia.core.flow.controller.GraphController;
@@ -25,9 +25,6 @@ import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ComponentManagerTest {
-
-    @Autowired
-    private ComponentManager componentManager;
 
     @Autowired
     private DomainOntologyController domainOntologyController;
@@ -66,6 +63,7 @@ public class ComponentManagerTest {
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressNode.getInputSubSchemas().add(subSchema);
         ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(ingressNode);
 
         var hiddenNode = this.dummyFactory.generateNode();
         hiddenNode.setNodeType(NodeType.HIDDEN);
@@ -73,6 +71,7 @@ public class ComponentManagerTest {
         hiddenNode.getEgressSettings().setHttpOutputType(HttpOutputType.PUT);
         hiddenNode.setEndpoint("http://localhost:8080/test");
         hiddenNode.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(hiddenNode);
 
         ingressComponent.setNode(ingressNode);
         hiddenComponent.setNode(hiddenNode);
@@ -88,12 +87,10 @@ public class ComponentManagerTest {
         deployment.setGraphName(graph.getName());
         deployment.setDomainVersion(domainOntology.getVersion());
         deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
 
         // Should throw exception since K8s is not enabled.
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            this.componentManager.tryDeployComponentsFor(
-                deployment);
+            this.graphController.tryDeployGraph(deployment);
         });
     }
 
@@ -115,6 +112,7 @@ public class ComponentManagerTest {
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressNode.getInputSubSchemas().add(subSchema);
         ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(ingressNode);
 
         var hiddenNode = this.dummyFactory.generateNode();
         hiddenNode.setNodeType(NodeType.HIDDEN);
@@ -122,6 +120,7 @@ public class ComponentManagerTest {
         hiddenNode.getEgressSettings().setHttpOutputType(HttpOutputType.PUT);
         hiddenNode.setEndpoint("http://localhost:8080/test");
         hiddenNode.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(hiddenNode);
 
         ingressComponent.setNode(ingressNode);
         hiddenComponent.setNode(hiddenNode);
@@ -137,12 +136,10 @@ public class ComponentManagerTest {
         deployment.setGraphName(graph.getName());
         deployment.setDomainVersion(domainOntology.getVersion());
         deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
 
         // Should throw exception since K8s is not enabled.
         Assertions.assertDoesNotThrow(() -> {
-            this.componentManager.tryDeployComponentsFor(
-                deployment);
+            this.graphController.tryDeployGraph(deployment);
         });
     }
 }

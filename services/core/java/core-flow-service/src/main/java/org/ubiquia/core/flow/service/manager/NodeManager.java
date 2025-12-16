@@ -63,9 +63,10 @@ public class NodeManager {
             .graphFinder
             .findGraphWith(graphName, domainOntologyName, version);
 
-        for (var nodeEntity : graphEntity.getNodes()) {
-            var nodeId = nodeEntity.getId();
 
+        for (var nodeEntity : graphEntity.getNodes()) {
+
+            var nodeId = nodeEntity.getId();
             if (this.isNodeCurrentlyDeployedWith(graphName, nodeId)) {
 
                 logger.warn("WARNING: node {} for graph {} is already deployed...",
@@ -147,7 +148,7 @@ public class NodeManager {
 
         var currentlyDeployed = false;
         if (this.nodeMap.containsKey(graphName)
-            && this.nodeMap.get(graphName).containsKey(nodeId)){
+            && this.nodeMap.get(graphName).containsKey(nodeId)) {
 
             currentlyDeployed = true;
         }

@@ -40,24 +40,26 @@ public class Inbox {
     /**
      * Try to query an inbox message for a queue adapter.
      *
-     * @param adapter The adapter to query a message for.
+     * @param node The adapter to query a message for.
      * @return An event associated with the query.
      * @throws JsonProcessingException Exceptions from parsing payloads.
      */
-    public FlowMessage tryQueryInboxMessagesFor(final QueueNode adapter)
+    public FlowMessage tryQueryInboxMessagesFor(final QueueNode node)
         throws JsonProcessingException {
 
-        var adapterContext = adapter.getNodeContext();
+        var nodeContext = node.getNodeContext();
         logger.debug("Querying inbox records for adapter {}...",
-            adapterContext.getNodeName());
+            nodeContext.getNodeName());
 
         var sort = Sort.by("createdAt").ascending();
+
         var pageRequest = PageRequest
             .of(0, 1)
             .withSort(sort);
-        var query = this.flowMessageRepository.findAllByTargetNodeId(
-            pageRequest,
-            adapterContext.getNodeId());
+
+        var query = this
+            .flowMessageRepository
+            .findAllByTargetNodeId(pageRequest, nodeContext.getNodeId());
 
         FlowMessage flowMessage = null;
         if (query.hasContent()) {

@@ -11,9 +11,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.ubiquia.common.model.ubiquia.dto.Node;
-import org.ubiquia.common.model.ubiquia.embeddable.NodeSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphSettings;
+import org.ubiquia.common.model.ubiquia.embeddable.NodeSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.OverrideSettingsStringified;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.service.decorator.node.override.NodeOverrideDecorator;
@@ -52,8 +52,10 @@ public class NodeOverrideDecoratorTest {
 
         var overrideSettings = new OverrideSettingsStringified();
         overrideSettings.setFlag("test");
-        overrideSettings.setKey("adapterSettings");
-        overrideSettings.setValue(this.objectMapper.writeValueAsString(overriddenAdapterSettings));
+        overrideSettings.setKey("nodeSettings");
+        overrideSettings.setValue(this
+            .objectMapper
+            .writeValueAsString(overriddenAdapterSettings));
 
         var overrideSettingsList = new ArrayList<OverrideSettingsStringified>();
         overrideSettingsList.add(overrideSettings);
@@ -62,12 +64,12 @@ public class NodeOverrideDecoratorTest {
         deployment.setGraphSettings(new GraphSettings());
         deployment.getGraphSettings().setFlag("test");
 
-        this.nodeOverrideDecorator.tryOverrideBaselineValues(
-            node,
-            overrideSettingsList,
-            deployment);
+        this
+            .nodeOverrideDecorator
+            .tryOverrideBaselineValues(node, overrideSettingsList, deployment);
 
-        Assertions.assertTrue(node.getNodeSettings().getPersistInputPayload());
+        var isPersistInputPayload = node.getNodeSettings().getPersistInputPayload();
+        Assertions.assertTrue(isPersistInputPayload);
     }
 
     @Test
@@ -79,13 +81,15 @@ public class NodeOverrideDecoratorTest {
         node.setNodeSettings(new NodeSettings());
         node.getNodeSettings().setPersistInputPayload(false);
 
-        var overriddenAdapterSettings = new NodeSettings();
-        overriddenAdapterSettings.setPersistInputPayload(true);
+        var overriddenNodeSettings = new NodeSettings();
+        overriddenNodeSettings.setPersistInputPayload(true);
 
         var overrideSettings = new OverrideSettingsStringified();
         overrideSettings.setFlag("test");
-        overrideSettings.setKey("adapterSettings");
-        overrideSettings.setValue(this.objectMapper.writeValueAsString(overriddenAdapterSettings));
+        overrideSettings.setKey("nodeSettings");
+        overrideSettings.setValue(this
+            .objectMapper
+            .writeValueAsString(overriddenNodeSettings));
 
         var overrideSettingsList = new ArrayList<OverrideSettingsStringified>();
         overrideSettingsList.add(overrideSettings);
@@ -94,10 +98,9 @@ public class NodeOverrideDecoratorTest {
         deployment.setGraphSettings(new GraphSettings());
         deployment.getGraphSettings().setFlag("another_test");
 
-        this.nodeOverrideDecorator.tryOverrideBaselineValues(
-            node,
-            overrideSettingsList,
-            deployment);
+        this
+            .nodeOverrideDecorator
+            .tryOverrideBaselineValues(node, overrideSettingsList, deployment);
 
         Assertions.assertFalse(node.getNodeSettings().getPersistInputPayload());
     }

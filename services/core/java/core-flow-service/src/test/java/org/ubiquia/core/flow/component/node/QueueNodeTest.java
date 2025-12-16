@@ -12,14 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
-import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.common.model.ubiquia.node.QueueNodeEgress;
 import org.ubiquia.core.flow.TestHelper;
-import org.ubiquia.core.flow.controller.DomainOntologyController;
-import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
 
@@ -29,12 +25,6 @@ import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 public class QueueNodeTest {
 
     @Autowired
-    private DomainOntologyController domainOntologyController;
-
-    @Autowired
-    private GraphController graphController;
-
-    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -42,9 +32,6 @@ public class QueueNodeTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     @Autowired
     private TestHelper testHelper;
@@ -60,15 +47,12 @@ public class QueueNodeTest {
         var domainOntology = this.dummyFactory.generateDomainOntology();
         var graph = domainOntology.getGraphs().get(0);
 
-        var ingressComponent = this.dummyFactory.generateComponent();
-        graph.getComponents().add(ingressComponent);
-
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressNode.getInputSubSchemas().add(subSchema);
         ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-        ingressComponent.setNode(ingressNode);
+        graph.getNodes().add(ingressNode);
 
         var queueNode = this.dummyFactory.generateNode();
         queueNode.setNodeType(NodeType.QUEUE);
@@ -81,12 +65,7 @@ public class QueueNodeTest {
         edge.getRightNodeNames().add(queueNode.getName());
         graph.getEdges().add(edge);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var targetUrl = "http://localhost:8080/graph/"
             + graph.getName().toLowerCase()
@@ -124,15 +103,12 @@ public class QueueNodeTest {
         var domainOntology = this.dummyFactory.generateDomainOntology();
         var graph = domainOntology.getGraphs().get(0);
 
-        var ingressComponent = this.dummyFactory.generateComponent();
-        graph.getComponents().add(ingressComponent);
-
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressNode.getInputSubSchemas().add(subSchema);
         ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-        ingressComponent.setNode(ingressNode);
+        graph.getNodes().add(ingressNode);
 
         var queueNode = this.dummyFactory.generateNode();
         queueNode.setNodeType(NodeType.QUEUE);
@@ -145,12 +121,7 @@ public class QueueNodeTest {
         edge.getRightNodeNames().add(queueNode.getName());
         graph.getEdges().add(edge);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var targetUrl = "http://localhost:8080/graph/"
             + graph.getName().toLowerCase()
@@ -191,6 +162,7 @@ public class QueueNodeTest {
         Assertions.assertEquals(
             event.getFlow().getId(),
             popEventOne.getFlowEvent().getFlow().getId());
+
         Assertions.assertEquals(
             0,
             popEventTwo.getQueuedRecords());

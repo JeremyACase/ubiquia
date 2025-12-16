@@ -122,9 +122,7 @@ public class QueueAdapterCommand implements InterfaceLogger {
         throws Exception {
 
         var egress = new QueueNodeEgress();
-        var event = this.flowEventBuilder.makeFlowAndEventFrom(
-            message.getPayload(),
-            node);
+        var event = this.flowEventBuilder.makeEventFrom(message, node);
         event.getFlowEventTimes().setPayloadEgressedTime(OffsetDateTime.now());
         event = this.flowEventRepository.save(event);
 

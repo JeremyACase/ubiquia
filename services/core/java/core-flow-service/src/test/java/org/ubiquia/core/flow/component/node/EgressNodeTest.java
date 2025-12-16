@@ -18,12 +18,9 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
-import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.HttpOutputType;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.TestHelper;
-import org.ubiquia.core.flow.controller.DomainOntologyController;
-import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
 
@@ -31,12 +28,6 @@ import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class EgressNodeTest {
-
-    @Autowired
-    private DomainOntologyController domainOntologyController;
-
-    @Autowired
-    private GraphController graphController;
 
     @Autowired
     private DummyFactory dummyFactory;

@@ -9,13 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.ubiquia.common.library.implementation.service.mapper.ComponentDtoMapper;
-import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.controller.DomainOntologyController;
-import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
-import org.ubiquia.core.flow.repository.ComponentRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -27,9 +23,6 @@ public class ComponentMapperTest {
 
     @Autowired
     private DummyFactory dummyFactory;
-
-    @Autowired
-    private GraphController graphController;
 
     @Autowired
     private TestHelper testHelper;
@@ -61,15 +54,16 @@ public class ComponentMapperTest {
         ingressComponent.setPostStartExecCommands(postExecCommands);
         graph.getComponents().add(ingressComponent);
 
-        var response = this.domainOntologyController.register(domainOntology);
+        var response = this
+            .domainOntologyController
+            .register(domainOntology);
 
-        var domainOntologyDto = this.domainOntologyController.queryModelWithId(response.getId());
-        var graphDto = this.graphController.queryModelWithId(domainOntologyDto
-            .getBody()
-            .getGraphs()
-            .get(0)
-            .getId());
-        var componentDto = graphDto.getBody().getComponents().get(0);
+        var domainOntologyDto = this
+            .domainOntologyController
+            .queryModelWithId(response.getId());
+
+        var graphDto = domainOntologyDto.getBody().getGraphs().get(0);
+        var componentDto = graphDto.getComponents().get(0);
 
         Assertions.assertEquals("0", componentDto.getPostStartExecCommands().get(0));
         Assertions.assertEquals("1", componentDto.getPostStartExecCommands().get(1));

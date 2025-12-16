@@ -53,7 +53,7 @@ public class GraphRegistrar {
     @Autowired
     private GraphValidator graphValidator;
 
-    public void tryRegisterGraphs(
+    public List<GraphEntity> tryRegisterGraphs(
         DomainOntologyEntity domainOntologyEntity,
         final DomainOntology domainOntology)
         throws Exception {
@@ -61,12 +61,16 @@ public class GraphRegistrar {
         logger.info("Registering graphs for domain ontology: {}...",
             domainOntology.getName());
 
+        var graphEntities = new ArrayList<GraphEntity>();
         for (var graph : domainOntology.getGraphs()) {
-            this.tryRegisterGraph(domainOntologyEntity, graph);
+            var graphEntity = this.tryRegisterGraph(domainOntologyEntity, graph);
+            graphEntities.add(graphEntity);
         }
 
         logger.info("...registered graphs for domain ontology: {}.",
             domainOntology.getName());
+
+        return graphEntities;
     }
 
     /**
@@ -224,6 +228,7 @@ public class GraphRegistrar {
         graphEntity.setName(graph.getName());
         graphEntity.setComponents(new HashSet<>());
         graphEntity.setNodes(new HashSet<>());
+        graphEntity.setFlows(new HashSet<>());
         graphEntity.setAgentsDeployingGraph(new ArrayList<>());
 
         graphEntity.setTags(new HashSet<>());

@@ -15,15 +15,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
-import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.component.node.PushNode;
-import org.ubiquia.core.flow.controller.DomainOntologyController;
-import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
 
@@ -32,22 +28,13 @@ import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 public class PayloadModelValidatorTest {
 
     @Autowired
-    private DomainOntologyController domainOntologyController;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private GraphController graphController;
-
-    @Autowired
     private DummyFactory dummyFactory;
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     @Autowired
     private TestHelper testHelper;
@@ -76,20 +63,15 @@ public class PayloadModelValidatorTest {
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressNode.getInputSubSchemas().add(subSchema);
         ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-
         ingressComponent.setNode(ingressNode);
+        graph.getNodes().add(ingressNode);
 
         var edge = new GraphEdge();
         edge.setLeftNodeName(ingressNode.getName());
         edge.setRightNodeNames(new ArrayList<>());
         graph.getEdges().add(edge);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var node = (PushNode) this
             .testHelper
@@ -120,7 +102,7 @@ public class PayloadModelValidatorTest {
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressNode.getInputSubSchemas().add(subSchema);
         ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-
+        graph.getNodes().add(ingressNode);
         ingressComponent.setNode(ingressNode);
 
         var edge = new GraphEdge();
@@ -128,12 +110,7 @@ public class PayloadModelValidatorTest {
         edge.setRightNodeNames(new ArrayList<>());
         graph.getEdges().add(edge);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var node = (PushNode) this
             .testHelper

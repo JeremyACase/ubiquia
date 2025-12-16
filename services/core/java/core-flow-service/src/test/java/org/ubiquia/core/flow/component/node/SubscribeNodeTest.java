@@ -10,7 +10,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.ubiquia.common.model.ubiquia.embeddable.BrokerSettings;
-import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.enums.BrokerType;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
@@ -32,20 +31,12 @@ import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 public class SubscribeNodeTest {
 
     @Autowired
-    private DomainOntologyController domainOntologyController;
-
-    @Autowired
-    private GraphController graphController;
-
-    @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
     @Autowired
     private DummyFactory dummyFactory;
 
     @Autowired
     private TestHelper testHelper;
-
-    private String mostRecentlyConsumedMessage;
 
     @BeforeEach
     public void setup() {
@@ -70,14 +61,10 @@ public class SubscribeNodeTest {
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         subscribeNode.getInputSubSchemas().add(subSchema);
         subscribeNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(subscribeNode);
         subscribeComponent.setNode(subscribeNode);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var node = (SubscribeNode) this
             .testHelper

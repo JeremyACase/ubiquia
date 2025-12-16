@@ -43,10 +43,12 @@ public class TestHelper {
         throws Exception {
 
         this.domainOntologyController.register(domainOntology);
+
         var deployment = new GraphDeployment();
         deployment.setGraphName(graph.getName());
         deployment.setDomainVersion(domainOntology.getVersion());
         deployment.setDomainOntologyName(domainOntology.getName());
+
         this.graphController.tryDeployGraph(deployment);
     }
 
@@ -65,9 +67,7 @@ public class TestHelper {
 
         var nodeEntity = this
             .nodeRepository
-            .findByGraphNameAndName(
-                graphName,
-                nodeName)
+            .findByGraphNameAndName(graphName, nodeName)
             .get();
 
         var node = nodeMap

@@ -11,16 +11,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
-import org.ubiquia.common.model.ubiquia.embeddable.NodeSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
-import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
-import org.ubiquia.common.model.ubiquia.enums.NodeType;
+import org.ubiquia.common.model.ubiquia.embeddable.NodeSettings;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.common.model.ubiquia.enums.HttpOutputType;
+import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.component.node.HiddenNode;
 import org.ubiquia.core.flow.controller.DomainOntologyController;
-import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
@@ -39,9 +37,6 @@ public class TemplateComponentProxyTest {
 
     @Autowired
     private FlowEventBuilder flowEventBuilder;
-
-    @Autowired
-    private GraphController graphController;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -78,6 +73,8 @@ public class TemplateComponentProxyTest {
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressNode.getInputSubSchemas().add(subSchema);
         ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(ingressNode);
+        ingressComponent.setNode(ingressNode);
 
         var hiddenNode = this.dummyFactory.generateNode();
         hiddenNode.setNodeType(NodeType.HIDDEN);
@@ -89,8 +86,7 @@ public class TemplateComponentProxyTest {
         hiddenNode.setEndpoint("http://localhost:8080/test");
         hiddenNode.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
         hiddenNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Cat"));
-
-        ingressComponent.setNode(ingressNode);
+        graph.getNodes().add(hiddenNode);
         hiddenComponent.setNode(hiddenNode);
 
         var edge = new GraphEdge();
@@ -99,25 +95,20 @@ public class TemplateComponentProxyTest {
         edge.getRightNodeNames().add(hiddenNode.getName());
         graph.getEdges().add(edge);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var node = (HiddenNode) this
             .testHelper
             .findNode(hiddenNode.getName(), graph.getName());
 
-        var flowEvent = this.flowEventBuilder.makeFlowAndEventFrom(
-            "test",
-            node);
+        var flowEvent = this
+            .flowEventBuilder
+            .makeFlowAndEventFrom("test", node);
 
         this.templateComponentProxy.proxyAsComponentWith(flowEvent);
-        var fuzzyData = this.objectMapper.readValue(
-            flowEvent.getOutputPayload(),
-            Object.class);
+        var fuzzyData = this
+            .objectMapper
+            .readValue(flowEvent.getOutputPayload(), Object.class);
 
         Assertions.assertDoesNotThrow(() -> {
             this.payloadModelValidator.tryValidateOutputPayloadFor(

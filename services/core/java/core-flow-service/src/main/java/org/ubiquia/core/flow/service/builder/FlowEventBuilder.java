@@ -67,7 +67,7 @@ public class FlowEventBuilder {
 
     @Transactional
     public FlowEventEntity makeFlowAndEventFrom(
-        String inputPayload,
+        final String inputPayload,
         final AbstractNode node)
         throws JsonProcessingException {
 

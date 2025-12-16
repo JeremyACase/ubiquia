@@ -1,40 +1,16 @@
 package org.ubiquia.core.flow.component.node;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.web.client.RestTemplate;
-import org.ubiquia.common.library.implementation.service.mapper.FlowMessageDtoMapper;
 import org.ubiquia.core.flow.TestHelper;
-import org.ubiquia.core.flow.controller.GraphController;
-import org.ubiquia.core.flow.dummy.factory.DummyFactory;
-import org.ubiquia.core.flow.service.command.node.MergeNodeCommand;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class MergeNodeTest {
-
-    @Autowired
-    private DummyFactory dummyFactory;
-
-    @Autowired
-    private FlowMessageDtoMapper flowMessageDtoMapper;
-
-    @Autowired
-    private GraphController graphController;
-
-    @Autowired
-    private MergeNodeCommand mergeNodeCommand;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     @Autowired
     private TestHelper testHelper;

@@ -19,18 +19,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
-import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.embeddable.NodeSettings;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.common.model.ubiquia.enums.HttpOutputType;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.TestHelper;
-import org.ubiquia.core.flow.controller.DomainOntologyController;
-import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
 
@@ -38,15 +34,6 @@ import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class PushNodeTest {
-
-    @Autowired
-    private GraphController graphController;
-
-    @Autowired
-    private DomainOntologyController domainOntologyController;
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     private DummyFactory dummyFactory;
@@ -71,10 +58,8 @@ public class PushNodeTest {
         var domainOntology = this.dummyFactory.generateDomainOntology();
         var graph = domainOntology.getGraphs().get(0);
 
-        var ingressComponent = this.dummyFactory.generateComponent();
         var hiddenComponent = this.dummyFactory.generateComponent();
         hiddenComponent.setComponentType(ComponentType.NONE);
-        graph.getComponents().add(ingressComponent);
         graph.getComponents().add(hiddenComponent);
 
         var ingressNode = this.dummyFactory.generateNode();
@@ -82,6 +67,7 @@ public class PushNodeTest {
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingressNode.getInputSubSchemas().add(subSchema);
         ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(ingressNode);
 
         var hiddenNode = this.dummyFactory.generateNode();
         hiddenNode.setNodeType(NodeType.HIDDEN);
@@ -89,9 +75,8 @@ public class PushNodeTest {
         hiddenNode.getEgressSettings().setHttpOutputType(HttpOutputType.POST);
         hiddenNode.setEndpoint("http://localhost:8080/test");
         hiddenNode.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
-
-        ingressComponent.setNode(ingressNode);
         hiddenComponent.setNode(hiddenNode);
+        graph.getNodes().add(hiddenNode);
 
         var edge = new GraphEdge();
         edge.setLeftNodeName(ingressNode.getName());
@@ -99,12 +84,7 @@ public class PushNodeTest {
         edge.getRightNodeNames().add(hiddenNode.getName());
         graph.getEdges().add(edge);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var node = (HiddenNode) this
             .testHelper
@@ -134,10 +114,8 @@ public class PushNodeTest {
         var domainOntology = this.dummyFactory.generateDomainOntology();
         var graph = domainOntology.getGraphs().get(0);
 
-        var ingressComponent = this.dummyFactory.generateComponent();
         var hiddenComponent = this.dummyFactory.generateComponent();
         hiddenComponent.setComponentType(ComponentType.NONE);
-        graph.getComponents().add(ingressComponent);
         graph.getComponents().add(hiddenComponent);
 
         var ingresNode = this.dummyFactory.generateNode();
@@ -147,6 +125,7 @@ public class PushNodeTest {
         var subSchema = this.dummyFactory.buildSubSchema("Person");
         ingresNode.getInputSubSchemas().add(subSchema);
         ingresNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(ingresNode);
 
         var hiddenNode = this.dummyFactory.generateNode();
         hiddenNode.setNodeType(NodeType.HIDDEN);
@@ -154,8 +133,8 @@ public class PushNodeTest {
         hiddenNode.getEgressSettings().setHttpOutputType(HttpOutputType.POST);
         hiddenNode.setEndpoint("http://localhost:8080/test");
         hiddenNode.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(hiddenNode);
 
-        ingressComponent.setNode(ingresNode);
         hiddenComponent.setNode(hiddenNode);
 
         var edge = new GraphEdge();
@@ -164,12 +143,7 @@ public class PushNodeTest {
         edge.getRightNodeNames().add(hiddenNode.getName());
         graph.getEdges().add(edge);
 
-        this.domainOntologyController.register(domainOntology);
-        var deployment = new GraphDeployment();
-        deployment.setGraphName(graph.getName());
-        deployment.setDomainVersion(domainOntology.getVersion());
-        deployment.setDomainOntologyName(domainOntology.getName());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var node = (PushNode) this
             .testHelper
@@ -185,7 +159,8 @@ public class PushNodeTest {
             response.getBody().getInputPayload(),
             Map.class);
 
-        Assertions.assertEquals(inputPayloadMap.get("testKey"),
+        Assertions.assertEquals(
+            inputPayloadMap.get("testKey"),
             mappedPayload.get("testKey"));
     }
 }

@@ -2,6 +2,7 @@ package org.ubiquia.core.flow.service.registrar;
 
 
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +40,18 @@ public class DomainOntologyRegistrar {
             domainOntology.getName());
 
         var domainOntologyEntity = this.getEntityFrom(domainOntology);
+        domainOntologyEntity = this.domainOntologyRepository.save(domainOntologyEntity);
 
         this
             .domainDataContractRegistrar
             .tryRegisterDomainDataContract(domainOntologyEntity, domainOntology);
 
-        this.graphRegistrar.tryRegisterGraphs(domainOntologyEntity, domainOntology);
+        var graphEntities = this
+            .graphRegistrar
+            .tryRegisterGraphs(domainOntologyEntity, domainOntology);
+
+        domainOntologyEntity.getGraphs().addAll(graphEntities);
+        domainOntologyEntity = this.domainOntologyRepository.save(domainOntologyEntity);
 
         var domainOntologyDto = this.domainOntologyDtoMapper.map(domainOntologyEntity);
 
@@ -54,14 +61,12 @@ public class DomainOntologyRegistrar {
         return domainOntologyDto;
     }
 
-    @Transactional
     private DomainOntologyEntity getEntityFrom(final DomainOntology domainOntology) {
 
         var entity = new DomainOntologyEntity();
+        entity.setGraphs(new ArrayList<>());
         entity.setName(domainOntology.getName());
         entity.setVersion(domainOntology.getVersion());
-        entity = this.domainOntologyRepository.save(entity);
-
         return entity;
     }
 }
