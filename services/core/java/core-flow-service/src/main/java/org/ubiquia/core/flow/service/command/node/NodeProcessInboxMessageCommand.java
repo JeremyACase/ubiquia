@@ -43,18 +43,17 @@ public class NodeProcessInboxMessageCommand {
         final AbstractNode node) {
 
         try {
-            this.payloadModelValidator.tryValidateInputPayloadFor(
-                message.getPayload(),
-                node);
+            this
+                .payloadModelValidator
+                .tryValidateInputPayloadFor(message.getPayload(), node);
 
-            var flowEvent = this.flowEventBuilder.makeFlowAndEventFrom(
-                message.getPayload(),
-                node);
+            var flowEvent = this
+                .flowEventBuilder
+                .makeEventFrom(message, node);
 
-            this.nodePayloadOrchestrator.forwardPayload(
-                flowEvent,
-                node,
-                message.getPayload());
+            this
+                .nodePayloadOrchestrator
+                .forwardPayload(flowEvent, node, message.getPayload());
 
         } catch (Exception e) {
             this.getLogger().error("ERROR: {} could not process inbox message: {}",

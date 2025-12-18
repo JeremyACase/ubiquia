@@ -42,14 +42,14 @@ public class NodeFactory {
         final GraphDeployment graphDeployment)
         throws Exception {
 
-        logger.info("...building an adapter named {} for graph {}...",
+        logger.info("...building an node named {} for graph {}...",
             nodeEntity.getName(),
             graphEntity.getName());
 
         var node = this.makeNodeByType(nodeEntity.getNodeType());
         this.nodeBuilder.buildNodeFrom(node, nodeEntity, graphEntity, graphDeployment);
 
-        logger.info("...completed building adapter {} for graph {}...",
+        logger.info("...completed building node {} for graph {}...",
             nodeEntity.getName(),
             nodeEntity.getGraph().getName());
         return node;
@@ -84,7 +84,7 @@ public class NodeFactory {
             componentEntity.getGraph(),
             graphDeployment);
 
-        logger.info("...completed building adapter for graph {} and component named {}...",
+        logger.info("...completed building node for graph {} and component named {}...",
             componentEntity.getGraph().getName(),
             componentEntity.getName());
 

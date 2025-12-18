@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.Flow;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.common.model.ubiquia.embeddable.FlowEventTimes;
+import org.ubiquia.common.model.ubiquia.entity.FlowEntity;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 import org.ubiquia.core.flow.component.node.AbstractNode;
+import org.ubiquia.core.flow.component.node.MergeNode;
 import org.ubiquia.core.flow.component.node.PollNode;
 import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.repository.FlowRepository;
@@ -92,7 +94,39 @@ public class FlowEventBuilder {
 
     @Transactional
     public FlowEventEntity makeEventFrom(
-        FlowMessage flowMessage,
+        final String mergedPayload,
+        final String flowId,
+        final MergeNode node)
+        throws Exception {
+
+        var flowEvent = this.getEventHelper(node);
+
+        var flowRecord = this.flowRepository.findById(flowId);
+        if (flowRecord.isEmpty()) {
+            throw new IllegalArgumentException("ERROR: Could not flow with ID: "
+                + flowId);
+        }
+
+        var flowEntity = flowRecord.get();
+
+        flowEvent.setFlow(flowEntity);
+        flowEntity.getFlowEvents().add(flowEvent);
+        this.flowRepository.save(flowEntity);
+
+        var nodeContext = node.getNodeContext();
+        if (nodeContext.getNodeSettings().getPersistInputPayload()) {
+            flowEvent.setInputPayload(mergedPayload);
+        }
+
+        this.stamperVisitor.tryStampInputs(flowEvent, mergedPayload);
+        flowEvent = this.flowEventRepository.save(flowEvent);
+
+        return flowEvent;
+    }
+
+    @Transactional
+    public FlowEventEntity makeEventFrom(
+        final FlowMessage flowMessage,
         final AbstractNode node)
         throws Exception {
 

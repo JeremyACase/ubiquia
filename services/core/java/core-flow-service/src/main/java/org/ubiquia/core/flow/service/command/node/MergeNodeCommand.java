@@ -53,17 +53,18 @@ public class MergeNodeCommand implements InterfaceLogger {
     }
 
     @Transactional
-    public void tryProcessMessageFor(final FlowMessage message, final MergeNode adapter) {
+    public void tryProcessMessageFor(final FlowMessage message, final MergeNode node) {
 
         Timer.Sample sample = null;
         if (Objects.nonNull(this.microMeterHelper)) {
             sample = this.microMeterHelper.startSample();
         }
 
-        var nodeContext = adapter.getNodeContext();
+        var nodeContext = node.getNodeContext();
 
         try {
-            var messages = this.flowMessageRepository
+            var messages = this
+                .flowMessageRepository
                 .findAllByTargetNodeIdAndFlowEventFlowId(
                     nodeContext.getNodeId(),
                     message.getFlowEvent().getFlow().getId());
@@ -73,10 +74,10 @@ public class MergeNodeCommand implements InterfaceLogger {
                 var targetNodeRecord = this
                     .nodeRepository
                     .findById(nodeContext.getNodeId());
-                var targetAdapter = targetNodeRecord.get();
+                var targetNode = targetNodeRecord.get();
 
-                var upstreamAdapters = targetAdapter.getUpstreamNodes();
-                if (messages.size() == upstreamAdapters.size()) {
+                var upstreamNodes = targetNode.getUpstreamNodes();
+                if (messages.size() == upstreamNodes.size()) {
 
                     this.getLogger().info("{} has all {} upstream messages "
                             + "with flow id {}; processing...",
@@ -86,15 +87,15 @@ public class MergeNodeCommand implements InterfaceLogger {
 
                     var merged = this.mergeMessages(messages);
 
-                    var event = this.flowEventBuilder.makeFlowAndEventFrom(
-                        merged,
-                        adapter);
+                    var event = this
+                        .flowEventBuilder
+                        .makeEventFrom(merged, message.getFlowEvent().getFlow().getId(), node);
 
-                    this.nodePayloadOrchestrator.forwardPayload(event, adapter, merged);
+                    this.nodePayloadOrchestrator.forwardPayload(event, node, merged);
 
                     this.flowMessageRepository.deleteAll(messages);
                 } else {
-                    this.getLogger().debug(" {} has only {} messages with batch id {}; "
+                    this.getLogger().debug(" {} has only {} messages with flow id {}; "
                             + "not processing...",
                         nodeContext.getNodeName(),
                         messages.size(),
@@ -109,10 +110,9 @@ public class MergeNodeCommand implements InterfaceLogger {
         }
 
         if (Objects.nonNull(sample)) {
-            this.microMeterHelper.endSample(
-                sample,
-                "tryProcessInboxMessage",
-                nodeContext.getTags());
+            this
+                .microMeterHelper
+                .endSample(sample, "tryProcessInboxMessage", nodeContext.getTags());
         }
     }
 

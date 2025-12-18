@@ -137,7 +137,9 @@ public abstract class AbstractNode implements InterfaceLogger {
         var response = ResponseEntity.accepted().body(egress);
 
         if (Objects.nonNull(sample)) {
-            this.microMeterHelper.endSample(sample, "push", this.nodeContext.getTags());
+            this
+                .microMeterHelper
+                .endSample(sample, "push", this.nodeContext.getTags());
         }
 
         return response;

@@ -49,26 +49,26 @@ public class Outbox {
         logger.debug("Received an event with ID {} to queue up for outbox...",
             flowEventEntity.getId());
 
-        var targetAdapterRecord = this
+        var targetNodeRecord = this
             .nodeRepository
             .findById(flowEventEntity.getNode().getId());
 
-        if (!targetAdapterRecord.get().getDownstreamNodes().isEmpty()) {
+        if (!targetNodeRecord.get().getDownstreamNodes().isEmpty()) {
 
             var eventTimes = flowEventEntity.getFlowEventTimes();
             eventTimes.setSentToOutboxTime(OffsetDateTime.now());
-            for (var adapter : targetAdapterRecord.get().getDownstreamNodes()) {
+            for (var nodeEntity : targetNodeRecord.get().getDownstreamNodes()) {
                 logger.debug("Creating an outbox message for event id {} for target node {}",
                     flowEventEntity.getId(),
-                    adapter.getName());
+                    nodeEntity.getName());
                 var message = new FlowMessageEntity();
                 message.setFlowEvent(flowEventEntity);
                 message.setPayload(componentResponse);
                 message.setTags(new HashSet<>());
-                message.setTargetNode(adapter);
+                message.setTargetNode(nodeEntity);
                 message = this.flowMessageRepository.save(message);
-                adapter.getOutboxFlowMessages().add(message);
-                this.nodeRepository.save(adapter);
+                nodeEntity.getOutboxFlowMessages().add(message);
+                this.nodeRepository.save(nodeEntity);
                 flowEventEntity.getFlowMessages().add(message);
             }
             eventTimes.setEventCompleteTime(OffsetDateTime.now());

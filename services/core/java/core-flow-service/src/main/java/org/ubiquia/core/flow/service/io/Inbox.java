@@ -48,7 +48,7 @@ public class Inbox {
         throws JsonProcessingException {
 
         var nodeContext = node.getNodeContext();
-        logger.debug("Querying inbox records for adapter {}...",
+        logger.debug("Querying inbox records for node {}...",
             nodeContext.getNodeName());
 
         var sort = Sort.by("createdAt").ascending();
@@ -76,6 +76,7 @@ public class Inbox {
      * @param node The adapter to query for.
      * @throws JsonProcessingException Exceptions from parsing payloads.
      */
+    @Transactional
     public List<FlowMessage> tryQueryInboxMessagesFor(final AbstractNode node)
         throws JsonProcessingException {
 
@@ -89,9 +90,9 @@ public class Inbox {
             .of(0, pageSize)
             .withSort(sort);
 
-        var query = this.flowMessageRepository.findAllByTargetNodeId(
-            pageRequest,
-            nodeContext.getNodeId());
+        var query = this
+            .flowMessageRepository
+            .findAllByTargetNodeId(pageRequest, nodeContext.getNodeId());
 
         var messages = new ArrayList<FlowMessage>();
         for (var flowMessageEntity : query.getContent()) {
