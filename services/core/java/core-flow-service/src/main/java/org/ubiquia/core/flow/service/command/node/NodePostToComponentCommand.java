@@ -20,7 +20,6 @@ import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 import org.ubiquia.core.flow.component.node.AbstractNode;
 import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.service.visitor.NodeOpenMessageVisitor;
-import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
 
 /**
  * A service that exposes various methods common to all adapters.
@@ -38,9 +37,6 @@ public class NodePostToComponentCommand implements InterfaceLogger {
 
     @Autowired
     private FlowEventRepository flowEventRepository;
-
-    @Autowired
-    private PayloadModelValidator payloadModelValidator;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -73,10 +69,9 @@ public class NodePostToComponentCommand implements InterfaceLogger {
         var request = new HttpEntity<>(inputPayload, headers);
         ResponseEntity<Object> response = null;
         try {
-            response = this.restTemplate.postForEntity(
-                nodeContext.getEndpointUri(),
-                request,
-                Object.class);
+            response = this
+                .restTemplate
+                .postForEntity(nodeContext.getEndpointUri(), request, Object.class);
 
             flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
         } catch (Exception e) {
@@ -116,34 +111,32 @@ public class NodePostToComponentCommand implements InterfaceLogger {
             .bodyValue(inputPayload)
             .retrieve()
             .toEntity(Object.class)
-            .subscribe(
-                response -> {
-                    this.nodeOpenMessageVisitor.decrementOpenMessagesFor(node);
-                    eventTimes.setComponentResponseTime(OffsetDateTime.now());
-                    flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
-                    logger.info("...got response code {} from agent for flow with id {}...",
-                        response.getStatusCode(),
-                        flowEventEntity.getFlow().getId());
-                    try {
-                        this.nodeComponentResponseCommand.processComponentResponse(
-                            flowEventEntity,
-                            node,
-                            response);
-                    } catch (Exception e) {
-                        logger.error("ERROR processing agent response: {}", e.getMessage());
-                    }
-                },
-                error -> {
-                    if (error instanceof HttpStatusCodeException errorCast) {
-                        flowEventEntity.setHttpResponseCode(errorCast.getStatusCode().value());
-                    } else {
-                        logger.error("ERROR response: {} ", error.getMessage());
-                    }
-                    eventTimes.setComponentResponseTime(OffsetDateTime.now());
-                    eventTimes.setEventCompleteTime(OffsetDateTime.now());
-                    this.nodeOpenMessageVisitor.decrementOpenMessagesFor(node);
-                    this.flowEventRepository.save(flowEventEntity);
+            .doOnNext(response -> {
+                this.nodeOpenMessageVisitor.decrementOpenMessagesFor(node);
+                eventTimes.setComponentResponseTime(OffsetDateTime.now());
+                flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
+                logger.info("...got response code {} from component for flow with id {}...",
+                    response.getStatusCode(),
+                    flowEventEntity.getFlow().getId());
+                try {
+                    this
+                        .nodeComponentResponseCommand
+                        .processComponentResponse(flowEventEntity, node, response);
+                } catch (Exception e) {
+                    logger.error("ERROR processing component response: {}", e.getMessage());
                 }
-            );
+            })
+            .doOnError(error -> {
+                if (error instanceof HttpStatusCodeException errorCast) {
+                    flowEventEntity.setHttpResponseCode(errorCast.getStatusCode().value());
+                }
+                logger.error("ERROR response when POSTing to component: {} ",
+                    error.getMessage());
+                eventTimes.setComponentResponseTime(OffsetDateTime.now());
+                eventTimes.setEventCompleteTime(OffsetDateTime.now());
+                this.nodeOpenMessageVisitor.decrementOpenMessagesFor(node);
+                this.flowEventRepository.save(flowEventEntity);
+            })
+            .subscribe();
     }
 }
