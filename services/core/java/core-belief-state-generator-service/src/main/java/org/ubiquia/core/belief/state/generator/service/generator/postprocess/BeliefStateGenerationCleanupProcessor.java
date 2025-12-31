@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GenerationCleanupProcessor {
+public class BeliefStateGenerationCleanupProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(GenerationCleanupProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(BeliefStateGenerationCleanupProcessor.class);
 
     private final List<String> BLACKLISTED_FILENAMES = List.of(
         "AbstractAclModel.java",
@@ -39,7 +39,7 @@ public class GenerationCleanupProcessor {
                     Files.delete(path);
                     logger.info("...deleting blacklisted file: {}", path);
                 } catch (IOException e) {
-                    logger.warn("ERORR: Failed to delete {}: {}!", path, e.getMessage());
+                    logger.warn("ERROR: Failed to delete {}: {}!", path, e.getMessage());
                 }
             });
     }

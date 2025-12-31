@@ -78,15 +78,15 @@ public class AnimalTestModule extends AbstractHelmTestModule {
 
         try {
             var postUrl = "http://"
-                + this.cache.getAcl().getName()
+                + this.cache.getDomainOntology().getName()
                 + "-belief-state-"
-                + this.cache.getAcl().getVersion().toString().replace(".", "-")
+                + this.cache.getDomainOntology().getVersion().toString().replace(".", "-")
                 + ":8080/ubiquia/belief-state-service/Animal/add";
 
             var getUrl = "http://"
-                + this.cache.getAcl().getName()
+                + this.cache.getDomainOntology().getName()
                 + "-belief-state-"
-                + this.cache.getAcl().getVersion().toString().replace(".", "-")
+                + this.cache.getDomainOntology().getVersion().toString().replace(".", "-")
                 + ":8080/ubiquia/belief-state-service/Animal/query/";
 
             var persistedModel = this.postAndRetriever.postAndRetrieve(

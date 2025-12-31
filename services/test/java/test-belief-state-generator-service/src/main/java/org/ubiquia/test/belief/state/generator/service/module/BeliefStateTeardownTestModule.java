@@ -101,8 +101,8 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
             logger.info("Proceeding with tests...");
 
             var generation = new BeliefStateGeneration();
-            generation.setDomainName(this.cache.getAcl().getName());
-            generation.setVersion(this.cache.getAcl().getVersion());
+            generation.setDomainName(this.cache.getDomainOntology().getName());
+            generation.setVersion(this.cache.getDomainOntology().getVersion());
 
             var postUrl = this.beliefStateGeneratorServiceConfig.getUrl()
                 + ":"
@@ -118,7 +118,7 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
 
             var name = this
                 .beliefStateNameBuilder
-                .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
+                .getKubernetesBeliefStateNameFrom(this.cache.getDomainOntology());
 
             this.waitForBeliefStateTearDown(name, Duration.ofSeconds(60));
 
@@ -143,7 +143,7 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
 
         var beliefStateName = this
             .beliefStateNameBuilder
-            .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
+            .getKubernetesBeliefStateNameFrom(this.cache.getDomainOntology());
 
         // Receive updates from Kubernetes when Deployments change
         informer.addEventHandler(new ResourceEventHandler<>() {

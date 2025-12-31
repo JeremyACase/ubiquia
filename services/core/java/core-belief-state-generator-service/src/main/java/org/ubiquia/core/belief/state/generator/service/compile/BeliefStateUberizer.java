@@ -29,9 +29,9 @@ public class BeliefStateUberizer {
      * @throws IOException if file IO fails
      */
     public void createUberJar(
-        String outputJarPath,
-        String compiledClassDir,
-        List<String> dependencyJarPaths
+        final String outputJarPath,
+        final String compiledClassDir,
+        final List<String> dependencyJarPaths
     ) throws IOException {
 
         // Ensure output directory exists

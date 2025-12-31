@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
+import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateCompiler;
 import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateUberizer;
 import org.ubiquia.core.belief.state.generator.service.decorator.EnumNormalizer;
@@ -19,7 +19,7 @@ import org.ubiquia.core.belief.state.generator.service.decorator.InheritancePrep
 import org.ubiquia.core.belief.state.generator.service.decorator.UbiquiaModelInjector;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiDtoGenerator;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiEntityGenerator;
-import org.ubiquia.core.belief.state.generator.service.generator.postprocess.PostProcessor;
+import org.ubiquia.core.belief.state.generator.service.generator.postprocess.BeliefStateGenerationPostProcessor;
 import org.ubiquia.core.belief.state.generator.service.k8s.BeliefStateOperator;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiDtoYamlMapper;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiEntityYamlMapper;
@@ -42,7 +42,7 @@ public class BeliefStateGenerator {
     private BeliefStateOperator beliefStateOperator;
 
     @Autowired
-    private PostProcessor postProcessor;
+    private BeliefStateGenerationPostProcessor beliefStateGenerationPostProcessor;
 
     @Autowired
     private EnumNormalizer enumNormalizer;
@@ -71,55 +71,69 @@ public class BeliefStateGenerator {
     @Autowired
     private BeliefStateUberizer beliefStateUberizer;
 
-    public void generateBeliefStateFrom(final DomainDataContract acl)
+    /**
+     * Given a domain ontology, attempt to generate and deploy a new Belief State for it.
+     *
+     * @param domainOntology The Domain Ontology we're generating a belief state for.
+     * @throws Exception Exceptions from a lot of stuff.
+     */
+    public void generateBeliefStateFrom(final DomainOntology domainOntology)
         throws Exception {
 
-        logger.info("Generating new Belief State from: {}",
-            this.objectMapper.writeValueAsString(acl));
+        logger.info("Generating new Belief State from: {}", this
+            .objectMapper
+            .writeValueAsString(domainOntology));
 
-        var jsonSchema = this.getJsonSchemaFrom(acl);
+        var jsonSchema = this.getJsonSchemaFrom(domainOntology);
 
-        var openApiEntityYaml =
-            this.jsonSchemaToOpenApiEntityYamlMapper
-                .translateJsonSchemaToOpenApiYaml(jsonSchema);
+        var openApiEntityYaml = this
+            .jsonSchemaToOpenApiEntityYamlMapper
+            .translateJsonSchemaToOpenApiYaml(jsonSchema);
+
         this.openApiEntityGenerator.generateOpenApiEntitiesFrom(openApiEntityYaml);
 
-        var openApiDtoYaml =
-            this.jsonSchemaToOpenApiDtoYamlMapper
-                .translateJsonSchemaToOpenApiYaml(jsonSchema);
+        var openApiDtoYaml = this
+            .jsonSchemaToOpenApiDtoYamlMapper
+            .translateJsonSchemaToOpenApiYaml(jsonSchema);
         this.openApiDtoGenerator.generateOpenApiDtosFrom(openApiDtoYaml);
 
-        this.postProcessor.postProcess(acl);
+        this.beliefStateGenerationPostProcessor.postProcess(domainOntology);
 
-        var beliefStateLibraries = this.getJarPaths(this.beliefStateLibsDirectory);
+        var beliefStateLibraries = this.getLibraryJarPaths(this.beliefStateLibsDirectory);
 
-        this.beliefStateCompiler.compileGeneratedSources(
-            "generated",
-            "compiled",
-            beliefStateLibraries);
+        this
+            .beliefStateCompiler
+            .compileGeneratedSources("generated", "compiled", beliefStateLibraries);
 
-        var beliefStateName =
-            acl.getName().toLowerCase()
-                + "-"
-                + acl.getVersion().toString()
-                + ".jar";
+        var beliefStateName = domainOntology
+            .getName().toLowerCase()
+            + "-"
+            + domainOntology.getVersion().toString()
+            + ".jar";
 
         var jarPath = this.uberJarsPath + beliefStateName;
-        this.beliefStateUberizer.createUberJar(
-            jarPath,
-            "compiled",
-            beliefStateLibraries
-        );
+        this
+            .beliefStateUberizer
+            .createUberJar(jarPath, "compiled", beliefStateLibraries);
 
         if (Objects.nonNull(this.beliefStateOperator)) {
-            this.beliefStateOperator.tryDeployBeliefState(acl);
+            this.beliefStateOperator.tryDeployBeliefState(domainOntology);
         }
     }
 
-    private String getJsonSchemaFrom(final DomainDataContract acl)
+    /**
+     * Given a domain ontology, build a JSON Schema to use to generate a new belief state.
+     *
+     * @param domainOntology The domain ontology we're generating a belief state for.
+     * @return The stringified JSON schema.
+     * @throws IOException Exception from IO.
+     */
+    private String getJsonSchemaFrom(final DomainOntology domainOntology)
         throws IOException {
 
-        var jsonSchema = this.objectMapper.writeValueAsString(acl.getJsonSchema());
+        var jsonSchema = this
+            .objectMapper
+            .writeValueAsString(domainOntology.getDomainDataContract().getJsonSchema());
         jsonSchema = this.enumNormalizer.normalizeEnums(jsonSchema);
         jsonSchema = this.ubiquiaModelInjector.appendAclModels(jsonSchema);
         jsonSchema = this.inheritancePreprocessor.appendInheritance(jsonSchema);
@@ -129,7 +143,14 @@ public class BeliefStateGenerator {
         return jsonSchema;
     }
 
-    private List<String> getJarPaths(final String libsDirPath) {
+    /**
+     * Given a location for Belief State libraries, build and return the appropriate
+     * .jar path dependencies.
+     *
+     * @param libsDirPath The path where the libraries exist at.
+     * @return A list of fully-qualified .jar file paths.
+     */
+    private List<String> getLibraryJarPaths(final String libsDirPath) {
         var libsDir = new File(libsDirPath);
         var jarPaths = new ArrayList<String>();
 

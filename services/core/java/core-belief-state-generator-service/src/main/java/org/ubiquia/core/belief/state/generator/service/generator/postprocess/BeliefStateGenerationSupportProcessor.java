@@ -14,10 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.config.AgentConfig;
-import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
+import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 
 @Service
-public class GenerationSupportProcessor {
+public class BeliefStateGenerationSupportProcessor {
 
     @Value("${ubiquia.agent.storage.minio.enabled:false}")
     private Boolean minioEnabled;
@@ -31,7 +31,7 @@ public class GenerationSupportProcessor {
     @Autowired
     private AgentConfig agentConfig;
 
-    public void postProcess(final DomainDataContract acl) throws IOException {
+    public void postProcess(final DomainOntology domainOntology) throws IOException {
         this.copyResourceFromClasspath(
             "template/java/support/Application.java.template",
             "generated/src/main/java/org/ubiquia/acl/generated/Application.java");
@@ -49,7 +49,7 @@ public class GenerationSupportProcessor {
             "generated/src/main/java/org/ubiquia/acl/generated/ObjectController.java");
 
         var tokenMap = new HashMap<String, String>();
-        tokenMap.put("{DOMAIN_NAME}", acl.getName());
+        tokenMap.put("{DOMAIN_NAME}", domainOntology.getName());
         tokenMap.put("{MINIO_ENABLED}", String.valueOf(this.minioEnabled));
         tokenMap.put("{UBIQUIA_AGENT_ID}", this.agentConfig.getId());
 

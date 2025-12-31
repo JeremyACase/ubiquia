@@ -16,7 +16,7 @@ public class EnumNormalizer {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public String normalizeEnums(String rawSchemaJson) throws IOException {
+    public String normalizeEnums(final String rawSchemaJson) throws IOException {
         var normalizedResult = rawSchemaJson;
 
         var root = this.objectMapper.readTree(rawSchemaJson);

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
+import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 
 @SpringBootTest
@@ -31,15 +32,19 @@ public class BeliefStateGeneratorTest {
             schemaPath.toFile(),
             Object.class);
 
-        var acl = new DomainDataContract();
-        acl.setJsonSchema(jsonSchema);
-        acl.setName("pets");
-        acl.setVersion(new SemanticVersion());
-        acl.getVersion().setMajor(1);
-        acl.getVersion().setMinor(2);
-        acl.getVersion().setPatch(3);
+        var domainOntology = new DomainOntology();
+        domainOntology.setName("pets");
+        domainOntology.setVersion(new SemanticVersion());
+        domainOntology.getVersion().setMajor(1);
+        domainOntology.getVersion().setMinor(2);
+        domainOntology.getVersion().setPatch(3);
 
-        Assertions.assertDoesNotThrow(() ->
-            this.beliefStateGenerator.generateBeliefStateFrom(acl));
+        var domainDataContract = new DomainDataContract();
+        domainDataContract.setJsonSchema(jsonSchema);
+        domainOntology.setDomainDataContract(domainDataContract);
+
+        Assertions.assertDoesNotThrow(() -> this
+            .beliefStateGenerator
+            .generateBeliefStateFrom(domainOntology));
     }
 }

@@ -17,7 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.common.library.implementation.service.builder.BeliefStateNameBuilder;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
-import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
+import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
 import org.ubiquia.core.belief.state.generator.service.generator.BeliefStateGenerator;
 import org.ubiquia.core.belief.state.generator.service.k8s.BeliefStateOperator;
@@ -57,13 +57,13 @@ public class BeliefStateGeneratorController {
         var url = this.flowServiceConfig.getUrl()
             + ":"
             + this.flowServiceConfig.getPort()
-            + "/ubiquia/flow-service/agent-communication-language/query/params";
+            + "/ubiquia/flow-service/domain-ontology/query/params";
 
         var uri = UriComponentsBuilder
             .fromHttpUrl(url)
             .queryParam("page", 0)
             .queryParam("size", 1)
-            .queryParam("domain", beliefStateGeneration.getDomainName())
+            .queryParam("name", beliefStateGeneration.getDomainName())
             .queryParam("version.major", beliefStateGeneration.getVersion().getMajor())
             .queryParam("version.minor", beliefStateGeneration.getVersion().getMinor())
             .queryParam("version.patch", beliefStateGeneration.getVersion().getPatch())
@@ -71,25 +71,23 @@ public class BeliefStateGeneratorController {
         logger.debug("...querying URL: {}...", uri);
 
         var responseType = new ParameterizedTypeReference
-            <GenericPageImplementation<DomainDataContract>>() {
+            <GenericPageImplementation<DomainOntology>>() {
         };
 
-        var response = this.restTemplate.exchange(
-            uri,
-            HttpMethod.GET,
-            null,
-            responseType);
+        var response = this
+            .restTemplate
+            .exchange(uri, HttpMethod.GET, null, responseType);
 
         if (!response.getStatusCode().is2xxSuccessful() ||
             Objects.requireNonNull(response.getBody()).getNumberOfElements() <= 0) {
 
-            throw new IllegalArgumentException("Could not find a registered Agent Communication "
-                + "Language for: "
+            throw new IllegalArgumentException("Could not find a registered Domain Ontology "
+                + "for: "
                 + this.objectMapper.writeValueAsString(beliefStateGeneration));
         }
 
-        var acl = response.getBody().getContent().get(0);
-        this.beliefStateGenerator.generateBeliefStateFrom(acl);
+        var domainOntology = response.getBody().getContent().get(0);
+        this.beliefStateGenerator.generateBeliefStateFrom(domainOntology);
 
         logger.info("..generated belief state.");
 

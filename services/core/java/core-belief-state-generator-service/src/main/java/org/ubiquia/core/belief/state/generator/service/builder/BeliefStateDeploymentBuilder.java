@@ -221,10 +221,12 @@ public class BeliefStateDeploymentBuilder {
         var mountPath = this.uberJarsPath + beliefStateJarName;
 
         // Volume mount with subPath
-        container.setVolumeMounts(List.of(new V1VolumeMount()
-            .name("belief-state-jar-volume")
-            .mountPath(mountPath)
-            .subPath(beliefStateJarName)));
+        container
+            .setVolumeMounts(List
+                .of(new V1VolumeMount()
+                    .name("belief-state-jar-volume")
+                    .mountPath(mountPath)
+                    .subPath(beliefStateJarName)));
 
         // Startup command
         container.setCommand(List.of("java"));
