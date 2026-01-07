@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
 import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.core.flow.component.config.bootstrap.DomainOntologyBootstrapConfig;
 import org.ubiquia.core.flow.interfaces.InterfaceBootstrapper;
@@ -49,9 +48,8 @@ public class DomainOntologyBootstrapper implements InterfaceBootstrapper {
         for (var filePath : filePaths) {
             try {
                 logger.info("...bootstrapping file: {}", filePath.getFileName());
-                var domainOntology = yamlMapper.readValue(
-                    filePath.toFile(),
-                    DomainOntology.class);
+                var domainOntology = yamlMapper
+                    .readValue(filePath.toFile(), DomainOntology.class);
                 this.domainOntologyRegistrar.tryRegister(domainOntology);
             } catch (Exception e) {
                 logger.error("Could not not bootstrap file at filepath {}: {}",

@@ -16,7 +16,7 @@ import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
  * A controller that exposes a RESTful interface for adapter.
  */
 @RestController
-@RequestMapping("/ubiquia/flow-service/node")
+@RequestMapping("/ubiquia/core/flow-service/node")
 public class NodeController extends GenericUbiquiaDaoController<NodeEntity, Node> {
 
     private static final Logger logger = LoggerFactory.getLogger(NodeController.class);

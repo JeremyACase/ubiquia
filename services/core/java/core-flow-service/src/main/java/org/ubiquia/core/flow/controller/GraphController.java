@@ -30,7 +30,7 @@ import org.ubiquia.core.flow.service.manager.NodeManager;
 import org.ubiquia.core.flow.service.registrar.GraphRegistrar;
 
 @RestController
-@RequestMapping("/ubiquia/flow-service/graph")
+@RequestMapping("/ubiquia/core/flow-service/graph")
 public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Graph> {
 
     private static final Logger logger = LoggerFactory.getLogger(GraphController.class);

@@ -20,7 +20,7 @@ import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
  * A controller that exposes a RESTful interface for agents.
  */
 @RestController
-@RequestMapping("/ubiquia/flow-service/agent")
+@RequestMapping("/ubiquia/core/flow-service/agent")
 public class AgentController implements InterfaceLogger {
 
     private static final Logger logger = LoggerFactory.getLogger(AgentController.class);

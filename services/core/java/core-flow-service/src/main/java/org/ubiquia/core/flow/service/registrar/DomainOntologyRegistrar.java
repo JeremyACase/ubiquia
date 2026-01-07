@@ -64,6 +64,8 @@ public class DomainOntologyRegistrar {
     private DomainOntologyEntity getEntityFrom(final DomainOntology domainOntology) {
 
         var entity = new DomainOntologyEntity();
+        entity.setAuthor(domainOntology.getAuthor());
+        entity.setDescription(domainOntology.getDescription());
         entity.setGraphs(new ArrayList<>());
         entity.setName(domainOntology.getName());
         entity.setVersion(domainOntology.getVersion());

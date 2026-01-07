@@ -9,6 +9,10 @@ import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 @Entity
 public class DomainOntologyEntity extends AbstractModelEntity {
 
+    private String author;
+
+    private String description;
+
     private String name;
 
     @OneToMany(
@@ -59,5 +63,21 @@ public class DomainOntologyEntity extends AbstractModelEntity {
 
     public void setDomainDataContract(DomainDataContractEntity domainDataContract) {
         this.domainDataContract = domainDataContract;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -2,6 +2,7 @@ package org.ubiquia.test.belief.state.generator.service.module;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.IOException;
 import java.nio.file.Paths;
 import org.slf4j.Logger;
@@ -55,9 +56,10 @@ public class DomainOntologyRegistrationTestModule extends AbstractHelmTestModule
         var domainOntologyFilepath = Paths.get(this.ontologyFilepath);
         DomainOntology domainOntology = null;
 
+        var yamlMapper = new ObjectMapper(new YAMLFactory());
+
         try {
-            domainOntology = this
-                .objectMapper
+            domainOntology = yamlMapper
                 .readValue(domainOntologyFilepath.toFile(), DomainOntology.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -81,14 +83,14 @@ public class DomainOntologyRegistrationTestModule extends AbstractHelmTestModule
                     .getUrl()
                     + ":"
                     + this.flowServiceConfig.getPort()
-                    + "/ubiquia/flow-service/domain-ontology/query";
+                    + "/ubiquia/core/flow-service/domain-ontology/query";
 
                 var postUrl = this
                     .flowServiceConfig
                     .getUrl()
                     + ":"
                     + this.flowServiceConfig.getPort()
-                    + "/ubiquia/flow-service/domain-ontology/register/post";
+                    + "/ubiquia/core/flow-service/domain-ontology/register/post";
 
                 var persistedOntology = this
                     .postAndRetriever
@@ -117,7 +119,7 @@ public class DomainOntologyRegistrationTestModule extends AbstractHelmTestModule
         var uri = UriComponentsBuilder.fromHttpUrl(this
                 .flowServiceConfig
                 .getUrl() + ":" + this.flowServiceConfig.getPort())
-            .path("/ubiquia/flow-service/domain-ontology/query/params")
+            .path("/ubiquia/core/flow-service/domain-ontology/query/params")
             .queryParam("page", "0")
             .queryParam("size", "1")
             .queryParam("name", ontology.getName())
@@ -129,7 +131,8 @@ public class DomainOntologyRegistrationTestModule extends AbstractHelmTestModule
         logger.info("...querying URI {}...", uri);
 
         var typeReference = new ParameterizedTypeReference<
-            GenericPageImplementation<DomainOntology>>() {};
+            GenericPageImplementation<DomainOntology>>() {
+        };
 
         var response = this
             .restTemplate

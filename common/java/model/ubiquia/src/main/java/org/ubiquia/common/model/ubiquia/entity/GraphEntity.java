@@ -55,7 +55,6 @@ public class GraphEntity extends AbstractModelEntity {
         this.name = name;
     }
 
-    @NotNull
     public String getAuthor() {
         return author;
     }

@@ -33,6 +33,8 @@ public class DomainOntologyDtoMapper extends GenericDtoMapper<
 
             super.setAbstractEntityFields(from, to);
 
+            to.setAuthor(from.getAuthor());
+            to.setDescription(from.getDescription());
             to.setName(from.getName());
             to.setGraphs(this.graphDtoMapper.map(from.getGraphs()));
             to.setVersion(from.getVersion());

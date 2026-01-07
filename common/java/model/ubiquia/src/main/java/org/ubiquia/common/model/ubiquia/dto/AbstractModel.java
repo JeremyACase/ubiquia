@@ -19,11 +19,12 @@ import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
     property = "modelType",
     visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = Node.class, name = "Adapter"),
+    @JsonSubTypes.Type(value = Node.class, name = "Node"),
     @JsonSubTypes.Type(value = FlowEvent.class, name = "FlowEvent"),
     @JsonSubTypes.Type(value = FlowMessage.class, name = "FlowMessage"),
     @JsonSubTypes.Type(value = Component.class, name = "Component"),
-    @JsonSubTypes.Type(value = DomainDataContract.class, name = "AgentCommunicationLanguage"),
+    @JsonSubTypes.Type(value = DomainOntology.class, name = "DomainOntology"),
+    @JsonSubTypes.Type(value = DomainDataContract.class, name = "DomainDataContract"),
     @JsonSubTypes.Type(value = ObjectMetadata.class, name = "ObjectMetadata"),
     @JsonSubTypes.Type(value = Graph.class, name = "Graph"),
 })

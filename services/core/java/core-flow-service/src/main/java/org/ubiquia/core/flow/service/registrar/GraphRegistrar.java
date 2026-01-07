@@ -88,7 +88,7 @@ public class GraphRegistrar {
 
         logger.info("...registering graph {} for domain {}...",
             graph.getName(),
-            graph.getDomainOntology().getName());
+            domainOntologyEntity.getName());
 
         this.tryCleanGraphRegistration(graph);
 

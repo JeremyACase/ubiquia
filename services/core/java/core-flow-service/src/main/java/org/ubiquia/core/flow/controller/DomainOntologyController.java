@@ -26,7 +26,7 @@ import org.ubiquia.core.flow.service.command.controller.DomainOntologyDestroyCom
 import org.ubiquia.core.flow.service.registrar.DomainOntologyRegistrar;
 
 @RestController
-@RequestMapping("/ubiquia/flow-service/domain-ontology")
+@RequestMapping("/ubiquia/core/flow-service/domain-ontology")
 public class DomainOntologyController extends GenericUbiquiaDaoController<
     DomainOntologyEntity,
     DomainOntology> {
@@ -98,21 +98,16 @@ public class DomainOntologyController extends GenericUbiquiaDaoController<
     }
 
     @PostMapping(value = "/register/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public IngressResponse upload(@RequestParam("file") MultipartFile file) {
+    public IngressResponse upload(@RequestParam("file") MultipartFile file) throws Exception {
         this.getLogger().info("Received uploaded ontology; processing...");
 
         IngressResponse response = null;
 
-        try {
-            var payload = IOUtils.toString(file.getInputStream(), StandardCharsets.UTF_8);
-            var yamlMapper = new ObjectMapper(new YAMLFactory());
-            var domainOntology = yamlMapper.readValue(payload, DomainOntology.class);
-            var registeredOntology = this.domainOntologyRegistrar.tryRegister(domainOntology);
-            response = super.ingressResponseBuilder.buildIngressResponseFrom(registeredOntology);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("ERROR: Could not transform file into ontology: "
-                + e.getMessage());
-        }
+        var payload = IOUtils.toString(file.getInputStream(), StandardCharsets.UTF_8);
+        var yamlMapper = new ObjectMapper(new YAMLFactory());
+        var domainOntology = yamlMapper.readValue(payload, DomainOntology.class);
+        var registeredOntology = this.domainOntologyRegistrar.tryRegister(domainOntology);
+        response = super.ingressResponseBuilder.buildIngressResponseFrom(registeredOntology);
 
         return response;
     }

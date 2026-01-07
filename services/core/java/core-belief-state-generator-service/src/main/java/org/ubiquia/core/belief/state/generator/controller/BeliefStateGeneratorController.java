@@ -57,7 +57,7 @@ public class BeliefStateGeneratorController {
         var url = this.flowServiceConfig.getUrl()
             + ":"
             + this.flowServiceConfig.getPort()
-            + "/ubiquia/flow-service/domain-ontology/query/params";
+            + "/ubiquia/core/flow-service/domain-ontology/query/params";
 
         var uri = UriComponentsBuilder
             .fromHttpUrl(url)

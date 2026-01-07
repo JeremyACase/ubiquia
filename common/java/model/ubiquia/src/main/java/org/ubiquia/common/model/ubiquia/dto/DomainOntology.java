@@ -9,6 +9,10 @@ public class DomainOntology extends AbstractModel {
 
     private String name;
 
+    private String author;
+
+    private String description;
+
     private List<Graph> graphs;
 
     private DomainDataContract domainDataContract;
@@ -52,5 +56,21 @@ public class DomainOntology extends AbstractModel {
 
     public void setDomainDataContract(DomainDataContract domainDataContract) {
         this.domainDataContract = domainDataContract;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

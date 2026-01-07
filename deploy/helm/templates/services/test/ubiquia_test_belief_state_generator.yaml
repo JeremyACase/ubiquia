@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ubiquia-test-belief-state-generator-acls
+  name: ubiquia-test-belief-state-generator-ontologies
 data:
-{{ (.Files.Glob "bootstrap/acls/*.json").AsConfig | indent 2 }}
+{{ (.Files.Glob "bootstrap/ontologies/*.yaml").AsConfig | indent 2 }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -70,8 +70,8 @@ data:
         enabled: true
         namespace: {{ .Release.Namespace }}      
       test:
-        acl:
-          filepath: /app/etc/pets-acl.json
+        ontology:
+          filepath: /app/etc/pets.yaml
 ---
 apiVersion: v1
 kind: Pod
@@ -92,13 +92,13 @@ spec:
         - name: config
           mountPath: /app/etc/application.yaml
           subPath: application.yaml
-        - name: ubiquia-test-belief-state-generator-acls
-          mountPath: /app/etc/pets-acl.json
-          subPath: pets-acl.json
+        - name: ubiquia-test-belief-state-generator-ontologies
+          mountPath: /app/etc/pets.yaml
+          subPath: pets.yaml
   volumes:
     - name: config
       configMap:
         name: ubiquia-test-belief-state-generator-config
-    - name: ubiquia-test-belief-state-generator-acls
+    - name: ubiquia-test-belief-state-generator-ontologies
       configMap:
-        name: ubiquia-test-belief-state-generator-acls
+        name: ubiquia-test-belief-state-generator-ontologies

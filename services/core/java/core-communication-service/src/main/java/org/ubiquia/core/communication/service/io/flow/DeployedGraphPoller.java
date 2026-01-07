@@ -244,7 +244,7 @@ public class DeployedGraphPoller {
 
         var targetUri = UriComponentsBuilder
             .fromHttpUrl(this.flowServiceConfig.getUrl() + ":" + this.flowServiceConfig.getPort())
-            .path("/ubiquia/flow-service/ubiquia-agent/{agentId}/get-deployed-graph-ids")
+            .path("/ubiquia/core/flow-service/agent/{agentId}/get-deployed-graph-ids")
             .queryParam("page", pageNumber)
             .queryParam("size", pageSize)
             .buildAndExpand(this.agentConfig.getId())

@@ -39,7 +39,6 @@ public class Graph extends AbstractModel {
         this.name = name;
     }
 
-    @NotNull
     public String getAuthor() {
         return author;
     }

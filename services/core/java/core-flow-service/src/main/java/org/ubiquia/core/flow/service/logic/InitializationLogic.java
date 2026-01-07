@@ -51,7 +51,7 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
             try {
                 this.domainOntologyBootstrapper.bootstrap();
             } catch (Exception e) {
-                logger.error("ERROR bootstrapping ACL - could not initialize: {}",
+                logger.error("ERROR bootstrapping domain ontolgoy - could not initialize: {}",
                     e.getMessage());
             }
         }
