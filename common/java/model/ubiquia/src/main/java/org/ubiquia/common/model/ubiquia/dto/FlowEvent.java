@@ -1,15 +1,13 @@
 package org.ubiquia.common.model.ubiquia.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import org.ubiquia.common.model.ubiquia.embeddable.FlowEventTimes;
 
 public class FlowEvent extends AbstractModel {
 
-    private Adapter adapter;
+    private Flow flow;
 
-    private String flowId;
+    private Node node;
 
     private Object inputPayload;
 
@@ -23,27 +21,17 @@ public class FlowEvent extends AbstractModel {
 
     private List<KeyValuePair> outputPayloadStamps;
 
-    @Schema(readOnly = true)
-    @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
-    public String getFlowId() {
-        return this.flowId;
-    }
-
-    public void setFlowId(String flowId) {
-        this.flowId = flowId;
-    }
-
     @Override
     public String getModelType() {
         return "FlowEvent";
     }
 
-    public Adapter getAdapter() {
-        return adapter;
+    public Node getAdapter() {
+        return node;
     }
 
-    public void setAdapter(Adapter adapter) {
-        this.adapter = adapter;
+    public void setAdapter(Node node) {
+        this.node = node;
     }
 
     public Object getInputPayload() {
@@ -92,5 +80,21 @@ public class FlowEvent extends AbstractModel {
 
     public void setFlowEventTimes(FlowEventTimes flowEventTimes) {
         this.flowEventTimes = flowEventTimes;
+    }
+
+    public Flow getFlow() {
+        return flow;
+    }
+
+    public void setFlow(Flow flow) {
+        this.flow = flow;
+    }
+
+    public Node getNode() {
+        return node;
+    }
+
+    public void setNode(Node node) {
+        this.node = node;
     }
 }

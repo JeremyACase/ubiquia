@@ -7,30 +7,23 @@ import jakarta.validation.constraints.NotNull;
 @Embeddable
 public class GraphDeployment {
 
-    private String name;
+    private String graphName;
+
+    private String domainOntologyName;
+
+    private SemanticVersion domainVersion;
 
     private Cardinality cardinality;
 
     private GraphSettings graphSettings;
 
-    private SemanticVersion version;
-
     @NotNull
-    public String getName() {
-        return name;
+    public String getGraphName() {
+        return graphName;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @NotNull
-    public SemanticVersion getVersion() {
-        return version;
-    }
-
-    public void setVersion(SemanticVersion version) {
-        this.version = version;
+    public void setGraphName(String graphName) {
+        this.graphName = graphName;
     }
 
     public GraphSettings getGraphSettings() {
@@ -47,5 +40,21 @@ public class GraphDeployment {
 
     public void setCardinality(Cardinality cardinality) {
         this.cardinality = cardinality;
+    }
+
+    public String getDomainOntologyName() {
+        return domainOntologyName;
+    }
+
+    public void setDomainOntologyName(String domainOntologyName) {
+        this.domainOntologyName = domainOntologyName;
+    }
+
+    public SemanticVersion getDomainVersion() {
+        return domainVersion;
+    }
+
+    public void setDomainVersion(SemanticVersion domainVersion) {
+        this.domainVersion = domainVersion;
     }
 }

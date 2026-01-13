@@ -31,7 +31,7 @@ public class Component extends AbstractModel {
 
     private LivenessProbe livenessProbe;
 
-    private Adapter adapter;
+    private Node node;
 
     private Graph graph;
 
@@ -64,12 +64,12 @@ public class Component extends AbstractModel {
         this.port = port;
     }
 
-    public Adapter getAdapter() {
-        return adapter;
+    public Node getNode() {
+        return node;
     }
 
-    public void setAdapter(Adapter adapter) {
-        this.adapter = adapter;
+    public void setNode(Node node) {
+        this.node = node;
     }
 
     public Graph getGraph() {

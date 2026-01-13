@@ -54,7 +54,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Pod labels
 */}}
 {{- define "ubiquia.podLabels" -}}
-{{- range $key, $val := .Values.config.podLabels -}}
+{{- range $key, $val := .Values.config.podLabels }}
 {{ $key }}: {{ $val | quote }}
 {{- end }}
 {{- end }}
@@ -74,16 +74,14 @@ Create the name of the service account to use
 {{ .Values.ubiquia.components.core.beliefStateGeneratorService.image.registry }}/{{ .Values.ubiquia.components.core.beliefStateGeneratorService.image.repository }}:{{ .Values.ubiquia.components.core.beliefStateGeneratorService.image.tag }}
 {{- end }}
 
-
 {{- define "ubiquia.core.communicationService.image" -}}
 {{ .Values.ubiquia.components.core.communicationService.image.registry }}/{{ .Values.ubiquia.components.core.communicationService.image.repository }}:{{ .Values.ubiquia.components.core.communicationService.image.tag }}
 {{- end }}
 
 {{- define "ubiquia.core.flowService.image" -}}
 {{ .Values.ubiquia.components.core.flowService.image.registry }}/{{ .Values.ubiquia.components.core.flowService.image.repository }}:{{ .Values.ubiquia.components.core.flowService.image.tag }}
+{{- end }}
 
 {{- define "ubiquia.test.beliefStateGeneratorService.image" -}}
 {{ .Values.ubiquia.components.test.beliefStateGeneratorService.image.registry }}/{{ .Values.ubiquia.components.test.beliefStateGeneratorService.image.repository }}:{{ .Values.ubiquia.components.test.beliefStateGeneratorService.image.tag }}
-{{- end }}
-
 {{- end }}

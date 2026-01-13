@@ -89,13 +89,13 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
         logger.info("Proceeding with tests...");
 
         var generation = new BeliefStateGeneration();
-        generation.setDomainName(this.cache.getAcl().getDomain());
-        generation.setVersion(this.cache.getAcl().getVersion());
+        generation.setDomainName(this.cache.getDomainOntology().getName());
+        generation.setVersion(this.cache.getDomainOntology().getVersion());
 
         var postUrl = this.beliefStateGeneratorServiceConfig.getUrl()
             + ":"
             + this.beliefStateGeneratorServiceConfig.getPort()
-            + "/ubiquia/belief-state-generator/belief-state/generate";
+            + "/ubiquia/core/belief-state-generator/belief-state/generate";
 
         logger.info("POSTing to URL: {}", postUrl);
 
@@ -118,7 +118,7 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
         if (!this.beliefStateDeploymentCreated) {
             var name = this
                 .beliefStateNameBuilder
-                .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
+                .getKubernetesBeliefStateNameFrom(this.cache.getDomainOntology());
             this.testState.addFailure("A belief state was never created with name: " + name);
         }
 
@@ -142,7 +142,7 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
 
         var beliefStateName = this
             .beliefStateNameBuilder
-            .getKubernetesBeliefStateNameFrom(this.cache.getAcl());
+            .getKubernetesBeliefStateNameFrom(this.cache.getDomainOntology());
 
         // Receive updates from Kubernetes when Deployments change
         informer.addEventHandler(new ResourceEventHandler<>() {

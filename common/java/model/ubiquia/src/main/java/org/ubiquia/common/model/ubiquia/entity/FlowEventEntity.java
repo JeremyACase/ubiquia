@@ -15,11 +15,13 @@ import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 @Entity
 public class FlowEventEntity extends AbstractModelEntity {
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "adapter_event_join_id", nullable = false)
-    private AdapterEntity adapter;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "node_event_join_id", nullable = false)
+    private NodeEntity node;
 
-    private String flowId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "flow_event_join_id", nullable = false)
+    private FlowEntity flow;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
@@ -60,23 +62,13 @@ public class FlowEventEntity extends AbstractModelEntity {
     })
     private Set<KeyValuePair> outputPayloadStamps;
 
-    @Pattern(regexp = "^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$")
     @NotNull
-    public String getFlowId() {
-        return this.flowId;
+    public NodeEntity getNode() {
+        return node;
     }
 
-    public void setFlowId(String flowId) {
-        this.flowId = flowId;
-    }
-
-    @NotNull
-    public AdapterEntity getAdapter() {
-        return adapter;
-    }
-
-    public void setAdapter(AdapterEntity adapterEntity) {
-        this.adapter = adapterEntity;
+    public void setNode(NodeEntity nodeEntity) {
+        this.node = nodeEntity;
     }
 
     public String getInputPayload() {
@@ -133,5 +125,13 @@ public class FlowEventEntity extends AbstractModelEntity {
 
     public void setFlowEventTimes(FlowEventTimes flowEventTimes) {
         this.flowEventTimes = flowEventTimes;
+    }
+
+    public FlowEntity getFlow() {
+        return flow;
+    }
+
+    public void setFlow(FlowEntity flow) {
+        this.flow = flow;
     }
 }

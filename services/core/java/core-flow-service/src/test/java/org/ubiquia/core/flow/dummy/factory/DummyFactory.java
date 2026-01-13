@@ -2,28 +2,29 @@ package org.ubiquia.core.flow.dummy.factory;
 
 import static org.instancio.Select.field;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import org.instancio.Instancio;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
-import org.ubiquia.common.model.ubiquia.dto.Adapter;
-import org.ubiquia.common.model.ubiquia.dto.Component;
-import org.ubiquia.common.model.ubiquia.dto.Graph;
-import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
-import org.ubiquia.common.model.ubiquia.embeddable.NameAndVersionPair;
+import org.ubiquia.common.model.ubiquia.dto.*;
+import org.ubiquia.common.model.ubiquia.embeddable.NodeSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.model.ubiquia.embeddable.SubSchema;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
-import org.ubiquia.core.flow.mock.MockRegistrar;
 
 
 @Service
 public class DummyFactory {
 
     @Autowired
-    private MockRegistrar mockRegistrar;
+    private ObjectMapper objectMapper;
+
+    @Value("${ubiquia.test.acl.schema.filepath}")
+    private String schemaFilepath;
 
     /**
      * Helper method to build a subschema provided a name.
@@ -42,27 +43,65 @@ public class DummyFactory {
      *
      * @return A dummy adapter.
      */
-    public Adapter generateAdapter() {
+    public Node generateNode() {
         var adapter = Instancio
-            .of(Adapter.class)
+            .of(Node.class)
             .ignore(field(AbstractModel::getId))
             .ignore(field(AbstractModel::getCreatedAt))
             .ignore(field(AbstractModel::getUpdatedAt))
-            .ignore(field(Adapter::getGraph))
-            .ignore(field(Adapter::getBrokerSettings))
-            .ignore(field(Adapter::getComponent))
-            .ignore(field(Adapter::getDownstreamAdapters))
-            .ignore(field(Adapter::getEgressSettings))
-            .ignore(field(Adapter::getOutputSubSchema))
-            .ignore(field(Adapter::getPollSettings))
-            .ignore(field(Adapter::getOverrideSettings))
-            .ignore(field(Adapter::getAdapterType))
-            .set(field(Adapter::getAdapterSettings), new AdapterSettings())
-            .set(field(Adapter::getFlowEvents), new ArrayList<>())
-            .set(field(Adapter::getInputSubSchemas), new ArrayList<>())
+            .ignore(field(Node::getGraph))
+            .ignore(field(Node::getBrokerSettings))
+            .ignore(field(Node::getComponent))
+            .ignore(field(Node::getDownstreamNodes))
+            .ignore(field(Node::getEgressSettings))
+            .ignore(field(Node::getOutputSubSchema))
+            .ignore(field(Node::getPollSettings))
+            .ignore(field(Node::getOverrideSettings))
+            .ignore(field(Node::getNodeType))
+            .set(field(Node::getNodeSettings), new NodeSettings())
+            .set(field(Node::getFlowEvents), new ArrayList<>())
+            .set(field(Node::getInputSubSchemas), new ArrayList<>())
             .set(field(AbstractModel::getModelType), "Adapter")
             .create();
         return adapter;
+    }
+
+    public DomainOntology generateDomainOntology() throws IOException {
+
+        var graphs = new ArrayList<Graph>();
+        graphs.add(this.generateGraph());
+
+        var domainOntology = Instancio
+            .of(DomainOntology.class)
+            .ignore(field(AbstractModel::getId))
+            .ignore(field(AbstractModel::getCreatedAt))
+            .ignore(field(AbstractModel::getUpdatedAt))
+            .set(field(AbstractModel::getModelType), "DomainOntology")
+            .set(field(DomainOntology::getVersion), this.getSemanticVersion())
+            .set(field(DomainOntology::getDomainDataContract), this.generateDomainContract())
+            .set(field(DomainOntology::getGraphs), graphs)
+            .create();
+
+        return domainOntology;
+
+    }
+
+    public DomainDataContract generateDomainContract() throws IOException {
+
+        var schemaPath = Paths.get(this.schemaFilepath);
+        var jsonSchema = this.objectMapper.readValue(
+            schemaPath.toFile(),
+            Object.class);
+
+        var domainDataContract = Instancio
+            .of(DomainDataContract.class)
+            .ignore(field(AbstractModel::getId))
+            .ignore(field(AbstractModel::getCreatedAt))
+            .ignore(field(AbstractModel::getUpdatedAt))
+            .set(field(AbstractModel::getModelType), "Component")
+            .set(field(DomainDataContract::getSchema), jsonSchema)
+            .create();
+        return domainDataContract;
     }
 
     /**
@@ -76,7 +115,7 @@ public class DummyFactory {
             .ignore(field(AbstractModel::getId))
             .ignore(field(AbstractModel::getCreatedAt))
             .ignore(field(AbstractModel::getUpdatedAt))
-            .ignore(field(Component::getAdapter))
+            .ignore(field(Component::getNode))
             .ignore(field(Component::getConfig))
             .ignore(field(Component::getEnvironmentVariables))
             .ignore(field(Component::getGraph))
@@ -92,25 +131,16 @@ public class DummyFactory {
      *
      * @return A dummy graph.
      */
-    public Graph generateGraph() throws IOException {
-
-        var acl = this.mockRegistrar.tryRegisterAcl();
-
-        var nameAndVersionPair = new NameAndVersionPair();
-        nameAndVersionPair.setName(acl.getDomain());
-        nameAndVersionPair.setVersion(acl.getVersion());
+    public Graph generateGraph() {
 
         var graph = Instancio
             .of(Graph.class)
             .ignore(field(AbstractModel::getId))
             .ignore(field(AbstractModel::getCreatedAt))
             .ignore(field(AbstractModel::getUpdatedAt))
-            .set(field(Graph::getAdapters), new ArrayList<>())
+            .set(field(Graph::getNodes), new ArrayList<>())
             .set(field(Graph::getComponents), new ArrayList<>())
-            .set(field(Graph::getComponentlessAdapters), new ArrayList<>())
             .set(field(Graph::getEdges), new ArrayList<>())
-            .set(field(Graph::getVersion), this.getSemanticVersion())
-            .set(field(Graph::getAgentCommunicationLanguage), nameAndVersionPair)
             .set(field(AbstractModel::getModelType), "Graph")
             .create();
         return graph;

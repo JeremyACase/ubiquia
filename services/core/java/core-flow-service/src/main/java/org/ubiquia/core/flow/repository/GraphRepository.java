@@ -8,16 +8,17 @@ import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 public interface GraphRepository
     extends AbstractEntityRepository<GraphEntity> {
 
-    Optional<GraphEntity> findByNameAndVersionMajorAndVersionMinorAndVersionPatch(
+    Optional<GraphEntity> findByNameAndDomainOntologyNameAndDomainOntologyVersionMajorAndDomainOntologyVersionMinorAndDomainOntologyVersionPatch(
         final String graphName,
+        final String domainOntologyName,
         final Integer major,
         final Integer minor,
         final Integer patch);
 
-    Optional<GraphEntity> findByNameAndVersionMajorAndVersionMinorAndVersionPatchAndUbiquiaAgentsDeployingGraphId(
-        final String graphName,
+    Optional<GraphEntity> findByDomainOntologyNameAndDomainOntologyVersionMajorAndDomainOntologyVersionMinorAndDomainOntologyVersionPatchAndAgentsDeployingGraphId(
+        final String domainOntologyName,
         final Integer major,
         final Integer minor,
         final Integer patch,
-        final String id);
+        final String graphId);
 }

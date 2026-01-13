@@ -6,8 +6,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.library.belief.state.libraries.controller.AbstractAclModelController;
-import org.ubiquia.common.model.acl.embeddable.KeyValuePair;
+import org.ubiquia.common.library.belief.state.libraries.controller.AbstractDomainModelController;
+import org.ubiquia.common.model.domain.embeddable.KeyValuePair;
 
 /**
  * A builder service to help ensure our Ubiquia multi-agent system provides observability in a
@@ -26,7 +26,7 @@ public class MicroMeterTagsBuilder {
      * @return A list of key-value-pair tags.
      */
     public List<KeyValuePair> buildControllerTagsFor(
-        final AbstractAclModelController controller) {
+        final AbstractDomainModelController controller) {
 
         var tags = new ArrayList<KeyValuePair>();
 

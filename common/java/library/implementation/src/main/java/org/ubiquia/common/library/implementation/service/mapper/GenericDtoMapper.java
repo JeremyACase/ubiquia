@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
@@ -24,11 +25,38 @@ public abstract class GenericDtoMapper<
     @Autowired
     protected ObjectMapper objectMapper;
 
+    /**
+     * Map from a list of entities to a list of DTOs.
+     *
+     * @param froms The entities to map from.
+     * @return A list of mapped DTOs.
+     * @throws JsonProcessingException Exceptions from processing payload strings.
+     */
     public List<T> map(final List<F> froms) throws JsonProcessingException {
         var tos = new ArrayList<T>();
-        for (var from : froms) {
-            var to = this.map(from);
-            tos.add(to);
+        if (Objects.nonNull(froms)) {
+            for (var from : froms) {
+                var to = this.map(from);
+                tos.add(to);
+            }
+        }
+        return tos;
+    }
+
+    /**
+     * Map from a hashset of entities to a list of DTOs.
+     *
+     * @param froms The entities to map from.
+     * @return A list of mapped DTOs.
+     * @throws JsonProcessingException Exceptions from processing payload strings.
+     */
+    public List<T> map(final Set<F> froms) throws JsonProcessingException {
+        var tos = new ArrayList<T>();
+        if (Objects.nonNull(froms)) {
+            for (var from : froms) {
+                var to = this.map(from);
+                tos.add(to);
+            }
         }
         return tos;
     }

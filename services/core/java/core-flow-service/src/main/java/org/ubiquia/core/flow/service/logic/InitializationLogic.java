@@ -7,11 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.service.io.bootstrap.AclBootstrapper;
 import org.ubiquia.core.flow.service.io.bootstrap.BeliefStateBootstrapper;
-import org.ubiquia.core.flow.service.io.bootstrap.DagBootstrapper;
+import org.ubiquia.core.flow.service.io.bootstrap.DomainOntologyBootstrapper;
 import org.ubiquia.core.flow.service.k8s.ComponentOperator;
-import org.ubiquia.core.flow.service.logic.ubiquia.UbiquiaAgentLogic;
+import org.ubiquia.core.flow.service.logic.agent.AgentLogic;
 
 
 /**
@@ -23,25 +22,22 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
     private static final Logger logger = LoggerFactory.getLogger(InitializationLogic.class);
 
     @Autowired(required = false)
-    private AclBootstrapper aclBootstrapper;
+    private DomainOntologyBootstrapper domainOntologyBootstrapper;
 
     @Autowired(required = false)
     private BeliefStateBootstrapper beliefStateBootstrapper;
 
     @Autowired(required = false)
-    private DagBootstrapper dagBootstrapper;
-
-    @Autowired(required = false)
     private ComponentOperator componentOperator;
 
     @Autowired
-    private UbiquiaAgentLogic ubiquiaAgentLogic;
+    private AgentLogic agentLogic;
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         logger.info("Initializing Flow instance...");
 
-        this.ubiquiaAgentLogic.tryInitializeAgentInDatabase();
+        this.agentLogic.tryInitializeAgentInDatabase();
 
         if (Objects.nonNull(this.componentOperator)) {
             try {
@@ -51,11 +47,11 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
             }
         }
 
-        if (Objects.nonNull(this.aclBootstrapper)) {
+        if (Objects.nonNull(this.domainOntologyBootstrapper)) {
             try {
-                this.aclBootstrapper.bootstrap();
+                this.domainOntologyBootstrapper.bootstrap();
             } catch (Exception e) {
-                logger.error("ERROR bootstrapping ACL - could not initialize: {}",
+                logger.error("ERROR bootstrapping domain ontolgoy - could not initialize: {}",
                     e.getMessage());
             }
         }
@@ -66,14 +62,6 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
             } catch (Exception e) {
                 logger.error("ERROR bootstrapping belief state - could not initialize: {}",
                     e.getMessage());
-            }
-        }
-
-        if (Objects.nonNull(this.dagBootstrapper)) {
-            try {
-                this.dagBootstrapper.bootstrap();
-            } catch (Exception e) {
-                logger.error("ERROR - could not initialize: {}", e.getMessage());
             }
         }
 

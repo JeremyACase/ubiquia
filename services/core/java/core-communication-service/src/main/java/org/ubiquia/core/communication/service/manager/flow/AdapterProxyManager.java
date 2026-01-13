@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
-import org.ubiquia.common.library.implementation.service.builder.AdapterEndpointRecordBuilder;
+import org.ubiquia.common.library.implementation.service.builder.NodeEndpointRecordBuilder;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
 
 /**
@@ -48,7 +48,7 @@ public class AdapterProxyManager {
     private final HashMap<String, String> proxiedAdapterEndpoints = new HashMap<>();
 
     @Autowired
-    private AdapterEndpointRecordBuilder adapterEndpointRecordBuilder;
+    private NodeEndpointRecordBuilder nodeEndpointRecordBuilder;
 
     @Autowired
     private FlowServiceConfig flowServiceConfig;
@@ -62,7 +62,7 @@ public class AdapterProxyManager {
      *
      * <p>
      * For each adapter with {@code exposeViaCommService == true}, computes the adapter's
-     * proxied base path using {@link AdapterEndpointRecordBuilder#getBasePathFor(String, String)}
+     * proxied base path using {@link NodeEndpointRecordBuilder#getBasePathFor(String, String)}
      * and stores it in the in-memory registry if not already present.
      * </p>
      *
@@ -71,7 +71,7 @@ public class AdapterProxyManager {
     public void tryProcessNewlyDeployedGraph(final Graph graph) {
 
         var adaptersToProxy = graph
-            .getAdapters()
+            .getNodes()
             .stream()
             .filter(adapter ->
                 Boolean.TRUE.equals(
@@ -83,7 +83,7 @@ public class AdapterProxyManager {
             var adapterName = adapter.getName().toLowerCase();
             if (!this.proxiedAdapterEndpoints.containsKey(adapterName)) {
                 logger.info("Registering proxy for adapter: {}", adapter.getName());
-                var endpoint = this.adapterEndpointRecordBuilder.getBasePathFor(
+                var endpoint = this.nodeEndpointRecordBuilder.getBasePathFor(
                     graph.getName(),
                     adapterName);
                 logger.info("...proxying base url: {}", endpoint);
@@ -105,7 +105,7 @@ public class AdapterProxyManager {
      * @param graph the torn-down graph whose adapters should be unproxied
      */
     public void tryProcessNewlyTornDownGraph(final Graph graph) {
-        var adaptersToUnproxy = graph.getAdapters().stream()
+        var adaptersToUnproxy = graph.getNodes().stream()
             .filter(adapter -> Boolean.TRUE.equals(
                 adapter.getCommunicationServiceSettings().getExposeViaCommService()))
             .toList();

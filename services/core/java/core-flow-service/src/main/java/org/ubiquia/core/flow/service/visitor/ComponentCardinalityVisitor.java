@@ -30,7 +30,7 @@ public class ComponentCardinalityVisitor {
             var match = cardinality
                 .getComponentSettings()
                 .stream()
-                .filter(x -> x.getName().equals(componentName))
+                .filter(x -> x.getComponentName().equals(componentName))
                 .findFirst();
 
             if (match.isPresent()) {
@@ -59,10 +59,19 @@ public class ComponentCardinalityVisitor {
         var match = cardinality
             .getComponentSettings()
             .stream()
-            .filter(x -> x.getName().equals(componentName))
+            .filter(x -> x.getComponentName().equals(componentName))
             .findFirst();
 
-        cardinalityEnabled = match.get().getEnabled();
+        if (match.isEmpty()) {
+            throw new IllegalArgumentException("ERROR: Could not find component name: "
+                + componentName);
+        }
+
+        var replicas = match.get().getReplicas();
+
+        if (replicas >= 1) {
+            cardinalityEnabled = true;
+        }
 
         return cardinalityEnabled;
     }

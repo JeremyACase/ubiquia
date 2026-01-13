@@ -11,13 +11,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.ubiquia.common.library.api.config.UbiquiaAgentConfig;
-import org.ubiquia.common.library.api.repository.UbiquiaAgentRepository;
+import org.ubiquia.common.library.api.config.AgentConfig;
+import org.ubiquia.common.library.api.repository.AgentRepository;
 import org.ubiquia.common.library.belief.state.libraries.repository.ObjectMetadataEntityRepository;
 import org.ubiquia.common.library.implementation.service.mapper.ObjectMetadataDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
 import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;
-import org.ubiquia.common.model.ubiquia.entity.UbiquiaAgentEntity;
+import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 
 /**
  * A service meant to store relational object metadata in a relational database for any
@@ -38,10 +38,10 @@ public class ObjectMetadataService {
     private ObjectMetadataDtoMapper objectMetadataDtoMapper;
 
     @Autowired
-    private UbiquiaAgentRepository ubiquiaAgentRepository;
+    private AgentRepository agentRepository;
 
     @Autowired
-    private UbiquiaAgentConfig ubiquiaAgentConfig;
+    private AgentConfig agentConfig;
 
     /**
      * Persist the object metadata into the relational database.
@@ -83,14 +83,14 @@ public class ObjectMetadataService {
     private ObjectMetadataEntity buildMetadataEntityFrom(
         final MultipartFile file,
         final String bucketName,
-        final UbiquiaAgentEntity agent) {
+        final AgentEntity agent) {
 
         var metadataEntity = new ObjectMetadataEntity();
         metadataEntity.setBucketName(bucketName);
         metadataEntity.setSize(file.getSize());
         metadataEntity.setContentType(file.getContentType());
         metadataEntity.setOriginalFilename(file.getOriginalFilename());
-        metadataEntity.setUbiquiaAgent(agent);
+        metadataEntity.setAgent(agent);
         metadataEntity = this.objectMetadataEntityRepository.save(metadataEntity);
 
         return metadataEntity;
@@ -103,24 +103,24 @@ public class ObjectMetadataService {
      * @throws SQLException Exceptions from database stuff.
      */
     @Transactional
-    private UbiquiaAgentEntity getUbiquiaAgent() throws SQLException {
-        var agentRecord = this.ubiquiaAgentRepository
-            .findById(this.ubiquiaAgentConfig.getId());
+    private AgentEntity getUbiquiaAgent() throws SQLException {
+        var agentRecord = this.agentRepository
+            .findById(this.agentConfig.getId());
 
         if (agentRecord.isEmpty()) {
             logger.error("ERROR: Could not find agent with ID: {}",
-                this.ubiquiaAgentConfig.getId());
+                this.agentConfig.getId());
 
             if (this.isRunningH2()) {
                 this.initializeInMemoryDatabaseAgent();
-                agentRecord = this.ubiquiaAgentRepository.findById(
-                    this.ubiquiaAgentConfig.getId());
+                agentRecord = this.agentRepository.findById(
+                    this.agentConfig.getId());
             }
         }
         var agent = agentRecord.get();
 
         logger.debug("...persisting metadata against agent id '{}'...",
-            this.ubiquiaAgentConfig.getId());
+            this.agentConfig.getId());
         return agent;
     }
 
@@ -159,12 +159,12 @@ public class ObjectMetadataService {
     public void initializeInMemoryDatabaseAgent() {
         logger.info("...service is running a local in-memory database; " +
                 "initializing inter agent id: {}...",
-            this.ubiquiaAgentConfig.getId());
+            this.agentConfig.getId());
 
-        var entity = new UbiquiaAgentEntity();
+        var entity = new AgentEntity();
         entity.setDeployedGraphs(new ArrayList<>());
-        entity.setId(this.ubiquiaAgentConfig.getId());
-        entity = this.ubiquiaAgentRepository.save(entity);
+        entity.setId(this.agentConfig.getId());
+        entity = this.agentRepository.save(entity);
         logger.info("...created ubiquia agent entity with id: {}", entity.getId());
 
         logger.info("...finished initialization.");

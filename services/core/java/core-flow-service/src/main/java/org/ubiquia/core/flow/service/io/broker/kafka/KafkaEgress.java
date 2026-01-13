@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
+import org.ubiquia.core.flow.component.node.AbstractNode;
 import org.ubiquia.core.flow.interfaces.InterfaceBrokerEgress;
 
 /**
@@ -34,9 +34,9 @@ public class KafkaEgress implements InterfaceBrokerEgress {
      * @param adapter The adapter to publish a payload for.
      */
     @Override
-    public void tryPublishPayload(final String payload, final AbstractAdapter adapter) {
+    public void tryPublishPayload(final String payload, final AbstractNode adapter) {
         this.kafkaTemplate.send(
-            adapter.getAdapterContext().getBrokerSettings().getTopic(),
+            adapter.getNodeContext().getBrokerSettings().getTopic(),
             payload);
     }
 }

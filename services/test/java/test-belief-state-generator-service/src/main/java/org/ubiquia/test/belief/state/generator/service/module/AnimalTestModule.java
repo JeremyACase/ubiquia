@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
-import org.ubiquia.common.model.acl.dto.AbstractAclModel;
+import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
 import org.ubiquia.common.test.helm.component.GenericAclPostAndRetriever;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
 import org.ubiquia.test.belief.state.generator.model.Animal;
@@ -53,9 +53,9 @@ public class AnimalTestModule extends AbstractHelmTestModule {
 
         var animal = Instancio
             .of(Animal.class)
-            .ignore(field(AbstractAclModel::getUbiquiaId))
-            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
-            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
+            .ignore(field(AbstractDomainModel::getUbiquiaId))
+            .ignore(field(AbstractDomainModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractDomainModel::getUbiquiaUpdatedAt))
             .ignore(field(Animal::getOwner))
             .set(field(Animal::getName), name)
             .create();
@@ -78,15 +78,15 @@ public class AnimalTestModule extends AbstractHelmTestModule {
 
         try {
             var postUrl = "http://"
-                + this.cache.getAcl().getDomain()
+                + this.cache.getDomainOntology().getName()
                 + "-belief-state-"
-                + this.cache.getAcl().getVersion().toString().replace(".", "-")
+                + this.cache.getDomainOntology().getVersion().toString().replace(".", "-")
                 + ":8080/ubiquia/belief-state-service/Animal/add";
 
             var getUrl = "http://"
-                + this.cache.getAcl().getDomain()
+                + this.cache.getDomainOntology().getName()
                 + "-belief-state-"
-                + this.cache.getAcl().getVersion().toString().replace(".", "-")
+                + this.cache.getDomainOntology().getVersion().toString().replace(".", "-")
                 + ":8080/ubiquia/belief-state-service/Animal/query/";
 
             var persistedModel = this.postAndRetriever.postAndRetrieve(

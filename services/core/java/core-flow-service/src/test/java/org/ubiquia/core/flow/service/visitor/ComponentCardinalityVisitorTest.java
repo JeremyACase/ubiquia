@@ -6,16 +6,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.embeddable.Cardinality;
 import org.ubiquia.common.model.ubiquia.embeddable.CardinalitySetting;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
-import org.ubiquia.common.model.ubiquia.enums.AdapterType;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.common.model.ubiquia.enums.HttpOutputType;
+import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.TestHelper;
+import org.ubiquia.core.flow.controller.DomainOntologyController;
 import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
@@ -24,13 +24,13 @@ import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 public class ComponentCardinalityVisitorTest {
 
     @Autowired
+    private DomainOntologyController domainOntologyController;
+
+    @Autowired
     private GraphController graphController;
 
     @Autowired
     private DummyFactory dummyFactory;
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     @Autowired
     private TestHelper testHelper;
@@ -41,64 +41,10 @@ public class ComponentCardinalityVisitorTest {
     }
 
     @Test
-    public void assertDoesNotDeployAdapter_isValid() throws Exception {
+    public void assertDeploysNode_isValid() throws Exception {
 
-        var graph = this.dummyFactory.generateGraph();
-
-        var ingressComponent = this.dummyFactory.generateComponent();
-        var hiddenComponent = this.dummyFactory.generateComponent();
-        hiddenComponent.setComponentType(ComponentType.NONE);
-        graph.getComponents().add(ingressComponent);
-        graph.getComponents().add(hiddenComponent);
-
-        var ingressAdapter = this.dummyFactory.generateAdapter();
-        ingressAdapter.setAdapterType(AdapterType.PUSH);
-        var subSchema = this.dummyFactory.buildSubSchema("Person");
-        ingressAdapter.getInputSubSchemas().add(subSchema);
-        ingressAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
-
-        var hiddenAdapter = this.dummyFactory.generateAdapter();
-        hiddenAdapter.setAdapterType(AdapterType.HIDDEN);
-        hiddenAdapter.setEgressSettings(new EgressSettings());
-        hiddenAdapter.getEgressSettings().setHttpOutputType(HttpOutputType.POST);
-        hiddenAdapter.setEndpoint("http://localhost:8080/test");
-        hiddenAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
-
-        ingressComponent.setAdapter(ingressAdapter);
-        hiddenComponent.setAdapter(hiddenAdapter);
-
-        var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getName());
-        edge.setRightAdapterNames(new ArrayList<>());
-        edge.getRightAdapterNames().add(hiddenAdapter.getName());
-        graph.getEdges().add(edge);
-
-        this.graphController.register(graph);
-
-        var setting = new CardinalitySetting();
-        setting.setEnabled(false);
-        setting.setName(ingressComponent.getName());
-
-        var cardinality = new Cardinality();
-        cardinality.setComponentSettings(new ArrayList<>());
-        cardinality.getComponentSettings().add(setting);
-
-        var deployment = new GraphDeployment();
-        deployment.setName(graph.getName());
-        deployment.setVersion(graph.getVersion());
-        deployment.setCardinality(cardinality);
-
-        this.graphController.tryDeployGraph(deployment);
-
-        // Should be null because our adapter's component's cardinality was toggled false
-        var adapter = this.testHelper.findAdapter(ingressAdapter.getName(), graph.getName());
-        Assertions.assertNull(adapter);
-    }
-
-    @Test
-    public void assertDeploysAdapter_isValid() throws Exception {
-
-        var graph = this.dummyFactory.generateGraph();
+        var domainOntology = this.dummyFactory.generateDomainOntology();
+        var graph = domainOntology.getGraphs().get(0);
 
         var ingressComponent = this.dummyFactory.generateComponent();
         var hiddenComponent = this.dummyFactory.generateComponent();
@@ -106,47 +52,49 @@ public class ComponentCardinalityVisitorTest {
         graph.getComponents().add(ingressComponent);
         graph.getComponents().add(hiddenComponent);
 
-        var ingressAdapter = this.dummyFactory.generateAdapter();
-        ingressAdapter.setAdapterType(AdapterType.PUSH);
+        var ingressNode = this.dummyFactory.generateNode();
+        ingressNode.setNodeType(NodeType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
-        ingressAdapter.getInputSubSchemas().add(subSchema);
-        ingressAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        ingressNode.getInputSubSchemas().add(subSchema);
+        ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(ingressNode);
 
-        var hiddenAdapter = this.dummyFactory.generateAdapter();
-        hiddenAdapter.setAdapterType(AdapterType.HIDDEN);
-        hiddenAdapter.setEgressSettings(new EgressSettings());
-        hiddenAdapter.getEgressSettings().setHttpOutputType(HttpOutputType.POST);
-        hiddenAdapter.setEndpoint("http://localhost:8080/test");
-        hiddenAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
+        var hiddenNode = this.dummyFactory.generateNode();
+        hiddenNode.setNodeType(NodeType.HIDDEN);
+        hiddenNode.setEgressSettings(new EgressSettings());
+        hiddenNode.getEgressSettings().setHttpOutputType(HttpOutputType.POST);
+        hiddenNode.setEndpoint("http://localhost:8080/test");
+        hiddenNode.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(hiddenNode);
 
-        ingressComponent.setAdapter(ingressAdapter);
-        hiddenComponent.setAdapter(hiddenAdapter);
+        ingressComponent.setNode(ingressNode);
+        hiddenComponent.setNode(hiddenNode);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getName());
-        edge.setRightAdapterNames(new ArrayList<>());
-        edge.getRightAdapterNames().add(hiddenAdapter.getName());
+        edge.setLeftNodeName(ingressNode.getName());
+        edge.setRightNodeNames(new ArrayList<>());
+        edge.getRightNodeNames().add(hiddenNode.getName());
         graph.getEdges().add(edge);
 
-        this.graphController.register(graph);
-
         var setting = new CardinalitySetting();
-        setting.setEnabled(true);
-        setting.setName(ingressComponent.getName());
+        setting.setReplicas(1);
+        setting.setComponentName(ingressComponent.getName());
 
         var cardinality = new Cardinality();
         cardinality.setComponentSettings(new ArrayList<>());
         cardinality.getComponentSettings().add(setting);
 
         var deployment = new GraphDeployment();
-        deployment.setName(graph.getName());
-        deployment.setVersion(graph.getVersion());
         deployment.setCardinality(cardinality);
 
+        this.domainOntologyController.register(domainOntology);
+        deployment.setGraphName(graph.getName());
+        deployment.setDomainVersion(domainOntology.getVersion());
+        deployment.setDomainOntologyName(domainOntology.getName());
         this.graphController.tryDeployGraph(deployment);
 
-        // Should not be null because our adapter's component's cardinality was toggled true
-        var adapter = this.testHelper.findAdapter(ingressAdapter.getName(), graph.getName());
-        Assertions.assertNotNull(adapter);
+        // Should not be null because our node's component's cardinality was set with a replica
+        var node = this.testHelper.findNode(ingressNode.getName(), graph.getName());
+        Assertions.assertNotNull(node);
     }
 }

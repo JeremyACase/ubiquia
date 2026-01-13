@@ -84,9 +84,6 @@ data:
         flow-service:
           bootstrap:
             enabled: {{ .Values.ubiquia.agent.flowService.bootstrap.enabled }}          
-            acl:
-              enabled: true
-              directory:  /app/etc/acls/
             belief-state:
               enabled: true
               deployments:
@@ -97,6 +94,9 @@ data:
                     minor: {{ $v.version.minor }}
                     patch: {{ $v.version.patch }}
                 {{- end }}
+            domain-ontology:
+              enabled: true
+              directory:  /app/etc/domain-ontologies/
             graph:
               enabled: true
               directory: /app/etc/graphs/

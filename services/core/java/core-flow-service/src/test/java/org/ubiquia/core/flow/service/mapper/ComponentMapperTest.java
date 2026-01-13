@@ -9,11 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.ubiquia.common.library.implementation.service.mapper.ComponentDtoMapper;
 import org.ubiquia.core.flow.TestHelper;
-import org.ubiquia.core.flow.controller.GraphController;
+import org.ubiquia.core.flow.controller.DomainOntologyController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
-import org.ubiquia.core.flow.repository.ComponentRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -21,16 +19,10 @@ import org.ubiquia.core.flow.repository.ComponentRepository;
 public class ComponentMapperTest {
 
     @Autowired
-    private ComponentDtoMapper componentDtoMapper;
-
-    @Autowired
-    private ComponentRepository componentRepository;
+    private DomainOntologyController domainOntologyController;
 
     @Autowired
     private DummyFactory dummyFactory;
-
-    @Autowired
-    private GraphController graphController;
 
     @Autowired
     private TestHelper testHelper;
@@ -50,7 +42,8 @@ public class ComponentMapperTest {
     @Transactional
     public void assertEgressOrderMatchesIngress_isValid() throws Exception {
 
-        var graph = this.dummyFactory.generateGraph();
+        var domainOntology = this.dummyFactory.generateDomainOntology();
+        var graph = domainOntology.getGraphs().get(0);
 
         var postExecCommands = new ArrayList<String>();
         postExecCommands.add("0");
@@ -61,10 +54,16 @@ public class ComponentMapperTest {
         ingressComponent.setPostStartExecCommands(postExecCommands);
         graph.getComponents().add(ingressComponent);
 
-        var response = this.graphController.register(graph);
+        var response = this
+            .domainOntologyController
+            .register(domainOntology);
 
-        var graphDto = this.graphController.queryModelWithId(response.getId());
-        var componentDto = graphDto.getBody().getComponents().get(0);
+        var domainOntologyDto = this
+            .domainOntologyController
+            .queryModelWithId(response.getId());
+
+        var graphDto = domainOntologyDto.getBody().getGraphs().get(0);
+        var componentDto = graphDto.getComponents().get(0);
 
         Assertions.assertEquals("0", componentDto.getPostStartExecCommands().get(0));
         Assertions.assertEquals("1", componentDto.getPostStartExecCommands().get(1));

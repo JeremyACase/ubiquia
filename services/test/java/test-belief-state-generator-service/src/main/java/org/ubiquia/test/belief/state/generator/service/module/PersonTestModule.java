@@ -14,7 +14,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.ubiquia.common.model.acl.dto.AbstractAclModel;
+import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.test.helm.component.GenericAclPostAndRetriever;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
@@ -57,9 +57,9 @@ public class PersonTestModule extends AbstractHelmTestModule {
 
         var person = Instancio
             .of(Person.class)
-            .ignore(field(AbstractAclModel::getUbiquiaId))
-            .ignore(field(AbstractAclModel::getUbiquiaCreatedAt))
-            .ignore(field(AbstractAclModel::getUbiquiaUpdatedAt))
+            .ignore(field(AbstractDomainModel::getUbiquiaId))
+            .ignore(field(AbstractDomainModel::getUbiquiaCreatedAt))
+            .ignore(field(AbstractDomainModel::getUbiquiaUpdatedAt))
             .set(field(Person::getPets), pets)
             .set(field(Person::getName), name)
             .create();
@@ -82,15 +82,15 @@ public class PersonTestModule extends AbstractHelmTestModule {
 
         try {
             var postUrl = "http://"
-                + this.cache.getAcl().getDomain()
+                + this.cache.getDomainOntology().getName()
                 + "-belief-state-"
-                + this.cache.getAcl().getVersion().toString().replace(".", "-")
+                + this.cache.getDomainOntology().getVersion().toString().replace(".", "-")
                 + ":8080/ubiquia/belief-state-service/Person/add";
 
             var getUrl = "http://"
-                + this.cache.getAcl().getDomain()
+                + this.cache.getDomainOntology().getName()
                 + "-belief-state-"
-                + this.cache.getAcl().getVersion().toString().replace(".", "-")
+                + this.cache.getDomainOntology().getVersion().toString().replace(".", "-")
                 + ":8080/ubiquia/belief-state-service/Person/query/";
 
             var persistedModel = this.postAndRetriever.postAndRetrieve(
@@ -130,9 +130,9 @@ public class PersonTestModule extends AbstractHelmTestModule {
                 Person>>() {};
 
         var getUrl = "http://"
-            + this.cache.getAcl().getDomain()
+            + this.cache.getDomainOntology().getName()
             + "-belief-state-"
-            + this.cache.getAcl().getVersion().toString().replace(".", "-")
+            + this.cache.getDomainOntology().getVersion().toString().replace(".", "-")
             + ":8080/ubiquia/belief-state-service/Person/query/params?page=0&size=1&pets.ubiquiaId="
             + this.cache.getAnimal().getUbiquiaId();
 

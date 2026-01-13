@@ -4,14 +4,14 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
+import org.ubiquia.common.model.domain.entity.AbstractDomainModelEntity;
 
 /**
  * An interface defining methods for models for generated belief states.
  *
  * @param <T> The generated entity type.
  */
-public interface EntityRepository<T extends AbstractAclModelEntity>
+public interface EntityRepository<T extends AbstractDomainModelEntity>
     extends PagingAndSortingRepository<T, String>,
     CrudRepository<T, String> {
 

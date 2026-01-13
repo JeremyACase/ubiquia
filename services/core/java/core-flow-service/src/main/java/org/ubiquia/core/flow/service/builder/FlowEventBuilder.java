@@ -6,26 +6,33 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.model.ubiquia.dto.Flow;
+import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.common.model.ubiquia.embeddable.FlowEventTimes;
+import org.ubiquia.common.model.ubiquia.entity.FlowEntity;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
-import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
-import org.ubiquia.core.flow.component.adapter.PollAdapter;
-import org.ubiquia.core.flow.repository.AdapterRepository;
+import org.ubiquia.core.flow.component.node.AbstractNode;
+import org.ubiquia.core.flow.component.node.MergeNode;
+import org.ubiquia.core.flow.component.node.PollNode;
 import org.ubiquia.core.flow.repository.FlowEventRepository;
+import org.ubiquia.core.flow.repository.FlowRepository;
+import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.service.visitor.StamperVisitor;
 
 @Service
-@Transactional
 public class FlowEventBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(FlowEventBuilder.class);
     @Autowired
-    private AdapterRepository adapterRepository;
+    private NodeRepository nodeRepository;
+    @Autowired
+    private FlowBuilder flowBuilder;
+    @Autowired
+    private FlowRepository flowRepository;
     @Autowired
     private FlowEventRepository flowEventRepository;
     @Autowired
@@ -36,54 +43,113 @@ public class FlowEventBuilder {
     /**
      * Make an event for a Poll adapter.
      *
-     * @param adapter The adapter to use to make an event.
+     * @param node The node to use to make an event.
      * @return A new Event.
      */
-    public FlowEventEntity makeEventFrom(final PollAdapter adapter) {
-        var flowEvent = this.getEventHelper(adapter);
+    @Transactional
+    public FlowEventEntity makeFlowAndEventFrom(final PollNode node) {
 
-        // We haven't received an upstream event in this method; we're assuming it's a new batch
-        flowEvent.setFlowId(UUID.randomUUID().toString());
+        var flowEntity = this.flowBuilder.makeFlowFrom(node);
 
-        var eventTimes = flowEvent.getFlowEventTimes();
-        eventTimes.setPollStartedTime(OffsetDateTime.now());
+        var flowEvent = this.getEventHelper(node);
+
+        // Because poll node
+        flowEvent
+            .getFlowEventTimes()
+            .setPollStartedTime(OffsetDateTime.now());
+
+        flowEvent.setFlow(flowEntity);
+        flowEntity.getFlowEvents().add(flowEvent);
+        this.flowRepository.save(flowEntity);
+
         flowEvent = this.flowEventRepository.save(flowEvent);
 
         return flowEvent;
     }
 
-    public FlowEventEntity makeEventFrom(
+    @Transactional
+    public FlowEventEntity makeFlowAndEventFrom(
         final String inputPayload,
-        final AbstractAdapter adapter) throws JsonProcessingException {
+        final AbstractNode node)
+        throws JsonProcessingException {
 
-        var flowEvent = this.getEventHelper(adapter);
+        var flowEvent = this.getEventHelper(node);
 
-        // We haven't received an upstream event in this method; we're assuming it's a new batch
-        flowEvent.setFlowId(UUID.randomUUID().toString());
-
-        var adapterContext = adapter.getAdapterContext();
-        if (adapterContext.getAdapterSettings().getPersistInputPayload()) {
+        var nodeContext = node.getNodeContext();
+        if (nodeContext.getNodeSettings().getPersistInputPayload()) {
             flowEvent.setInputPayload(inputPayload);
         }
 
         this.stamperVisitor.tryStampInputs(flowEvent, inputPayload);
+
+        var flowEntity = this.flowBuilder.makeFlowFrom(node);
+        flowEvent.setFlow(flowEntity);
+        flowEntity.getFlowEvents().add(flowEvent);
+        this.flowRepository.save(flowEntity);
+
         flowEvent = this.flowEventRepository.save(flowEvent);
 
         return flowEvent;
     }
 
+    @Transactional
     public FlowEventEntity makeEventFrom(
-        final String inputPayload,
-        final String batchId,
-        final AbstractAdapter adapter) throws Exception {
+        final String mergedPayload,
+        final String flowId,
+        final MergeNode node)
+        throws Exception {
 
-        var flowEvent = this.getEventHelper(adapter);
+        var flowEvent = this.getEventHelper(node);
 
-        // We have an upstream event from our message; use that event's batch ID.
-        flowEvent.setFlowId(batchId);
+        var flowRecord = this.flowRepository.findById(flowId);
+        if (flowRecord.isEmpty()) {
+            throw new IllegalArgumentException("ERROR: Could not flow with ID: "
+                + flowId);
+        }
 
-        var adapterContext = adapter.getAdapterContext();
-        if (adapterContext.getAdapterSettings().getPersistInputPayload()) {
+        var flowEntity = flowRecord.get();
+
+        flowEvent.setFlow(flowEntity);
+        flowEntity.getFlowEvents().add(flowEvent);
+        this.flowRepository.save(flowEntity);
+
+        var nodeContext = node.getNodeContext();
+        if (nodeContext.getNodeSettings().getPersistInputPayload()) {
+            flowEvent.setInputPayload(mergedPayload);
+        }
+
+        this.stamperVisitor.tryStampInputs(flowEvent, mergedPayload);
+        flowEvent = this.flowEventRepository.save(flowEvent);
+
+        return flowEvent;
+    }
+
+    @Transactional
+    public FlowEventEntity makeEventFrom(
+        final FlowMessage flowMessage,
+        final AbstractNode node)
+        throws Exception {
+
+        var flowEvent = this.getEventHelper(node);
+
+        var flow = flowMessage.getFlowEvent().getFlow();
+        var flowRecord = this.flowRepository.findById(flow.getId());
+
+        if (flowRecord.isEmpty()) {
+            throw new IllegalArgumentException("ERROR: Could not flow with ID: "
+                + flow.getId());
+        }
+
+        var flowEntity = flowRecord.get();
+
+        flowEvent.setFlow(flowEntity);
+        flowEntity.getFlowEvents().add(flowEvent);
+        this.flowRepository.save(flowEntity);
+
+        var inputPayload = flowMessage.getPayload();
+
+        var nodeContext = node.getNodeContext();
+        if (nodeContext.getNodeSettings().getPersistInputPayload()) {
             flowEvent.setInputPayload(inputPayload);
         }
 
@@ -96,25 +162,24 @@ public class FlowEventBuilder {
     /**
      * A simple helper method to create events.
      *
-     * @param adapter The adapter we're using to build an event for.
+     * @param node The adapter we're using to build an event for.
      * @return A new event.
      */
-    private FlowEventEntity getEventHelper(final AbstractAdapter adapter) {
+    private FlowEventEntity getEventHelper(final AbstractNode node) {
 
-        var adapterContext = adapter.getAdapterContext();
-        logger.debug("Creating a new event for adapter: {}",
-            adapterContext.getAdapterName());
+        var nodeContext = node.getNodeContext();
+        logger.debug("Creating a new event for node: {}", nodeContext.getNodeName());
 
-        var adapterRecord = this.adapterRepository.findById(adapterContext.getAdapterId());
+        var nodeRecord = this.nodeRepository.findById(nodeContext.getNodeId());
 
-        if (adapterRecord.isEmpty()) {
-            throw new RuntimeException("ERROR: Could not find an adapter with id: "
-                + adapterContext.getAdapterId());
+        if (nodeRecord.isEmpty()) {
+            throw new RuntimeException("ERROR: Could not find an node with id: "
+                + nodeContext.getNodeId());
         }
 
         var flowEvent = new FlowEventEntity();
         flowEvent.setFlowMessages(new HashSet<>());
-        flowEvent.setAdapter(adapterRecord.get());
+        flowEvent.setNode(nodeRecord.get());
         flowEvent.setInputPayloadStamps(new HashSet<>());
         flowEvent.setOutputPayloadStamps(new HashSet<>());
 

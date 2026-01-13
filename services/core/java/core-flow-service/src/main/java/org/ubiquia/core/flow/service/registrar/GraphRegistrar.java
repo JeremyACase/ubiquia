@@ -4,19 +4,26 @@ package org.ubiquia.core.flow.service.registrar;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.library.implementation.service.mapper.GraphDtoMapper;
+import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
-import org.ubiquia.common.model.ubiquia.entity.AgentCommunicationLanguageEntity;
+import org.ubiquia.common.model.ubiquia.entity.ComponentEntity;
+import org.ubiquia.common.model.ubiquia.entity.DomainOntologyEntity;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
-import org.ubiquia.core.flow.repository.AgentCommunicationLanguageRepository;
+import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
+import org.ubiquia.core.flow.repository.ComponentRepository;
+import org.ubiquia.core.flow.repository.DomainDataContractRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
-import org.ubiquia.core.flow.service.visitor.validator.GraphValidator;
-import org.ubiquia.core.flow.service.manager.AdapterManager;
+import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.service.manager.ComponentManager;
+import org.ubiquia.core.flow.service.manager.NodeManager;
+import org.ubiquia.core.flow.service.visitor.validator.GraphValidator;
 
 /**
  * A service dedicated to registering graphs in Ubiquia.
@@ -26,55 +33,145 @@ public class GraphRegistrar {
 
     private static final Logger logger = LoggerFactory.getLogger(GraphRegistrar.class);
     @Autowired
-    private AdapterManager adapterManager;
+    private NodeManager nodeManager;
     @Autowired
-    private AdapterRegistrar adapterRegistrar;
+    private NodeRegistrar nodeRegistrar;
+    @Autowired
+    private NodeRepository nodeRepository;
     @Autowired
     private ComponentRegistrar componentRegistrar;
     @Autowired
     private ComponentManager componentManager;
     @Autowired
-    private AgentCommunicationLanguageRepository agentCommunicationLanguageRepository;
+    private ComponentRepository componentRepository;
+    @Autowired
+    private DomainDataContractRepository domainDataContractRepository;
     @Autowired
     private GraphRepository graphRepository;
     @Autowired
+    private GraphDtoMapper graphDtoMapper;
+    @Autowired
     private GraphValidator graphValidator;
+
+    public List<GraphEntity> tryRegisterGraphs(
+        DomainOntologyEntity domainOntologyEntity,
+        final DomainOntology domainOntology)
+        throws Exception {
+
+        logger.info("Registering graphs for domain ontology: {}...",
+            domainOntology.getName());
+
+        var graphEntities = new ArrayList<GraphEntity>();
+        for (var graph : domainOntology.getGraphs()) {
+            var graphEntity = this.tryRegisterGraph(domainOntologyEntity, graph);
+            graphEntities.add(graphEntity);
+        }
+
+        logger.info("...registered graphs for domain ontology: {}.",
+            domainOntology.getName());
+
+        return graphEntities;
+    }
 
     /**
      * Attempt to register the provided graph with Ubiquia.
      *
-     * @param graphRegistration The graph to register.
+     * @param graph The graph to register.
      * @return A newly-registered graph.
      * @throws Exception Exceptions from an invalid graph.
      */
     @Transactional
-    public GraphEntity tryRegister(final Graph graphRegistration) throws Exception {
+    public GraphEntity tryRegisterGraph(
+        DomainOntologyEntity domainOntologyEntity,
+        final Graph graph)
+        throws Exception {
 
-        logger.info("...registering graph {} with version {} for domain {}...",
-            graphRegistration.getName(),
-            graphRegistration.getVersion(),
-            graphRegistration.getAgentCommunicationLanguage().getName());
+        logger.info("...registering graph {} for domain {}...",
+            graph.getName(),
+            domainOntologyEntity.getName());
 
-        this.cleanGraphRegistration(graphRegistration);
-        var domainOntologyEntity = this.tryGetAgentCommunicationLanguageFrom(graphRegistration);
-        var graphEntity = this.tryGetGraphEntityFrom(graphRegistration);
+        this.tryCleanGraphRegistration(graph);
+
+        var graphEntity = this.tryGetGraphEntityFrom(graph);
         graphEntity = this.persistGraph(domainOntologyEntity, graphEntity);
 
-        var componentEntities = this.componentRegistrar.registerComponentsFor(
-            graphEntity,
-            graphRegistration);
-        graphEntity.setComponents(componentEntities);
+        var componentEntities = this
+            .componentRegistrar
+            .registerComponentsFor(graphEntity, graph);
+        graphEntity.getComponents().addAll(componentEntities);
 
-        var adapterEntities = this.adapterRegistrar.registerAdaptersFor(
-            graphEntity,
-            graphRegistration);
-        graphEntity.setAdapters(adapterEntities);
-        this.graphValidator.tryValidate(graphEntity, graphRegistration);
+        var nodeEntities = this
+            .nodeRegistrar
+            .registerNodesFor(graphEntity, graph);
+        graphEntity.getNodes().addAll(nodeEntities);
+
+        this.tryAdaptComponentsToNodes(componentEntities, nodeEntities, graph);
+
+        var dto = this.graphDtoMapper.map(graphEntity);
+        this.graphValidator.tryValidate(dto);
 
         graphEntity = this.graphRepository.save(graphEntity);
-        logger.info("...registered graph {}.", graphRegistration.getName());
+        logger.info("...registered graph {}.", graph.getName());
 
         return graphEntity;
+    }
+
+    @Transactional
+    private void tryAdaptComponentsToNodes(
+        List<ComponentEntity> componentEntities,
+        List<NodeEntity> nodeEntities,
+        final Graph graph) {
+
+        logger.info("...attempting to adapt nodes to components...");
+
+        for (var component : graph.getComponents()) {
+            if (Objects.nonNull(component.getNode())) {
+
+                var nodeRecord = nodeEntities
+                    .stream()
+                    .filter(x -> x
+                        .getName()
+                        .equals(component.getNode().getName()))
+                    .findFirst();
+
+                if (nodeRecord.isEmpty()) {
+                    throw new IllegalArgumentException("ERROR: Could not find node named: "
+                        + component.getNode().getName());
+                }
+                var nodeEntity = nodeRecord.get();
+
+                logger.info("...component named {} is adapted to node {}; connecting...",
+                    component.getName(),
+                    nodeEntity.getName());
+
+                if (Objects.nonNull(nodeEntity.getComponent())) {
+                    throw new IllegalArgumentException("ERROR: Node is already adapted to "
+                        + "component named: "
+                        + nodeEntity.getComponent().getNode());
+                }
+
+                var componentRecord = componentEntities
+                    .stream()
+                    .filter(x -> x
+                        .getName()
+                        .equals(component.getName()))
+                    .findFirst();
+
+                if (componentRecord.isEmpty()) {
+                    throw new IllegalArgumentException("ERROR: Could not find component named: "
+                        + component.getNode().getName());
+                }
+                var componentEntity = componentRecord.get();
+
+                nodeEntity.setComponent(componentEntity);
+                nodeEntity = this.nodeRepository.save(nodeEntity);
+                componentEntity.setNode(nodeEntity);
+                this.componentRepository.save(componentEntity);
+                logger.info("...completed adapting node to component.");
+            }
+        }
+
+        logger.info("...completed adapting nodes to components.");
     }
 
     /**
@@ -82,11 +179,7 @@ public class GraphRegistrar {
      *
      * @param graph The graph object to clean.
      */
-    private void cleanGraphRegistration(Graph graph) {
-
-        if (Objects.isNull(graph.getComponentlessAdapters())) {
-            graph.setComponentlessAdapters(new ArrayList<>());
-        }
+    private void tryCleanGraphRegistration(Graph graph) {
 
         if (Objects.isNull(graph.getEdges())) {
             graph.setEdges(new ArrayList<>());
@@ -100,111 +193,49 @@ public class GraphRegistrar {
             graph.setComponents(new ArrayList<>());
         }
 
+        if (Objects.isNull(graph.getNodes())) {
+            graph.setNodes(new ArrayList<>());
+        }
+
         if (Objects.isNull(graph.getTags())) {
             graph.setTags(new ArrayList<>());
         }
     }
 
-    /**
-     * Attempt to persist a graph entity for a given domain ontology.
-     *
-     * @param agentCommunicationLanguageEntity The domain ontology to associate the graph with.
-     * @param graphEntity          The graph to register.
-     * @return The newly-persisted graph.
-     */
     @Transactional
     private GraphEntity persistGraph(
-        AgentCommunicationLanguageEntity agentCommunicationLanguageEntity,
+        DomainOntologyEntity domainOntologyEntity,
         GraphEntity graphEntity) {
 
-        if (Objects.isNull(agentCommunicationLanguageEntity.getGraphs())) {
-            agentCommunicationLanguageEntity.setGraphs(new ArrayList<>());
-        }
-        agentCommunicationLanguageEntity.getGraphs().add(graphEntity);
-        agentCommunicationLanguageEntity = this
-            .agentCommunicationLanguageRepository
-            .save(agentCommunicationLanguageEntity);
-
-        graphEntity.setAgentCommunicationLanguage(agentCommunicationLanguageEntity);
+        graphEntity.setDomainOntology(domainOntologyEntity);
         graphEntity = this.graphRepository.save(graphEntity);
+
         return graphEntity;
     }
 
     /**
      * Provided a graph registration object, attempt to get an equivalent entity.
      *
-     * @param graphRegistration The graph registration object.
+     * @param graph The graph registration object.
      * @return A graph entity.
      */
-    @Transactional
-    private GraphEntity tryGetGraphEntityFrom(final Graph graphRegistration) {
-
-        var record = this.graphRepository
-            .findByNameAndVersionMajorAndVersionMinorAndVersionPatch(
-                graphRegistration.getName(),
-                graphRegistration.getVersion().getMajor(),
-                graphRegistration.getVersion().getMinor(),
-                graphRegistration.getVersion().getPatch()
-            );
-
-        if (record.isPresent()) {
-            throw new IllegalArgumentException("ERROR: A graph with name "
-                + graphRegistration.getName()
-                + " and version "
-                + graphRegistration.getVersion()
-                + " has already been registered!");
-        }
+    private GraphEntity tryGetGraphEntityFrom(final Graph graph) {
 
         var graphEntity = new GraphEntity();
-        graphEntity.setAuthor(graphRegistration.getAuthor());
-        graphEntity.setCapabilities(graphRegistration.getCapabilities());
-        graphEntity.setDescription(graphRegistration.getDescription());
-        graphEntity.setName(graphRegistration.getName());
-        graphEntity.setVersion(graphRegistration.getVersion());
-        graphEntity.setComponents(new ArrayList<>());
-        graphEntity.setAdapters(new ArrayList<>());
-        graphEntity.setUbiquiaAgentsDeployingGraph(new ArrayList<>());
+        graphEntity.setAuthor(graph.getAuthor());
+        graphEntity.setCapabilities(graph.getCapabilities());
+        graphEntity.setDescription(graph.getDescription());
+        graphEntity.setName(graph.getName());
+        graphEntity.setComponents(new HashSet<>());
+        graphEntity.setNodes(new HashSet<>());
+        graphEntity.setFlows(new HashSet<>());
+        graphEntity.setAgentsDeployingGraph(new ArrayList<>());
 
         graphEntity.setTags(new HashSet<>());
-        if (Objects.nonNull(graphRegistration.getTags())) {
-            graphEntity.getTags().addAll(graphRegistration.getTags());
+        if (Objects.nonNull(graph.getTags())) {
+            graphEntity.getTags().addAll(graph.getTags());
         }
 
         return graphEntity;
-    }
-
-    /**
-     * A helper method that can retrieve a Domain Ontology for a graph - if one exists.
-     *
-     * @param graphRegistration The graph to get an ontology for.
-     * @return The graph's ontology.
-     */
-    @Transactional
-    private AgentCommunicationLanguageEntity tryGetAgentCommunicationLanguageFrom(
-        final Graph graphRegistration) {
-
-        var acl = graphRegistration.getAgentCommunicationLanguage();
-        if (Objects.isNull(acl)) {
-            throw new IllegalArgumentException("ERROR: Cannot register a graph "
-                + " with a NULL domain ontology!");
-        }
-
-        var record = this
-            .agentCommunicationLanguageRepository
-            .findByDomainAndVersionMajorAndVersionMinorAndVersionPatch(
-                acl.getName(),
-                acl.getVersion().getMajor(),
-                acl.getVersion().getMinor(),
-                acl.getVersion().getPatch());
-
-        if (record.isEmpty()) {
-            throw new IllegalArgumentException("ERROR: Cannot find an agent communication language "
-                + " registered with the name: "
-                + acl.getName()
-                + " and version: "
-                + graphRegistration.getVersion());
-        }
-
-        return record.get();
     }
 }

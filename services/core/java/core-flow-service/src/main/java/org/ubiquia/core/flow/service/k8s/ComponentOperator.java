@@ -181,9 +181,9 @@ public class ComponentOperator {
 
         logger.info("Trying to deploy component {}...", component.getName());
 
-        var currentDeployment = this.deploymentClient.get(
-            this.namespace,
-            component.getName().toLowerCase());
+        var currentDeployment = this
+            .deploymentClient
+            .get(this.namespace, component.getName().toLowerCase());
 
         if (Objects.isNull(currentDeployment.getObject())) {
             logger.info("...no current deployment exists, attempting to deploy...");
@@ -191,12 +191,13 @@ public class ComponentOperator {
             var deployment = this
                 .componentDeploymentBuilder
                 .buildDeploymentFrom(component);
+
             logger.debug("...deploying deployment: {}...",
                 this.objectMapper.writeValueAsString(deployment));
-            var deploymentResponse = this.deploymentClient.create(
-                this.namespace,
-                deployment,
-                new CreateOptions());
+
+            var deploymentResponse = this
+                .deploymentClient
+                .create(this.namespace, deployment, new CreateOptions());
 
             if (!deploymentResponse.isSuccess()) {
                 throw new IllegalArgumentException("ERROR - unable to create deployment;"
@@ -210,10 +211,11 @@ public class ComponentOperator {
             var service = this.componentDeploymentBuilder.buildServiceFrom(component);
             logger.debug("...deploying service: {}...",
                 this.objectMapper.writeValueAsString(service));
-            var serviceResponse = this.serviceClient.create(
-                this.namespace,
-                service,
-                new CreateOptions());
+
+            var serviceResponse = this
+                .serviceClient
+                .create(this.namespace, service, new CreateOptions());
+
             if (!serviceResponse.isSuccess()) {
                 throw new IllegalArgumentException("ERROR - unable to create service; "
                     + "response from Kubernetes: "
@@ -226,12 +228,14 @@ public class ComponentOperator {
             var configMap = this
                 .componentDeploymentBuilder
                 .tryBuildConfigMapFrom(component);
+
             if (Objects.nonNull(configMap)) {
                 logger.info("...found a configmap for component; attempting to deploy...");
-                var configMapResponse = this.configMapClient.create(
-                    this.namespace,
-                    configMap,
-                    new CreateOptions());
+
+                var configMapResponse = this
+                    .configMapClient
+                    .create(this.namespace, configMap, new CreateOptions());
+
                 if (!configMapResponse.isSuccess()) {
                     throw new IllegalArgumentException("ERROR - unable to create configMap; "
                         + "response from Kubernetes: "

@@ -37,6 +37,7 @@ dependencies {
     implementation project(':common:java:library:implementation')
 
     implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${JACKSON_VERSION}"
     implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
     implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"
     implementation "org.openapitools:openapi-generator:${OPENAPI_GENERATOR_VERSION}"
@@ -100,7 +101,7 @@ task copyRuntimeLibs(type: Copy) {
     from configurations.runtimeClasspath
 
     def projectJars = [
-        ':common:java:model:acl',
+        ':common:java:model:domain',
         ':common:java:model:ubiquia',
         ':common:java:library:advice',
         ':common:java:library:api',

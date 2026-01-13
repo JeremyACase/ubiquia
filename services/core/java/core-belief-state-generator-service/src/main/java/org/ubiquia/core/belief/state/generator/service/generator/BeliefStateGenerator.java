@@ -1,17 +1,19 @@
 package org.ubiquia.core.belief.state.generator.service.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateCompiler;
 import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateUberizer;
 import org.ubiquia.core.belief.state.generator.service.decorator.EnumNormalizer;
@@ -19,7 +21,7 @@ import org.ubiquia.core.belief.state.generator.service.decorator.InheritancePrep
 import org.ubiquia.core.belief.state.generator.service.decorator.UbiquiaModelInjector;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiDtoGenerator;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiEntityGenerator;
-import org.ubiquia.core.belief.state.generator.service.generator.postprocess.PostProcessor;
+import org.ubiquia.core.belief.state.generator.service.generator.postprocess.BeliefStateGenerationPostProcessor;
 import org.ubiquia.core.belief.state.generator.service.k8s.BeliefStateOperator;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiDtoYamlMapper;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiEntityYamlMapper;
@@ -42,7 +44,7 @@ public class BeliefStateGenerator {
     private BeliefStateOperator beliefStateOperator;
 
     @Autowired
-    private PostProcessor postProcessor;
+    private BeliefStateGenerationPostProcessor beliefStateGenerationPostProcessor;
 
     @Autowired
     private EnumNormalizer enumNormalizer;
@@ -71,57 +73,78 @@ public class BeliefStateGenerator {
     @Autowired
     private BeliefStateUberizer beliefStateUberizer;
 
-    public void generateBeliefStateFrom(final AgentCommunicationLanguage acl)
+    /**
+     * Given a domain ontology, attempt to generate and deploy a new Belief State for it.
+     *
+     * @param domainOntology The Domain Ontology we're generating a belief state for.
+     * @throws Exception Exceptions from a lot of stuff.
+     */
+    public void generateBeliefStateFrom(final DomainOntology domainOntology)
         throws Exception {
 
-        logger.info("Generating new Belief State from: {}",
-            this.objectMapper.writeValueAsString(acl));
+        logger.info("Generating new Belief State from: {}", this
+            .objectMapper
+            .writeValueAsString(domainOntology));
 
-        var jsonSchema = this.getJsonSchemaFrom(acl);
+        var jsonSchema = this.getJsonSchemaFrom(domainOntology);
 
-        var openApiEntityYaml =
-            this.jsonSchemaToOpenApiEntityYamlMapper
-                .translateJsonSchemaToOpenApiYaml(jsonSchema);
+        var openApiEntityYaml = this
+            .jsonSchemaToOpenApiEntityYamlMapper
+            .translateJsonSchemaToOpenApiYaml(jsonSchema);
+
         this.openApiEntityGenerator.generateOpenApiEntitiesFrom(openApiEntityYaml);
 
-        var openApiDtoYaml =
-            this.jsonSchemaToOpenApiDtoYamlMapper
-                .translateJsonSchemaToOpenApiYaml(jsonSchema);
+        var openApiDtoYaml = this
+            .jsonSchemaToOpenApiDtoYamlMapper
+            .translateJsonSchemaToOpenApiYaml(jsonSchema);
         this.openApiDtoGenerator.generateOpenApiDtosFrom(openApiDtoYaml);
 
-        this.postProcessor.postProcess(acl);
+        this.beliefStateGenerationPostProcessor.postProcess(domainOntology);
 
-        var beliefStateLibraries = this.getJarPaths(this.beliefStateLibsDirectory);
+        var beliefStateLibraries = this.getLibraryJarPaths(this.beliefStateLibsDirectory);
 
-        this.beliefStateCompiler.compileGeneratedSources(
-            "generated",
-            "compiled",
-            beliefStateLibraries);
+        this
+            .beliefStateCompiler
+            .compileGeneratedSources("generated", "compiled", beliefStateLibraries);
 
-        var beliefStateName =
-            acl.getDomain().toLowerCase()
-                + "-"
-                + acl.getVersion().toString()
-                + ".jar";
+        var beliefStateName = domainOntology
+            .getName().toLowerCase()
+            + "-"
+            + domainOntology.getVersion().toString()
+            + ".jar";
 
         var jarPath = this.uberJarsPath + beliefStateName;
-        this.beliefStateUberizer.createUberJar(
-            jarPath,
-            "compiled",
-            beliefStateLibraries
-        );
+        this
+            .beliefStateUberizer
+            .createUberJar(jarPath, "compiled", beliefStateLibraries);
 
         if (Objects.nonNull(this.beliefStateOperator)) {
-            this.beliefStateOperator.tryDeployBeliefState(acl);
+            this.beliefStateOperator.tryDeployBeliefState(domainOntology);
         }
     }
 
-    private String getJsonSchemaFrom(final AgentCommunicationLanguage acl)
+    /**
+     * Given a domain ontology, build a JSON Schema to use to generate a new belief state.
+     *
+     * @param domainOntology The domain ontology we're generating a belief state for.
+     * @return The stringified JSON schema.
+     * @throws IOException Exception from IO.
+     */
+    private String getJsonSchemaFrom(final DomainOntology domainOntology)
         throws IOException {
 
-        var jsonSchema = this.objectMapper.writeValueAsString(acl.getJsonSchema());
+        var schema = domainOntology
+            .getDomainDataContract()
+            .getSchema();
+
+        // Turn "JSON string" OR "object" into a real JSON node
+        var schemaNode = (schema instanceof String s)
+            ? this.objectMapper.readTree(s)          // parse the JSON string
+            : this.objectMapper.valueToTree(schema); // convert POJO/Map/etc
+
+        var jsonSchema = this.objectMapper.writeValueAsString(schemaNode);
         jsonSchema = this.enumNormalizer.normalizeEnums(jsonSchema);
-        jsonSchema = this.ubiquiaModelInjector.appendAclModels(jsonSchema);
+        jsonSchema = this.ubiquiaModelInjector.appendDomainModels(jsonSchema);
         jsonSchema = this.inheritancePreprocessor.appendInheritance(jsonSchema);
 
         logger.debug("Preprocessed JSON Schema to: {}", jsonSchema);
@@ -129,7 +152,14 @@ public class BeliefStateGenerator {
         return jsonSchema;
     }
 
-    private List<String> getJarPaths(final String libsDirPath) {
+    /**
+     * Given a location for Belief State libraries, build and return the appropriate
+     * .jar path dependencies.
+     *
+     * @param libsDirPath The path where the libraries exist at.
+     * @return A list of fully-qualified .jar file paths.
+     */
+    private List<String> getLibraryJarPaths(final String libsDirPath) {
         var libsDir = new File(libsDirPath);
         var jarPaths = new ArrayList<String>();
 

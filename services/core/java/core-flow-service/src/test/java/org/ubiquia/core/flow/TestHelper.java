@@ -4,72 +4,76 @@ import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.ubiquia.common.library.api.repository.UbiquiaAgentRepository;
-import org.ubiquia.core.flow.component.adapter.AbstractAdapter;
-import org.ubiquia.core.flow.repository.*;
-import org.ubiquia.core.flow.service.logic.ubiquia.UbiquiaAgentLogic;
-import org.ubiquia.core.flow.service.manager.AdapterManager;
+import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
+import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
+import org.ubiquia.core.flow.component.node.AbstractNode;
+import org.ubiquia.core.flow.controller.DomainOntologyController;
+import org.ubiquia.core.flow.controller.GraphController;
+import org.ubiquia.core.flow.repository.NodeRepository;
+import org.ubiquia.core.flow.service.logic.agent.AgentLogic;
+import org.ubiquia.core.flow.service.manager.NodeManager;
 
 @Service
 public class TestHelper {
 
+    @Autowired
+    private DomainOntologyController domainOntologyController;
 
     @Autowired
-    private AgentCommunicationLanguageRepository aclRepository;
+    private GraphController graphController;
 
     @Autowired
-    private AdapterManager adapterManager;
+    private NodeManager nodeManager;
 
     @Autowired
-    private AdapterRepository adapterRepository;
+    private NodeRepository nodeRepository;
 
     @Autowired
-    private ComponentRepository componentRepository;
-
-    @Autowired
-    private FlowEventRepository flowEventRepository;
-
-    @Autowired
-    private FlowMessageRepository flowMessageRepository;
-
-    @Autowired
-    private GraphRepository graphRepository;
-
-    @Autowired
-    private UbiquiaAgentLogic ubiquiaAgentLogic;
-
-    @Autowired
-    private UbiquiaAgentRepository ubiquiaAgentRepository;
+    private AgentLogic agentLogic;
 
     public void setupAgentState() {
-        this.adapterManager.teardownAllAdapters();
-        this.ubiquiaAgentLogic.tryInitializeAgentInDatabase();
+        this.nodeManager.teardownAllNodes();
+        this.agentLogic.tryInitializeAgentInDatabase();
+    }
+
+    public void registerAndDeploy(
+        final DomainOntology domainOntology,
+        final Graph graph)
+        throws Exception {
+
+        this.domainOntologyController.register(domainOntology);
+
+        var deployment = new GraphDeployment();
+        deployment.setGraphName(graph.getName());
+        deployment.setDomainVersion(domainOntology.getVersion());
+        deployment.setDomainOntologyName(domainOntology.getName());
+
+        this.graphController.tryDeployGraph(deployment);
     }
 
     /**
-     * A helper method that can "find" a deployed adapter from the context.
+     * A helper method that can "find" a deployed node from the context.
      *
-     * @param adapterName The adapter name to find.
-     * @param graphName   The graph to find the adapter from.
+     * @param nodeName  The node name to find.
+     * @param graphName The graph to find the adapter from.
      * @return The deployed adapter.
      */
     @SuppressWarnings({"unchecked", "OptionalGetWithoutIsPresent"})
-    public AbstractAdapter findAdapter(final String adapterName, final String graphName) {
+    public AbstractNode findNode(final String nodeName, final String graphName) {
 
-        var adapterMap = (HashMap<String, HashMap<String, AbstractAdapter>>) ReflectionTestUtils
-            .getField(this.adapterManager, "adapterMap");
+        var nodeMap = (HashMap<String, HashMap<String, AbstractNode>>) ReflectionTestUtils
+            .getField(this.nodeManager, "nodeMap");
 
-        var adapterEntity = this
-            .adapterRepository
-            .findByGraphNameAndName(
-                graphName,
-                adapterName)
+        var nodeEntity = this
+            .nodeRepository
+            .findByGraphNameAndName(graphName, nodeName)
             .get();
 
-        var adapter = adapterMap
+        var node = nodeMap
             .get(graphName)
-            .get(adapterEntity.getId());
+            .get(nodeEntity.getId());
 
-        return adapter;
+        return node;
     }
 }

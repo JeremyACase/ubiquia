@@ -7,27 +7,27 @@ import java.util.List;
 
 public class GraphEdge {
 
-    private String leftAdapterName;
+    private String leftNodeName;
 
-    private List<String> rightAdapterNames;
+    private List<String> rightNodeNames;
 
     @NotNull
-    public String getLeftAdapterName() {
-        return leftAdapterName;
+    public String getLeftNodeName() {
+        return leftNodeName;
     }
 
-    public void setLeftAdapterName(String leftAdapterName) {
-        this.leftAdapterName = leftAdapterName;
+    public void setLeftNodeName(String leftNodeName) {
+        this.leftNodeName = leftNodeName;
     }
 
     @NotNull
     @Size(min = 1)
-    public List<String> getRightAdapterNames() {
-        return rightAdapterNames;
+    public List<String> getRightNodeNames() {
+        return rightNodeNames;
     }
 
-    public void setRightAdapterNames(List<String> rightAdapterNames) {
-        this.rightAdapterNames = rightAdapterNames;
+    public void setRightNodeNames(List<String> rightNodeNames) {
+        this.rightNodeNames = rightNodeNames;
     }
 }
 

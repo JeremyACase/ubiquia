@@ -15,6 +15,7 @@ import org.ubiquia.common.model.ubiquia.entity.ComponentEntity;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.service.decorator.override.ComponentOverrideDecorator;
+import org.ubiquia.core.flow.service.finder.GraphFinder;
 import org.ubiquia.core.flow.service.k8s.ComponentOperator;
 import org.ubiquia.core.flow.service.visitor.ComponentCardinalityVisitor;
 
@@ -38,6 +39,9 @@ public class ComponentManager {
     @Autowired
     private GraphDtoMapper graphDtoMapper;
 
+    @Autowired
+    private GraphFinder graphFinder;
+
     /**
      * Attempt to deploy agents for a provided graph deployment.
      *
@@ -52,21 +56,13 @@ public class ComponentManager {
 
         logger.info("Attempting to deploy a list of components for graph {} with settings "
                 + "{}...",
-            graphDeployment.getName(),
+            graphDeployment.getGraphName(),
             graphDeployment.getGraphSettings());
 
-        var graphRecord = this
-            .graphRepository
-            .findByNameAndVersionMajorAndVersionMinorAndVersionPatch(
-                graphDeployment.getName(),
-                graphDeployment.getVersion().getMajor(),
-                graphDeployment.getVersion().getMinor(),
-                graphDeployment.getVersion().getPatch());
-
-        if (graphRecord.isEmpty()) {
-            throw new IllegalArgumentException("ERROR: Could not find graph: " + graphDeployment);
-        }
-        var graphEntity = graphRecord.get();
+        var graphEntity = this.graphFinder.findGraphWith(
+            graphDeployment.getGraphName(),
+            graphDeployment.getDomainOntologyName(),
+            graphDeployment.getDomainVersion());
 
         for (var componentEntity : graphEntity.getComponents()) {
             logger.info("...attempting to deploy component: {}",
@@ -79,13 +75,17 @@ public class ComponentManager {
             var graph = this.graphDtoMapper.map(graphEntity);
             component.setGraph(graph);
 
-            if (this.componentCardinalityVisitor.hasMatchingCardinality(
-                component.getName(),
-                graphDeployment)) {
+            var matchingCardinality = this
+                .componentCardinalityVisitor
+                .hasMatchingCardinality(component.getName(), graphDeployment);
 
-                if (this.componentCardinalityVisitor.isCardinalityEnabled(
-                    component.getName(),
-                    graphDeployment)) {
+            if (matchingCardinality) {
+
+                var cardinalityEnabled = this
+                    .componentCardinalityVisitor
+                    .isCardinalityEnabled(component.getName(), graphDeployment);
+
+                if (cardinalityEnabled) {
 
                     this.tryDeployComponent(component, componentEntity, graphDeployment);
                 } else {

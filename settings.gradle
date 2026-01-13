@@ -1,6 +1,6 @@
 rootProject.name = 'ubiquia'
 
-include ':common:java:model:acl'
+include ':common:java:model:domain'
 include ':common:java:model:ubiquia'
 include ':common:java:library:advice'
 include ':common:java:library:api'

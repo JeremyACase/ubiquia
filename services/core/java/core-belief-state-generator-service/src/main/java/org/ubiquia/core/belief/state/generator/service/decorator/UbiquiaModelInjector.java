@@ -16,21 +16,28 @@ public class UbiquiaModelInjector {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public String appendAclModels(final String jsonSchema) throws JsonProcessingException {
+    public String appendDomainModels(final String jsonSchema) throws JsonProcessingException {
 
         logger.debug("Appending Ubiquia models to: {}...", jsonSchema);
 
-        // 1. Parse the input
-        var root = (ObjectNode) this.objectMapper.readTree(jsonSchema);
+        var node = objectMapper.readTree(jsonSchema);
 
-        // 2. Ensure /definitions exists
+        if (!node.isObject()) {
+            throw new IllegalArgumentException(
+                "Expected JSON object for schema, but got: "
+                    + node.getNodeType()
+                    + " value=" + node
+            );
+        }
+
+        var root = (ObjectNode) node;
+
         var defs = (ObjectNode) root.get("definitions");
         if (defs == null) {
             defs = this.objectMapper.createObjectNode();
             root.set("definitions", defs);
         }
 
-        // 3. Create KeyValuePair definition
         var kvPair = this.objectMapper.createObjectNode()
             .put("type", "object")
             .put("additionalProperties", false);
@@ -41,23 +48,21 @@ public class UbiquiaModelInjector {
         kvPair.set("properties", kvProps);
         kvPair.set("required", this.objectMapper.createArrayNode()); // add "key","value" if required
 
-        // 4. Create AbstractAclEntity definition
-        var acl = this.objectMapper.createObjectNode()
+        var domainSchema = this.objectMapper.createObjectNode()
             .put("type", "object")
             .put("additionalProperties", false);
 
-        var aclProps = this.objectMapper.createObjectNode();
-        aclProps.set("id",        uuid("Database-generated UUID"));
-        aclProps.set("createdAt", timestamp("Creation timestamp", true));
-        aclProps.set("updatedAt", timestamp("Last update timestamp", true));
-        aclProps.set("tags", tagsArray());
-        aclProps.set("modelType", stringOrNull("Transient helper for type introspection"));
-        acl.set("properties", aclProps);
-        acl.set("required", this.objectMapper.createArrayNode()); // e.g. ["id"] if you need it
+        var domainProperties = this.objectMapper.createObjectNode();
+        domainProperties.set("id",        uuid("Database-generated UUID"));
+        domainProperties.set("createdAt", timestamp("Creation timestamp", true));
+        domainProperties.set("updatedAt", timestamp("Last update timestamp", true));
+        domainProperties.set("tags", tagsArray());
+        domainProperties.set("modelType", stringOrNull("Transient helper for type introspection"));
+        domainSchema.set("properties", domainProperties);
+        domainSchema.set("required", this.objectMapper.createArrayNode()); // e.g. ["id"] if you need it
 
-        // 5. Insert if not already present
         defs.putIfAbsent("KeyValuePair", kvPair);
-        defs.putIfAbsent("AbstractAclModel", acl);
+        defs.putIfAbsent("AbstractAclModel", domainSchema);
 
         var preprocssed = this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
         logger.debug("...appended Ubiquia models: {}.", preprocssed);

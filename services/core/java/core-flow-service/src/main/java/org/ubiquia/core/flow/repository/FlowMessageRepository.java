@@ -8,14 +8,14 @@ import org.ubiquia.common.model.ubiquia.entity.FlowMessageEntity;
 
 public interface FlowMessageRepository extends AbstractEntityRepository<FlowMessageEntity> {
 
-    Long countByTargetAdapterId(final String adapterId);
+    Long countByTargetNodeId(final String adapterId);
 
-    Page<FlowMessageEntity> findAllByTargetAdapterId(
+    Page<FlowMessageEntity> findAllByTargetNodeId(
         Pageable pageable,
-        final String targetAdapterId);
+        final String targetNodeId);
 
-    List<FlowMessageEntity> findAllByTargetAdapterIdAndFlowEventFlowId(
-        final String targetAdapterId,
+    List<FlowMessageEntity> findAllByTargetNodeIdAndFlowEventFlowId(
+        final String targetNodeId,
         final String flowId);
 
 }

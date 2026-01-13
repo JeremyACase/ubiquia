@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.ubiquia.common.library.api.config.UbiquiaAgentConfig;
+import org.ubiquia.common.library.api.config.AgentConfig;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
@@ -59,7 +59,7 @@ public class DeployedGraphPoller {
     private ComponentProxyManager componentProxyManager;
 
     @Autowired
-    private UbiquiaAgentConfig ubiquiaAgentConfig;
+    private AgentConfig agentConfig;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -172,7 +172,7 @@ public class DeployedGraphPoller {
                 .queryParam("page", 0)
                 .queryParam("size", 1)
                 .queryParam("id", id)
-                .buildAndExpand(this.ubiquiaAgentConfig.getId())
+                .buildAndExpand(this.agentConfig.getId())
                 .toUriString();
 
             var headers = new HttpHeaders();
@@ -244,10 +244,10 @@ public class DeployedGraphPoller {
 
         var targetUri = UriComponentsBuilder
             .fromHttpUrl(this.flowServiceConfig.getUrl() + ":" + this.flowServiceConfig.getPort())
-            .path("/ubiquia/flow-service/ubiquia-agent/{agentId}/get-deployed-graph-ids")
+            .path("/ubiquia/core/flow-service/agent/{agentId}/get-deployed-graph-ids")
             .queryParam("page", pageNumber)
             .queryParam("size", pageSize)
-            .buildAndExpand(this.ubiquiaAgentConfig.getId())
+            .buildAndExpand(this.agentConfig.getId())
             .toUriString();
 
         var headers = new HttpHeaders();

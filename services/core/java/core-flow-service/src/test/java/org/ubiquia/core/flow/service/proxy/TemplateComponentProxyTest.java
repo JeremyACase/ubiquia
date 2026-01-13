@@ -11,15 +11,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
-import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
-import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
-import org.ubiquia.common.model.ubiquia.enums.AdapterType;
+import org.ubiquia.common.model.ubiquia.embeddable.NodeSettings;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.common.model.ubiquia.enums.HttpOutputType;
+import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.TestHelper;
-import org.ubiquia.core.flow.component.adapter.HiddenAdapter;
-import org.ubiquia.core.flow.controller.GraphController;
+import org.ubiquia.core.flow.component.node.HiddenNode;
+import org.ubiquia.core.flow.controller.DomainOntologyController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
@@ -34,10 +33,10 @@ public class TemplateComponentProxyTest {
     private DummyFactory dummyFactory;
 
     @Autowired
-    private FlowEventBuilder flowEventBuilder;
+    private DomainOntologyController domainOntologyController;
 
     @Autowired
-    private GraphController graphController;
+    private FlowEventBuilder flowEventBuilder;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -60,7 +59,8 @@ public class TemplateComponentProxyTest {
     @Transactional
     public void assertGeneratesFuzzyData_isValid() throws Exception {
 
-        var graph = this.dummyFactory.generateGraph();
+        var domainOntology = this.dummyFactory.generateDomainOntology();
+        var graph = domainOntology.getGraphs().get(0);
 
         var ingressComponent = this.dummyFactory.generateComponent();
         var hiddenComponent = this.dummyFactory.generateComponent();
@@ -68,55 +68,52 @@ public class TemplateComponentProxyTest {
         graph.getComponents().add(ingressComponent);
         graph.getComponents().add(hiddenComponent);
 
-        var ingressAdapter = this.dummyFactory.generateAdapter();
-        ingressAdapter.setAdapterType(AdapterType.PUSH);
+        var ingressNode = this.dummyFactory.generateNode();
+        ingressNode.setNodeType(NodeType.PUSH);
         var subSchema = this.dummyFactory.buildSubSchema("Person");
-        ingressAdapter.getInputSubSchemas().add(subSchema);
-        ingressAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        ingressNode.getInputSubSchemas().add(subSchema);
+        ingressNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(ingressNode);
+        ingressComponent.setNode(ingressNode);
 
-        var hiddenAdapter = this.dummyFactory.generateAdapter();
-        hiddenAdapter.setAdapterType(AdapterType.HIDDEN);
-        hiddenAdapter.setEgressSettings(new EgressSettings());
-        hiddenAdapter.getEgressSettings().setHttpOutputType(HttpOutputType.PUT);
-        hiddenAdapter.setAdapterSettings(new AdapterSettings());
-        hiddenAdapter.getAdapterSettings().setValidateInputPayload(true);
-        hiddenAdapter.getAdapterSettings().setPersistOutputPayload(true);
-        hiddenAdapter.setEndpoint("http://localhost:8080/test");
-        hiddenAdapter.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
-        hiddenAdapter.setOutputSubSchema(this.dummyFactory.buildSubSchema("Cat"));
-
-        ingressComponent.setAdapter(ingressAdapter);
-        hiddenComponent.setAdapter(hiddenAdapter);
+        var hiddenNode = this.dummyFactory.generateNode();
+        hiddenNode.setNodeType(NodeType.HIDDEN);
+        hiddenNode.setEgressSettings(new EgressSettings());
+        hiddenNode.getEgressSettings().setHttpOutputType(HttpOutputType.PUT);
+        hiddenNode.setNodeSettings(new NodeSettings());
+        hiddenNode.getNodeSettings().setValidateInputPayload(true);
+        hiddenNode.getNodeSettings().setPersistOutputPayload(true);
+        hiddenNode.setEndpoint("http://localhost:8080/test");
+        hiddenNode.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Dog"));
+        hiddenNode.setOutputSubSchema(this.dummyFactory.buildSubSchema("Cat"));
+        graph.getNodes().add(hiddenNode);
+        hiddenComponent.setNode(hiddenNode);
 
         var edge = new GraphEdge();
-        edge.setLeftAdapterName(ingressAdapter.getName());
-        edge.setRightAdapterNames(new ArrayList<>());
-        edge.getRightAdapterNames().add(hiddenAdapter.getName());
+        edge.setLeftNodeName(ingressNode.getName());
+        edge.setRightNodeNames(new ArrayList<>());
+        edge.getRightNodeNames().add(hiddenNode.getName());
         graph.getEdges().add(edge);
 
-        this.graphController.register(graph);
-        var deployment = new GraphDeployment();
-        deployment.setName(graph.getName());
-        deployment.setVersion(graph.getVersion());
-        this.graphController.tryDeployGraph(deployment);
+        this.testHelper.registerAndDeploy(domainOntology, graph);
 
-        var adapter = (HiddenAdapter) this
+        var node = (HiddenNode) this
             .testHelper
-            .findAdapter(hiddenAdapter.getName(), graph.getName());
+            .findNode(hiddenNode.getName(), graph.getName());
 
-        var flowEvent = this.flowEventBuilder.makeEventFrom(
-            "test",
-            adapter);
+        var flowEvent = this
+            .flowEventBuilder
+            .makeFlowAndEventFrom("test", node);
 
-        this.templateComponentProxy.proxyAsComponentFor(flowEvent);
-        var fuzzyData = this.objectMapper.readValue(
-            flowEvent.getOutputPayload(),
-            Object.class);
+        this.templateComponentProxy.proxyAsComponentWith(flowEvent);
+        var fuzzyData = this
+            .objectMapper
+            .readValue(flowEvent.getOutputPayload(), Object.class);
 
         Assertions.assertDoesNotThrow(() -> {
             this.payloadModelValidator.tryValidateOutputPayloadFor(
                 this.objectMapper.writeValueAsString(fuzzyData),
-                adapter);
+                node);
         });
     }
 }

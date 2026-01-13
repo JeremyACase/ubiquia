@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.ubiquia.common.model.ubiquia.embeddable.AdapterSettings;
+import org.ubiquia.common.model.ubiquia.embeddable.NodeSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
-import org.ubiquia.common.model.ubiquia.entity.AdapterEntity;
+import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 
 
@@ -42,13 +42,13 @@ public class StamperTest {
         kvp.setValue(payload.get("stampKey"));
         event.getInputPayloadStamps().add(kvp);
 
-        var settings = new AdapterSettings();
+        var settings = new NodeSettings();
         settings.setInputStampKeychains(new ArrayList<>());
         settings.getInputStampKeychains().add(kvp.getKey());
 
-        var adapter = new AdapterEntity();
-        adapter.setAdapterSettings(settings);
-        event.setAdapter(adapter);
+        var adapter = new NodeEntity();
+        adapter.setNodeSettings(settings);
+        event.setNode(adapter);
 
         this.stamper.tryStampInputs(event, json);
         var match = event.getInputPayloadStamps().stream().filter(x ->
@@ -74,17 +74,18 @@ public class StamperTest {
         kvp.setValue(payload.get("stampKey"));
         event.getOutputPayloadStamps().add(kvp);
 
-        var settings = new AdapterSettings();
+        var settings = new NodeSettings();
         settings.setOutputStampKeychains(new ArrayList<>());
         settings.getOutputStampKeychains().add(kvp.getKey());
 
-        var adapter = new AdapterEntity();
-        adapter.setAdapterSettings(settings);
-        event.setAdapter(adapter);
+        var node = new NodeEntity();
+        node.setNodeSettings(settings);
+        event.setNode(node);
 
         this.stamper.tryStampInputs(event, json);
-        var match = event.getOutputPayloadStamps().stream().filter(x ->
-            x.getKey().equals("stampKey")).findFirst();
+        var match = event.getOutputPayloadStamps().stream().filter(
+            x -> x.getKey().equals("stampKey"))
+            .findFirst();
         Assertions.assertEquals(1, (long) event.getOutputPayloadStamps().size());
         Assertions.assertEquals(payload.get("stampKey"), match.get().getValue());
     }

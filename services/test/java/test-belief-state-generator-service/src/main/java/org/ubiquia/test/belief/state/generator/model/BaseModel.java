@@ -16,7 +16,7 @@ package org.ubiquia.test.belief.state.generator.model;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.ubiquia.common.model.acl.dto.AbstractAclModel;
+import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
 
 /**
  * A base model.
@@ -30,7 +30,7 @@ import org.ubiquia.common.model.acl.dto.AbstractAclModel;
     @JsonSubTypes.Type(value = Animal.class, name = "Animal")
 })
 
-public class BaseModel extends AbstractAclModel {
+public class BaseModel extends AbstractDomainModel {
 
     @Override
     public String getModelType() {

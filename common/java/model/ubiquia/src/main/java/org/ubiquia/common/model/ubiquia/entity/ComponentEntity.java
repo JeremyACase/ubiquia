@@ -56,7 +56,7 @@ public class ComponentEntity extends AbstractModelEntity {
     private LivenessProbe livenessProbe;
 
     @OneToOne(mappedBy = "component", optional = true)
-    private AdapterEntity adapter;
+    private NodeEntity node;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "graph_component_join_id", nullable = false)
@@ -96,12 +96,12 @@ public class ComponentEntity extends AbstractModelEntity {
         return "Component";
     }
 
-    public AdapterEntity getAdapter() {
-        return adapter;
+    public NodeEntity getNode() {
+        return node;
     }
 
-    public void setAdapter(AdapterEntity adapterEntity) {
-        this.adapter = adapterEntity;
+    public void setNode(NodeEntity nodeEntity) {
+        this.node = nodeEntity;
     }
 
     public GraphEntity getGraph() {

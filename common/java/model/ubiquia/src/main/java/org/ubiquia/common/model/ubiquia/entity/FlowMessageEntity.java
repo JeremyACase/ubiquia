@@ -15,7 +15,7 @@ public class FlowMessageEntity extends AbstractModelEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "message_target_adapter_join_id", nullable = false)
-    private AdapterEntity targetAdapter;
+    private NodeEntity targetNode;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
@@ -32,12 +32,12 @@ public class FlowMessageEntity extends AbstractModelEntity {
     }
 
     @NotNull
-    public AdapterEntity getTargetAdapter() {
-        return targetAdapter;
+    public NodeEntity getTargetNode() {
+        return targetNode;
     }
 
-    public void setTargetAdapter(AdapterEntity targetAdapterEntity) {
-        this.targetAdapter = targetAdapterEntity;
+    public void setTargetNode(NodeEntity targetNodeEntity) {
+        this.targetNode = targetNodeEntity;
     }
 
     public String getPayload() {

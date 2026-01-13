@@ -5,14 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import org.ubiquia.common.library.belief.state.libraries.controller.AbstractAclModelController;
+import org.ubiquia.common.library.belief.state.libraries.controller.AbstractDomainModelController;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractEgressDtoMapper;
 import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractIngressDtoMapper;
 
 @RestController
 @RequestMapping("/ubiquia/belief-state-service/{{classname}}")
-public class {{classname}}Controller extends AbstractAclModelController<{{classname}}Entity, {{classname}}> {
+public class {{classname}}Controller extends AbstractDomainModelController<{{classname}}Entity, {{classname}}> {
 
     private static final Logger logger = LoggerFactory.getLogger({{classname}}Controller.class);
 

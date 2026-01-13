@@ -7,7 +7,6 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.dao.interfaces.InterfaceUbiquiaDaoController;
-import org.ubiquia.common.library.implementation.service.builder.IngressResponseBuilder;
+import org.ubiquia.common.library.implementation.service.builder.UbiquiaIngressResponseBuilder;
 import org.ubiquia.common.library.implementation.service.visitor.PageValidator;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
@@ -40,7 +39,7 @@ public abstract class GenericUbiquiaDaoController<
     @Autowired
     protected ObjectMapper objectMapper;
     @Autowired
-    protected IngressResponseBuilder ingressResponseBuilder;
+    protected UbiquiaIngressResponseBuilder ingressResponseBuilder;
     protected Class<T> persistedEntityClass;
     protected Class<D> persistedDTOClass;
     @Autowired

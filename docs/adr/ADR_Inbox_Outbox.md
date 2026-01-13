@@ -37,7 +37,7 @@ Within a Kubernetes cluster, it is a very-common design to use a [message broker
 
 The Flow Service is designed to work across arbitrary-scales; it does this by assuming that the database is distributed. Adapters will effectively communicate with one another over this distributed database. 
 
-Because Flow Service adapters leverage the transactional-nature of a distributed SQL database, they can send messages in a discretized, transactional manner, agnostic of where the adapters reside (i.e., in the same Kubernetes cluster, or in another Kubernetes cluster.) 
+Because Flow Service nodes leverage the transactional-nature of a distributed SQL database, they can send messages in a discretized, transactional manner, agnostic of where the nodes reside (i.e., in the same Kubernetes cluster, or in another Kubernetes cluster.) 
 
 
 ## Consequences & Tradeoffs

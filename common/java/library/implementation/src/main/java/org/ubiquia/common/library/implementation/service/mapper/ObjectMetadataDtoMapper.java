@@ -28,7 +28,7 @@ public class ObjectMetadataDtoMapper extends GenericDtoMapper<
             to.setBucketName(from.getBucketName());
             to.setContentType(from.getContentType());
             to.setOriginalFilename(from.getOriginalFilename());
-            to.setUbiquiaAgent(this.ubiquiaAgentDtoMapper.map(from.getUbiquiaAgent()));
+            to.setUbiquiaAgent(this.ubiquiaAgentDtoMapper.map(from.getAgent()));
             to.setSize(from.getSize());
 
         }

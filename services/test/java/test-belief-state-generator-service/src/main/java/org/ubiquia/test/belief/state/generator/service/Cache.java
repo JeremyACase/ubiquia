@@ -1,25 +1,25 @@
 package org.ubiquia.test.belief.state.generator.service;
 
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.dto.AgentCommunicationLanguage;
+import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.test.belief.state.generator.model.Animal;
 import org.ubiquia.test.belief.state.generator.model.Person;
 
 @Service
 public class Cache {
 
-    private AgentCommunicationLanguage acl;
+    private DomainOntology domainOntology;
 
     private Animal animal;
 
     private Person person;
 
-    public AgentCommunicationLanguage getAcl() {
-        return acl;
+    public DomainOntology getDomainOntology() {
+        return domainOntology;
     }
 
-    public void setAcl(AgentCommunicationLanguage acl) {
-        this.acl = acl;
+    public void setDomainOntology(DomainOntology domainOntology) {
+        this.domainOntology = domainOntology;
     }
 
     public Animal getAnimal() {

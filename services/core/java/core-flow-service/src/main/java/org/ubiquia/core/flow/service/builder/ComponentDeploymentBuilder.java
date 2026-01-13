@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kubernetes.client.custom.IntOrString;
 import io.kubernetes.client.openapi.models.*;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -70,7 +69,6 @@ public class ComponentDeploymentBuilder {
      * @param component The agent to build a service for.
      * @return A Kubernetes service.
      */
-    @Transactional
     public V1Service buildServiceFrom(final Component component) {
         var service = new V1Service();
         service.setApiVersion("v1");
@@ -118,7 +116,6 @@ public class ComponentDeploymentBuilder {
      * @param component The agent to build a deployment for.
      * @return A Kubernetes deployment.
      */
-    @Transactional
     public V1Deployment buildDeploymentFrom(final Component component) {
         var deployment = new V1Deployment();
         deployment.setApiVersion("apps/v1");
@@ -134,7 +131,6 @@ public class ComponentDeploymentBuilder {
      * @param component The agent to build a metadata for.
      * @return A Kubernetes metadata.
      */
-    @Transactional
     private V1ObjectMeta getMetadataFrom(final Component component) {
         var metadata = new V1ObjectMeta();
         metadata.setName(component.getName().toLowerCase());
@@ -161,7 +157,6 @@ public class ComponentDeploymentBuilder {
      * @param component The agent to build a deployment spec for.
      * @return A Kubernetes deployment spec.
      */
-    @Transactional
     private V1DeploymentSpec getDeploymentSpecFrom(final Component component) {
         var spec = new V1DeploymentSpec();
         spec.setReplicas(component.getScaleSettings().getMinReplicas());
@@ -184,7 +179,6 @@ public class ComponentDeploymentBuilder {
      * @param component The agent to build a template spec for.
      * @return A Kubernetes template spec.
      */
-    @Transactional
     private V1PodTemplateSpec getPodTemplateSpec(final Component component) {
 
         var template = new V1PodTemplateSpec();
@@ -244,7 +238,6 @@ public class ComponentDeploymentBuilder {
      * @param component The agent to build a container for.
      * @return A Kubernetes container.
      */
-    @Transactional
     private V1Container getContainer(final Component component) {
         var container = new V1Container();
         container.setName(component.getName().toLowerCase());

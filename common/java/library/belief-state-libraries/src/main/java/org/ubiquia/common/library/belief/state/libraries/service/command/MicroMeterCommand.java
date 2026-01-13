@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.acl.embeddable.KeyValuePair;
+import org.ubiquia.common.model.domain.embeddable.KeyValuePair;
 
 /**
  * A command object to use micrometer to feed Prometheus metrics.

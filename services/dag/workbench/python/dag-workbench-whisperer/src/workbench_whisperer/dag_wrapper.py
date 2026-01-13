@@ -108,7 +108,7 @@ INPUTS:
    - Do NOT invent model names or reference anything outside the ACL.
    - Required fields:
      - "modelType": "Graph"
-     - "agentCommunicationLanguage": {{
+     - "domainDataContract": {{
          "name": "{_squish(domain)}",
          "version": {{"major": {version['major']}, "minor": {version['minor']}, "patch": {version['patch']}}}
        }}

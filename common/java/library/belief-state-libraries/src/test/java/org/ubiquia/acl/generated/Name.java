@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
-import org.ubiquia.common.model.acl.dto.AbstractAclModel;
 
 /**
  * A model with some name information.

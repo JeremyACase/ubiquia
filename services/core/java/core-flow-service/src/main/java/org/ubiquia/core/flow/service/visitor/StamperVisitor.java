@@ -31,8 +31,8 @@ public class StamperVisitor {
         throws JsonProcessingException {
 
         for (var stampKeychain : flowEventEntity
-            .getAdapter()
-            .getAdapterSettings()
+            .getNode()
+            .getNodeSettings()
             .getInputStampKeychains()) {
 
             var stamp = this.getStampFrom(inputPayload, stampKeychain);
@@ -54,8 +54,8 @@ public class StamperVisitor {
         throws JsonProcessingException {
 
         for (var stampKeychain : flowEventEntity
-            .getAdapter()
-            .getAdapterSettings()
+            .getNode()
+            .getNodeSettings()
             .getOutputStampKeychains()) {
             var stamp = this.getStampFrom(outputPayload, stampKeychain);
             var kvp = new KeyValuePair();

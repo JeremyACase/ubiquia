@@ -47,9 +47,9 @@ spec:
       {{- end }}
 
       volumes:
-        - name: ubiquia-flow-bootstrap-acls
+        - name: ubiquia-flow-bootstrap-domain-ontologies
           configMap:
-            name: ubiquia-flow-bootstrap-acls
+            name: ubiquia-flow-bootstrap-domain-ontologies
         - name: ubiquia-flow-bootstrap-graphs
           configMap:
             name: ubiquia-flow-bootstrap-graphs
@@ -60,8 +60,8 @@ spec:
       containers:
         - name: flow-service
           volumeMounts:
-            - name: ubiquia-flow-bootstrap-acls
-              mountPath: /app/etc/acls
+            - name: ubiquia-flow-bootstrap-domain-ontologies
+              mountPath: /app/etc/domain-ontologies
             - name: ubiquia-flow-bootstrap-graphs
               mountPath: /app/etc/graphs
             - name: config

@@ -7,7 +7,7 @@ public class FlowMessage extends AbstractModel {
 
     private FlowEvent flowEvent;
 
-    private Adapter targetAdapter;
+    private Node targetNode;
 
     private String payload;
 
@@ -26,12 +26,12 @@ public class FlowMessage extends AbstractModel {
     }
 
     @NotNull
-    public Adapter getTargetAdapter() {
-        return targetAdapter;
+    public Node getTargetAdapter() {
+        return targetNode;
     }
 
-    public void setTargetAdapter(Adapter targetAdapter) {
-        this.targetAdapter = targetAdapter;
+    public void setTargetAdapter(Node targetNode) {
+        this.targetNode = targetNode;
     }
 
     public String getPayload() {

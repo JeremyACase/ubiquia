@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.belief.state.libraries.service.finder.EntityRelationshipBuilderFinder;
 import org.ubiquia.common.library.belief.state.libraries.service.finder.EntityRepositoryFinder;
-import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
+import org.ubiquia.common.model.domain.entity.AbstractDomainModelEntity;
 
 /**
  * <p>An abstract class that enables generated belief states to persist model relationships
@@ -32,7 +32,7 @@ import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
  */
 @Service
 @Transactional
-public abstract class EntityRelationshipBuilder<T extends AbstractAclModelEntity>
+public abstract class EntityRelationshipBuilder<T extends AbstractDomainModelEntity>
     implements InterfaceLogger {
 
     protected final Map<Field, Field> cachedEntityFieldMap = new HashMap<>();
@@ -90,7 +90,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclModelEntity
      * @return The appropriate relationship builder.
      */
     private EntityRelationshipBuilder<?> tryGetRelationshipBuilderFor(
-        AbstractAclModelEntity entity) {
+        AbstractDomainModelEntity entity) {
 
         var entityName = getEntityClassName(entity);
         EntityRelationshipBuilder<?> builder = null;
@@ -263,7 +263,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclModelEntity
      * @throws Exception Exceptions from black magic.
      */
     private void tryBuildNestedRelationshipsIfNeededFor(Object child) throws Exception {
-        if ((child instanceof AbstractAclModelEntity entity)) {
+        if ((child instanceof AbstractDomainModelEntity entity)) {
             var entityName = this.getEntityClassName(entity);
             if (!entityName.equalsIgnoreCase(this.cachedEntityClass.getSimpleName())) {
                 var builder =
@@ -333,7 +333,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclModelEntity
      */
     private Boolean tryCacheFieldRelationship(Field field) {
         var cached = false;
-        if (AbstractAclModelEntity.class.isAssignableFrom(field.getType())) {
+        if (AbstractDomainModelEntity.class.isAssignableFrom(field.getType())) {
             cached = this.tryCacheEntityRelationship(field);
         }
         return cached;
@@ -446,7 +446,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractAclModelEntity
      * @param entity The entity we're building a name for.
      * @return The entity class name.
      */
-    private String getEntityClassName(final AbstractAclModelEntity entity) {
+    private String getEntityClassName(final AbstractDomainModelEntity entity) {
         return entity.getModelType() + "Entity";
     }
 }

@@ -16,7 +16,7 @@ public class TestManager extends AbstractTestManager {
     private static final Logger logger = LoggerFactory.getLogger(TestManager.class);
 
     @Autowired
-    private AclRegistrationTestModule aclRegistrationTestModule;
+    private DomainOntologyRegistrationTestModule domainOntologyRegistrationTestModule;
 
     @Autowired
     private BeliefStateDeploymentTestModule beliefStateDeploymentTestModule;
@@ -35,7 +35,7 @@ public class TestManager extends AbstractTestManager {
 
     @Override
     public void registerTests() {
-        this.testRegistrar.registerModule(this.aclRegistrationTestModule);
+        this.testRegistrar.registerModule(this.domainOntologyRegistrationTestModule);
         this.testRegistrar.registerModule(this.beliefStateDeploymentTestModule);
         this.testRegistrar.registerModule(this.animalTestModule);
         this.testRegistrar.registerModule(this.personTestModule);

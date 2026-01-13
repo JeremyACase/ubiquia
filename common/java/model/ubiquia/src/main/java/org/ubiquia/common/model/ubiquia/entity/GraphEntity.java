@@ -3,8 +3,9 @@ package org.ubiquia.common.model.ubiquia.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.List;
-import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
+import java.util.Set;
 
 
 @Entity
@@ -19,19 +20,26 @@ public class GraphEntity extends AbstractModelEntity {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "acl_graph_join_id", nullable = false)
-    private AgentCommunicationLanguageEntity agentCommunicationLanguage;
-
-    private SemanticVersion version;
+    @JoinColumn(name = "domain_ontology_graph_join_id", nullable = false)
+    private DomainOntologyEntity domainOntology;
 
     @OneToMany(mappedBy = "graph", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-    private List<AdapterEntity> adapters;
+    private Set<NodeEntity> nodes;
 
     @OneToMany(mappedBy = "graph", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-    private List<ComponentEntity> components;
-
+    private Set<ComponentEntity> components;
+    @OneToMany(mappedBy = "graph", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    private Set<FlowEntity> flows;
     @ManyToMany(mappedBy = "deployedGraphs", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<UbiquiaAgentEntity> ubiquiaAgentsDeployingGraph;
+    private List<AgentEntity> agentsDeployingGraph;
+
+    public Set<FlowEntity> getFlows() {
+        return flows;
+    }
+
+    public void setFlows(HashSet<FlowEntity> flows) {
+        this.flows = flows;
+    }
 
     @Override
     public String getModelType() {
@@ -47,7 +55,6 @@ public class GraphEntity extends AbstractModelEntity {
         this.name = name;
     }
 
-    @NotNull
     public String getAuthor() {
         return author;
     }
@@ -66,39 +73,21 @@ public class GraphEntity extends AbstractModelEntity {
     }
 
     @NotNull
-    public SemanticVersion getVersion() {
-        return version;
+    public Set<NodeEntity> getNodes() {
+        return nodes;
     }
 
-    public void setVersion(SemanticVersion version) {
-        this.version = version;
-    }
-
-    @NotNull
-    public List<AdapterEntity> getAdapters() {
-        return adapters;
-    }
-
-    public void setAdapters(List<AdapterEntity> adapters) {
-        this.adapters = adapters;
+    public void setNodes(HashSet<NodeEntity> nodes) {
+        this.nodes = nodes;
     }
 
     @NotNull
-    public List<ComponentEntity> getComponents() {
+    public Set<ComponentEntity> getComponents() {
         return components;
     }
 
-    public void setComponents(List<ComponentEntity> components) {
+    public void setComponents(HashSet<ComponentEntity> components) {
         this.components = components;
-    }
-
-    @NotNull
-    public AgentCommunicationLanguageEntity getAgentCommunicationLanguage() {
-        return agentCommunicationLanguage;
-    }
-
-    public void setAgentCommunicationLanguage(AgentCommunicationLanguageEntity agentCommunicationLanguageEntity) {
-        this.agentCommunicationLanguage = agentCommunicationLanguageEntity;
     }
 
     public List<String> getCapabilities() {
@@ -109,12 +98,21 @@ public class GraphEntity extends AbstractModelEntity {
         this.capabilities = capabilities;
     }
 
-    public List<UbiquiaAgentEntity> getUbiquiaAgentsDeployingGraph() {
-        return ubiquiaAgentsDeployingGraph;
+    public List<AgentEntity> getAgentsDeployingGraph() {
+        return agentsDeployingGraph;
     }
 
-    public void setUbiquiaAgentsDeployingGraph(List<UbiquiaAgentEntity> ubiquiaAgentsDeployingGraph) {
-        this.ubiquiaAgentsDeployingGraph = ubiquiaAgentsDeployingGraph;
+    public void setAgentsDeployingGraph(List<AgentEntity> agentsDeployingGraph) {
+        this.agentsDeployingGraph = agentsDeployingGraph;
+    }
+
+    @NotNull
+    public DomainOntologyEntity getDomainOntology() {
+        return domainOntology;
+    }
+
+    public void setDomainOntology(DomainOntologyEntity domainOntology) {
+        this.domainOntology = domainOntology;
     }
 }
 

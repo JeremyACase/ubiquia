@@ -25,13 +25,14 @@ dependencies {
     // Import the Page implementation stuff without having to have a database
     implementation "org.springframework.data:spring-data-commons"
 
-    implementation project(':common:java:model:acl')
+    implementation project(':common:java:model:domain')
     implementation project(':common:java:model:ubiquia')
     implementation project(':common:java:library:advice')
     implementation project(':common:java:library:api')
     implementation project(':common:java:library:implementation')
     implementation project(':common:java:test:helm')
 
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${JACKSON_VERSION}"
     implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
     implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
     implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"

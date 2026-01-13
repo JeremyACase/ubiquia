@@ -16,7 +16,7 @@ package org.ubiquia.acl.generated;
 
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.Entity;
-import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
+import org.ubiquia.common.model.domain.entity.AbstractDomainModelEntity;
 
 /**
  * A base model.
@@ -39,6 +39,6 @@ import org.ubiquia.common.model.acl.entity.AbstractAclModelEntity;
 })
 
 @Entity
-public class BaseModelEntity extends AbstractAclModelEntity {
+public class BaseModelEntity extends AbstractDomainModelEntity {
 
 }
