@@ -53,7 +53,7 @@ public class DomainDataContractRegistrar {
 
         var stringifiedSchema = this.objectMapper.writeValueAsString(domainOntology
             .getDomainDataContract()
-            .getJsonSchema());
+            .getSchema());
 
         this.jsonSchemaValidator.isValidJsonSchema(stringifiedSchema);
     }
@@ -69,9 +69,9 @@ public class DomainDataContractRegistrar {
 
         var stringifiedSchema = this.objectMapper.writeValueAsString(domainOntology
             .getDomainDataContract()
-            .getJsonSchema());
+            .getSchema());
 
-        domainDataContractEntity.setJsonSchema(stringifiedSchema);
+        domainDataContractEntity.setSchema(stringifiedSchema);
 
         domainDataContractEntity = this
             .domainDataContractRepository

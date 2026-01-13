@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull;
 public class DomainDataContractEntity extends AbstractModelEntity {
 
     @Column(columnDefinition = "TEXT")
-    private String jsonSchema;
+    private String schema;
 
     @OneToOne
     @JoinColumn(name = "domain_ontology_contract_join_id", nullable = true)
@@ -23,12 +23,12 @@ public class DomainDataContractEntity extends AbstractModelEntity {
     }
 
     @NotNull
-    public String getJsonSchema() {
-        return jsonSchema;
+    public String getSchema() {
+        return schema;
     }
 
-    public void setJsonSchema(String jsonSchema) {
-        this.jsonSchema = jsonSchema;
+    public void setSchema(String schema) {
+        this.schema = schema;
     }
 
     public DomainOntologyEntity getDomainOntology() {

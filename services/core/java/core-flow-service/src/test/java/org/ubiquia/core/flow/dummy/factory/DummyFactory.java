@@ -99,7 +99,7 @@ public class DummyFactory {
             .ignore(field(AbstractModel::getCreatedAt))
             .ignore(field(AbstractModel::getUpdatedAt))
             .set(field(AbstractModel::getModelType), "Component")
-            .set(field(DomainDataContract::getJsonSchema), jsonSchema)
+            .set(field(DomainDataContract::getSchema), jsonSchema)
             .create();
         return domainDataContract;
     }

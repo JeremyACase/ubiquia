@@ -24,7 +24,7 @@ public class AgentCommunicationLanguageDtoMapper extends GenericDtoMapper<
         if (Objects.nonNull(from)) {
             to = new DomainDataContract();
             super.setAbstractEntityFields(from, to);
-            to.setJsonSchema(super.objectMapper.readValue(from.getJsonSchema(), Object.class));
+            to.setSchema(super.objectMapper.readValue(from.getSchema(), Object.class));
         }
         return to;
     }

@@ -38,7 +38,7 @@
     {{/vendorExtensions.x-embeddable}}
 {{/isEnum}}
 
-public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}}{{^parent}}{{^vendorExtensions.x-embeddable}}extends AbstractAclModelEntity{{/vendorExtensions.x-embeddable}}{{/parent}}
+public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}}{{^parent}}{{^vendorExtensions.x-embeddable}}extends AbstractDomainModelEntity{{/vendorExtensions.x-embeddable}}{{/parent}}
 {{#vendorExtensions.x-implements}}
     {{#-first}}implements {{{.}}}{{/-first}}
     {{^-first}}, {{{.}}}{{/-first}}

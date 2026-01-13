@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 public class DomainDataContract extends AbstractModel {
 
-    private Object jsonSchema;
+    private Object schema;
 
     private DomainOntology domainOntology;
 
@@ -15,12 +15,12 @@ public class DomainDataContract extends AbstractModel {
     }
 
     @NotNull
-    public Object getJsonSchema() {
-        return jsonSchema;
+    public Object getSchema() {
+        return schema;
     }
 
-    public void setJsonSchema(Object jsonSchema) {
-        this.jsonSchema = jsonSchema;
+    public void setSchema(Object schema) {
+        this.schema = schema;
     }
 
     public DomainOntology getDomainOntology() {

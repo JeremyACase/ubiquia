@@ -1,6 +1,7 @@
 package org.ubiquia.core.belief.state.generator.service.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.IOException;
 import java.nio.file.Paths;
 import org.junit.jupiter.api.Assertions;
@@ -21,27 +22,16 @@ public class BeliefStateGeneratorTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Value("${ubiquia.test.acl.schema.filepath}")
-    private String schemaFilepath;
+    @Value("${ubiquia.test.ontology.filepath}")
+    private String ontologyFilepath;
 
     @Test
     public void assertGeneratesBeliefState_isValid() throws IOException {
 
-        var schemaPath = Paths.get(this.schemaFilepath);
-        var jsonSchema = this.objectMapper.readValue(
-            schemaPath.toFile(),
-            Object.class);
-
-        var domainOntology = new DomainOntology();
-        domainOntology.setName("pets");
-        domainOntology.setVersion(new SemanticVersion());
-        domainOntology.getVersion().setMajor(1);
-        domainOntology.getVersion().setMinor(2);
-        domainOntology.getVersion().setPatch(3);
-
-        var domainDataContract = new DomainDataContract();
-        domainDataContract.setJsonSchema(jsonSchema);
-        domainOntology.setDomainDataContract(domainDataContract);
+        var ontologyFilepath = Paths.get(this.ontologyFilepath);
+        var yamlMapper = new ObjectMapper(new YAMLFactory());
+        var domainOntology = yamlMapper
+            .readValue(ontologyFilepath.toFile(), DomainOntology.class);
 
         Assertions.assertDoesNotThrow(() -> this
             .beliefStateGenerator

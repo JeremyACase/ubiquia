@@ -37,7 +37,7 @@ public class OpenApiEntityGenerator {
 
         var configurator = new CodegenConfigurator()
             .setInputSpec(specFilePath)
-            .setGeneratorName("ubiquia-acl-entity-generator")
+            .setGeneratorName("ubiquia-domain-entity-generator")
             .setOutputDir("generated")
             .setTemplateDir(templatePath)
             .addAdditionalProperty("gson", false)

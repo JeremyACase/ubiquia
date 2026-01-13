@@ -66,10 +66,7 @@ ubiquia:
       url: http://ubiquia-core-flow-service
       pollFrequencyMilliseconds: 5000
   test:
-    acl:
-      openapi:
-        filepath: src/test/resources/pets-openapi.yaml
-      schema:
-        filepath: src/test/resources/pets-acl-json-schema.json
+    ontology:
+      filepath: src/test/resources/pets.yaml
 
   jdkVersion: @OPENJDK_VERSION@

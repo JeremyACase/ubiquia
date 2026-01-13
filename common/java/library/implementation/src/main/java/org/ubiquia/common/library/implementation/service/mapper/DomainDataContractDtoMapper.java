@@ -23,7 +23,7 @@ public class DomainDataContractDtoMapper extends GenericDtoMapper<
 
             super.setAbstractEntityFields(from, to);
 
-            to.setJsonSchema(from.getJsonSchema());
+            to.setSchema(from.getSchema());
         }
         return to;
     }

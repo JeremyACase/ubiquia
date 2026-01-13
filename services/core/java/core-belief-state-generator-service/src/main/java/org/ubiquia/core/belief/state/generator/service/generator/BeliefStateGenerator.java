@@ -1,10 +1,12 @@
 package org.ubiquia.core.belief.state.generator.service.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,11 +133,18 @@ public class BeliefStateGenerator {
     private String getJsonSchemaFrom(final DomainOntology domainOntology)
         throws IOException {
 
-        var jsonSchema = this
-            .objectMapper
-            .writeValueAsString(domainOntology.getDomainDataContract().getJsonSchema());
+        var schema = domainOntology
+            .getDomainDataContract()
+            .getSchema();
+
+        // Turn "JSON string" OR "object" into a real JSON node
+        var schemaNode = (schema instanceof String s)
+            ? this.objectMapper.readTree(s)          // parse the JSON string
+            : this.objectMapper.valueToTree(schema); // convert POJO/Map/etc
+
+        var jsonSchema = this.objectMapper.writeValueAsString(schemaNode);
         jsonSchema = this.enumNormalizer.normalizeEnums(jsonSchema);
-        jsonSchema = this.ubiquiaModelInjector.appendAclModels(jsonSchema);
+        jsonSchema = this.ubiquiaModelInjector.appendDomainModels(jsonSchema);
         jsonSchema = this.inheritancePreprocessor.appendInheritance(jsonSchema);
 
         logger.debug("Preprocessed JSON Schema to: {}", jsonSchema);

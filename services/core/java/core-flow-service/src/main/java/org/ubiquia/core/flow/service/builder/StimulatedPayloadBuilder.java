@@ -84,7 +84,7 @@ public class StimulatedPayloadBuilder {
                 .getGraph()
                 .getDomainOntology()
                 .getDomainDataContract()
-                .getJsonSchema();
+                .getSchema();
 
             var schemaStore = new SchemaStore(true);
             var schema = schemaStore.loadSchemaJson(jsonSchema);

@@ -107,7 +107,7 @@ public class BeliefStateTeardownTestModule extends AbstractHelmTestModule {
             var postUrl = this.beliefStateGeneratorServiceConfig.getUrl()
                 + ":"
                 + this.beliefStateGeneratorServiceConfig.getPort()
-                + "/belief-state-generator/teardown/belief-state";
+                + "/core/belief-state-generator/teardown/belief-state";
 
             logger.info("...POSTing to teardown at: {}", postUrl);
 

@@ -223,15 +223,15 @@ graphs:
 
       - name: Pet-Store-Image-Classifier-Component
 
-        # Setting a component as a template will instruct Ubiquia to not instantiate it as a 
-        # Kubernetes pod, but instead to generate a "proxy" for it which will act on its behalf with 
+        # Setting a component as a template will instruct Ubiquia to not instantiate it as a
+        # Kubernetes pod, but instead to generate a "proxy" for it which will act on its behalf with
         # dummy data.
         componentType: TEMPLATE
         modelType: Component
         description: This is a an example component that will classify an animal from an image.
 
         communicationServiceSettings:
-          # Ensure the Communication Service exposes this component's endpoints  
+          # Ensure the Communication Service exposes this component's endpoints
           exposeViaCommService: true
 
         # This is the port that will be exposed for this component when it is deployed.
@@ -253,12 +253,12 @@ graphs:
                 value: demo-value
           configMountPath: /example/mountpath
 
-        # This is a list of settings to use to override the baseline values should the graph be 
-        # deployed with any "flags." Flags are passed to Ubiquia when deploying graphs via the GraphController 
+        # This is a list of settings to use to override the baseline values should the graph be
+        # deployed with any "flags." Flags are passed to Ubiquia when deploying graphs via the GraphController
         # RESTful interface.
         overrideSettings:
 
-          # Any example override setting. It will override the baseline image values defined when the 
+          # Any example override setting. It will override the baseline image values defined when the
           # graph is deployed with a "exampleOverride" flag.
           - flag: exampleOverride
             key: image
@@ -308,112 +308,112 @@ graphs:
             value: POD
 
         node:
-          
+
 
     # This is a list of nodes that should be deployed with the graph. Nodes may or may not be associated with components.
     nodes:
 
-    - modelType: Node
-      nodeType: PUSH
-      name: Pet-Store-Image-Classifier-Node
-      description: This is an example node.
+      - modelType: Node
+        nodeType: PUSH
+        name: Pet-Store-Image-Classifier-Node
+        description: This is an example node.
 
-      communicationServiceSettings:
-        # Ensure the Communication Service exposes this nodes's endpoints  
-        exposeViaCommService: true
+        communicationServiceSettings:
+          # Ensure the Communication Service exposes this nodes's endpoints
+          exposeViaCommService: true
 
-      # This is the endpoint of the component that the node will interact with when it 
-      # receives upstream traffic.
-      endpoint: /upload-image
+        # This is the endpoint of the component that the node will interact with when it
+        # receives upstream traffic.
+        endpoint: /upload-image
 
-      # An example input schema that references a model of the domain ontology.
-      inputSubSchemas:
-        - modelName: BinaryFile
+        # An example input schema that references a model of the domain ontology.
+        inputSubSchemas:
+          - modelName: BinaryFile
 
-      # An example input schema that references a model of the domain ontology.
-      outputSubSchema:
-        modelName: ClassificationResult
-      
-      # Various configuration for the node, such as whether to persist payload traffic in the 
-      # Ubiquia database for later diagnostics/analysis.
-      nodeSettings:
-        persistInputPayload: true
-        persistOutputPayload: true
-        validateOutputPayload: false
-        validateInputPayload: false
+        # An example input schema that references a model of the domain ontology.
+        outputSubSchema:
+          modelName: ClassificationResult
 
-      # Like components, nodes can have overridesettings.
-      overrideSettings:
-        - flag: demo
-          key: nodeSettings
-          value:
-            persistInputPayload: false
-            persistOutputPayload: false
-            validateOutputPayload: true
+        # Various configuration for the node, such as whether to persist payload traffic in the
+        # Ubiquia database for later diagnostics/analysis.
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateOutputPayload: false
+          validateInputPayload: false
 
-    - modelType: Node
-      nodeType: HIDDEN
-      name: Pet-Generator-Node
-      description: This is an example node.
+        # Like components, nodes can have overridesettings.
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: false
+              persistOutputPayload: false
+              validateOutputPayload: true
 
-      communicationServiceSettings:
-        exposeViaCommService: true
+      - modelType: Node
+        nodeType: HIDDEN
+        name: Pet-Generator-Node
+        description: This is an example node.
 
-      endpoint: /pet/store/create-pet
+        communicationServiceSettings:
+          exposeViaCommService: true
 
-      inputSubSchemas:
-        - modelName: ClassificationResult
+        endpoint: /pet/store/create-pet
 
-      outputSubSchema:
-        modelName: Animal
-      nodeSettings:
-        persistInputPayload: true
-        persistOutputPayload: true
-        validateOutputPayload: false
-        validateInputPayload: false
+        inputSubSchemas:
+          - modelName: ClassificationResult
 
-      overrideSettings:
-        - flag: demo
-          key: nodeSettings
-          value:
-            persistInputPayload: true
-            persistOutputPayload: true
-            validateInputPayload: true
-            validateOutputPayload: true
-            stimulateInputPayload: true
+        outputSubSchema:
+          modelName: Animal
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateOutputPayload: false
+          validateInputPayload: false
 
-    - modelType: Node
-      nodeType: EGRESS
-      name: Pet-Egress-Node
-      description: This is an example node that POSTs incoming payloads to a belief state.
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: true
+              validateOutputPayload: true
+              stimulateInputPayload: true
 
-      endpoint: http://pets-belief-state-1-2-3:8080/ubiquia/Animal/add
+      - modelType: Node
+        nodeType: EGRESS
+        name: Pet-Egress-Node
+        description: This is an example node that POSTs incoming payloads to a belief state.
 
-      inputSubSchemas:
-        - modelName: Animal
+        endpoint: http://pets-belief-state-1-2-3:8080/ubiquia/Animal/add
 
-      egressSettings:
-        httpOutputType: POST
-        egressType: SYNCHRONOUS
-        egressConcurrency: 1
+        inputSubSchemas:
+          - modelName: Animal
 
-      nodeSettings:
-        persistInputPayload: true
-        persistOutputPayload: true
-        validateOutputPayload: false
-        validateInputPayload: false
+        egressSettings:
+          httpOutputType: POST
+          egressType: SYNCHRONOUS
+          egressConcurrency: 1
 
-      overrideSettings:
-        - flag: demo
-          key: nodeSettings
-          value:
-            persistInputPayload: true
-            persistOutputPayload: true
-            validateInputPayload: true
-            validateOutputPayload: true
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateOutputPayload: false
+          validateInputPayload: false
 
-    # This is how Ubiquia knows how to connect nodes together into a Directed Acyclic Graph. Conceptually, 
-    # data flows from left-to-right. As nodes receive payloads, they will send them to their respective 
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: true
+              validateOutputPayload: true
+
+    # This is how Ubiquia knows how to connect nodes together into a Directed Acyclic Graph. Conceptually,
+    # data flows from left-to-right. As nodes receive payloads, they will send them to their respective
     # components (if they have them), package up the component response (if applicable), and send
     # the payload "downstream" (i.e., to any nodes "immediately on the right.")
     edges:

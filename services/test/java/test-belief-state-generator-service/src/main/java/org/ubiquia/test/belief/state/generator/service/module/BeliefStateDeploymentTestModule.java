@@ -95,7 +95,7 @@ public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
         var postUrl = this.beliefStateGeneratorServiceConfig.getUrl()
             + ":"
             + this.beliefStateGeneratorServiceConfig.getPort()
-            + "/ubiquia/belief-state-generator/belief-state/generate";
+            + "/ubiquia/core/belief-state-generator/belief-state/generate";
 
         logger.info("POSTing to URL: {}", postUrl);
 

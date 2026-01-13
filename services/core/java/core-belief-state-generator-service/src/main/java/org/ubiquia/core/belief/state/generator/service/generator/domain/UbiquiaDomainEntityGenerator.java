@@ -1,6 +1,6 @@
-package org.ubiquia.core.belief.state.generator.service.generator.acl;
+package org.ubiquia.core.belief.state.generator.service.generator.domain;
 
-import static org.ubiquia.core.belief.state.generator.service.generator.acl.UbiquiaAclEntityGenerator.RelationPair.Cardinality.ONE;
+import static org.ubiquia.core.belief.state.generator.service.generator.domain.UbiquiaDomainEntityGenerator.RelationPair.Cardinality.ONE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,13 +13,13 @@ import org.openapitools.codegen.model.ModelsMap;
  * Post-processor that figures out JPA relationship metadata and
  * stores it in vendor-extensions every template can use.
  */
-public class UbiquiaAclEntityGenerator extends JavaClientCodegen {
+public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
 
     private final Map<String, CodegenModel> modelIndex = new HashMap<>();
 
     @Override
     public String getName() {
-        return "ubiquia-acl-entity-generator";
+        return "ubiquia-domain-entity-generator";
     }
 
     @Override

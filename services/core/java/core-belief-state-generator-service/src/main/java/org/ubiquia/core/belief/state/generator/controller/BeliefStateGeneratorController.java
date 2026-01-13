@@ -23,7 +23,7 @@ import org.ubiquia.core.belief.state.generator.service.generator.BeliefStateGene
 import org.ubiquia.core.belief.state.generator.service.k8s.BeliefStateOperator;
 
 @RestController
-@RequestMapping("ubiquia/belief-state-generator")
+@RequestMapping("ubiquia/core/belief-state-generator")
 public class BeliefStateGeneratorController {
 
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateGeneratorController.class);
@@ -87,6 +87,8 @@ public class BeliefStateGeneratorController {
         }
 
         var domainOntology = response.getBody().getContent().get(0);
+        logger.info("Raw: {}", domainOntology.toString());
+        logger.info("Parsed: {}", this.objectMapper.writeValueAsString(domainOntology));
         this.beliefStateGenerator.generateBeliefStateFrom(domainOntology);
 
         logger.info("..generated belief state.");

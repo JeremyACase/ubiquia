@@ -1,4 +1,4 @@
-package org.ubiquia.core.belief.state.generator.service.generator.acl;
+package org.ubiquia.core.belief.state.generator.service.generator.domain;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +7,7 @@ import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.languages.JavaClientCodegen;
 import org.openapitools.codegen.model.ModelsMap;
 
-public class UbiquiaAclDtoGenerator extends JavaClientCodegen {
+public class UbiquiaDomainDtoGenerator extends JavaClientCodegen {
 
     private final Map<String, CodegenModel> modelIndex = new HashMap<>();
 
@@ -23,7 +23,7 @@ public class UbiquiaAclDtoGenerator extends JavaClientCodegen {
 
     @Override
     public String getName() {
-        return "ubiquia-acl-dto-generator";
+        return "ubiquia-domain-dto-generator";
     }
 
     @Override
