@@ -18,7 +18,7 @@ import org.ubiquia.common.library.api.config.AgentConfig;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
-import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
+import org.ubiquia.core.communication.service.manager.flow.NodeProxyManager;
 import org.ubiquia.core.communication.service.manager.flow.ComponentProxyManager;
 
 /**
@@ -32,7 +32,7 @@ import org.ubiquia.core.communication.service.manager.flow.ComponentProxyManager
  *   <li>Keeps an internal map of known graphs (by ID) to detect new deployments and
  *       torn-down graphs between polling cycles.</li>
  *   <li>Fetches full {@link Graph} records for new deployments, updates the cache, and
- *       informs {@link AdapterProxyManager} and {@link ComponentProxyManager} to (un)register
+ *       informs {@link NodeProxyManager} and {@link ComponentProxyManager} to (un)register
  *       reverse-proxy routes or other resources.</li>
  * </ul>
  *
@@ -53,7 +53,7 @@ public class DeployedGraphPoller {
     private FlowServiceConfig flowServiceConfig;
 
     @Autowired
-    private AdapterProxyManager adapterProxyManager;
+    private NodeProxyManager nodeProxyManager;
 
     @Autowired
     private ComponentProxyManager componentProxyManager;
@@ -207,7 +207,7 @@ public class DeployedGraphPoller {
         throws URISyntaxException {
         for (var id : newlyDeployedGraphIds) {
             var graph = this.currentGraphs.get(id);
-            this.adapterProxyManager.tryProcessNewlyDeployedGraph(graph);
+            this.nodeProxyManager.tryProcessNewlyDeployedGraph(graph);
             this.componentProxyManager.tryProcessNewlyDeployedGraph(graph);
         }
     }
@@ -221,7 +221,7 @@ public class DeployedGraphPoller {
     private void processTornDownGraphs(final List<String> newlyTornDownGraphIds) {
         for (var id : newlyTornDownGraphIds) {
             var graph = this.currentGraphs.get(id);
-            this.adapterProxyManager.tryProcessNewlyTornDownGraph(graph);
+            this.nodeProxyManager.tryProcessNewlyTornDownGraph(graph);
             this.componentProxyManager.tryProcessNewlyTornDownGraph(graph);
             this.currentGraphs.remove(id);
         }

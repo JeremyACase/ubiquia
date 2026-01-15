@@ -27,8 +27,8 @@ import org.ubiquia.common.model.ubiquia.dto.Graph;
  * <p>Downstream host/port are sourced from {@link FlowServiceConfig}.</p>
  */
 @RestController
-@RequestMapping("/ubiquia/communication-service/flow-service/adapter")
-public class AdapterControllerProxy extends AbstractUbiquiaDaoControllerProxy<Graph> {
+@RequestMapping("/ubiquia/core/communication-service/flow-service/node")
+public class NodeControllerProxy extends AbstractUbiquiaDaoControllerProxy<Graph> {
 
     /** Flow Service host/port configuration used to build the downstream base URL. */
     @Autowired
@@ -46,7 +46,7 @@ public class AdapterControllerProxy extends AbstractUbiquiaDaoControllerProxy<Gr
         var url = this.flowServiceConfig.getUrl()
             + ":"
             + this.flowServiceConfig.getPort().toString()
-            + "/ubiquia/flow-service/adapter";
+            + "/ubiquia/core/flow-service/node";
         return url;
     }
 }

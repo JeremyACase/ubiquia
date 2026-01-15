@@ -15,7 +15,7 @@ import org.ubiquia.core.communication.interfaces.InterfaceUbiquiaDaoControllerPr
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/ubiquia/communication-service/belief-state-generator-service")
+@RequestMapping("/ubiquia/core/communication-service/belief-state-generator-service")
 public class BeliefStateGeneratorControllerProxy implements InterfaceUbiquiaDaoControllerProxy {
 
     @Autowired
@@ -108,7 +108,7 @@ public class BeliefStateGeneratorControllerProxy implements InterfaceUbiquiaDaoC
         var url = this.beliefStateGeneratorServiceConfig.getUrl()
             + ":"
             + this.beliefStateGeneratorServiceConfig.getPort().toString()
-            + "/belief-state-generator";
+            + "/core/belief-state-generator-service";
         return url;
     }
 }

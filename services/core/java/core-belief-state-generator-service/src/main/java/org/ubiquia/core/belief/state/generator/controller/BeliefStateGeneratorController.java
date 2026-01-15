@@ -23,7 +23,7 @@ import org.ubiquia.core.belief.state.generator.service.generator.BeliefStateGene
 import org.ubiquia.core.belief.state.generator.service.k8s.BeliefStateOperator;
 
 @RestController
-@RequestMapping("ubiquia/core/belief-state-generator")
+@RequestMapping("ubiquia/core/belief-state-generator-service")
 public class BeliefStateGeneratorController {
 
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateGeneratorController.class);

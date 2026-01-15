@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
-import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
+import org.ubiquia.core.communication.service.manager.flow.NodeProxyManager;
 
 /**
  * Reverse proxy controller for adapter endpoints.
@@ -24,7 +24,7 @@ import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
  * This controller exposes a generic reverse-proxy route under
  * {@code /ubiquia/communication-service/adapter-reverse-proxy}. Requests to
  * {@code /{adapterName}/**} are forwarded to a target adapter endpoint that is
- * dynamically looked up via {@link AdapterProxyManager}. The final target URL is
+ * dynamically looked up via {@link NodeProxyManager}. The final target URL is
  * constructed from the configured {@link FlowServiceConfig} host/port and the
  * registered adapter endpoint.
  * </p>
@@ -52,20 +52,20 @@ import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
  *       consider reading {@code getErrorStream()} for error bodies.</li>
  * </ul>
  *
- * @see AdapterProxyManager
+ * @see NodeProxyManager
  * @see FlowServiceConfig
  */
 @RestController
-@RequestMapping("/ubiquia/communication-service/adapter-reverse-proxy")
-public class DeployedAdapterProxyController {
+@RequestMapping("/ubiquia/core/communication-service/node-reverse-proxy")
+public class DeployedNodeProxyController {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeployedAdapterProxyController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeployedNodeProxyController.class);
 
     /**
      * Registry for dynamically discovered/registered adapter endpoints.
      */
     @Autowired
-    private AdapterProxyManager adapterProxyManager;
+    private NodeProxyManager nodeProxyManager;
 
     /**
      * Base host/port configuration used to build the adapter target URL.
@@ -85,7 +85,7 @@ public class DeployedAdapterProxyController {
      *
      * <p>
      * This is primarily a diagnostics/introspection endpoint to verify what the
-     * {@link AdapterProxyManager} has registered.
+     * {@link NodeProxyManager} has registered.
      * </p>
      *
      * @return a list of registered adapter endpoint strings
@@ -93,7 +93,7 @@ public class DeployedAdapterProxyController {
     @GetMapping("/get-proxied-urls")
     public List<String> getProxiedUrls() {
         logger.info("Received request for currently proxied urls...");
-        return this.adapterProxyManager.getRegisteredEndpoints();
+        return this.nodeProxyManager.getRegisteredEndpoints();
     }
 
     /**
@@ -104,7 +104,7 @@ public class DeployedAdapterProxyController {
      * The method:
      * </p>
      * <ol>
-     *   <li>Looks up the adapter's registered endpoint using {@link AdapterProxyManager}.</li>
+     *   <li>Looks up the adapter's registered endpoint using {@link NodeProxyManager}.</li>
      *   <li>Builds a target URL using {@link FlowServiceConfig#getUrl()} and {@link FlowServiceConfig#getPort()}.</li>
      *   <li>Copies inbound headers to the outbound connection.</li>
      *   <li>For {@code POST}/{@code PUT}, streams the request body to the target.</li>
@@ -115,27 +115,27 @@ public class DeployedAdapterProxyController {
      * the trailing path. If your adapters require hierarchical paths, consider preserving
      * separators when computing {@code cleanedPath}.</p>
      *
-     * @param adapterName the logical adapter identifier used to resolve the target endpoint
+     * @param nodeName the logical adapter identifier used to resolve the target endpoint
      * @param request     the incoming servlet request from the client
      * @param response    the servlet response to write the proxied result into
      * @throws IOException              if an I/O error occurs while forwarding the request/response
      * @throws IllegalArgumentException if no adapter is registered under the given {@code adapterName}
      */
     @RequestMapping(
-        value = "/{adapterName}/**",
+        value = "/{nodeName}/**",
         method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT}
     )
     public void proxyToAdapter(
-        @PathVariable String adapterName,
+        @PathVariable String nodeName,
         HttpServletRequest request,
         HttpServletResponse response) throws IOException {
 
-        var registeredEndpoint = this.adapterProxyManager.getRegisteredEndpointFor(adapterName);
+        var registeredEndpoint = this.nodeProxyManager.getRegisteredEndpointFor(nodeName);
         if (Objects.nonNull(registeredEndpoint)) {
 
             var cleanedPath = request.getRequestURI()
                 .replace("/ubiquia/communication-service/adapter-reverse-proxy", "")
-                .replace(adapterName, "")
+                .replace(nodeName, "")
                 .replace("/", "");
 
             var targetUrl = this.flowServiceConfig.getUrl()
@@ -189,7 +189,7 @@ public class DeployedAdapterProxyController {
             }
         } else {
             throw new IllegalArgumentException("ERROR: No adapter registered with name: "
-                + adapterName);
+                + nodeName);
         }
     }
 }

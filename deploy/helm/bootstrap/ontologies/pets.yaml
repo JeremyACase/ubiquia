@@ -57,6 +57,17 @@ domainDataContract:
             maxLength: 100
             default: Just some info about this model.
 
+      BinaryFile:
+        description: A model representing raw binary file data.
+        type: object
+        properties:
+          data:
+            type: string
+            format: byte
+            description: Base64-encoded binary data.
+        required:
+          - data
+
       AdoptionTransaction:
         description: A transaction of an adoption.
         type: object
@@ -185,6 +196,8 @@ domainDataContract:
     properties:
       ColorType:
         $ref: "#/definitions/ColorType"
+      BinaryFile:
+        $ref: "#/definitions/BinaryFile"
       Name:
         $ref: "#/definitions/Name"
       BaseModel:

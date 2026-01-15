@@ -38,14 +38,14 @@ import org.ubiquia.common.model.ubiquia.dto.Graph;
  * </p>
  */
 @Service
-public class AdapterProxyManager {
+public class NodeProxyManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(AdapterProxyManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(NodeProxyManager.class);
 
     /**
      * Registry of adapter name → proxied base endpoint path.
      */
-    private final HashMap<String, String> proxiedAdapterEndpoints = new HashMap<>();
+    private final HashMap<String, String> proxiedNodeEndpoints = new HashMap<>();
 
     @Autowired
     private NodeEndpointRecordBuilder nodeEndpointRecordBuilder;
@@ -70,25 +70,25 @@ public class AdapterProxyManager {
      */
     public void tryProcessNewlyDeployedGraph(final Graph graph) {
 
-        var adaptersToProxy = graph
+        var nodesToProxy = graph
             .getNodes()
             .stream()
-            .filter(adapter ->
+            .filter(node ->
                 Boolean.TRUE.equals(
-                    adapter.getCommunicationServiceSettings().getExposeViaCommService()))
+                    node.getCommunicationServiceSettings().getExposeViaCommService()))
             .toList();
 
-        for (var adapter : adaptersToProxy) {
+        for (var node : nodesToProxy) {
 
-            var adapterName = adapter.getName().toLowerCase();
-            if (!this.proxiedAdapterEndpoints.containsKey(adapterName)) {
-                logger.info("Registering proxy for adapter: {}", adapter.getName());
+            var nodeName = node.getName().toLowerCase();
+            if (!this.proxiedNodeEndpoints.containsKey(nodeName)) {
+                logger.info("Registering proxy for node: {}", node.getName());
                 var endpoint = this.nodeEndpointRecordBuilder.getBasePathFor(
                     graph.getName(),
-                    adapterName);
+                    nodeName);
                 logger.info("...proxying base url: {}", endpoint);
-                this.proxiedAdapterEndpoints.put(
-                    adapterName,
+                this.proxiedNodeEndpoints.put(
+                    nodeName,
                     endpoint);
             }
         }
@@ -105,17 +105,17 @@ public class AdapterProxyManager {
      * @param graph the torn-down graph whose adapters should be unproxied
      */
     public void tryProcessNewlyTornDownGraph(final Graph graph) {
-        var adaptersToUnproxy = graph.getNodes().stream()
-            .filter(adapter -> Boolean.TRUE.equals(
-                adapter.getCommunicationServiceSettings().getExposeViaCommService()))
+        var nodesToUnproxy = graph.getNodes().stream()
+            .filter(node -> Boolean.TRUE.equals(
+                node.getCommunicationServiceSettings().getExposeViaCommService()))
             .toList();
 
-        for (var adapter : adaptersToUnproxy) {
+        for (var node : nodesToUnproxy) {
 
-            if (this.proxiedAdapterEndpoints.containsKey(adapter.getName())) {
-                logger.info("...unproxying endpoints for adapter {}...",
-                    adapter.getName());
-                this.proxiedAdapterEndpoints.remove(adapter.getName());
+            if (this.proxiedNodeEndpoints.containsKey(node.getName())) {
+                logger.info("...unproxying endpoints for node {}...",
+                    node.getName());
+                this.proxiedNodeEndpoints.remove(node.getName());
             }
         }
     }
@@ -126,7 +126,11 @@ public class AdapterProxyManager {
      * @return immutable snapshot list of endpoint base paths
      */
     public List<String> getRegisteredEndpoints() {
-        return this.proxiedAdapterEndpoints.values().stream().toList();
+        return this
+            .proxiedNodeEndpoints
+            .values()
+            .stream()
+            .toList();
     }
 
     /**
@@ -135,13 +139,13 @@ public class AdapterProxyManager {
      * <p><strong>Casing:</strong> Keys may be stored in lower case; callers should
      * normalize their input (e.g., {@code toLowerCase(Locale.ROOT)}) to avoid misses.</p>
      *
-     * @param adapterName the adapter's logical name
+     * @param nodeName the adapter's logical name
      * @return the registered base endpoint (e.g., {@code "graph-x/adapter-y"}), or {@code null} if not registered
      */
-    public String getRegisteredEndpointFor(final String adapterName) {
+    public String getRegisteredEndpointFor(final String nodeName) {
         String endpoint = null;
-        if (this.proxiedAdapterEndpoints.containsKey(adapterName)) {
-            endpoint = this.proxiedAdapterEndpoints.get(adapterName);
+        if (this.proxiedNodeEndpoints.containsKey(nodeName)) {
+            endpoint = this.proxiedNodeEndpoints.get(nodeName);
         }
         return endpoint;
     }

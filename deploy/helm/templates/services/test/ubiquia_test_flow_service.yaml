@@ -1,14 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ubiquia-test-belief-state-generator-ontologies
-data:
-{{ (.Files.Glob "bootstrap/ontologies/*.yaml").AsConfig | indent 2 }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ubiquia-test-belief-state-generator-config
+  name: ubiquia-test-flow-service-config
 data:
   application.yaml: |
     logging:
@@ -43,7 +36,7 @@ data:
       port: {{ .Values.convenience.variables.spring.port }}
 
       application:
-        name: belief-state-generator-service-test
+        name: flow-service-test
       jackson:
         date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
 
@@ -58,10 +51,6 @@ data:
         storage:
           minio:
             enabled: {{ .Values.ubiquia.agent.storage.minio.enabled }}
-      belief-state-generator:
-        service:
-          port: {{ .Values.convenience.variables.spring.port }}
-          url: http://ubiquia-core-belief-state-generator-service
       flow:
         service:
           port: {{ .Values.convenience.variables.spring.port }}
@@ -69,14 +58,11 @@ data:
       kubernetes:
         enabled: true
         namespace: {{ .Release.Namespace }}      
-      test:
-        ontology:
-          filepath: /app/etc/pets.yaml
 ---
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ubiquia-core-belief-state-generator-service-test
+  name: ubiquia-test-flow-service
   annotations:
     "helm.sh/hook": test
   labels:
@@ -85,20 +71,14 @@ spec:
   serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
   restartPolicy: Never
   containers:
-    - name: ubiquia-core-belief-state-generator-service-test-runner
-      image: {{ include "ubiquia.test.beliefStateGeneratorService.image" . }}
+    - name: ubiquia-test-flow-service-runner
+      image: {{ include "ubiquia.test.flowService.image" . }}
       imagePullPolicy: IfNotPresent
       volumeMounts:
         - name: config
           mountPath: /app/etc/application.yaml
           subPath: application.yaml
-        - name: ubiquia-test-belief-state-generator-ontologies
-          mountPath: /app/etc/pets.yaml
-          subPath: pets.yaml
   volumes:
     - name: config
       configMap:
-        name: ubiquia-test-belief-state-generator-config
-    - name: ubiquia-test-belief-state-generator-ontologies
-      configMap:
-        name: ubiquia-test-belief-state-generator-ontologies
+        name: ubiquia-test-flow-service-config
