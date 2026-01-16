@@ -12,6 +12,7 @@ import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.generic.GenericKubernetesApi;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class ComponentDeploymentTestModule extends AbstractHelmTestModule {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Boolean dagDeployed = false;
+    private final AtomicBoolean dagDeployed = new AtomicBoolean(false);
 
     @Autowired
     private FlowServiceConfig flowServiceConfig;
@@ -125,7 +126,7 @@ public class ComponentDeploymentTestModule extends AbstractHelmTestModule {
             throw new RuntimeException(e);
         }
 
-        if (this.dagDeployed) {
+        if (!this.dagDeployed.get()) {
             this.testState.addFailure("No components for a pets DAG were created in "
                 + "Kubernetes...");
         }
@@ -147,10 +148,17 @@ public class ComponentDeploymentTestModule extends AbstractHelmTestModule {
             @Override
             public void onAdd(V1Deployment v1Deployment) {
 
+                logger.info("...received deployment with name {}...",
+                    v1Deployment.getMetadata().getName());
+
                 var labels = v1Deployment.getMetadata().getLabels();
                 if (Objects.nonNull(labels)
+                    && Objects.nonNull(labels.get("ubiquia-graph"))
                     && labels.get("ubiquia-graph").equals("pet-store-dag")) {
-                    dagDeployed = true;
+
+                    logger.info("...pet-store-dag deployed; setting passed to true...");
+
+                    dagDeployed.set(true);
                 }
             }
 

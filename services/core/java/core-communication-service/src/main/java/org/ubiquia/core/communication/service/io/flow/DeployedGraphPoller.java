@@ -160,15 +160,18 @@ public class DeployedGraphPoller {
 
     /**
      * Fetches and caches full {@link Graph} records for newly deployed IDs by querying the
-     * Flow Service {@code /ubiquia/flow-service/graph/query/params} endpoint with {@code id}.
+     * Flow Service {@code /ubiquia/core/flow-service/graph/query/params} endpoint with {@code id}.
      *
      * @param newlyDeployedGraphIds IDs to resolve into {@link Graph} objects
      */
     private void queryNewlyDeployedGraphs(final List<String> newlyDeployedGraphIds) {
         for (var id : newlyDeployedGraphIds) {
             var targetUri = UriComponentsBuilder
-                .fromHttpUrl(this.flowServiceConfig.getUrl() + ":" + this.flowServiceConfig.getPort())
-                .path("/ubiquia/flow-service/graph/query/params")
+                .fromHttpUrl(
+                    this.flowServiceConfig.getUrl()
+                        + ":"
+                        + this.flowServiceConfig.getPort())
+                .path("/ubiquia/core/flow-service/graph/query/params")
                 .queryParam("page", 0)
                 .queryParam("size", 1)
                 .queryParam("id", id)
