@@ -71,8 +71,10 @@ spec:
           test_endpoint_allowing_any_non_404 POST "$BASE_URL/ubiquia/core/communication-service/belief-state-generator-service/belief-state/generate" "Generate Belief State"
           test_endpoint_allowing_any_non_404 POST "$BASE_URL/ubiquia/core/communication-service/belief-state-generator-service/belief-state/teardown" "Teardown Belief State"
 
-          # -- Proxy to flow-service/ubiquia-agent --
+          # -- Proxy to flow-service --
           test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/core/communication-service/flow-service/agent/instance/get" "Proxy: Get Instance"
+          test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/core/communication-service/flow-service/component/query/params?page=0&size=1" "Proxy: Get Query Params for Components"
+          test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/core/communication-service/flow-service/node/query/params?page=0&size=1" "Proxy: Get Query Params for Nodes"
 
           AGENT_ID=test-agent-id
           test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/core/communication-service/flow-service/agent/${AGENT_ID}/get-deployed-graph-ids?page=0&size=10" "Proxy: Get Deployed Graph IDs"

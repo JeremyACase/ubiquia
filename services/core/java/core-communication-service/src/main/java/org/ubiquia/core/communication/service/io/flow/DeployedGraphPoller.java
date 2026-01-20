@@ -192,7 +192,8 @@ public class DeployedGraphPoller {
             if (responseEntity.getStatusCode().is2xxSuccessful()
                 && Objects.nonNull(responseEntity.getBody())
                 && !responseEntity.getBody().getContent().isEmpty()) {
-                this.currentGraphs.put(id, responseEntity.getBody().getContent().get(0));
+                var graph = responseEntity.getBody().getContent().get(0);
+                this.currentGraphs.put(id, graph);
             } else {
                 logger.warn("No data retrieved for Graph ID {}. Status: {}", id, responseEntity.getStatusCode());
             }

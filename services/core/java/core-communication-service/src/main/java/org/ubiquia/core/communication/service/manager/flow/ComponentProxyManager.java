@@ -99,7 +99,9 @@ public class ComponentProxyManager {
      * @param graph the torn-down graph whose components should be unproxied
      */
     public void tryProcessNewlyTornDownGraph(final Graph graph) {
-        var componentsToUnproxy = graph.getComponents().stream()
+        var componentsToUnproxy = graph
+            .getComponents()
+            .stream()
             .filter(component -> Boolean.TRUE.equals(
                 component.getCommunicationServiceSettings().getExposeViaCommService()))
             .toList();

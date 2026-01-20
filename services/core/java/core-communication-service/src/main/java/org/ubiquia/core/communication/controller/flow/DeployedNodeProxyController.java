@@ -134,7 +134,7 @@ public class DeployedNodeProxyController {
         if (Objects.nonNull(registeredEndpoint)) {
 
             var cleanedPath = request.getRequestURI()
-                .replace("/ubiquia/communication-service/adapter-reverse-proxy", "")
+                .replace("/ubiquia/core/communication-service/adapter-reverse-proxy", "")
                 .replace(nodeName, "")
                 .replace("/", "");
 
@@ -188,7 +188,7 @@ public class DeployedNodeProxyController {
                 clientStream.flush();
             }
         } else {
-            throw new IllegalArgumentException("ERROR: No adapter registered with name: "
+            throw new IllegalArgumentException("ERROR: No node registered with name: "
                 + nodeName);
         }
     }

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
-import org.ubiquia.common.test.helm.component.GenericAclPostAndRetriever;
+import org.ubiquia.common.test.helm.component.GenericDomainPostAndRetriever;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
 import org.ubiquia.test.belief.state.generator.model.Animal;
 import org.ubiquia.test.belief.state.generator.model.Name;
@@ -33,7 +33,7 @@ public class AnimalTestModule extends AbstractHelmTestModule {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private GenericAclPostAndRetriever<Animal> postAndRetriever;
+    private GenericDomainPostAndRetriever<Animal> postAndRetriever;
 
     @Autowired
     private RestTemplate restTemplate;

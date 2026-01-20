@@ -369,9 +369,6 @@ graphs:
       name: Pet-Generator-Node
       description: This is an example node.
 
-      communicationServiceSettings:
-        exposeViaCommService: true
-
       endpoint: /pet/store/create-pet
 
       inputSubSchemas:

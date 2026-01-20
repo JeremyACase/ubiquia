@@ -1,5 +1,7 @@
 package org.ubiquia.core.communication.service.manager.flow;
 
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.slf4j.Logger;
@@ -10,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.common.library.implementation.service.builder.NodeEndpointRecordBuilder;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
+import org.ubiquia.common.model.ubiquia.dto.Node;
 
 /**
  * Manages adapter reverse-proxy registrations derived from deployed {@link Graph}s.
@@ -45,7 +48,7 @@ public class NodeProxyManager {
     /**
      * Registry of adapter name → proxied base endpoint path.
      */
-    private final HashMap<String, String> proxiedNodeEndpoints = new HashMap<>();
+    private final HashMap<String, Node> proxiedNodes = new HashMap<>();
 
     @Autowired
     private NodeEndpointRecordBuilder nodeEndpointRecordBuilder;
@@ -80,16 +83,16 @@ public class NodeProxyManager {
 
         for (var node : nodesToProxy) {
 
-            var nodeName = node.getName().toLowerCase();
-            if (!this.proxiedNodeEndpoints.containsKey(nodeName)) {
+            if (!this.proxiedNodes.containsKey(node.getId())) {
                 logger.info("Registering proxy for node: {}", node.getName());
-                var endpoint = this.nodeEndpointRecordBuilder.getBasePathFor(
-                    graph.getName(),
-                    nodeName);
+                var nodeName = node.getName().toLowerCase();
+                var endpoint = this
+                    .nodeEndpointRecordBuilder
+                    .getBasePathFor(graph.getName(), nodeName);
                 logger.info("...proxying base url: {}", endpoint);
-                this.proxiedNodeEndpoints.put(
-                    nodeName,
-                    endpoint);
+                this
+                    .proxiedNodes
+                    .put(nodeName, node);
             }
         }
     }
@@ -105,17 +108,19 @@ public class NodeProxyManager {
      * @param graph the torn-down graph whose adapters should be unproxied
      */
     public void tryProcessNewlyTornDownGraph(final Graph graph) {
-        var nodesToUnproxy = graph.getNodes().stream()
+        var nodesToUnproxy = graph
+            .getNodes()
+            .stream()
             .filter(node -> Boolean.TRUE.equals(
                 node.getCommunicationServiceSettings().getExposeViaCommService()))
             .toList();
 
         for (var node : nodesToUnproxy) {
 
-            if (this.proxiedNodeEndpoints.containsKey(node.getName())) {
+            if (this.proxiedNodes.containsKey(node.getName())) {
                 logger.info("...unproxying endpoints for node {}...",
                     node.getName());
-                this.proxiedNodeEndpoints.remove(node.getName());
+                this.proxiedNodes.remove(node.getName());
             }
         }
     }
@@ -126,11 +131,11 @@ public class NodeProxyManager {
      * @return immutable snapshot list of endpoint base paths
      */
     public List<String> getRegisteredEndpoints() {
-        return this
-            .proxiedNodeEndpoints
-            .values()
-            .stream()
-            .toList();
+        var endpoints = new ArrayList<String>();
+        for (var node : this.proxiedNodes.values().stream().toList()) {
+            endpoints.add(node.getEndpoint());
+        }
+        return endpoints;
     }
 
     /**
@@ -139,13 +144,13 @@ public class NodeProxyManager {
      * <p><strong>Casing:</strong> Keys may be stored in lower case; callers should
      * normalize their input (e.g., {@code toLowerCase(Locale.ROOT)}) to avoid misses.</p>
      *
-     * @param nodeName the adapter's logical name
+     * @param nodeId the node's logical name
      * @return the registered base endpoint (e.g., {@code "graph-x/adapter-y"}), or {@code null} if not registered
      */
-    public String getRegisteredEndpointFor(final String nodeName) {
+    public String getRegisteredEndpointFor(final String nodeId) {
         String endpoint = null;
-        if (this.proxiedNodeEndpoints.containsKey(nodeName)) {
-            endpoint = this.proxiedNodeEndpoints.get(nodeName);
+        if (this.proxiedNodes.containsKey(nodeId)) {
+            endpoint = this.proxiedNodes.get(nodeId).getEndpoint();
         }
         return endpoint;
     }

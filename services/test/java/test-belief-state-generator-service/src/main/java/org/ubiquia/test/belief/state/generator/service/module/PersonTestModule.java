@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
-import org.ubiquia.common.test.helm.component.GenericAclPostAndRetriever;
+import org.ubiquia.common.test.helm.component.GenericDomainPostAndRetriever;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
 import org.ubiquia.test.belief.state.generator.model.Name;
 import org.ubiquia.test.belief.state.generator.model.Person;
@@ -34,7 +34,7 @@ public class PersonTestModule extends AbstractHelmTestModule {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private GenericAclPostAndRetriever<Person> postAndRetriever;
+    private GenericDomainPostAndRetriever<Person> postAndRetriever;
 
     @Autowired
     private RestTemplate restTemplate;

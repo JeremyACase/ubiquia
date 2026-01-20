@@ -28,7 +28,7 @@ public class TestManager extends AbstractTestManager {
     @Override
     public void registerTests() {
         this.testRegistrar.registerModule(this.componentDeploymentTestModule);
-        //this.testRegistrar.registerModule(this.componentTeardownTestModule);
+        this.testRegistrar.registerModule(this.componentTeardownTestModule);
     }
 
     @EventListener(ApplicationReadyEvent.class)
