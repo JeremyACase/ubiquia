@@ -125,7 +125,7 @@ public class DeployedNodeProxyController {
         value = "/{nodeName}/**",
         method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT}
     )
-    public void proxyToAdapter(
+    public void proxyToNode(
         @PathVariable String nodeName,
         HttpServletRequest request,
         HttpServletResponse response) throws IOException {
@@ -134,7 +134,7 @@ public class DeployedNodeProxyController {
         if (Objects.nonNull(registeredEndpoint)) {
 
             var cleanedPath = request.getRequestURI()
-                .replace("/ubiquia/core/communication-service/adapter-reverse-proxy", "")
+                .replace("/ubiquia/core/communication-service/node-reverse-proxy", "")
                 .replace(nodeName, "")
                 .replace("/", "");
 
