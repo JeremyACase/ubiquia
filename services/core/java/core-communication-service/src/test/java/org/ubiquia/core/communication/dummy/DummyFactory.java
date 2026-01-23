@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.dummy.factory;
+package org.ubiquia.core.communication.dummy;
 
 import static org.instancio.Select.field;
 

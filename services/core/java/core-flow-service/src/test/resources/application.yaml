@@ -11,8 +11,6 @@ ubiquia:
           directory:
             enabled: true
             path: src/test/resources/boostrap/graphs/
-        acls:
-          filepath: src/test/resources/boostrap/ontologies/pets-acl.json
     id: 0328ca73-4d50-409f-85a8-7168ce80bd96
 
   broker:
@@ -32,9 +30,8 @@ ubiquia:
     max-size: 100
   
   test:
-    acl:
-      schema:
-        filepath: src/test/resources/pets-acl-json-schema.json
+    schema:
+      filepath: src/test/resources/pets-domain-json-schema.json
 
 management:
   endpoint:

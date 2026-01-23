@@ -1,6 +1,5 @@
 package org.ubiquia.core.communication.service.manager.flow;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,9 +44,6 @@ public class NodeProxyManager {
 
     private static final Logger logger = LoggerFactory.getLogger(NodeProxyManager.class);
 
-    /**
-     * Registry of adapter name → proxied base endpoint path.
-     */
     private final HashMap<String, Node> proxiedNodes = new HashMap<>();
 
     @Autowired
@@ -83,16 +79,15 @@ public class NodeProxyManager {
 
         for (var node : nodesToProxy) {
 
+            logger.info("...node {} is set to be exposed via comm service...", node.getName());
+
             if (!this.proxiedNodes.containsKey(node.getId())) {
-                logger.info("Registering proxy for node: {}", node.getName());
-                var nodeName = node.getName().toLowerCase();
+                logger.info("...registering proxy for node: {}", node.getName());
                 var endpoint = this
                     .nodeEndpointRecordBuilder
-                    .getBasePathFor(graph.getName(), nodeName);
+                    .getBasePathFor(graph.getName(), node.getName());
                 logger.info("...proxying base url: {}", endpoint);
-                this
-                    .proxiedNodes
-                    .put(nodeName, node);
+                this.proxiedNodes.put(node.getId(), node);
             }
         }
     }
@@ -108,19 +103,22 @@ public class NodeProxyManager {
      * @param graph the torn-down graph whose adapters should be unproxied
      */
     public void tryProcessNewlyTornDownGraph(final Graph graph) {
+
+        logger.info("...processing torn down graph: {}", graph.getName());
+
         var nodesToUnproxy = graph
             .getNodes()
             .stream()
-            .filter(node -> Boolean.TRUE.equals(
-                node.getCommunicationServiceSettings().getExposeViaCommService()))
             .toList();
 
         for (var node : nodesToUnproxy) {
 
-            if (this.proxiedNodes.containsKey(node.getName())) {
+            logger.info("...checking if node {} needs to be torn down...", node.getName());
+
+            if (this.proxiedNodes.containsKey(node.getId())) {
                 logger.info("...unproxying endpoints for node {}...",
                     node.getName());
-                this.proxiedNodes.remove(node.getName());
+                this.proxiedNodes.remove(node.getId());
             }
         }
     }
@@ -141,11 +139,8 @@ public class NodeProxyManager {
     /**
      * Looks up the proxied base endpoint for a given adapter name.
      *
-     * <p><strong>Casing:</strong> Keys may be stored in lower case; callers should
-     * normalize their input (e.g., {@code toLowerCase(Locale.ROOT)}) to avoid misses.</p>
-     *
      * @param nodeId the node's logical name
-     * @return the registered base endpoint (e.g., {@code "graph-x/adapter-y"}), or {@code null} if not registered
+     * @return the registered base endpoint
      */
     public String getRegisteredEndpointFor(final String nodeId) {
         String endpoint = null;
