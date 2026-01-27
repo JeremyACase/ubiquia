@@ -38,7 +38,7 @@ import reactor.core.publisher.Mono;
  * base proxy implementation as error signals in the returned {@link Mono}.</p>
  */
 @RestController
-@RequestMapping("/ubiquia/communication-service/flow-service/graph")
+@RequestMapping("/ubiquia/core/communication-service/flow-service/graph")
 public class GraphControllerProxy extends AbstractUbiquiaDaoControllerProxy<Graph> {
 
     /**

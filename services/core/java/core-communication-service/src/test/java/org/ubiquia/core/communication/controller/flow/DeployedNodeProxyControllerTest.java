@@ -62,7 +62,7 @@ class DeployedNodeProxyControllerTest {
     @Test
     void proxyToNode_get_forwardsStatusHeadersAndBody() throws Exception {
         var nodeName = "nodeA";
-        when(nodeProxyManager.getRegisteredEndpointFor(nodeName)).thenReturn("graph-x/node-a");
+        when(nodeProxyManager.getRegisteredEndpointForNodeName(nodeName)).thenReturn("graph-x/node-a");
 
         var connection = mock(HttpURLConnection.class);
         when(connection.getResponseCode()).thenReturn(200);
@@ -102,7 +102,7 @@ class DeployedNodeProxyControllerTest {
     @Test
     void proxyToNode_post_streamsRequestBodyToDownstream() throws Exception {
         var nodeName = "nodeB";
-        when(nodeProxyManager.getRegisteredEndpointFor(nodeName)).thenReturn("graph-y/node-b");
+        when(nodeProxyManager.getRegisteredEndpointForNodeName(nodeName)).thenReturn("graph-y/node-b");
 
         var downstreamBody = new ByteArrayOutputStream();
 

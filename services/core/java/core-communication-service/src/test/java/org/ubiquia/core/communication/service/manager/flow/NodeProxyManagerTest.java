@@ -38,7 +38,7 @@ class NodeProxyManagerTest {
 
         @SuppressWarnings("unchecked")
         var map = (HashMap<String, Node>) ReflectionTestUtils
-            .getField(this.nodeProxyManager, "proxiedNodes");
+            .getField(this.nodeProxyManager, "proxiedNodesById");
 
         Assertions.assertTrue(map.containsKey(node.getId()));
     }
@@ -74,7 +74,7 @@ class NodeProxyManagerTest {
 
         @SuppressWarnings("unchecked")
         var map = (HashMap<String, Node>) ReflectionTestUtils
-            .getField(this.nodeProxyManager, "proxiedNodes");
+            .getField(this.nodeProxyManager, "proxiedNodesById");
 
         Assertions.assertFalse(map.containsKey(node.getId()));
     }

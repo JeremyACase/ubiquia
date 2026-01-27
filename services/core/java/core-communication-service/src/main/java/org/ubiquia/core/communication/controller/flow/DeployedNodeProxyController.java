@@ -130,7 +130,7 @@ public class DeployedNodeProxyController {
         HttpServletRequest request,
         HttpServletResponse response) throws IOException {
 
-        var registeredEndpoint = this.nodeProxyManager.getRegisteredEndpointFor(nodeName);
+        var registeredEndpoint = this.nodeProxyManager.getRegisteredEndpointForNodeName(nodeName);
         if (Objects.nonNull(registeredEndpoint)) {
 
             var cleanedPath = request.getRequestURI()

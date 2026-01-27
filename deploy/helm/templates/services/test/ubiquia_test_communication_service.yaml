@@ -74,6 +74,9 @@ spec:
           # -- Proxy to flow-service --
           test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/core/communication-service/flow-service/agent/instance/get" "Proxy: Get Instance"
           test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/core/communication-service/flow-service/component/query/params?page=0&size=1" "Proxy: Get Query Params for Components"
+          test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/core/communication-service/flow-service/domain-ontology/query/params?page=0&size=1" "Proxy: Get Query Params for Domain Ontologies"
+          test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/core/communication-service/flow-service/event/query/params?page=0&size=1" "Proxy: Get Query Params for Events"
+          test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/core/communication-service/flow-service/graph/query/params?page=0&size=1" "Proxy: Get Query Params for Graphs"
           test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/core/communication-service/flow-service/node/query/params?page=0&size=1" "Proxy: Get Query Params for Nodes"
 
           AGENT_ID=test-agent-id

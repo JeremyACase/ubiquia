@@ -15,7 +15,7 @@ import org.ubiquia.core.flow.service.visitor.validator.JsonSchemaValidator;
 @AutoConfigureMockMvc
 public class JsonSubSchemaValidatorTest {
 
-    @Value("${ubiquia.test.acl.schema.filepath}")
+    @Value("${ubiquia.test.schema.filepath}")
     private String filepath;
 
     @Autowired

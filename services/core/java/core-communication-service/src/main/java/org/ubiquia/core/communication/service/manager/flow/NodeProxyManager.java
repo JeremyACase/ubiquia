@@ -36,7 +36,7 @@ import org.ubiquia.common.model.ubiquia.dto.Node;
  *
  * <p><strong>Note on name keys:</strong> Newly registered adapters are stored under a
  * lower-cased key (adapter name), while unregistration looks up using the adapter's
- * original casing. Ensure consistent casing when calling {@link #getRegisteredEndpointFor(String)}.
+ * original casing. Ensure consistent casing when calling {@link #getRegisteredEndpointForNodeName(String)}.
  * </p>
  */
 @Service
@@ -44,7 +44,8 @@ public class NodeProxyManager {
 
     private static final Logger logger = LoggerFactory.getLogger(NodeProxyManager.class);
 
-    private final HashMap<String, Node> proxiedNodes = new HashMap<>();
+    private final HashMap<String, Node> proxiedNodesById = new HashMap<>();
+    private final HashMap<String, Node> proxiedNodesByName = new HashMap<>();
 
     @Autowired
     private NodeEndpointRecordBuilder nodeEndpointRecordBuilder;
@@ -81,13 +82,14 @@ public class NodeProxyManager {
 
             logger.info("...node {} is set to be exposed via comm service...", node.getName());
 
-            if (!this.proxiedNodes.containsKey(node.getId())) {
+            if (!this.proxiedNodesById.containsKey(node.getId())) {
                 logger.info("...registering proxy for node: {}", node.getName());
                 var endpoint = this
                     .nodeEndpointRecordBuilder
                     .getBasePathFor(graph.getName(), node.getName());
                 logger.info("...proxying base url: {}", endpoint);
-                this.proxiedNodes.put(node.getId(), node);
+                this.proxiedNodesById.put(node.getId(), node);
+                this.proxiedNodesByName.put(node.getName(), node);
             }
         }
     }
@@ -115,10 +117,11 @@ public class NodeProxyManager {
 
             logger.info("...checking if node {} needs to be torn down...", node.getName());
 
-            if (this.proxiedNodes.containsKey(node.getId())) {
+            if (this.proxiedNodesById.containsKey(node.getId())) {
                 logger.info("...unproxying endpoints for node {}...",
                     node.getName());
-                this.proxiedNodes.remove(node.getId());
+                this.proxiedNodesById.remove(node.getId());
+                this.proxiedNodesByName.remove(node.getName());
             }
         }
     }
@@ -130,7 +133,7 @@ public class NodeProxyManager {
      */
     public List<String> getRegisteredEndpoints() {
         var endpoints = new ArrayList<String>();
-        for (var node : this.proxiedNodes.values().stream().toList()) {
+        for (var node : this.proxiedNodesById.values().stream().toList()) {
             endpoints.add(node.getEndpoint());
         }
         return endpoints;
@@ -139,13 +142,13 @@ public class NodeProxyManager {
     /**
      * Looks up the proxied base endpoint for a given adapter name.
      *
-     * @param nodeId the node's logical name
+     * @param nodeName the node's logical name
      * @return the registered base endpoint
      */
-    public String getRegisteredEndpointFor(final String nodeId) {
+    public String getRegisteredEndpointForNodeName(final String nodeName) {
         String endpoint = null;
-        if (this.proxiedNodes.containsKey(nodeId)) {
-            endpoint = this.proxiedNodes.get(nodeId).getEndpoint();
+        if (this.proxiedNodesByName.containsKey(nodeName)) {
+            endpoint = this.proxiedNodesByName.get(nodeName).getEndpoint();
         }
         return endpoint;
     }
