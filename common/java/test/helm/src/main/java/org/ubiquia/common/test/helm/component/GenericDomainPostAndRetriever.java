@@ -11,9 +11,9 @@ import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 
 @Service
-public class GenericAclPostAndRetriever<T> implements InterfaceLogger {
+public class GenericDomainPostAndRetriever<T> implements InterfaceLogger {
 
-    private static final Logger logger = LoggerFactory.getLogger(GenericAclPostAndRetriever.class);
+    private static final Logger logger = LoggerFactory.getLogger(GenericDomainPostAndRetriever.class);
 
     @Autowired
     private ObjectMapper objectMapper;

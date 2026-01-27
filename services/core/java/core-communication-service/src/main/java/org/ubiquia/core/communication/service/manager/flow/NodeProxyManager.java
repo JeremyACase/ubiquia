@@ -1,5 +1,6 @@
 package org.ubiquia.core.communication.service.manager.flow;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.common.library.implementation.service.builder.NodeEndpointRecordBuilder;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
+import org.ubiquia.common.model.ubiquia.dto.Node;
 
 /**
  * Manages adapter reverse-proxy registrations derived from deployed {@link Graph}s.
@@ -34,18 +36,16 @@ import org.ubiquia.common.model.ubiquia.dto.Graph;
  *
  * <p><strong>Note on name keys:</strong> Newly registered adapters are stored under a
  * lower-cased key (adapter name), while unregistration looks up using the adapter's
- * original casing. Ensure consistent casing when calling {@link #getRegisteredEndpointFor(String)}.
+ * original casing. Ensure consistent casing when calling {@link #getRegisteredEndpointForNodeName(String)}.
  * </p>
  */
 @Service
-public class AdapterProxyManager {
+public class NodeProxyManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(AdapterProxyManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(NodeProxyManager.class);
 
-    /**
-     * Registry of adapter name → proxied base endpoint path.
-     */
-    private final HashMap<String, String> proxiedAdapterEndpoints = new HashMap<>();
+    private final HashMap<String, Node> proxiedNodesById = new HashMap<>();
+    private final HashMap<String, Node> proxiedNodesByName = new HashMap<>();
 
     @Autowired
     private NodeEndpointRecordBuilder nodeEndpointRecordBuilder;
@@ -70,26 +70,26 @@ public class AdapterProxyManager {
      */
     public void tryProcessNewlyDeployedGraph(final Graph graph) {
 
-        var adaptersToProxy = graph
+        var nodesToProxy = graph
             .getNodes()
             .stream()
-            .filter(adapter ->
+            .filter(node ->
                 Boolean.TRUE.equals(
-                    adapter.getCommunicationServiceSettings().getExposeViaCommService()))
+                    node.getCommunicationServiceSettings().getExposeViaCommService()))
             .toList();
 
-        for (var adapter : adaptersToProxy) {
+        for (var node : nodesToProxy) {
 
-            var adapterName = adapter.getName().toLowerCase();
-            if (!this.proxiedAdapterEndpoints.containsKey(adapterName)) {
-                logger.info("Registering proxy for adapter: {}", adapter.getName());
-                var endpoint = this.nodeEndpointRecordBuilder.getBasePathFor(
-                    graph.getName(),
-                    adapterName);
+            logger.info("...node {} is set to be exposed via comm service...", node.getName());
+
+            if (!this.proxiedNodesById.containsKey(node.getId())) {
+                logger.info("...registering proxy for node: {}", node.getName());
+                var endpoint = this
+                    .nodeEndpointRecordBuilder
+                    .getBasePathFor(graph.getName(), node.getName());
                 logger.info("...proxying base url: {}", endpoint);
-                this.proxiedAdapterEndpoints.put(
-                    adapterName,
-                    endpoint);
+                this.proxiedNodesById.put(node.getId(), node);
+                this.proxiedNodesByName.put(node.getName(), node);
             }
         }
     }
@@ -105,17 +105,23 @@ public class AdapterProxyManager {
      * @param graph the torn-down graph whose adapters should be unproxied
      */
     public void tryProcessNewlyTornDownGraph(final Graph graph) {
-        var adaptersToUnproxy = graph.getNodes().stream()
-            .filter(adapter -> Boolean.TRUE.equals(
-                adapter.getCommunicationServiceSettings().getExposeViaCommService()))
+
+        logger.info("...processing torn down graph: {}", graph.getName());
+
+        var nodesToUnproxy = graph
+            .getNodes()
+            .stream()
             .toList();
 
-        for (var adapter : adaptersToUnproxy) {
+        for (var node : nodesToUnproxy) {
 
-            if (this.proxiedAdapterEndpoints.containsKey(adapter.getName())) {
-                logger.info("...unproxying endpoints for adapter {}...",
-                    adapter.getName());
-                this.proxiedAdapterEndpoints.remove(adapter.getName());
+            logger.info("...checking if node {} needs to be torn down...", node.getName());
+
+            if (this.proxiedNodesById.containsKey(node.getId())) {
+                logger.info("...unproxying endpoints for node {}...",
+                    node.getName());
+                this.proxiedNodesById.remove(node.getId());
+                this.proxiedNodesByName.remove(node.getName());
             }
         }
     }
@@ -126,22 +132,23 @@ public class AdapterProxyManager {
      * @return immutable snapshot list of endpoint base paths
      */
     public List<String> getRegisteredEndpoints() {
-        return this.proxiedAdapterEndpoints.values().stream().toList();
+        var endpoints = new ArrayList<String>();
+        for (var node : this.proxiedNodesById.values().stream().toList()) {
+            endpoints.add(node.getEndpoint());
+        }
+        return endpoints;
     }
 
     /**
      * Looks up the proxied base endpoint for a given adapter name.
      *
-     * <p><strong>Casing:</strong> Keys may be stored in lower case; callers should
-     * normalize their input (e.g., {@code toLowerCase(Locale.ROOT)}) to avoid misses.</p>
-     *
-     * @param adapterName the adapter's logical name
-     * @return the registered base endpoint (e.g., {@code "graph-x/adapter-y"}), or {@code null} if not registered
+     * @param nodeName the node's logical name
+     * @return the registered base endpoint
      */
-    public String getRegisteredEndpointFor(final String adapterName) {
+    public String getRegisteredEndpointForNodeName(final String nodeName) {
         String endpoint = null;
-        if (this.proxiedAdapterEndpoints.containsKey(adapterName)) {
-            endpoint = this.proxiedAdapterEndpoints.get(adapterName);
+        if (this.proxiedNodesByName.containsKey(nodeName)) {
+            endpoint = this.proxiedNodesByName.get(nodeName).getEndpoint();
         }
         return endpoint;
     }

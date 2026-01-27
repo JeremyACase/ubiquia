@@ -66,7 +66,7 @@ class DeployedComponentProxyControllerTest {
     void unknownComponentReturns400() throws Exception {
         given(this.componentProxyManager.getRegisteredEndpointFor("missing")).willReturn(null);
 
-        this.mockMvc.perform(get("/ubiquia/communication-service/component-reverse-proxy/missing/whatever"))
+        this.mockMvc.perform(get("/ubiquia/core/communication-service/component-reverse-proxy/missing/whatever"))
             .andExpect(status().isBadRequest());
     }
 
@@ -92,12 +92,12 @@ class DeployedComponentProxyControllerTest {
         given(this.componentProxyManager.getRegisteredEndpointFor("workbench"))
             .willReturn(URI.create(absoluteBase));
 
-        mockMvc.perform(get("/ubiquia/communication-service/component-reverse-proxy/workbench/index.html"))
+        mockMvc.perform(get("/ubiquia/core/communication-service/component-reverse-proxy/workbench/index.html"))
             .andExpect(status().isOk())
             .andExpect(header().string("X-Ubiquia-Target", absoluteBase + "index.html"))
             .andExpect(header().string("Content-Type", "text/html; charset=utf-8"))
             .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                "<base href=\"/ubiquia/communication-service/component-reverse-proxy/workbench/\">"
+                "<base href=\"/ubiquia/core/communication-service/component-reverse-proxy/workbench/\">"
             )));
 
         var recorded = server.takeRequest();
@@ -127,7 +127,7 @@ class DeployedComponentProxyControllerTest {
         given(this.componentProxyManager.getRegisteredEndpointFor("workbench"))
             .willReturn(URI.create(absoluteBase));
 
-        var res = mockMvc.perform(get("/ubiquia/communication-service/component-reverse-proxy/workbench/assets/app.js"))
+        var res = mockMvc.perform(get("/ubiquia/core/communication-service/component-reverse-proxy/workbench/assets/app.js"))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse();
@@ -149,7 +149,7 @@ class DeployedComponentProxyControllerTest {
         given(this.componentProxyManager.getRegisteredEndpointFor("flow-ui"))
             .willReturn(URI.create("/ui/"));
 
-        this.mockMvc.perform(get("/ubiquia/communication-service/component-reverse-proxy/flow-ui/api/ping?x=1"))
+        this.mockMvc.perform(get("/ubiquia/core/communication-service/component-reverse-proxy/flow-ui/api/ping?x=1"))
             .andExpect(status().isOk())
             .andExpect(content().json("{\"ok\":true}"));
     }
@@ -165,10 +165,10 @@ class DeployedComponentProxyControllerTest {
         given(this.componentProxyManager.getRegisteredEndpointFor("workbench"))
             .willReturn(URI.create("/ui/"));
 
-        this.mockMvc.perform(get("/ubiquia/communication-service/component-reverse-proxy/workbench/secret"))
+        this.mockMvc.perform(get("/ubiquia/core/communication-service/component-reverse-proxy/workbench/secret"))
             .andExpect(status().isFound())
             .andExpect(header().string("Location",
-                "/ubiquia/communication-service/component-reverse-proxy/workbench/login"));
+                "/ubiquia/core/communication-service/component-reverse-proxy/workbench/login"));
     }
 
     @Test
@@ -182,7 +182,7 @@ class DeployedComponentProxyControllerTest {
         given(this.componentProxyManager.getRegisteredEndpointFor("flow-api"))
             .willReturn(URI.create("/api/"));
 
-        this.mockMvc.perform(post("/ubiquia/communication-service/component-reverse-proxy/flow-api/items")
+        this.mockMvc.perform(post("/ubiquia/core/communication-service/component-reverse-proxy/flow-api/items")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Custom", "abc")
                 .content("{\"name\":\"test\"}"))
@@ -203,7 +203,8 @@ class DeployedComponentProxyControllerTest {
         given(this.componentProxyManager.getRegisteredEndpoints())
             .willReturn(java.util.List.of("/ui/", "/api/"));
 
-        this.mockMvc.perform(get("/ubiquia/communication-service/component-reverse-proxy/get-proxied-urls"))
+        this.mockMvc.perform(get("/ubiquia/core/communication-service/component-reverse-proxy/get-proxied-urls"));
+        this.mockMvc.perform(get("/ubiquia/core/communication-service/component-reverse-proxy/get-proxied-urls"))
             .andExpect(status().isOk())
             .andExpect(content().json("[\"/ui/\",\"/api/\"]"));
     }

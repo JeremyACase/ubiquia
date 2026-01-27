@@ -33,8 +33,8 @@ import reactor.core.publisher.Mono;
  * <p>Downstream host/port are sourced from {@link FlowServiceConfig}.</p>
  */
 @RestController
-@RequestMapping("/ubiquia/communication-service/flow-service/agent-communication-language")
-public class AgentCommunicationLanguageControllerProxy
+@RequestMapping("/ubiquia/core/communication-service/flow-service/domain-ontology")
+public class DomainOntologyControllerProxy
     extends AbstractUbiquiaDaoControllerProxy<DomainDataContract> {
 
     /** Flow Service host/port configuration used to build the downstream base URL. */
@@ -74,7 +74,7 @@ public class AgentCommunicationLanguageControllerProxy
         var url = this.flowServiceConfig.getUrl()
             + ":"
             + this.flowServiceConfig.getPort().toString()
-            + "/ubiquia/flow-service/agent-communication-language";
+            + "/ubiquia/core/flow-service/domain-ontology";
         return url;
     }
 }

@@ -1,0 +1,50 @@
+logging:
+  level:
+    org.ubiquia: DEBUG
+
+ubiquia:
+  test:
+    schema:
+      filepath: src/test/resources/pets-domain-json-schema.json
+
+management:
+  endpoint:
+    info:
+      enabled: true
+      java:
+        enabled: true
+      build:
+        enabled: true
+      health:
+        probes:
+          enabled: true
+        show-components: always
+        show-details: always
+      prometheus:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: info,prometheus,health,mappings
+  metrics:
+    tags:
+      application: ubiquia-core-communication-service
+
+spring:
+  application:
+    name: ubiquia-core-communication-service
+  jackson:
+    date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+
+    # Determines what properties are egressed (https://docs.spring.io/spring-boot/docs/2.1.5.RELEASE/reference/html/howto-spring-mvc.html)
+    default-property-inclusion: non_empty
+    deserialization:
+      fail-on-unknown-properties: true
+  tomcat:
+    mbeanregistry:
+      enabled: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui/index.html
+    enabled: true

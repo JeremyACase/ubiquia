@@ -31,7 +31,7 @@ import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
  * </p>
  */
 @RestController
-@RequestMapping("/ubiquia/communication-service/flow-service/event")
+@RequestMapping("/ubiquia/core/communication-service/flow-service/event")
 public class EventControllerProxy extends AbstractUbiquiaDaoControllerProxy<FlowEvent> {
 
     /**
@@ -52,7 +52,7 @@ public class EventControllerProxy extends AbstractUbiquiaDaoControllerProxy<Flow
         var url = this.flowServiceConfig.getUrl()
             + ":"
             + this.flowServiceConfig.getPort().toString()
-            + "/ubiquia/flow-service/event";
+            + "/ubiquia/core/flow-service/event";
         return url;
     }
 }

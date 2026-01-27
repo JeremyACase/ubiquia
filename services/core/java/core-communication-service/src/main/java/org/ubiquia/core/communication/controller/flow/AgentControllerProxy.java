@@ -29,8 +29,8 @@ import reactor.core.publisher.Mono;
  * </p>
  */
 @RestController
-@RequestMapping("/ubiquia/communication-service/flow-service/ubiquia-agent")
-public class UbiquiaAgentControllerProxy implements InterfaceUbiquiaDaoControllerProxy {
+@RequestMapping("/ubiquia/core/communication-service/flow-service/agent")
+public class AgentControllerProxy implements InterfaceUbiquiaDaoControllerProxy {
 
     /** Flow Service host/port configuration used to build the downstream base URL. */
     @Autowired
@@ -122,7 +122,7 @@ public class UbiquiaAgentControllerProxy implements InterfaceUbiquiaDaoControlle
         var url = this.flowServiceConfig.getUrl()
             + ":"
             + this.flowServiceConfig.getPort().toString()
-            + "/ubiquia/flow-service/ubiquia-agent";
+            + "/ubiquia/core/flow-service/agent";
         return url;
     }
 }

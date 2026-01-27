@@ -1,154 +1,134 @@
 package org.ubiquia.core.communication.controller.flow;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.ubiquia.common.library.api.config.FlowServiceConfig;
-import org.ubiquia.core.communication.config.MockWebServerTestConfig;
-import org.ubiquia.core.communication.service.io.flow.DeployedGraphPoller;
-import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
+import org.ubiquia.core.communication.service.manager.flow.NodeProxyManager;
 
-@WebMvcTest(controllers = DeployedAdapterProxyController.class)
-@Import({MockWebServerTestConfig.class})
+@SpringBootTest(properties = {
+    "spring.task.scheduling.enabled=false",
+    "ubiquia.flow.service.url=http://flow-host",
+    "ubiquia.flow.service.port=8080",
+    "ubiquia.flow.service.poll-frequency-milliseconds=60000"
+})
+@AutoConfigureMockMvc
 class DeployedNodeProxyControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private MockWebServer server;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private Environment env;
 
-    private String baseUrl;
+    @MockitoBean private NodeProxyManager nodeProxyManager;
 
-    @MockitoBean
-    private FlowServiceConfig flowServiceConfig;
+    private String flowUrl() {
+        return env.getRequiredProperty("ubiquia.flow.service.url");
+    }
 
-    @MockitoBean
-    private AdapterProxyManager adapterProxyManager;
-
-    // Prevent background polling from interfering with the slice
-    @MockitoBean
-    private DeployedGraphPoller deployedGraphPoller;
-
-    @BeforeEach
-    void setUp() throws IOException {
-        this.server = new MockWebServer();
-        this.server.start();
-        this.baseUrl = "http://" + this.server.getHostName();
-        given(this.flowServiceConfig.getUrl()).willReturn(this.baseUrl);
-        given(this.flowServiceConfig.getPort()).willReturn(this.server.getPort());
+    private int flowPort() {
+        return Integer.parseInt(env.getRequiredProperty("ubiquia.flow.service.port"));
     }
 
     @Test
-    void getProxiedUrls_returnsList() throws Exception {
-        when(adapterProxyManager.getRegisteredEndpoints())
-            .thenReturn(List.of("adapter-a", "adapter-b"));
+    void getProxiedUrls_returnsRegisteredEndpoints() throws Exception {
+        when(nodeProxyManager.getRegisteredEndpoints()).thenReturn(List.of("a/b", "c/d"));
 
-        mockMvc.perform(get("/ubiquia/communication-service/adapter-reverse-proxy/get-proxied-urls"))
+        var base = "/ubiquia/core/communication-service/node-reverse-proxy";
+
+        mockMvc.perform(get(base + "/get-proxied-urls"))
             .andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$[0]").value("adapter-a"))
-            .andExpect(jsonPath("$[1]").value("adapter-b"));
+            .andExpect(jsonPath("$[*]").value(containsInAnyOrder("a/b", "c/d")));
+
+        verify(nodeProxyManager).getRegisteredEndpoints();
     }
 
     @Test
-    void proxy_get_forwardsToRegisteredEndpoint_andReturnsBodyAndHeaders() throws Exception {
-        final String adapterName = "my-adapter";
-        final String registeredEndpoint = "registered/endpoint";
-        when(adapterProxyManager.getRegisteredEndpointFor(adapterName)).thenReturn(registeredEndpoint);
+    void proxyToNode_get_forwardsStatusHeadersAndBody() throws Exception {
+        var nodeName = "nodeA";
+        when(nodeProxyManager.getRegisteredEndpointForNodeName(nodeName)).thenReturn("graph-x/node-a");
 
-        server.enqueue(new MockResponse()
-            .setResponseCode(200)
-            .setHeader("X-Downstream", "yes")
-            .setBody("pong"));
+        var connection = mock(HttpURLConnection.class);
+        when(connection.getResponseCode()).thenReturn(200);
+        when(connection.getHeaderFields()).thenReturn(Map.of(
+            "X-Downstream", List.of("yes"),
+            "Content-Type", List.of("text/plain")
+        ));
+        when(connection.getInputStream()).thenReturn(new ByteArrayInputStream("OK".getBytes()));
 
-        mockMvc.perform(get("/ubiquia/communication-service/adapter-reverse-proxy/{adapterName}/ping", adapterName)
-                .header("X-Client", "hello"))
-            .andExpect(status().isOk())
-            .andExpect(header().string("X-Downstream", "yes"))
-            .andExpect(content().string("pong"));
+        var capturedTargetUrl = new StringBuilder();
 
-        // --- Timeout to avoid indefinite hang if the proxy never calls downstream
-        RecordedRequest rr = server.takeRequest(2, TimeUnit.SECONDS);
-        assertThat(rr).as("proxy never hit MockWebServer").isNotNull();
-        assertThat(rr.getMethod()).isEqualTo("GET");
-        // cleanedPath for “…/{adapterName}/ping” becomes “ping”; final path: “/{registeredEndpoint}/ping”
-        assertThat(rr.getPath()).isEqualTo("/" + registeredEndpoint + "/ping");
-        assertThat(rr.getHeader("X-Client")).isEqualTo("hello");
+        try (var mockedUrl =
+                 mockConstruction(URL.class, (mock, context) -> {
+                     capturedTargetUrl.append(context.arguments().get(0));
+                     when(mock.openConnection()).thenReturn(connection);
+                 })) {
+
+            var base = "/ubiquia/core/communication-service/node-reverse-proxy";
+
+            mockMvc.perform(get(base + "/" + nodeName + "/foo/bar")
+                    .header("X-Inbound", "123"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("X-Downstream", "yes"))
+                .andExpect(content().string("OK"));
+
+            verify(connection).setRequestMethod("GET");
+            verify(connection).setRequestProperty("X-Inbound", "123");
+
+            var expected = flowUrl() + ":" + flowPort() + "/graph-x/node-a/foobar";
+            org.junit.jupiter.api.Assertions.assertTrue(
+                capturedTargetUrl.toString().contains(expected),
+                "Expected URL to contain: " + expected + " but was: " + capturedTargetUrl
+            );
+        }
     }
 
     @Test
-    void proxy_post_forwardsBody() throws Exception {
-        final String adapterName = "schema";
-        final String registeredEndpoint = "lint/json";
-        when(adapterProxyManager.getRegisteredEndpointFor(adapterName)).thenReturn(registeredEndpoint);
+    void proxyToNode_post_streamsRequestBodyToDownstream() throws Exception {
+        var nodeName = "nodeB";
+        when(nodeProxyManager.getRegisteredEndpointForNodeName(nodeName)).thenReturn("graph-y/node-b");
 
-        server.enqueue(new MockResponse()
-            .setResponseCode(201)
-            .setHeader("Content-Type", "application/json")
-            .setBody("{\"ok\":true}"));
+        var downstreamBody = new ByteArrayOutputStream();
 
-        String requestJson = "{\"hello\":\"world\"}";
+        var connection = mock(HttpURLConnection.class);
+        when(connection.getResponseCode()).thenReturn(201);
+        when(connection.getHeaderFields()).thenReturn(Map.of());
+        when(connection.getOutputStream()).thenReturn(downstreamBody);
+        when(connection.getInputStream()).thenReturn(new ByteArrayInputStream("CREATED".getBytes()));
 
-        mockMvc.perform(post("/ubiquia/communication-service/adapter-reverse-proxy/{adapterName}/validate", adapterName)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestJson))
-            .andExpect(status().isCreated())
-            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(content().json("{\"ok\":true}"));
+        try (var mockedUrl =
+                 mockConstruction(URL.class, (mock, context) -> {
+                     when(mock.openConnection()).thenReturn(connection);
+                 })) {
 
-        RecordedRequest rr = server.takeRequest(2, TimeUnit.SECONDS);
-        assertThat(rr).as("proxy never hit MockWebServer").isNotNull();
-        assertThat(rr.getMethod()).isEqualTo("POST");
-        assertThat(rr.getPath()).isEqualTo("/" + registeredEndpoint + "/validate");
-        assertThat(rr.getBody().readString(StandardCharsets.UTF_8)).isEqualTo(requestJson);
-    }
+            var base = "/ubiquia/core/communication-service/node-reverse-proxy";
 
-    @Test
-    void proxy_put_forwardsBody() throws Exception {
-        final String adapterName = "files";
-        final String registeredEndpoint = "upload";
-        when(adapterProxyManager.getRegisteredEndpointFor(adapterName)).thenReturn(registeredEndpoint);
+            mockMvc.perform(post(base + "/" + nodeName + "/some/path")
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .content("hello downstream"))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("CREATED"));
 
-        server.enqueue(new MockResponse().setResponseCode(204));
+            verify(connection).setRequestMethod("POST");
+            verify(connection).setDoOutput(true);
 
-        var payload = "BYTES".getBytes(StandardCharsets.UTF_8);
-
-        mockMvc.perform(put("/ubiquia/communication-service/adapter-reverse-proxy/{adapterName}/chunk", adapterName)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .content(payload))
-            .andExpect(status().isNoContent());
-
-        RecordedRequest rr = server.takeRequest(2, TimeUnit.SECONDS);
-        assertThat(rr).as("proxy never hit MockWebServer").isNotNull();
-        assertThat(rr.getMethod()).isEqualTo("PUT");
-        assertThat(rr.getPath()).isEqualTo("/" + registeredEndpoint + "/chunk");
-        assertThat(rr.getBody().readByteArray()).isEqualTo(payload);
-    }
-
-    @Test
-    void proxy_whenAdapterNotRegistered_returnsServerError() throws Exception {
-        final String adapterName = "unknown";
-        when(adapterProxyManager.getRegisteredEndpointFor(adapterName)).thenReturn(null);
-
-        mockMvc.perform(get("/ubiquia/communication-service/adapter-reverse-proxy/{adapterName}/anything", adapterName))
-            .andExpect(status().is4xxClientError());
+            org.junit.jupiter.api.Assertions.assertEquals("hello downstream", downstreamBody.toString());
+        }
     }
 }

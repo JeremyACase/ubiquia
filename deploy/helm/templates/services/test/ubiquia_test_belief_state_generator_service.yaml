@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-belief-state-generator-service-ontologies-config
+data:
+{{ (.Files.Glob "bootstrap/ontologies/*.yaml").AsConfig | indent 2 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-belief-state-generator-service-config
+data:
+  application.yaml: |
+    logging:
+      level:
+        org.ubiquia: {{ .Values.logging.ubiquia }}
+
+    management:
+      endpoint:
+        info:
+          enabled: true
+          java:
+            enabled: true
+          build:
+            enabled: true
+          health:
+            probes:
+              enabled: true
+            show-components: always
+            show-details: always
+          prometheus:
+            enabled: true
+      endpoints:
+        web:
+          exposure:
+            include: info, prometheus, health
+      metrics:
+        tags:
+          application: ${spring.application.name}
+
+    spring:
+      server:
+      port: {{ .Values.convenience.variables.spring.port }}
+
+      application:
+        name: belief-state-generator-service-test
+      jackson:
+        date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+
+    springdoc:
+      swagger-ui:
+        path: {{ .Values.convenience.variables.spring.swaggerDocs }}
+        enabled: true
+
+    ubiquia:
+      agent:
+        id: {{ .Values.ubiquia.agent.id }}
+        storage:
+          minio:
+            enabled: {{ .Values.ubiquia.agent.storage.minio.enabled }}
+      belief-state-generator:
+        service:
+          port: {{ .Values.convenience.variables.spring.port }}
+          url: http://ubiquia-core-belief-state-generator-service
+      flow:
+        service:
+          port: {{ .Values.convenience.variables.spring.port }}
+          url: http://ubiquia-core-flow-service
+      kubernetes:
+        enabled: true
+        namespace: {{ .Release.Namespace }}      
+      test:
+        ontology:
+          filepath: /app/etc/pets.yaml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubiquia-test-belief-state-generator-service
+  annotations:
+    "helm.sh/hook": test
+  labels:
+    sidecar.istio.io/inject: "false"
+spec:
+  serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+  restartPolicy: Never
+  containers:
+    - name: ubiquia-test-belief-state-generator-service-runner
+      image: {{ include "ubiquia.test.beliefStateGeneratorService.image" . }}
+      imagePullPolicy: IfNotPresent
+      volumeMounts:
+        - name: config
+          mountPath: /app/etc/application.yaml
+          subPath: application.yaml
+        - name: ubiquia-test-belief-state-generator-service-ontologies-config
+          mountPath: /app/etc/pets.yaml
+          subPath: pets.yaml
+  volumes:
+    - name: config
+      configMap:
+        name: ubiquia-test-belief-state-generator-service-config
+    - name: ubiquia-test-belief-state-generator-service-ontologies-config
+      configMap:
+        name: ubiquia-test-belief-state-generator-service-ontologies-config

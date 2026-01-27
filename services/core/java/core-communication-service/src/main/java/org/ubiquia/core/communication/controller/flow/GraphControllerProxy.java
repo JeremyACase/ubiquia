@@ -1,15 +1,20 @@
 package org.ubiquia.core.communication.controller.flow;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
+import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
+import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import reactor.core.publisher.Mono;
 
 /**
@@ -33,7 +38,7 @@ import reactor.core.publisher.Mono;
  * base proxy implementation as error signals in the returned {@link Mono}.</p>
  */
 @RestController
-@RequestMapping("/ubiquia/communication-service/flow-service/graph")
+@RequestMapping("/ubiquia/core/communication-service/flow-service/graph")
 public class GraphControllerProxy extends AbstractUbiquiaDaoControllerProxy<Graph> {
 
     /**
@@ -41,6 +46,9 @@ public class GraphControllerProxy extends AbstractUbiquiaDaoControllerProxy<Grap
      */
     @Autowired
     private FlowServiceConfig flowServiceConfig;
+
+    @Autowired
+    private WebClient webClient;
 
     /**
      * Proxies a graph registration request to the Flow Service.
@@ -62,6 +70,46 @@ public class GraphControllerProxy extends AbstractUbiquiaDaoControllerProxy<Grap
         return proxied;
     }
 
+    @PostMapping("/deploy")
+    public Mono<ResponseEntity<GraphDeployment>> proxyDeploy(
+        @RequestBody GraphDeployment body) {
+
+        var url = this.getUrlHelper();
+        var uri = UriComponentsBuilder.fromHttpUrl(url + "/deploy")
+            .build(true)
+            .toUri();
+
+        var response = this
+            .webClient
+            .method(HttpMethod.POST)
+            .uri(uri)
+            .bodyValue(body)
+            .retrieve()
+            .toEntity(GraphDeployment.class);
+
+        return response;
+    }
+
+    @PostMapping("/teardown")
+    public Mono<ResponseEntity<GraphDeployment>> proxyTeardown(
+        @RequestBody GraphDeployment body) {
+
+        var url = this.getUrlHelper();
+        var uri = UriComponentsBuilder.fromHttpUrl(url + "/teardown")
+            .build(true)
+            .toUri();
+
+        var response = this
+            .webClient
+            .method(HttpMethod.POST)
+            .uri(uri)
+            .bodyValue(body)
+            .retrieve()
+            .toEntity(GraphDeployment.class);
+
+        return response;
+    }
+
     /**
      * Builds the base URL for the downstream Flow Service graph endpoints.
      *
@@ -74,7 +122,7 @@ public class GraphControllerProxy extends AbstractUbiquiaDaoControllerProxy<Grap
         var url = this.flowServiceConfig.getUrl()
             + ":"
             + this.flowServiceConfig.getPort().toString()
-            + "/ubiquia/flow-service/graph";
+            + "/ubiquia/core/flow-service/graph";
         return url;
     }
 }

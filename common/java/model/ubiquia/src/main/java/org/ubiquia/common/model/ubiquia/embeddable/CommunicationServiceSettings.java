@@ -22,6 +22,7 @@ public class CommunicationServiceSettings {
         this.exposeViaCommService = exposeViaCommService;
     }
 
+    @NotNull
     public String getProxiedEndpoint() {
         return proxiedEndpoint;
     }

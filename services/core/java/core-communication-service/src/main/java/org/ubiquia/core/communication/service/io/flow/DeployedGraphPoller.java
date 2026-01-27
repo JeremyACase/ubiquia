@@ -18,7 +18,7 @@ import org.ubiquia.common.library.api.config.AgentConfig;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
-import org.ubiquia.core.communication.service.manager.flow.AdapterProxyManager;
+import org.ubiquia.core.communication.service.manager.flow.NodeProxyManager;
 import org.ubiquia.core.communication.service.manager.flow.ComponentProxyManager;
 
 /**
@@ -32,7 +32,7 @@ import org.ubiquia.core.communication.service.manager.flow.ComponentProxyManager
  *   <li>Keeps an internal map of known graphs (by ID) to detect new deployments and
  *       torn-down graphs between polling cycles.</li>
  *   <li>Fetches full {@link Graph} records for new deployments, updates the cache, and
- *       informs {@link AdapterProxyManager} and {@link ComponentProxyManager} to (un)register
+ *       informs {@link NodeProxyManager} and {@link ComponentProxyManager} to (un)register
  *       reverse-proxy routes or other resources.</li>
  * </ul>
  *
@@ -53,7 +53,7 @@ public class DeployedGraphPoller {
     private FlowServiceConfig flowServiceConfig;
 
     @Autowired
-    private AdapterProxyManager adapterProxyManager;
+    private NodeProxyManager nodeProxyManager;
 
     @Autowired
     private ComponentProxyManager componentProxyManager;
@@ -160,15 +160,18 @@ public class DeployedGraphPoller {
 
     /**
      * Fetches and caches full {@link Graph} records for newly deployed IDs by querying the
-     * Flow Service {@code /ubiquia/flow-service/graph/query/params} endpoint with {@code id}.
+     * Flow Service {@code /ubiquia/core/flow-service/graph/query/params} endpoint with {@code id}.
      *
      * @param newlyDeployedGraphIds IDs to resolve into {@link Graph} objects
      */
     private void queryNewlyDeployedGraphs(final List<String> newlyDeployedGraphIds) {
         for (var id : newlyDeployedGraphIds) {
             var targetUri = UriComponentsBuilder
-                .fromHttpUrl(this.flowServiceConfig.getUrl() + ":" + this.flowServiceConfig.getPort())
-                .path("/ubiquia/flow-service/graph/query/params")
+                .fromHttpUrl(
+                    this.flowServiceConfig.getUrl()
+                        + ":"
+                        + this.flowServiceConfig.getPort())
+                .path("/ubiquia/core/flow-service/graph/query/params")
                 .queryParam("page", 0)
                 .queryParam("size", 1)
                 .queryParam("id", id)
@@ -189,7 +192,8 @@ public class DeployedGraphPoller {
             if (responseEntity.getStatusCode().is2xxSuccessful()
                 && Objects.nonNull(responseEntity.getBody())
                 && !responseEntity.getBody().getContent().isEmpty()) {
-                this.currentGraphs.put(id, responseEntity.getBody().getContent().get(0));
+                var graph = responseEntity.getBody().getContent().get(0);
+                this.currentGraphs.put(id, graph);
             } else {
                 logger.warn("No data retrieved for Graph ID {}. Status: {}", id, responseEntity.getStatusCode());
             }
@@ -207,7 +211,7 @@ public class DeployedGraphPoller {
         throws URISyntaxException {
         for (var id : newlyDeployedGraphIds) {
             var graph = this.currentGraphs.get(id);
-            this.adapterProxyManager.tryProcessNewlyDeployedGraph(graph);
+            this.nodeProxyManager.tryProcessNewlyDeployedGraph(graph);
             this.componentProxyManager.tryProcessNewlyDeployedGraph(graph);
         }
     }
@@ -221,7 +225,7 @@ public class DeployedGraphPoller {
     private void processTornDownGraphs(final List<String> newlyTornDownGraphIds) {
         for (var id : newlyTornDownGraphIds) {
             var graph = this.currentGraphs.get(id);
-            this.adapterProxyManager.tryProcessNewlyTornDownGraph(graph);
+            this.nodeProxyManager.tryProcessNewlyTornDownGraph(graph);
             this.componentProxyManager.tryProcessNewlyTornDownGraph(graph);
             this.currentGraphs.remove(id);
         }

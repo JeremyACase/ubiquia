@@ -74,16 +74,13 @@ public class ComponentProxyManager {
 
         for (var component : componentsToProxy) {
 
-            var componentName = component.getName().toLowerCase();
-            if (!this.proxiedComponentEndpoints.containsKey(componentName)) {
+            if (!this.proxiedComponentEndpoints.containsKey(component.getName())) {
                 logger.info("Registering proxy for component: {}", component.getName());
                 var endpoint = this
                     .componentEndpointRecordBuilder
                     .getComponentUriFrom(graph.getName(), component);
                 logger.info("...proxying base url: {}", endpoint);
-                this.proxiedComponentEndpoints.put(
-                    componentName,
-                    endpoint);
+                this.proxiedComponentEndpoints.put(component.getName(), endpoint);
             }
         }
     }
@@ -99,12 +96,18 @@ public class ComponentProxyManager {
      * @param graph the torn-down graph whose components should be unproxied
      */
     public void tryProcessNewlyTornDownGraph(final Graph graph) {
-        var componentsToUnproxy = graph.getComponents().stream()
-            .filter(component -> Boolean.TRUE.equals(
-                component.getCommunicationServiceSettings().getExposeViaCommService()))
+
+        logger.info("...processing torn down graph: {}", graph.getName());
+
+        var componentsToUnproxy = graph
+            .getComponents()
+            .stream()
             .toList();
 
         for (var component : componentsToUnproxy) {
+
+            logger.info("...checking if component {} needs to be torn down...",
+                component.getName());
 
             if (this.proxiedComponentEndpoints.containsKey(component.getName())) {
                 logger.info("...unproxying endpoints for component {}...",

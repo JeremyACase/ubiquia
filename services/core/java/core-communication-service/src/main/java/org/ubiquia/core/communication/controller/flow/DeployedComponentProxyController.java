@@ -27,7 +27,7 @@ import org.ubiquia.core.communication.service.manager.flow.ComponentProxyManager
  * Reverse proxy for component endpoints with smart HTML/CSS URL rewriting.
  *
  * <p>This controller forwards requests under
- * {@code /ubiquia/communication-service/component-reverse-proxy/{componentName}/**}
+ * {@code /ubiquia/core/communication-service/component-reverse-proxy/{componentName}/**}
  * to a target component endpoint resolved via {@link ComponentProxyManager}. It:
  * </p>
  * <ul>
@@ -48,7 +48,7 @@ import org.ubiquia.core.communication.service.manager.flow.ComponentProxyManager
  * </ul>
  */
 @RestController
-@RequestMapping("/ubiquia/communication-service/component-reverse-proxy")
+@RequestMapping("/ubiquia/core/communication-service/component-reverse-proxy")
 public class DeployedComponentProxyController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

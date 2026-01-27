@@ -139,3 +139,5 @@ tasks.named("test") {
     mustRunAfter tasks.named("copyRuntimeLibs")
     mustRunAfter tasks.named("processTestResources")
 }
+
+build.dependsOn jacocoTestReport
