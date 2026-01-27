@@ -35,7 +35,7 @@ allprojects {
         reports { xml.required = false; html.required = true }
     }
 
-    jacoco { toolVersion = '0.8.8' }
+    jacoco { toolVersion = '0.8.14' }
 }
 
 subprojects {
