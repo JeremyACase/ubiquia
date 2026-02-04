@@ -20,6 +20,7 @@ jar {
 
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-logging"
     implementation "org.springframework.boot:spring-boot-starter-web"
 
     // Import the Page implementation stuff without having to have a database
@@ -31,7 +32,6 @@ dependencies {
     implementation project(':common:java:library:implementation')
     implementation project(':common:java:test:helm')
 
-    implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
     implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
     implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"
     implementation "org.instancio:instancio-junit:${INSTANCIO_VERSION}"

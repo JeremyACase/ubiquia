@@ -1,4 +1,4 @@
-package org.ubiquia.acl.generated;
+package org.ubiquia.domain.generated;
 
 
 import jakarta.annotation.PostConstruct;
@@ -15,9 +15,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableAspectJAutoProxy
 @ComponentScan(basePackages = {"org.ubiquia.*"})
 @EntityScan(basePackages = {
-    "org.ubiquia.acl.generated",
+    "org.ubiquia.domain.generated",
     "org.ubiquia.common.model.ubiquia.entity"})
-@EnableJpaRepositories(basePackages = {"org.ubiquia.common.library", "org.ubiquia.acl.generated"})
+@EnableJpaRepositories(basePackages = {"org.ubiquia.common.library", "org.ubiquia.domain.generated"})
 public class Application {
 
     /**

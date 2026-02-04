@@ -1,4 +1,4 @@
-package org.ubiquia.acl.generated;
+package org.ubiquia.domain.generated;
 
 import io.minio.MinioClient;
 import io.minio.errors.MinioException;

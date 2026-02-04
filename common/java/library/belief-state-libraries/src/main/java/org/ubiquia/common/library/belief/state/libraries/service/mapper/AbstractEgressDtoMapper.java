@@ -19,9 +19,9 @@ import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
 import org.ubiquia.common.model.domain.entity.AbstractDomainModelEntity;
 
 /**
- * An abstract class defining how DTO mappers should map ACL entities to DTO's. It will be
- * implemented by Ubiquia Belief States where models are defined in the ACL. Importantly,
- * this class WILL NOT cache the "many" side of any ACL relationships, thereby ensuring
+ * An abstract class defining how DTO mappers should map domain entities to DTO's. It will be
+ * implemented by Ubiquia Belief States where models are defined in the domain schema. Importantly,
+ * this class WILL NOT cache the "many" side of any domain relationships, thereby ensuring
  * that no unbounded lists get egressed to clients.
  *
  * @param <F> The entity class we're mapping from.
@@ -157,7 +157,7 @@ public abstract class AbstractEgressDtoMapper<
             shouldCache = false;
         }
 
-        if (isCollectionOfAclEntities(field)) {
+        if (isCollectionOfDomainEntities(field)) {
             shouldCache = false;
         }
 
@@ -172,19 +172,19 @@ public abstract class AbstractEgressDtoMapper<
      * @param field The field to check for.
      * @return Whether the field is a collection of Belief State entities or not.
      */
-    private Boolean isCollectionOfAclEntities(final Field field) {
+    private Boolean isCollectionOfDomainEntities(final Field field) {
 
-        var isCollectionOfAclEntities = true;
+        var isCollectionOfDomainEntities = true;
 
         if (!Collection.class.isAssignableFrom(field.getType())) {
-            isCollectionOfAclEntities = false;
+            isCollectionOfDomainEntities = false;
         } else {
             try {
                 var type = (ParameterizedType) field.getGenericType();
                 var arg = type.getActualTypeArguments()[0];
 
                 if (arg instanceof Class<?> elementClass) {
-                    isCollectionOfAclEntities =
+                    isCollectionOfDomainEntities =
                         AbstractDomainModelEntity.class.isAssignableFrom(elementClass);
                 }
 
@@ -194,7 +194,7 @@ public abstract class AbstractEgressDtoMapper<
                     e);
             }
         }
-        return isCollectionOfAclEntities;
+        return isCollectionOfDomainEntities;
     }
 
     /**

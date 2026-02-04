@@ -88,7 +88,7 @@ public class BeliefStateUberizer {
 
         // Repackage into Spring Boot format
         Repackager repackager = new Repackager(baseJarPath.toFile());
-        repackager.setMainClass("org.ubiquia.acl.generated.Application"); // Update if needed
+        repackager.setMainClass("org.ubiquia.domain.generated.Application"); // Update if needed
         repackager.setLayout(new Layouts.Jar());
 
         repackager.repackage(

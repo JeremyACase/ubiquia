@@ -11,19 +11,19 @@
  */
 
 
-package org.ubiquia.acl.generated;
+package org.ubiquia.domain.generated;
 
 
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.Entity;
-import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
- * The model of a cat.
+ * The model of a wiener dog.
  */
 @JsonPropertyOrder({
-    CatEntity.JSON_PROPERTY_MEOW_DECIBELS
+    DachschundEntity.JSON_PROPERTY_APEX_PREDATOR
 })
 @jakarta.annotation.Generated(value = "org.ubiquia.core.belief.state.generator.service.generator.acl.UbiquiaAclEntityCodegen", date = "2025-06-18T01:59:36.137342500Z[UTC]", comments = "Generator version: 7.13.0")
 @JsonIgnoreProperties(
@@ -33,43 +33,39 @@ import java.util.Objects;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
 
 @Entity
-public class CatEntity extends AnimalEntity {
-    public static final String JSON_PROPERTY_MEOW_DECIBELS = "meowDecibels";
-    @jakarta.annotation.Nullable
+public class DachschundEntity extends DogEntity {
+    public static final String JSON_PROPERTY_APEX_PREDATOR = "apexPredator";
+    @jakarta.annotation.Nonnull
 
 
-    private Float meowDecibels;
+    private Boolean apexPredator = true;
 
-    public CatEntity() {
+    public DachschundEntity apexPredator(@jakarta.annotation.Nonnull Boolean apexPredator) {
 
-    }
-
-    public CatEntity meowDecibels(@jakarta.annotation.Nullable Float meowDecibels) {
-
-        this.meowDecibels = meowDecibels;
+        this.apexPredator = apexPredator;
         return this;
     }
 
     /**
-     * Get meowDecibels
-     * minimum: 0
+     * Get apexPredator
      *
-     * @return meowDecibels
+     * @return apexPredator
      */
-    @jakarta.annotation.Nullable
-    @DecimalMin("0")
-    @JsonProperty(JSON_PROPERTY_MEOW_DECIBELS)
-    @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+    @jakarta.annotation.Nonnull
+    @NotNull
 
-    public Float getMeowDecibels() {
-        return meowDecibels;
+    @JsonProperty(JSON_PROPERTY_APEX_PREDATOR)
+    @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+    public Boolean getApexPredator() {
+        return apexPredator;
     }
 
 
-    @JsonProperty(JSON_PROPERTY_MEOW_DECIBELS)
-    @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setMeowDecibels(@jakarta.annotation.Nullable Float meowDecibels) {
-        this.meowDecibels = meowDecibels;
+    @JsonProperty(JSON_PROPERTY_APEX_PREDATOR)
+    @JsonInclude(value = JsonInclude.Include.ALWAYS)
+    public void setApexPredator(@jakarta.annotation.Nonnull Boolean apexPredator) {
+        this.apexPredator = apexPredator;
     }
 
     @Override
@@ -80,22 +76,22 @@ public class CatEntity extends AnimalEntity {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        CatEntity catEntity = (CatEntity) o;
-        return Objects.equals(this.meowDecibels, catEntity.meowDecibels) &&
+        DachschundEntity dachschundEntity = (DachschundEntity) o;
+        return Objects.equals(this.apexPredator, dachschundEntity.apexPredator) &&
             super.equals(o);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(meowDecibels, super.hashCode());
+        return Objects.hash(apexPredator, super.hashCode());
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("class Cat {\n");
+        sb.append("class Dachschund {\n");
         sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-        sb.append("    meowDecibels: ").append(toIndentedString(meowDecibels)).append("\n");
+        sb.append("    apexPredator: ").append(toIndentedString(apexPredator)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -111,9 +107,10 @@ public class CatEntity extends AnimalEntity {
         return o.toString().replace("\n", "\n    ");
     }
 
+
     @Override
     public String getModelType() {
-        return "Cat";
+        return "Dachschund";
     }
 
 }

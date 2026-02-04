@@ -1,0 +1,21 @@
+# This config will ensure that the KIND cluster can be hit on a LAN on port 8080
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+
+      - containerPort: 30080
+        hostPort: 8080
+        listenAddress: "0.0.0.0"
+        protocol: TCP
+    
+      - containerPort: 30900
+        hostPort: 9000
+        listenAddress: "0.0.0.0"
+        protocol: TCP
+
+      - containerPort: 30433
+        hostPort: 5443
+        listenAddress: "0.0.0.0"
+        protocol: TCP

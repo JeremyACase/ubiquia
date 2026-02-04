@@ -20,6 +20,7 @@ jar {
 
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-logging"
     implementation "org.springframework.boot:spring-boot-starter-validation"
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-loader-tools"
@@ -36,7 +37,6 @@ dependencies {
     implementation project(':common:java:library:api')
     implementation project(':common:java:library:implementation')
 
-    implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${JACKSON_VERSION}"
     implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
     implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"
@@ -95,10 +95,31 @@ tasks.named("processTestResources") {
     }
 }
 
+ext.blacklistedModules = [
+    [group: 'org.slf4j', name: 'slf4j-simple'],
+    [group: 'commons-logging', name: 'commons-logging'],
+]
+
+def filesExcludingModules = { Project p ->
+    def cfg = p.configurations.runtimeClasspath
+    def bannedIds = blacklistedModules.collect { "${it.group}:${it.name}" } as Set
+
+    // map resolved components to their artifact files
+    def bannedComponents = cfg.incoming.resolutionResult.allComponents.findAll { c ->
+        c.moduleVersion != null && bannedIds.contains("${c.moduleVersion.group}:${c.moduleVersion.name}")
+    }.collect { it.id }.toSet()
+
+    def bannedFiles = cfg.incoming.artifactView { }.artifacts.artifacts.findAll { a ->
+        a.id.componentIdentifier in bannedComponents
+    }.collect { it.file }.toSet()
+
+    cfg.filter { !bannedFiles.contains(it) }
+}
+
 task copyRuntimeLibs(type: Copy) {
     description = 'Copies all runtime dependencies and project jars to build/belief-state-libs'
 
-    from configurations.runtimeClasspath
+    from(filesExcludingModules(project))
 
     def projectJars = [
         ':common:java:model:domain',
@@ -113,14 +134,12 @@ task copyRuntimeLibs(type: Copy) {
     projectJars.each { path ->
         def subproject = project(path)
 
-        // Add the compiled jar
         def jarTask = subproject.tasks.named('jar')
         dependsOn(jarTask)
         from(jarTask.map { it.archiveFile.get().asFile })
 
-        // Add runtime dependencies from the subproject
         dependsOn(subproject.configurations.runtimeClasspath)
-        from(subproject.configurations.runtimeClasspath)
+        from(filesExcludingModules(subproject))
     }
 
     into "belief-state-libs"

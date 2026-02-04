@@ -24,7 +24,7 @@ import org.ubiquia.common.library.belief.state.libraries.service.builder.io.DtoP
 import org.ubiquia.common.library.belief.state.libraries.service.builder.telemetry.MicroMeterTagsBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.command.MicroMeterCommand;
 import org.ubiquia.common.library.belief.state.libraries.service.finder.EntityRepositoryFinder;
-import org.ubiquia.common.library.belief.state.libraries.service.logic.AclControllerLogic;
+import org.ubiquia.common.library.belief.state.libraries.service.logic.DomainControllerLogic;
 import org.ubiquia.common.library.dao.component.EntityDao;
 import org.ubiquia.common.library.implementation.service.builder.DomainIngressResponseBuilder;
 import org.ubiquia.common.library.implementation.service.visitor.PageValidator;
@@ -36,7 +36,7 @@ import org.ubiquia.common.model.ubiquia.IngressResponse;
 
 /**
  * A base controller to be used by generated belief states to serve models defined in the
- * belief state's Agent Communication Language (ACL.)
+ * belief state's domain ontologyt schema.
  *
  * @param <T> The entity type we're processing.
  * @param <D> The DTO mirroring the entity.
@@ -51,7 +51,7 @@ public abstract class AbstractDomainModelController<
     protected Class<T> cachedEntityClass;
     protected Class<D> cachedDtoClass;
     @Autowired
-    protected AclControllerLogic aclControllerLogic;
+    protected DomainControllerLogic domainControllerLogic;
     @Autowired
     protected EntityDao<T> entityDao;
     @Autowired
@@ -94,7 +94,7 @@ public abstract class AbstractDomainModelController<
     }
 
     /**
-     * A RESTful method allowing the service to ingest new ACL models and persist them.
+     * A RESTful method allowing the service to ingest new models and persist them.
      *
      * @param ingress The ingress model.
      * @return A response with metadata about the new record.
@@ -502,7 +502,7 @@ public abstract class AbstractDomainModelController<
 
         this.getLogger().info("Received a count request with params...");
 
-        var parameterMap = this.aclControllerLogic.getParameterMapFrom(httpServletRequest);
+        var parameterMap = this.domainControllerLogic.getParameterMapFrom(httpServletRequest);
         var count = this.entityDao.getCount(parameterMap, this.cachedEntityClass);
 
         if (Objects.nonNull(sample)) {
@@ -543,7 +543,7 @@ public abstract class AbstractDomainModelController<
         this.getLogger().debug("Received a multiselect query request...");
 
         this.pageValidator.validatePageAndSize(page, size);
-        var parameterMap = this.aclControllerLogic.getParameterMapFrom(httpServletRequest);
+        var parameterMap = this.domainControllerLogic.getParameterMapFrom(httpServletRequest);
 
         var records = this.entityDao.getPageMultiselect(
             parameterMap,
@@ -590,7 +590,7 @@ public abstract class AbstractDomainModelController<
         this.getLogger().info("Received a query request by params...");
 
         this.pageValidator.validatePageAndSize(page, size);
-        var parameterMap = this.aclControllerLogic.getParameterMapFrom(httpServletRequest);
+        var parameterMap = this.domainControllerLogic.getParameterMapFrom(httpServletRequest);
 
         var records = this.entityDao.getPage(
             parameterMap,

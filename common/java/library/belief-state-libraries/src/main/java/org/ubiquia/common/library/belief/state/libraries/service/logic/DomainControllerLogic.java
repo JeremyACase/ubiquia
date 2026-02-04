@@ -11,16 +11,16 @@ import org.springframework.stereotype.Service;
  * Some common logic for Belief State controllers for ACL entities.
  */
 @Service
-public class AclControllerLogic {
+public class DomainControllerLogic {
 
-    private static final Logger logger = LoggerFactory.getLogger(AclControllerLogic.class);
+    private static final Logger logger = LoggerFactory.getLogger(DomainControllerLogic.class);
 
     private final Pattern camelcaseRegex;
 
     /**
      * Constructors are fun.
      */
-    public AclControllerLogic() {
+    public DomainControllerLogic() {
         logger.debug("Initializing...");
         this.camelcaseRegex = Pattern.compile("-([a-z])");
         logger.debug("...initialized...");

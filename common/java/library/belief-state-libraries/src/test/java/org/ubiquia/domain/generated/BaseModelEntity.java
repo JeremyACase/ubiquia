@@ -11,7 +11,7 @@
  */
 
 
-package org.ubiquia.acl.generated;
+package org.ubiquia.domain.generated;
 
 
 import com.fasterxml.jackson.annotation.*;

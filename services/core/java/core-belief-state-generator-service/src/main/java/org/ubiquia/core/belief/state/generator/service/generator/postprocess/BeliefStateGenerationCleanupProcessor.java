@@ -14,13 +14,13 @@ public class BeliefStateGenerationCleanupProcessor {
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateGenerationCleanupProcessor.class);
 
     private final List<String> BLACKLISTED_FILENAMES = List.of(
-        "AbstractAclModel.java",
-        "AbstractAclModelEntity.java",
-        "AbstractAclModelEntityRelationshipBuilder.java",
-        "AbstractAclModelEntityRepository.java",
-        "AbstractAclModelController.java",
-        "AbstractAclModelIngressDtoMapper.java",
-        "AbstractAclModelEgressDtoMapper.java",
+        "AbstractDomainModel.java",
+        "AbstractDomainModelEntity.java",
+        "AbstractDomainModelEntityRelationshipBuilder.java",
+        "AbstractDomainModelEntityRepository.java",
+        "AbstractDomainModelController.java",
+        "AbstractDomainModelIngressDtoMapper.java",
+        "AbstractDomainModelEgressDtoMapper.java",
         "KeyValuePair.java",
         "KeyValuePairEntity.java",
         "KeyValuePairController.java",

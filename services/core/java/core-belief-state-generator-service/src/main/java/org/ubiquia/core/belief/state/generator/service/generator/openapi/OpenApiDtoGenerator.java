@@ -49,7 +49,7 @@ public class OpenApiDtoGenerator {
             .addAdditionalProperty("library", "native")
             .addAdditionalProperty("modelPropertyNaming", "original")
             .addAdditionalProperty("javaxPackage", "jakarta")
-            .addAdditionalProperty("modelPackage", "org.ubiquia.acl.generated");
+            .addAdditionalProperty("modelPackage", "org.ubiquia.domain.generated");
 
         configurator.setGlobalProperties(Map.of(
             "models", "",

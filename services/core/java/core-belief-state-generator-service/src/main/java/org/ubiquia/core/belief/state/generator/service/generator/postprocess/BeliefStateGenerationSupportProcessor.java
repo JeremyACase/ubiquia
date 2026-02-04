@@ -34,19 +34,19 @@ public class BeliefStateGenerationSupportProcessor {
     public void postProcess(final DomainOntology domainOntology) throws IOException {
         this.copyResourceFromClasspath(
             "template/java/support/Application.java.template",
-            "generated/src/main/java/org/ubiquia/acl/generated/Application.java");
+            "generated/src/main/java/org/ubiquiadomainl/generated/Application.java");
 
         this.copyResourceFromClasspath(
             "template/java/support/GlobalExceptionHandler.java.template",
-            "generated/src/main/java/org/ubiquia/acl/generated/GlobalExceptionHandler.java");
+            "generated/src/main/java/org/ubiquia/domain/generated/GlobalExceptionHandler.java");
 
         this.copyResourceFromClasspath(
             "template/java/support/MinioClientConfig.java.template",
-            "generated/src/main/java/org/ubiquia/acl/generated/MinioClientConfig.java");
+            "generated/src/main/java/org/ubiquia/domain/generated/MinioClientConfig.java");
 
         this.copyResourceFromClasspath(
             "template/java/support/ObjectController.java.template",
-            "generated/src/main/java/org/ubiquia/acl/generated/ObjectController.java");
+            "generated/src/main/java/org/ubiquia/domain/generated/ObjectController.java");
 
         var tokenMap = new HashMap<String, String>();
         tokenMap.put("{DOMAIN_NAME}", domainOntology.getName());

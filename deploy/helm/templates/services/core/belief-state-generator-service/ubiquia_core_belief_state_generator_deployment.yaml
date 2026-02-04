@@ -32,9 +32,6 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
 
-      nodeSelector:
-        kubernetes.io/hostname: ubiquia-agent-0-control-plane
-
       tolerations:
         - key: "node.kubernetes.io/not-ready"
           operator: "Exists"

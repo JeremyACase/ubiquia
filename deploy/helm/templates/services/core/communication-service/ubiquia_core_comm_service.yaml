@@ -5,11 +5,12 @@ metadata:
   labels:
     component: ubiquia-core-communication-service
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
     - name: http
       port: {{ .Values.convenience.variables.spring.port }}
       targetPort: http
       protocol: TCP
+      nodePort: 30080
   selector:
     component: ubiquia-core-communication-service

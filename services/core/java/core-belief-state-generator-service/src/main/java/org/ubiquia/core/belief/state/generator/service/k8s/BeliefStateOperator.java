@@ -179,7 +179,7 @@ public class BeliefStateOperator {
 
             logger.info("...completed deployment...");
         } else {
-            logger.info("...deployment found for that ACL; not deploying...");
+            logger.info("...deployment found for that domain; not deploying...");
         }
     }
 

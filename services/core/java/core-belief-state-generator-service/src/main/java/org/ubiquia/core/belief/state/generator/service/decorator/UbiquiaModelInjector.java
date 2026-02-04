@@ -62,7 +62,7 @@ public class UbiquiaModelInjector {
         domainSchema.set("required", this.objectMapper.createArrayNode()); // e.g. ["id"] if you need it
 
         defs.putIfAbsent("KeyValuePair", kvPair);
-        defs.putIfAbsent("AbstractAclModel", domainSchema);
+        defs.putIfAbsent("AbstractDomainModel", domainSchema);
 
         var preprocssed = this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
         logger.debug("...appended Ubiquia models: {}.", preprocssed);

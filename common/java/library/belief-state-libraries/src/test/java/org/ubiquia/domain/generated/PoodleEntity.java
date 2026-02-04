@@ -11,19 +11,21 @@
  */
 
 
-package org.ubiquia.acl.generated;
+package org.ubiquia.domain.generated;
 
 
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.Entity;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
- * The model of a wiener dog.
+ * The model of a poodle.
  */
 @JsonPropertyOrder({
-    DachschundEntity.JSON_PROPERTY_APEX_PREDATOR
+    PoodleEntity.JSON_PROPERTY_DOG_SHOWS_WON
 })
 @jakarta.annotation.Generated(value = "org.ubiquia.core.belief.state.generator.service.generator.acl.UbiquiaAclEntityCodegen", date = "2025-06-18T01:59:36.137342500Z[UTC]", comments = "Generator version: 7.13.0")
 @JsonIgnoreProperties(
@@ -33,39 +35,40 @@ import java.util.Objects;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
 
 @Entity
-public class DachschundEntity extends DogEntity {
-    public static final String JSON_PROPERTY_APEX_PREDATOR = "apexPredator";
-    @jakarta.annotation.Nonnull
+public class PoodleEntity extends DogEntity {
+    public static final String JSON_PROPERTY_DOG_SHOWS_WON = "dogShowsWon";
+    @jakarta.annotation.Nullable
 
 
-    private Boolean apexPredator = true;
+    private BigDecimal dogShowsWon = new BigDecimal("0");
 
-    public DachschundEntity apexPredator(@jakarta.annotation.Nonnull Boolean apexPredator) {
+    public PoodleEntity dogShowsWon(@jakarta.annotation.Nullable BigDecimal dogShowsWon) {
 
-        this.apexPredator = apexPredator;
+        this.dogShowsWon = dogShowsWon;
         return this;
     }
 
     /**
-     * Get apexPredator
+     * Get dogShowsWon
+     * minimum: 0
      *
-     * @return apexPredator
+     * @return dogShowsWon
      */
-    @jakarta.annotation.Nonnull
-    @NotNull
+    @jakarta.annotation.Nullable
+    @Valid
+    @DecimalMin("0")
+    @JsonProperty(JSON_PROPERTY_DOG_SHOWS_WON)
+    @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-    @JsonProperty(JSON_PROPERTY_APEX_PREDATOR)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
-    public Boolean getApexPredator() {
-        return apexPredator;
+    public BigDecimal getDogShowsWon() {
+        return dogShowsWon;
     }
 
 
-    @JsonProperty(JSON_PROPERTY_APEX_PREDATOR)
-    @JsonInclude(value = JsonInclude.Include.ALWAYS)
-    public void setApexPredator(@jakarta.annotation.Nonnull Boolean apexPredator) {
-        this.apexPredator = apexPredator;
+    @JsonProperty(JSON_PROPERTY_DOG_SHOWS_WON)
+    @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+    public void setDogShowsWon(@jakarta.annotation.Nullable BigDecimal dogShowsWon) {
+        this.dogShowsWon = dogShowsWon;
     }
 
     @Override
@@ -76,22 +79,22 @@ public class DachschundEntity extends DogEntity {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DachschundEntity dachschundEntity = (DachschundEntity) o;
-        return Objects.equals(this.apexPredator, dachschundEntity.apexPredator) &&
+        PoodleEntity poodleEntity = (PoodleEntity) o;
+        return Objects.equals(this.dogShowsWon, poodleEntity.dogShowsWon) &&
             super.equals(o);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(apexPredator, super.hashCode());
+        return Objects.hash(dogShowsWon, super.hashCode());
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("class Dachschund {\n");
+        sb.append("class Poodle {\n");
         sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-        sb.append("    apexPredator: ").append(toIndentedString(apexPredator)).append("\n");
+        sb.append("    dogShowsWon: ").append(toIndentedString(dogShowsWon)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -107,10 +110,9 @@ public class DachschundEntity extends DogEntity {
         return o.toString().replace("\n", "\n    ");
     }
 
-
     @Override
     public String getModelType() {
-        return "Dachschund";
+        return "Poodle";
     }
 
 }

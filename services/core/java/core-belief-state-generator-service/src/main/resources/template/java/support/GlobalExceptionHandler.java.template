@@ -1,4 +1,4 @@
-package org.ubiquia.acl.generated;
+package org.ubiquia.domain.generated;
 
 
 import org.springframework.web.bind.annotation.ControllerAdvice;

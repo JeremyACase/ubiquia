@@ -3,8 +3,8 @@ package org.ubiquia.common.library.belief.state.libraries.service.mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.ubiquia.acl.generated.Person;
-import org.ubiquia.acl.generated.PersonEntity;
+import org.ubiquia.domain.generated.Person;
+import org.ubiquia.domain.generated.PersonEntity;
 
 @Component
 public class PersonEgressDtoMapper extends AbstractEgressDtoMapper<PersonEntity, Person> {

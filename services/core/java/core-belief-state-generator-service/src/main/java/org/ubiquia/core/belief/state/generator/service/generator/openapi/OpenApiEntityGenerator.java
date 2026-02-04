@@ -44,7 +44,7 @@ public class OpenApiEntityGenerator {
             .addAdditionalProperty("jackson", false)
             .addAdditionalProperty("library", "native")
             .addAdditionalProperty("modelPropertyNaming", "original")
-            .addAdditionalProperty("modelPackage", "org.ubiquia.acl.generated")
+            .addAdditionalProperty("modelPackage", "org.ubiquia.domain.generated")
             .addAdditionalProperty("useBeanValidation", true);
 
         configurator.setGlobalProperties(Map.of(

@@ -1,7 +1,7 @@
 package org.ubiquia.common.library.belief.state.libraries.repository;
 
 
-import org.ubiquia.acl.generated.DachschundEntity;
+import org.ubiquia.domain.generated.DachschundEntity;
 
 public interface DachschundEntityRepository extends EntityRepository<DachschundEntity> {
 

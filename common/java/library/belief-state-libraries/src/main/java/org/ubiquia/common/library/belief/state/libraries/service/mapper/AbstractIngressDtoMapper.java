@@ -80,7 +80,7 @@ public abstract class AbstractIngressDtoMapper<
 
             var cast = (AbstractDomainModelEntity) to;
 
-            var clazz = Class.forName("org.ubiquia.acl.generated."
+            var clazz = Class.forName("org.ubiquia.domain.generated."
                 + cast.getModelType()
                 + "Entity");
 

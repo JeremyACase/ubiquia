@@ -1,4 +1,4 @@
-package org.ubiquia.acl.generated;
+package org.ubiquia.domain.generated;
 
 import io.minio.errors.MinioException;
 import io.swagger.v3.oas.annotations.Operation;

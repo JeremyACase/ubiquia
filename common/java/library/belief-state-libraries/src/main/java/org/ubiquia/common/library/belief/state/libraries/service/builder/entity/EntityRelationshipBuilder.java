@@ -66,7 +66,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractDomainModelEnt
     }
 
     /**
-     * Provided an ACL entity, crawl through the model and hydrate any existing relationships
+     * Provided a domain entity, crawl through the model and hydrate any existing relationships
      * recursively.
      *
      * @param entity The entity we're building existing relationship data for.
@@ -84,7 +84,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractDomainModelEnt
     }
 
     /**
-     * Provided an ACL entity, attempt to get the appropriate relationship builder.
+     * Provided a domain entity, attempt to get the appropriate relationship builder.
      *
      * @param entity The entity to get a relationship builder for.
      * @return The appropriate relationship builder.
@@ -441,7 +441,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractDomainModelEnt
     }
 
     /**
-     * Provided an ACL entity, build and return the class name.
+     * Provided a domain entity, build and return the class name.
      *
      * @param entity The entity we're building a name for.
      * @return The entity class name.

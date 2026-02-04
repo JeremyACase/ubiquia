@@ -14,7 +14,7 @@ public class InheritancePreprocessor {
 
     private static final Logger logger = LoggerFactory.getLogger(UbiquiaModelInjector.class);
 
-    private static final String REF_VALUE = "#/definitions/AbstractAclModel";
+    private static final String REF_VALUE = "#/definitions/AbstractDomainModel";
 
     @Autowired
     private ObjectMapper objectMapper;

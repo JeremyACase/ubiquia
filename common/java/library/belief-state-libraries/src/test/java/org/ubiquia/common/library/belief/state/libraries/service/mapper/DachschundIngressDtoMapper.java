@@ -1,8 +1,8 @@
 package org.ubiquia.common.library.belief.state.libraries.service.mapper;
 
 import org.springframework.stereotype.Service;
-import org.ubiquia.acl.generated.Dachschund;
-import org.ubiquia.acl.generated.DachschundEntity;
+import org.ubiquia.domain.generated.Dachschund;
+import org.ubiquia.domain.generated.DachschundEntity;
 
 @Service
 public class DachschundIngressDtoMapper extends AbstractIngressDtoMapper<

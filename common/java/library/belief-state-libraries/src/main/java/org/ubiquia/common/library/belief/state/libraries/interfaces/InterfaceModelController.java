@@ -52,7 +52,7 @@ public interface InterfaceModelController<
     AbstractIngressDtoMapper<D, T> getIngressMapper();
 
     /**
-     * A RESTful method allowing the service to ingest new ACL models and persist them.
+     * A RESTful method allowing the service to ingest new models and persist them.
      *
      * @param ingress The ingress model.
      * @return A response with metadata about the new record.

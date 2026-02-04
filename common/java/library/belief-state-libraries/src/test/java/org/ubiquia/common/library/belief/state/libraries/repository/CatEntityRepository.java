@@ -1,7 +1,7 @@
 package org.ubiquia.common.library.belief.state.libraries.repository;
 
 
-import org.ubiquia.acl.generated.CatEntity;
+import org.ubiquia.domain.generated.CatEntity;
 
 public interface CatEntityRepository extends EntityRepository<CatEntity> {
 

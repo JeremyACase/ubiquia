@@ -9,11 +9,10 @@ dependencyManagement {
 }
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     implementation project(':common:java:library:api')
     implementation project(':common:java:model:domain')
     implementation project(':common:java:model:ubiquia')
-
-    implementation "ch.qos.logback:logback-core:${LOGBACK_VERSION}"
 }

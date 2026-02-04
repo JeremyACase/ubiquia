@@ -1,8 +1,8 @@
 package org.ubiquia.common.library.belief.state.libraries.service.mapper;
 
 import org.springframework.stereotype.Service;
-import org.ubiquia.acl.generated.Shark;
-import org.ubiquia.acl.generated.SharkEntity;
+import org.ubiquia.domain.generated.Shark;
+import org.ubiquia.domain.generated.SharkEntity;
 
 @Service
 public class SharkIngressDtoMapper extends AbstractIngressDtoMapper<

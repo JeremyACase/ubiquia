@@ -1,7 +1,7 @@
 package org.ubiquia.common.library.belief.state.libraries.repository;
 
 
-import org.ubiquia.acl.generated.PersonEntity;
+import org.ubiquia.domain.generated.PersonEntity;
 
 public interface PersonEntityRepository extends EntityRepository<PersonEntity> {
 
