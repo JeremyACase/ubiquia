@@ -4,6 +4,6 @@ dependencies:
   version: 17.0.21
 - name: yugabyte
   repository: https://charts.yugabyte.com
-  version: 2024.1.3
-digest: sha256:d6123fbf90cca0cf2cc9f9d6c1a7b1794039b0b27ce2d92a1c7876fea0c3acee
-generated: "2025-10-01T11:32:00.2683635-10:00"
+  version: 2025.2.0
+digest: sha256:5337220f510b513fb5c2f5a93d949df54bdeea05265b3b4e114a274b656a4c56
+generated: "2026-02-06T18:28:11.4269477-08:00"

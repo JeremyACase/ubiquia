@@ -21,6 +21,10 @@ ubiquia:
                 major: 1
                 minor: 0
                 patch: 0
+    storage:
+      minio:
+        enabled: false
+        
   components:
     core:
       beliefStateGeneratorService:
@@ -48,3 +52,11 @@ ubiquia:
 infrastructure:
   image:
     pullPolicy: Never
+
+# yugabyte:
+
+#   tserver:
+#     serverBroadcastAddress: "192.168.200.56:30910"
+
+#   master:
+#     serverBroadcastAddress: 192.168.200.56:30710"

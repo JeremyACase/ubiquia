@@ -36,7 +36,7 @@ data:
 
     spring:
       server:
-      port: {{ .Values.convenience.variables.spring.port }}
+        port: {{ .Values.convenience.variables.spring.port }}
 
       application:
         name: flow-service
@@ -55,7 +55,7 @@ data:
 {{ else if .Values.ubiquia.agent.database.yugabyte.enabled }}
       datasource:
         driverClassName: com.yugabyte.Driver
-        url: jdbc:yugabytedb://yb-tservers:5433/yugabyte?autoReconnect=true
+        url: jdbc:yugabytedb://192.168.200.56:5433/yugabyte?sslmode=disable
         username: yugabyte
         password: yugabyte
         hikari:

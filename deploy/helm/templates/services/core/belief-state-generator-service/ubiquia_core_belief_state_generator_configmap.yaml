@@ -34,8 +34,8 @@ data:
 
     spring:
       server:
-      port: {{ .Values.convenience.variables.spring.port }}
-
+        port: {{ .Values.convenience.variables.spring.port }}
+  
       application:
         name: belief-state-generator-service
       jackson:

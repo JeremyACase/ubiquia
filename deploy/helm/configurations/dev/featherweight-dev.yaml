@@ -23,7 +23,8 @@ ubiquia:
                 patch: 0
     storage:  
       minio:
-        enabled: true
+        enabled: false
+        
   components:
     core:
       beliefStateGeneratorService:

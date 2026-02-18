@@ -34,7 +34,7 @@ data:
 
     spring:
       server:
-      port: {{ .Values.convenience.variables.spring.port }}
+        port: {{ .Values.convenience.variables.spring.port }}
 
       application:
         name: communication-service
