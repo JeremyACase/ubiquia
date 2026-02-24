@@ -48,15 +48,7 @@ ubiquia:
           registry: docker.io/ubiquia
           repository: test-belief-state-generator-service
           tag: latest
-      
+
 infrastructure:
   image:
     pullPolicy: Never
-
-# yugabyte:
-
-#   tserver:
-#     serverBroadcastAddress: "192.168.200.56:30910"
-
-#   master:
-#     serverBroadcastAddress: 192.168.200.56:30710"

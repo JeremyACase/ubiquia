@@ -40,7 +40,7 @@ spec:
           args:
             - >
               echo "Waiting for Yugabyte YSQL at yb-tservers:5433...";
-              until nc -z 192.168.200.56 5433; do
+              until nc -z yb-tservers 5433; do
                 echo "YSQL not up yet"; sleep 2;
               done;
               echo "YSQL port is open.";
