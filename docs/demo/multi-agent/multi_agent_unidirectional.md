@@ -6,15 +6,6 @@ This document shows how to run a unidirectional yugabyteDB setup. It assumes Ubi
 - **Date:** 2026-02-23
 - **Author:** Jeremy Case
 
-* [Setup](#setup)
-  * [High-Level Architecture Diagram](#high-level-architecture-diagram)
-  * [Components](#components)
-  * [Message Broker](#message-broker)
-  * [Databases](#databases)
-  * [Observability](#observability)
-  * [Deployment](#deployment)
-
-
 ## Setup
 
 At least two Ubiquia agents must be run. For the purposes of this demo, there is a a script that can be run, as well as several specific configurations.
@@ -26,6 +17,42 @@ For my LAN, I had to open up the IP address and ports via my Windows firewall se
 
 ```powershell
 > New-NetFirewallRule -DisplayName "Yugabyte 5433" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5433
+```
+
+### KIND Configuration
+If running this in KIND, the agents will need to have the appropriate ports opened. This is already configured in the kind_lan_config.yaml file located under tools/scripts/devs/multi-agent.
+
+```yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+
+      - containerPort: 30080
+        hostPort: 8080
+        listenAddress: "0.0.0.0"
+        protocol: TCP
+    
+      - containerPort: 30900
+        hostPort: 9000
+        listenAddress: "0.0.0.0"
+        protocol: TCP
+
+      - containerPort: 30433
+        hostPort: 5433
+        listenAddress: "0.0.0.0"
+        protocol: TCP
+
+      - containerPort: 30710
+        hostPort: 7100
+        listenAddress: "0.0.0.0"
+        protocol: TCP
+
+      - containerPort: 30910
+        hostPort: 9100
+        listenAddress: "0.0.0.0"
+        protocol: TCP
 ```
 
 ### YugabyteDB Configuration

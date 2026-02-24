@@ -1,4 +1,3 @@
-# This config will ensure that the KIND cluster can be hit on a LAN on port 8080
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
