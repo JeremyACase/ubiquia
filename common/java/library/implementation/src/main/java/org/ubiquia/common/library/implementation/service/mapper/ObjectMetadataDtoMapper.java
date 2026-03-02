@@ -15,7 +15,7 @@ public class ObjectMetadataDtoMapper extends GenericDtoMapper<
     ObjectMetadata> {
 
     @Autowired
-    private UbiquiaAgentDtoMapper ubiquiaAgentDtoMapper;
+    private AgentDtoMapper agentDtoMapper;
 
     @Override
     public ObjectMetadata map(final ObjectMetadataEntity from) throws JsonProcessingException {
@@ -28,7 +28,7 @@ public class ObjectMetadataDtoMapper extends GenericDtoMapper<
             to.setBucketName(from.getBucketName());
             to.setContentType(from.getContentType());
             to.setOriginalFilename(from.getOriginalFilename());
-            to.setUbiquiaAgent(this.ubiquiaAgentDtoMapper.map(from.getAgent()));
+            to.setUbiquiaAgent(this.agentDtoMapper.map(from.getAgent()));
             to.setSize(from.getSize());
 
         }

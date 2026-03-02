@@ -6,6 +6,7 @@
 
 ## 🌟 Why Ubiquia?
 
+
 Modern agent-based systems often rely on brittle glue code: ad-hoc APIs, hand-rolled orchestration, and inconsistent state handling. **Ubiquia replaces that mess with clean, declarative infrastructure**:
 
 - 🔁 **Composable DAGs**  

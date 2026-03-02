@@ -41,6 +41,8 @@ public abstract class AbstractModel {
     @Transient
     private String modelType;
 
+    private List<Update> updates;
+
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
     public String getId() {
         return this.id;
@@ -84,5 +86,13 @@ public abstract class AbstractModel {
     @NotNull
     public String getModelType() {
         return "AbstractEntity";
+    }
+
+    public List<Update> getUpdates() {
+        return updates;
+    }
+
+    public void setUpdates(List<Update> updates) {
+        this.updates = updates;
     }
 }

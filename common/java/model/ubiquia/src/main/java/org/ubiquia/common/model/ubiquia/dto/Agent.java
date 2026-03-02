@@ -8,15 +8,17 @@ import java.util.List;
 import java.util.Set;
 import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;
 
-public class UbiquiaAgent {
+public class Agent {
 
     private String id = null;
 
-    private String modelType = "UbiquiaAgent";
+    private String modelType = "Agent";
 
     private OffsetDateTime createdAt = null;
 
     private OffsetDateTime updatedAt = null;
+
+    private Set<Update> updates;
 
     private List<Graph> deployedGraphs;
 
@@ -66,5 +68,13 @@ public class UbiquiaAgent {
 
     public void setObjectMetadatas(Set<ObjectMetadataEntity> objectMetadatas) {
         this.objectMetadatas = objectMetadatas;
+    }
+
+    public Set<Update> getUpdates() {
+        return updates;
+    }
+
+    public void setUpdates(Set<Update> updates) {
+        this.updates = updates;
     }
 }

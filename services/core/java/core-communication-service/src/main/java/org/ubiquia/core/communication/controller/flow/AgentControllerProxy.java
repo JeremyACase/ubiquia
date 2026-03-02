@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
-import org.ubiquia.common.model.ubiquia.dto.UbiquiaAgent;
+import org.ubiquia.common.model.ubiquia.dto.Agent;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.core.communication.interfaces.InterfaceUbiquiaDaoControllerProxy;
 import reactor.core.publisher.Mono;
@@ -41,7 +41,7 @@ public class AgentControllerProxy implements InterfaceUbiquiaDaoControllerProxy 
     private WebClient webClient;
 
     /**
-     * Retrieves the singleton {@link UbiquiaAgent} instance from the Flow Service.
+     * Retrieves the singleton {@link Agent} instance from the Flow Service.
      *
      * <p>Proxies a {@code GET} to the downstream {@code /instance/get} endpoint and returns
      * the response as-is.</p>
@@ -50,10 +50,10 @@ public class AgentControllerProxy implements InterfaceUbiquiaDaoControllerProxy 
      * with a {@code null} body.</p>
      *
      * @return a {@link Mono} emitting the downstream {@link ResponseEntity} containing a
-     *         {@link UbiquiaAgent}, or a {@code 502} response on error
+     *         {@link Agent}, or a {@code 502} response on error
      */
     @GetMapping("/instance/get")
-    public Mono<ResponseEntity<UbiquiaAgent>> proxyGetInstance() {
+    public Mono<ResponseEntity<Agent>> proxyGetInstance() {
 
         var targetUri = UriComponentsBuilder
             .fromHttpUrl(this.getUrlHelper() + "/instance/get")
@@ -64,7 +64,7 @@ public class AgentControllerProxy implements InterfaceUbiquiaDaoControllerProxy 
             .get()
             .uri(targetUri)
             .retrieve()
-            .toEntity(UbiquiaAgent.class)
+            .toEntity(Agent.class)
             .onErrorResume(e ->
                 Mono.just(ResponseEntity.status(502).body(null))
             );
