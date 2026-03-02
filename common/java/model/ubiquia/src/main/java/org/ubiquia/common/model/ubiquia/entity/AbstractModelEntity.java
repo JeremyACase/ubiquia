@@ -32,6 +32,9 @@ public abstract class AbstractModelEntity {
     @Valid
     private Set<KeyValuePair> tags = null;
 
+    @OneToMany(mappedBy = "model", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    private Set<UpdateEntity> updates;
+
     @Transient
     private String modelType;
 
@@ -111,5 +114,13 @@ public abstract class AbstractModelEntity {
         return
             Objects.equals(this.id, aentity.id)
                 && Objects.equals(this.modelType, aentity.modelType);
+    }
+
+    public Set<UpdateEntity> getUpdates() {
+        return updates;
+    }
+
+    public void setUpdates(Set<UpdateEntity> updates) {
+        this.updates = updates;
     }
 }

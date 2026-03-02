@@ -5,7 +5,7 @@ public class ObjectMetadata extends AbstractModel {
 
     private String bucketName;
 
-    private UbiquiaAgent ubiquiaAgent;
+    private Agent agent;
 
     private String originalFilename;
 
@@ -26,12 +26,12 @@ public class ObjectMetadata extends AbstractModel {
         this.bucketName = bucketName;
     }
 
-    public UbiquiaAgent getUbiquiaAgent() {
-        return ubiquiaAgent;
+    public Agent getUbiquiaAgent() {
+        return agent;
     }
 
-    public void setUbiquiaAgent(UbiquiaAgent ubiquiaAgent) {
-        this.ubiquiaAgent = ubiquiaAgent;
+    public void setUbiquiaAgent(Agent agent) {
+        this.agent = agent;
     }
 
     public String getOriginalFilename() {

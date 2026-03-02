@@ -27,6 +27,9 @@ public class AgentEntity {
     @OneToMany(mappedBy = "agent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private Set<ObjectMetadataEntity> objectMetadatas;
 
+    @OneToMany(mappedBy = "agent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    private Set<UpdateEntity> updates;
+
     @CreationTimestamp
     @Column(updatable = false)
     private OffsetDateTime createdAt = null;
@@ -86,5 +89,13 @@ public class AgentEntity {
 
     public void setObjectMetadatas(Set<ObjectMetadataEntity> objectMetadatas) {
         this.objectMetadatas = objectMetadatas;
+    }
+
+    public Set<UpdateEntity> getUpdates() {
+        return updates;
+    }
+
+    public void setUpdates(Set<UpdateEntity> updates) {
+        this.updates = updates;
     }
 }

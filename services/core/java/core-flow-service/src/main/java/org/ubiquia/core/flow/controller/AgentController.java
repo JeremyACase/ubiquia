@@ -12,8 +12,8 @@ import org.ubiquia.common.library.api.config.AgentConfig;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.api.repository.AgentRepository;
 import org.ubiquia.common.library.dao.component.EntityDao;
-import org.ubiquia.common.library.implementation.service.mapper.UbiquiaAgentDtoMapper;
-import org.ubiquia.common.model.ubiquia.dto.UbiquiaAgent;
+import org.ubiquia.common.library.implementation.service.mapper.AgentDtoMapper;
+import org.ubiquia.common.model.ubiquia.dto.Agent;
 import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 
 /**
@@ -26,7 +26,7 @@ public class AgentController implements InterfaceLogger {
     private static final Logger logger = LoggerFactory.getLogger(AgentController.class);
 
     @Autowired
-    private UbiquiaAgentDtoMapper dtoMapper;
+    private AgentDtoMapper dtoMapper;
 
     @Autowired
     private AgentConfig agentConfig;
@@ -44,7 +44,7 @@ public class AgentController implements InterfaceLogger {
 
     @GetMapping(value = "/instance/get")
     @Transactional
-    public UbiquiaAgent getInstance() throws JsonProcessingException {
+    public Agent getInstance() throws JsonProcessingException {
         logger.debug("Received request for Ubiquia instance...");
         var id = this.agentConfig.getId();
         var record = this.agentRepository.findById(id);
