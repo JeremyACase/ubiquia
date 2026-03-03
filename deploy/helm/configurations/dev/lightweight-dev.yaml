@@ -49,12 +49,12 @@ ubiquia:
           repository: test-belief-state-generator-service
           tag: latest
 
-# yugabyte:
-#   master:
-#     serverBroadcastAddress: "192.168.200.222"
+yugabyte:
+  master:
+    serverBroadcastAddress: "192.168.200.222"
 
-#   tserver:
-#     serverBroadcastAddress: "192.168.200.222"
+  tserver:
+    serverBroadcastAddress: "192.168.200.222"
 
 infrastructure:
   image:

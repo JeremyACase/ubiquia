@@ -47,6 +47,7 @@ public class UpdateDtoMapper {
 
         Update to = null;
         if (Objects.nonNull(from)) {
+            to = new Update();
             to.setId(from.getId());
             to.setModelType(from.getModelType());
             to.setCreatedAt(from.getCreatedAt());
