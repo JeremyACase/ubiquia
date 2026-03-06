@@ -1,19 +1,29 @@
 # Ubiquia
 
-> **Ubiquia is a distributed, schema-driven multi-agent orchestration system. Define agent DAGs declaratively, and Ubiquia automatically deploys and wires them into a live Kubernetes ecosystem—with optional belief state services for distributed, persistent, queryable shared context. All data is governed by schemas, ensuring reliable structure across all agents and components--including LLMs.**
+> **Ubiquia is a distributed, schema-driven multi-node orchestration system. Define DAGs declaratively, and Ubiquia automatically deploys and wires them into a live Kubernetes ecosystem—with optional belief state services for distributed, persistent, queryable shared context. All data is governed by schemas, ensuring reliable structure across all nodes and components—including LLMs.**
 
 ---
 
 ## 🌟 Why Ubiquia?
 
+The defense industry has a deep structural problem: capability vendors are forced to anticipate the operational environment at development time. In contested, degraded, and rapidly changing conditions, that is impossible. The result is brittle, vendor-locked systems that cannot adapt when the network degrades, infrastructure is lost, or mission objectives change.
 
-Modern agent-based systems often rely on brittle glue code: ad-hoc APIs, hand-rolled orchestration, and inconsistent state handling. **Ubiquia replaces that mess with clean, declarative infrastructure**:
+**Ubiquia solves this by decoupling capability development from operational control.**
+
+Vendors define what their hardware or software can do. Operators define objectives. **Ubiquia handles everything in between**—deploying workflows, routing compute, replicating data, and reforming the network in real time as conditions change and nodes are lost.
+
+This means:
+- capability developers do **not** need to know the runtime topology in advance
+- operators do **not** need to hand-wire brittle integrations under changing mission conditions
+- systems can continue adapting even as infrastructure degrades or fragments
+
+Ubiquia provides a resilient, self-organizing software platform for distributed operations.
 
 - 🔁 **Composable DAGs**  
-  Describe workflows as YAML-based DAGs. Ubiquia spins up agents, components, nodes, belief states, and communication services on demand.
+  Describe workflows as YAML-based DAGs. Ubiquia spins up nodes, components, belief states, and communication services on demand.
 
 - 📦 **Schema-to-Belief Pipelines**  
-  Provide an Agent Communication Language (i.e., JSON Schema), and Ubiquia will deploy a **RESTful Belief State service** with:  
+  Provide a **Domain Data Contract (DDC)** (i.e., JSON Schema), and Ubiquia will deploy a **RESTful Belief State service** with:  
   - Distributed persistence  
   - A fully-typed REST API generated from your schema  
   - A relational back-end  
@@ -21,136 +31,39 @@ Modern agent-based systems often rely on brittle glue code: ad-hoc APIs, hand-ro
   - Real-time ingestion of normalized relational data
 
 - 🧬 **Schema-Driven Stability**  
-  Prevent long-term degeneration in multi-agent systems. Every I/O channel is bound to a contract defined in JSON Schema, keeping agents—including LLMs—grounded in clean, structured, machine-validated data.
+  Prevent long-term degeneration in distributed multi-node systems. Every I/O channel is bound to a contract defined in JSON Schema, keeping nodes—including LLMs—grounded in clean, structured, machine-validated data.
 
 - ⚙️ **Kubernetes-Native by Design**  
   Helm-first deployments, Prometheus & Micrometer observability baked in. Built for production from day one.
 
 - 🌍 **Cross-Cluster DAG Communication**  
-  DAGs can span **multiple Kubernetes clusters**, enabling agents to operate across physical and cloud boundaries:  
+  DAGs can span **multiple Kubernetes clusters**, enabling nodes to operate across physical and cloud boundaries:  
   - **Resilient Compute**: workloads can route around degraded or partitioned clusters  
-  - **Topology-Aware Execution**: deploy agents near data, users, or available compute zones
+  - **Topology-Aware Execution**: deploy nodes near data, users, or available compute zones  
+  - **Autonomous Reformation**: workflows can continue adapting as nodes fail, disconnect, or rejoin
+
+- 🛡️ **Built for Contested Environments**  
+  Ubiquia is designed for environments where topology, connectivity, and available compute cannot be assumed ahead of time. It continuously manages those realities at runtime rather than forcing vendors or operators to hard-code around them up front.
 
 ---
 
-Unlike most MAS (Multi-Agent System) frameworks, **Ubiquia is designed from the ground up for real-world, production-grade integration**. It combines formal schema enforcement with robust deployment tooling, dynamic service generation, and cross-cluster communication—bridging the gap between research prototypes and hardened operational systems.
+Ubiquia is not a clean-sheet concept. It is the generalization of **MACHINA**, a fielded system already used for space domain awareness sensor orchestration at operational scale. Ubiquia carries forward the lessons learned from building and operating MACHINA in the real world, while evolving the architecture into a more general, production-ready platform.
+
+Unlike most MAS (Multi-Agent System) frameworks, **Ubiquia is designed from the ground up for real-world, production-grade integration in dynamic and contested environments**. It combines formal schema enforcement with robust deployment tooling, dynamic service generation, autonomous reconfiguration, and cross-cluster communication—bridging the gap between research prototypes and hardened operational systems.
 
 ---
 
-## Table of Contents
+## Getting Started: Project Overview
 
-* [Quickstart](#quickstart)
-  * [Quickstart: Requirements](#quick-start-requirements)
-  * [Quickstart: Scripts - One-Time Setup](#quick-start-scripts-one-time-setup)
-  * [Quickstart: Scripts - Recurring Setup](#quick-start-scripts-recurring-setup)
-  * [Quickstart: Workbench](#quick-start-workbench)
-* [Getting Started](#getting-started)
-  * [Getting Started: Requirements](#getting-started-requirements)
-  * [Getting Started: Helm Repo](#getting-started-helm-repo)
-  * [Getting Started: Installation](#getting-started-installation)
-  * [Getting Started: Project Overview](#getting-started-project-overview)
-* [Agent Communication Language](#agent-communication-language)
-  * [Agent Communication Language: Defining ACLs](#agent-communication-language-defining-acls)
-* [DAGs](#dags)
-  * [DAGs: Flow](#dags-flow)
-  * [DAGs: Cardinality](#dags-cardinality)
-* [Belief States](#belief-states)
-  * [Belief States: Querying Data](#belief-states-querying-data)
-* [Datastores](#datastores)
-  * [Datastores: Configuration](#datastores-configuration)
-* [For Devs](#for-devs)
-  * [For Devs: Building Ubiquia](#for-devs-building-ubiquia)
-  * [For Devs: Building Subprojects](#for-devs-building-subprojects)
-* [Advanced Topics](#advanced-topics)
-  * [Advanced Topics: Adapter Backpressure](#advanced-topics-node-backpressure)
-  * [Advanced Topics: PostStartExecCommand](#advanced-topics-poststartexeccommands)
-* [Contributors](#contributors)
-* [Who Is This For?](#who-is-this-for)
-* [Glossary](#glossary)
-* [License](#license)
+Ubiquia is a modular multi-node orchestration platform designed for scalable, belief-driven AI systems running on Kubernetes.
 
-## Quickstart
-The quickest way to get up and running with Ubiquia is to follow this section.
+At a high level, Ubiquia separates three concerns that are too often tightly coupled in traditional systems:
 
-### Quickstart: Requirements
-Before running Ubiquia, make sure the following tools are installed:
+1. **Capability development** — vendors define what their software or hardware can do  
+2. **Operational intent** — operators define mission objectives and desired outcomes  
+3. **Runtime orchestration** — Ubiquia determines how work, data, and communication should be coordinated in the environment that actually exists
 
-| Tool        | Minimum Version | Install Link |
-|-------------|-----------------|--------------|
-| Helm        | 3.12.0          | [helm.sh/docs](https://helm.sh/docs/intro/install/) |
-| KIND        | 0.20.0          | [kind.sigs.k8s.io](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-with-go-install) |
-| Kubectl     | 1.27.0          | [kubernetes.io](https://kubernetes.io/docs/tasks/tools/) |
-| Docker      | 24.0.0          | [docs.docker.com](https://docs.docker.com/engine/install/) |
-
-### Quickstart: Scripts
-Some convenience scripts are provided to users in this repo to get users up and running. ***The scripts must be executed in the root Ubiquia directory.***
-
-### Quickstart: Scripts - One-Time Setup
-These scripts should only ever need to be run once.
-```bash
-$ ./tools/scripts/devs/helm-repo-setup.sh
-```
-
-### Quickstart: Scripts - Recurring Setup
-These scripts need to be run whenever you want to do a fresh install of Ubiquia in a new KIND cluster.
-
-```bash
-$ ./tools/scripts/devs/install-ubiquia-into-kind.sh
-```
-
-After invoking the script and a successful installation, Helm will output to console how to interface with the newly-installed Ubiquia agent.
-
-### Quickstart: Deleting Ubiquia Cluster
-If you ran the above script to install Ubiquia into KIND and want a completely fresh start, you can delete the KIND Kubernetes cluster
-
-```bash
-$ kind delete clusters ubiquia-agent-0
-```
-
-Now you can re-run the installation script with a fresh Kubernetes cluster!
-
-### Quickstart: Workbench
-Ubiquia ships with a standard DAG called the "Ubiquia Workbench." The quickstart installation scripts above use a configuration that deploys this DAG by default. Once both the DAG and Ubiquia come alive in the cluster, it can be accessed through the Ubiquia communication service (like after port-forwarding the comm service) per the below:
-
-```http
-GET http://localhost:8080/ubiquia/communication-service/component-reverse-proxy/workbench-ui/index.html
-```
-
-The workbench DAG leverages an LLM that will generate an ACL and DAG to match the user's prompt. It will automatically register the DAG and ACL with Ubiquia so that a client can in turn instantiate the DAG and a Belief State.  
-
-
-## Getting Started
-
-### Getting Started: Development Requirements
-Before running Ubiquia, ensure the following tools are installed.
-
-#### Installation Tools
-
-| Tool        | Minimum Version | Install Link |
-|-------------|-----------------|--------------|
-| Helm        | 3.12.0          | [helm.sh/docs](https://helm.sh/docs/intro/install/) |
-| Kubectl     | 1.27.0          | [kubernetes.io](https://kubernetes.io/docs/tasks/tools/) |
-| Kubernetes  | 1.27.0          | [kubernetes.io](https://kubernetes.io/docs/setup/) |
-
-#### Development Tools
-
-| Tool        | Minimum Version | Install Link |
-|-------------|-----------------|--------------|
-| Docker      | 24.0.0          | [docs.docker.com](https://docs.docker.com/engine/install/) |
-| KIND        | 0.20.0          | [kind.sigs.k8s.io](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-with-go-install) |
-| OpenJDK     | 21              | [jdk.java.net/21](https://jdk.java.net/21/) or a preferred distribution |
-
-
-### Getting Started: Installation
-Ubiquia should be able to be installed into any Kubernetes environment using Helm as a package manager. Ubiquia's configurable values are listed in the values.yaml file. Specific configurations are available to devs that override a subset of these values. They can be found in 'helm/configurations/'.
-
-Example Ubiquia Installation
-```bash
-$ helm install ubiquia ubiquia-helm --values helm/configurations/prod/featherwweight.yaml -n ubiquia
-```
-
-### Getting Started: Project Overview
-Ubiquia is a modular multi-agent orchestration platform designed for scalable, belief-driven AI systems running on Kubernetes.
+This separation allows Ubiquia to adapt to changing runtime conditions without requiring every capability provider to predict network topology, compute availability, or degradation scenarios at development time.
 
 To ensure modularity, clarity, and maintainability, the codebase is divided into subprojects. Each will eventually have its own README and design documents — some already do, and others are coming soon.
 
@@ -164,301 +77,33 @@ root/
 │   └── helm/               # Helm manifests to deploy Ubiquia into Kubernetes
 ├── tools/                  # Dev and ops automation scripts
 ├── docs/                   # System-level documentation and diagrams
-├── config/                 # Project-wide config (e.g., Checkstyle rules) or development config separate of Helm
+├── config/                 # Project-wide config (e.g., Checkstyle rules) or development config separate from Helm
 ├── common/java
 │   ├── library/            # Shared APIs and libraries used across services
-│   └── model/              # Shared model definitions and database entities  
+│   ├── test/               # Shared libraries for internal e2e tests
+│   └── model/              # Shared model definitions and database entities
 ├── services/
 │   ├── dag/                # Services related to DAGs that ship with Ubiquia
 │   ├── test/               # Test microservices that run in Helm tests
-│   └── core/               # Core services that will run as as K8s microservices
+│   └── core/               # Core services that will run as K8s microservices
 └──
 ```
 
-## Agent Communication Language
-Ubiquia revolves around the the idea that schemas are necessary to prevent Multi-Agent systems from collapsing under their own weight. To battle entropy at scale, Ubiquia requires an Agent Communication Language (ACL) before orchestrating any DAGs or Belief States. ACLs are themselves really minimal metadata around the [JSON Schema](https://json-schema.org/) specification.
+## Domain Ontology
 
-### Agent Communication Language: Defining ACLs
-Here's an example ACL:
+Ubiquia requires a "Domain Ontology" to be registered before it can manage workflows for a particular domain. Generally, a domain ontology is some metadata around two other items: a **Domain Data Contract (DDC)** that defines the models and schemas of that domain, and a list of **Directed Acyclic Graphs (DAGs)** that define various workflows within that domain. 
 
-```json
-{
-  "domain": "pets",
-  "version": {
-    "major": 1,
-    "minor": 2,
-    "patch": 3
-  },
-  "modelType": "AgentCommunicationLanguage",
-  "jsonSchema": {
-    "type": "object",
-    "definitions": {
-      "ColorType": {
-        "type": "string",
-        "enum": [
-          "BLUE",
-          "GREEN",
-          "BROWN",
-          "BLACK",
-          "WHITE",
-          "GRAY"
-        ]
-      },
-      "Name": {
-        "description": "A model with some name information.",
-        "type": "object",
-        "properties": {
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "firstName"
-        ]
-      },
-      "BaseModel": {
-        "description": "A base model.",
-        "type": "object",
-        "properties": {
-          "info": {
-            "type": "string",
-            "maxLength": 100,
-            "default": "Just some info about this model."
-          }
-        }
-      },
-      "AdoptionTransaction": {
-        "description": "A transaction of an adoption.",
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/definitions/BaseModel"
-          }
-        ],
-        "properties": {
-          "owner": {
-            "$ref": "#/definitions/Person"
-          },
-          "pet": {
-            "$ref": "#/definitions/Animal"
-          }
-        }
-      },
-      "ClassificationResult": {
-        "description": "The result of our ML model making a classification inference.",
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/definitions/BaseModel"
-          }
-        ],
-        "properties": {
-          "class": {
-            "type": "string",
-            "description": "The class label predicted by the model."
-          },
-          "confidence": {
-            "type": "number",
-            "format": "float",
-            "minimum": 0.0,
-            "maximum": 1.0,
-            "description": "The confidence score (between 0 and 1) for the predicted class."
-          }
-        },
-        "required": ["class", "confidence"]
-      },
-      "Person": {
-        "description": "A model of a person.",
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/definitions/BaseModel"
-          }
-        ],
-        "properties": {
-          "hairColor": {
-            "$ref": "#/definitions/ColorType"
-          },
-          "name": {
-            "$ref": "#/definitions/Name"
-          },
-          "pets": {
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/Animal"
-            }
-          }
-        }
-      },
-      "Animal": {
-        "description": "The model of an animal.",
-        "allOf": [
-          {
-            "$ref": "#/definitions/BaseModel"
-          }
-        ],
-        "properties": {
-          "color": {
-            "$ref": "#/definitions/ColorType"
-          },
-          "owner": {
-            "$ref": "#/definitions/Person"
-          },
-          "name": {
-            "$ref": "#/definitions/Name"
-          },
-          "height": {
-            "type": "number",
-            "format": "float",
-            "example": 1.2,
-            "minimum": 0
-          },
-          "weight": {
-            "type": "number",
-            "format": "float",
-            "example": 1.2,
-            "minimum": 0
-          }
-        }
-      },
-      "Dog": {
-        "description": "The model of a dog.",
-        "allOf": [
-          {
-            "$ref": "#/definitions/Animal"
-          }
-        ],
-        "properties": {
-          "barkDecibels": {
-            "type": "number",
-            "format": "float",
-            "example": 1.2,
-            "minimum": 0
-          }
-        }
-      },
-      "Dachschund": {
-        "description": "The model of a wiener dog.",
-        "allOf": [
-          {
-            "$ref": "#/definitions/Dog"
-          }
-        ],
-        "properties": {
-          "apexPredator": {
-            "type": "boolean",
-            "default": true
-          }
-        },
-        "required": [
-          "apexPredator"
-        ]
-      },
-      "Poodle": {
-        "description": "The model of a poodle.",
-        "allOf": [
-          {
-            "$ref": "#/definitions/Dog"
-          }
-        ],
-        "properties": {
-          "dogShowsWon": {
-            "type": "number",
-            "format": "int64",
-            "default": 0,
-            "minimum": 0
-          }
-        }
-      },
-      "Cat": {
-        "description": "The model of a cat.",
-        "allOf": [
-          {
-            "$ref": "#/definitions/Animal"
-          }
-        ],
-        "properties": {
-          "meowDecibels": {
-            "type": "number",
-            "format": "float",
-            "example": 1.2,
-            "minimum": 0
-          }
-        }
-      },
-      "Shark": {
-        "description": "The model of a shark.",
-        "allOf": [
-          {
-            "$ref": "#/definitions/Animal"
-          }
-        ],
-        "properties": {
-          "peopleBitten": {
-            "type": "number",
-            "format": "int64",
-            "default": 0,
-            "minimum": 0
-          },
-          "friendly": {
-            "type": "boolean",
-            "default": true
-          }
-        }
-      }
-    },
-    "properties": {
-      "ColorType": {
-        "$ref": "#/definitions/ColorType"
-      },
-      "Name": {
-        "$ref": "#/definitions/Name"
-      },
-      "BaseModel": {
-        "$ref": "#/definitions/BaseModel"
-      },
-      "AdoptionTransaction": {
-        "$ref": "#/definitions/AdoptionTransaction"
-      },
-      "Person": {
-        "$ref": "#/definitions/Person"
-      },
-      "Animal": {
-        "$ref": "#/definitions/Animal"
-      },
-      "Dog": {
-        "$ref": "#/definitions/Dog"
-      },
-      "Dachschund": {
-        "$ref": "#/definitions/Dachschund"
-      },
-      "Poodle": {
-        "$ref": "#/definitions/Poodle"
-      },
-      "Cat": {
-        "$ref": "#/definitions/Cat"
-      },
-      "Shark": {
-        "$ref": "#/definitions/Shark"
-      }
-    }
-  }
-}
-```
+### Domain Ontology: Domain Data Contracts
 
-## DAGs
-Ubiquia can orchestrate Directed Acyclic Graphs--DAGs--provided a yaml definition that references an ACL.
+Ubiquia revolves around the idea that schemas are necessary to prevent multi-agent systems from collapsing under their own weight. To battle entropy at scale, Ubiquia requires a **Domain Data Contract (DDC)** before orchestrating any DAGs or Belief States. DDCs are themselves really minimal metadata around the [JSON Schema](https://json-schema.org/) specification.
 
 ```yaml
-graphName: Pets
-modelType: Graph
+name: pets
+modelType: DomainOntology
 author: Jeremy Case
-description: The "Hello World" of Directed Acyclic Graphs (DAG's) in Ubiquia, but with Pets!
+description: The "Hello World" of Domain Ontologies in Ubiquia, but with Pets!
 
-# Graphs require semantic versions
+# ontologies require semantic versions
 version:
   major: 1
   minor: 2
@@ -473,95 +118,339 @@ tags:
   - key: testTagKey3
     value: testTagValue3
 
-# These are capabilities that the graph implements. These will eventually be used by Ubiquia's Executive Service.
-capabilities:
-  - ImACapability!
-
-# This is the "Agent Communication Language" that this graph is associated with.
 domainDataContract:
-  name: pets
-  version:
-    major: 1
-    minor: 2
-    patch: 3
 
-# These are a list of components that comprise this graph.
-components:
+graphs:
+```
 
-  - componenttName: Pet-Store-Image-Classifier-Component
+#### Domain Data Contracts: Defining DDCs
 
-    # Setting a component as a template will instruct Ubiquia to not instantiate it as a 
-    # Kubernetes pod, but instead to generate a "proxy" for it which will act on its behalf with 
-    # dummy data.
-    componentName: TEMPLATE
-    modelType: Component
-    description: This is a an example component that will classify an animal from an image.
+**Domain Data Contractrs (DDCs)** in Ubiquia are (JSON Schemas)[https://json-schema.org/] formatted in YAML that describe the models/definitions/schemas for a domain in Ubiquia. They can be relational, polymorphic, or flat--Ubiquia will handle the relationship in any of those cases. 
 
-    communicationServiceSettings:
-      # Ensure the Communication Service exposes this component's endpoints  
-      exposeViaCommService: true
+Here's an example DDC, defined within a Domain Ontology's "domainDataContract" section
 
-    # This is the port that will be exposed for this component when it is deployed.
-    port: 5000
+```yaml
+domainDataContract:
 
-    # Data pertaining to the image so that it can be deployed as pods/containers.
-    image:
-      registry: ubiquia
-      repository: pet-store-image-classiffier
-      tag: latest
+  modelType: DomainDataContract
 
-    # An optional configmap to pass to the component.
-    config:
-      configMap:
-        application.yml: |
-          config_0:
-            value: true
-          config_1:
-            value: demo-value
-      configMountPath: /example/mountpath
+  schema:
+    type: object
 
-    # This is a list of settings to use to override the baseline values should the graph be 
-    # deployed with any "flags." Flags are passed to Ubiquia when deploying graphs via the GraphController 
-    # RESTful interface.
-    overrideSettings:
+    definitions:
 
-      # Any example override setting. It will override the baseline image values defined when the 
-      # graph is deployed with a "exampleOverride" flag.
-      - flag: exampleOverride
-        key: image
-        value:
-          registry: exampleOverrideRegistry
-          repository: exampleOverrideRepository
+      ColorType:
+        type: string
+        enum:
+          - BLUE
+          - GREEN
+          - BROWN
+          - BLACK
+          - WHITE
+          - GRAY
+
+      Name:
+        description: A model with some name information.
+        type: object
+        properties:
+          firstName:
+            type: string
+          lastName:
+            type: string
+        required:
+          - firstName
+
+      BaseModel:
+        description: A base model.
+        type: object
+        properties:
+          info:
+            type: string
+            maxLength: 100
+            default: Just some info about this model.
+
+      BinaryFile:
+        description: A model representing raw binary file data.
+        type: object
+        properties:
+          data:
+            type: string
+            format: byte
+            description: Base64-encoded binary data.
+        required:
+          - data
+
+      AdoptionTransaction:
+        description: A transaction of an adoption.
+        type: object
+        allOf:
+          - $ref: "#/definitions/BaseModel"
+        properties:
+          owner:
+            $ref: "#/definitions/Person"
+          pet:
+            $ref: "#/definitions/Animal"
+
+      ClassificationResult:
+        description: The result of our ML model making a classification inference.
+        type: object
+        allOf:
+          - $ref: "#/definitions/BaseModel"
+        properties:
+          class:
+            type: string
+            description: The class label predicted by the model.
+          confidence:
+            type: number
+            format: float
+            minimum: 0.0
+            maximum: 1.0
+            description: The confidence score (between 0 and 1) for the predicted class.
+        required:
+          - class
+          - confidence
+
+      Person:
+        description: A model of a person.
+        type: object
+        allOf:
+          - $ref: "#/definitions/BaseModel"
+        properties:
+          hairColor:
+            $ref: "#/definitions/ColorType"
+          name:
+            $ref: "#/definitions/Name"
+          pets:
+            type: array
+            items:
+              $ref: "#/definitions/Animal"
+
+      Animal:
+        description: The model of an animal.
+        allOf:
+          - $ref: "#/definitions/BaseModel"
+        properties:
+          color:
+            $ref: "#/definitions/ColorType"
+          owner:
+            $ref: "#/definitions/Person"
+          name:
+            $ref: "#/definitions/Name"
+          height:
+            type: number
+            format: float
+            example: 1.2
+            minimum: 0
+          weight:
+            type: number
+            format: float
+            example: 1.2
+            minimum: 0
+
+      Dog:
+        description: The model of a dog.
+        allOf:
+          - $ref: "#/definitions/Animal"
+        properties:
+          barkDecibels:
+            type: number
+            format: float
+            example: 1.2
+            minimum: 0
+
+      Dachschund:
+        description: The model of a wiener dog.
+        allOf:
+          - $ref: "#/definitions/Dog"
+        properties:
+          apexPredator:
+            type: boolean
+            default: true
+        required:
+          - apexPredator
+
+      Poodle:
+        description: The model of a poodle.
+        allOf:
+          - $ref: "#/definitions/Dog"
+        properties:
+          dogShowsWon:
+            type: number
+            format: int64
+            default: 0
+            minimum: 0
+
+      Cat:
+        description: The model of a cat.
+        allOf:
+          - $ref: "#/definitions/Animal"
+        properties:
+          meowDecibels:
+            type: number
+            format: float
+            example: 1.2
+            minimum: 0
+
+      Shark:
+        description: The model of a shark.
+        allOf:
+          - $ref: "#/definitions/Animal"
+        properties:
+          peopleBitten:
+            type: number
+            format: int64
+            default: 0
+            minimum: 0
+          friendly:
+            type: boolean
+            default: true
+
+    properties:
+      ColorType:
+        $ref: "#/definitions/ColorType"
+      BinaryFile:
+        $ref: "#/definitions/BinaryFile"
+      Name:
+        $ref: "#/definitions/Name"
+      BaseModel:
+        $ref: "#/definitions/BaseModel"
+      AdoptionTransaction:
+        $ref: "#/definitions/AdoptionTransaction"
+      Person:
+        $ref: "#/definitions/Person"
+      Animal:
+        $ref: "#/definitions/Animal"
+      Dog:
+        $ref: "#/definitions/Dog"
+      Dachschund:
+        $ref: "#/definitions/Dachschund"
+      Poodle:
+        $ref: "#/definitions/Poodle"
+      Cat:
+        $ref: "#/definitions/Cat"
+      Shark:
+        $ref: "#/definitions/Shark"
+```
+
+### Domain Ontology: DAGs
+
+Ubiquia can orchestrate Directed Acyclic Graphs—DAGs—provided a YAML definition that references a DDC. DAGs themselves can be defined within the "graphs" section of a DomainOntology.
+
+```yaml
+graphs:
+
+  - name: pet-store-dag
+
+    modelType: Graph
+
+    description: I'm a Directed Acyclic Graph that shows off some Ubiquia capabilities
+
+    # These are capabilities that the graph implements. These will eventually be used by Ubiquia's Executive Service.
+    capabilities:
+      - ImACapability!
+
+    # These are a list of components that comprise this graph.
+    components:
+
+      - name: Pet-Store-Image-Classifier-Component
+
+        # Setting a component as a template will instruct Ubiquia to not instantiate it as a 
+        # Kubernetes pod, but instead to generate a "proxy" for it which will act on its behalf with 
+        # dummy data.
+        componentType: TEMPLATE
+        modelType: Component
+        description: This is a an example component that will classify an animal from an image.
+
+        communicationServiceSettings:
+          # Ensure the Communication Service exposes this component's endpoints  
+          exposeViaCommService: true
+
+        # This is the port that will be exposed for this component when it is deployed.
+        port: 5000
+
+        # Data pertaining to the image so that it can be deployed as pods/containers.
+        image:
+          registry: ubiquia
+          repository: pet-store-image-classiffier
           tag: latest
 
-      # Another example override setting. It will override the template component boolean when the graph
-      # is deployed with the "demo" flag.
-      - flag: demo
-        key: componentType
-        value: POD
-
-      # Yet another example to show that even nested configuration values can be overridden.
-      - flag: exampleOverride
-        key: config
-        value:
+        # An optional configmap to pass to the component.
+        config:
           configMap:
             application.yml: |
               config_0:
-                value: false
-              config_99:
+                value: true
+              config_1:
                 value: demo-value
           configMountPath: /example/mountpath
 
-    # This is an "node" for the component; Ubiquia will use this to manage DAG network 
-    # traffic to/from the component.
-    node:
-      modelType: Adapter
+        # This is a list of settings to use to override the baseline values should the graph be 
+        # deployed with any "flags." Flags are passed to Ubiquia when deploying graphs via the GraphController 
+        # RESTful interface.
+        overrideSettings:
+
+          # Any example override setting. It will override the baseline image values defined when the 
+          # graph is deployed with a "exampleOverride" flag.
+          - flag: exampleOverride
+            key: image
+            value:
+              registry: exampleOverrideRegistry
+              repository: exampleOverrideRepository
+              tag: latest
+
+          # Another example override setting. It will override the template component boolean when the graph
+          # is deployed with the "demo" flag.
+          - flag: demo
+            key: componentType
+            value: POD
+          - flag: devops
+            key: componentType
+            value: POD
+
+          # Yet another example to show that even nested configuration values can be overridden.
+          - flag: exampleOverride
+            key: config
+            value:
+              configMap:
+                application.yml: |
+                  config_0:
+                    value: false
+                  config_99:
+                    value: demo-value
+              configMountPath: /example/mountpath
+
+      - name: Pet-Generator-Component
+
+        componentType: TEMPLATE
+        modelType: Component
+        description: This is a an example component that will generate new Pets given a name.
+        port: 8080
+        image:
+          registry: ubiquia
+          repository: pet-store-data-transform
+          tag: latest
+
+        overrideSettings:
+          - flag: demo
+            key: componentType
+            value: POD
+          - flag: devops
+            key: componentType
+            value: POD
+
+        node:
+          
+
+    # This is a list of nodes that should be deployed with the graph. Nodes may or may not be associated with components.
+    nodes:
+
+    - modelType: Node
       nodeType: PUSH
-      adapterName: Pet-Store-Image-Classifier-Adapter
+      name: Pet-Store-Image-Classifier-Node
       description: This is an example node.
 
       communicationServiceSettings:
-        # Ensure the Communication Service exposes this node's endpoints  
+        # Ensure the Communication Service exposes this nodes's endpoints  
         exposeViaCommService: true
 
       # This is the endpoint of the component that the node will interact with when it 
@@ -584,7 +473,7 @@ components:
         validateOutputPayload: false
         validateInputPayload: false
 
-      # Like components, Adapters can have overridesettings.
+      # Like components, nodes can have overridesettings.
       overrideSettings:
         - flag: demo
           key: nodeSettings
@@ -593,30 +482,10 @@ components:
             persistOutputPayload: false
             validateOutputPayload: true
 
-  - componentName: Pet-Generator-Component
-
-    componentType: TEMPLATE
-    modelType: Component
-    description: This is a an example component that will generate new Pets given a name.
-    port: 8080
-    image:
-      registry: ubiquia
-      repository: pet-store-data-transform
-      tag: latest
-
-    overrideSettings:
-      - flag: demo
-        key: componentType
-        value: POD
-
-    node:
-      modelType: Adapter
+    - modelType: Node
       nodeType: HIDDEN
-      adapterName: Pet-Generator-Adapter
+      name: Pet-Generator-Node
       description: This is an example node.
-
-      communicationServiceSettings:
-        exposeViaCommService: true
 
       endpoint: /pet/store/create-pet
 
@@ -641,61 +510,58 @@ components:
             validateOutputPayload: true
             stimulateInputPayload: true
 
-# This is a list of nodes that should be deployed with the graph that are not to be associated
-# with components. These are typically useful as ingress/egress components to a DAG.
-componentlessNodes:
+    - modelType: Node
+      nodeType: EGRESS
+      name: Pet-Egress-Node
+      description: This is an example node that POSTs incoming payloads to a belief state.
 
-  - modelType: Adapter
-    nodeType: EGRESS
-    adapterName: Pet-Egress-Adapter
-    description: This is an example node that POSTs incoming payloads to a belief state.
+      endpoint: http://pets-belief-state-1-2-3:8080/ubiquia/Animal/add
 
-    endpoint: http://pets-belief-state-1-2-3:8080/ubiquia/Animal/add
+      inputSubSchemas:
+        - modelName: Animal
 
-    inputSubSchemas:
-      - modelName: Animal
+      egressSettings:
+        httpOutputType: POST
+        egressType: SYNCHRONOUS
+        egressConcurrency: 1
 
-    egressSettings:
-      httpOutputType: POST
-      egressType: SYNCHRONOUS
-      egressConcurrency: 1
+      nodeSettings:
+        persistInputPayload: true
+        persistOutputPayload: true
+        validateOutputPayload: false
+        validateInputPayload: false
 
-    nodeSettings:
-      persistInputPayload: true
-      persistOutputPayload: true
-      validateOutputPayload: false
-      validateInputPayload: false
+      overrideSettings:
+        - flag: demo
+          key: nodeSettings
+          value:
+            persistInputPayload: true
+            persistOutputPayload: true
+            validateInputPayload: true
+            validateOutputPayload: true
 
-    overrideSettings:
-      - flag: demo
-        key: nodeSettings
-        value:
-          persistInputPayload: true
-          persistOutputPayload: true
-          validateInputPayload: true
-          validateOutputPayload: true
-
-# This is how Ubiquia knows how to connect nodes together into a Directed Acyclic Graph. Conceptually, 
-# data flows from left-to-right. As nodes receive payloads, they will send them to their respective 
-# components (if they have them), package up the component response (if applicable), and send
-# the payload "downstream" (i.e., to any nodes "immediately on the right.")
-edges:
-  - leftAdapterName: Pet-Store-Image-Classifier-Adapter
-    rightAdapterNames:
-      - Pet-Generator-Adapter
-  - leftAdapterName: Pet-Generator-Adapter
-    rightAdapterNames:
-      - Pet-Egress-Adapter
-
+    # This is how Ubiquia knows how to connect nodes together into a Directed Acyclic Graph. Conceptually, 
+    # data flows from left-to-right. As nodes receive payloads, they will send them to their respective 
+    # components (if they have them), package up the component response (if applicable), and send
+    # the payload "downstream" (i.e., to any nodes "immediately on the right.")
+    edges:
+      - leftNodeName: Pet-Store-Image-Classifier-Node
+        rightNodeNames:
+          - Pet-Generator-Node
+      - leftNodeName: Pet-Generator-Node
+        rightNodeNames:
+          - Pet-Egress-Node
 ```
 
-### DAGs: Flow
-In Ubiquia, a "flow" is considered a discrete unit of work that starts when the first node of a DAG ingests data. All subsequent events within that flow will be considered to be a part of that parent "flow" - they will have the same "FlowId." This flow can occur entirely within a single DAG, or across multiple DAGs across multiple Ubiquia Agents.
+#### DAGs: Flow
 
-### DAGs: Cardinality
-DAGs can be deployed by individual Ubiquia agents with "Cardinality" - or the ability to toggle on/off components/nodes of the DAG at "deploy time." This allows multiple Ubiquia agents to coordinate on a distributed DAG such that the agents can optimize the execution of the DAG internals in a way best-suited to the compute resources available to those Ubiquia agents.
+In Ubiquia, a "flow" is considered a discrete unit of work that starts when the first node of a DAG ingests data. All subsequent events within that flow will be considered to be a part of that parent flow — they will have the same `FlowId`. This flow can occur entirely within a single DAG, or across multiple DAGs across multiple Ubiquia Agents.
 
-The "Cardinality" is defined at deploy time, either as a part of the bootstrapping process (defined in Helm), or when a RESTful GraphDeployment payload is set to Ubiquia instructing it to instantiate a new DAG. 
+#### DAGs: Cardinality
+
+DAGs can be deployed by individual Ubiquia Agents with "Cardinality" — or the ability to toggle on/off components/nodes of the DAG at deploy time. This allows multiple Ubiquia Agents to coordinate on a distributed DAG such that the agents can optimize execution of the DAG internals in a way best-suited to the compute resources available to those Ubiquia Agents.
+
+The "Cardinality" is defined at deploy time, either as a part of the bootstrapping process (defined in Helm), or when a RESTful `GraphDeployment` payload is sent to Ubiquia instructing it to instantiate a new DAG. Importantly, these can be updated at runtime, allowing for Ubiquia agents to respond to computational requirements in real-time.
 
 ```yaml
 ubiquia:
@@ -711,25 +577,21 @@ ubiquia:
                 patch: 0
               cardinality:
                 componentSettings:
-                - name: component-a
-                  enabled: true
-                - name: component-b
-                  enabled: false
-                componentlessAdapterSettings:
-                - name: node-a
-                  enabled: false
-                - name: node-b
-                  enabled: true
+                  - name: component-a
+                    replicas: 0
+                  - name: component-b
+                    replicas: 1
+                  - name: component-c
+                    replicas: 2
 ```
 
-If the cardinality is not explicitly defined at deploy time, Ubiquia will default to "enabled = true" for every component and node.
-
+If cardinality is not explicitly defined at deploy time, Ubiquia will default to `enabled = true` for every component and node.
 
 ## Belief States
 
-Ubiquia allows clients to deploy fully RESTful, schema-validating, queryable **Belief State** services directly from an Agent Communication Language (ACL — really just JSON Schema). These services are automatically deployed into Kubernetes and support both ingestion and querying of relational data out of the box.
+Ubiquia allows clients to deploy fully RESTful, schema-validating, queryable **Belief State** services directly from a **Domain Data Contract (DDC)**. These services are automatically deployed into Kubernetes and support both ingestion and querying of relational data out of the box.
 
-When configured to run against YugabyteDB, these belief states will be distributed and automatically synch with other belief states also connected to the same logical YugabyteDB cluster.
+When configured to run against YugabyteDB, these belief states will be distributed and automatically sync with other belief states also connected to the same logical YugabyteDB cluster.
 
 ---
 
@@ -756,13 +618,14 @@ In addition to `equals`, the following operators are available directly in a GET
 ---
 
 #### Example: Query by Parameters
+
 Ubiquia's generated Belief States support querying data via URL GET endpoints:
 
 ```http
 GET /ubiquia/belief-state-service/animal/query/params?page=0&size=25&sort-descending=true&created-at>=2022-08-30T21:00:00.000Z&name=!null
 ```
 
-response:
+Response:
 
 ```json
 {
@@ -807,64 +670,65 @@ response:
 ```
 
 #### Example: Relational Queries
-Ubiquia Belief States support querying for relational data, out of the box:
+
+Ubiquia Belief States support querying for relational data out of the box:
 
 ```http
 GET /ubiquia/belief-state-service/animal/query/params?page=0&size=25&sort-descending=true&created-at>=2022-08-30T21:00:00.000Z&owner.name=Mark
 ```
 
-response:
+Response:
 
 ```json
 {
-    "content": [
-        {
-            "id": "daad6ddd-c060-4f52-ada3-f81e099948f2",
-            "name": "Fang",
-            "modelType": "Cat",
-            "createdAt": "2022-11-02T14:26:45.244Z",
-            "updatedAt": "2022-11-02T14:26:45.244Z",
-            "whiskers": 10,
-            "owner": {
-                "name": "Mark",
-                "id": "cbad6ddd-c060-4f52-ada3-f81e099948f2",
-                "modelType": "Person",
-                "createdAt": "2022-11-02T14:26:45.244Z",
-                "updatedAt": "2022-11-02T14:26:45.244Z"
-            }
-        }
-    ],
-    "pageable": {
-        "sort": {
-            "empty": true,
-            "sorted": false,
-            "unsorted": true
-        },
-        "offset": 0,
-        "pageSize": 25,
-        "pageNumber": 0,
-        "paged": true,
-        "unpaged": false
-    },
-    "last": true,
-    "totalElements": 1,
-    "totalPages": 1,
-    "size": 25,
-    "number": 0,
+  "content": [
+    {
+      "id": "daad6ddd-c060-4f52-ada3-f81e099948f2",
+      "name": "Fang",
+      "modelType": "Cat",
+      "createdAt": "2022-11-02T14:26:45.244Z",
+      "updatedAt": "2022-11-02T14:26:45.244Z",
+      "whiskers": 10,
+      "owner": {
+        "name": "Mark",
+        "id": "cbad6ddd-c060-4f52-ada3-f81e099948f2",
+        "modelType": "Person",
+        "createdAt": "2022-11-02T14:26:45.244Z",
+        "updatedAt": "2022-11-02T14:26:45.244Z"
+      }
+    }
+  ],
+  "pageable": {
     "sort": {
-        "empty": true,
-        "sorted": false,
-        "unsorted": true
+      "empty": true,
+      "sorted": false,
+      "unsorted": true
     },
-    "first": true,
-    "numberOfElements": 1,
-    "empty": false
+    "offset": 0,
+    "pageSize": 25,
+    "pageNumber": 0,
+    "paged": true,
+    "unpaged": false
+  },
+  "last": true,
+  "totalElements": 1,
+  "totalPages": 1,
+  "size": 25,
+  "number": 0,
+  "sort": {
+    "empty": true,
+    "sorted": false,
+    "unsorted": true
+  },
+  "first": true,
+  "numberOfElements": 1,
+  "empty": false
 }
 ```
 
 ### Querying Data: Multiselect
 
-Belief States support "multiselect" endpoints that allow clients to define ONLY the fields that they would like back from a RESTful query for performance-minded queries. These endpoints support pagination, sorting, and the sort. 
+Belief States support multiselect endpoints that allow clients to define only the fields that they would like back from a RESTful query for performance-minded queries. These endpoints support pagination, sorting, and filtering.
 
 Multiselect syntax:
 
@@ -872,7 +736,7 @@ Multiselect syntax:
 GET /ubiquia/belief-state-service/animal/query/multiselect/params?page=0&size=1&multiselect-fields=createdAt,updatedAt
 ```
 
-Multiselect Response:
+Multiselect response:
 
 ```json
 {
@@ -911,17 +775,19 @@ Multiselect Response:
 ```
 
 ## Datastores
-Ubiquia supports different datastore configurations. Primarily, this boils down to a relational datastore choice between a distributed YugabyteDB SQL setting or an embedded H2 SQL setting, and whether or not to enable a (Minio)[https://www.min.io] object storage. Both Ubiquia's "Core Flow Service" and generated Belief States will use the configured relational datastore. 
 
-Moreover, generated Belief States will automatically connect against the internal Minio instance should minio be enabled. Thus, clients can upload binaries (or anything) to Minio for later retrieval. ***Importantly, the metadata of these objects will be housed in the relational database.*** This last point is important for when multiple Ubiquia agents are running against a distributed YugabyteDB cluster, and may need specific artifacts available only locally to one agent. In this specific case, Ubiquia agents will be aware of artifacts available locally to other agents, and be able to retrive them through the communication service.
+Ubiquia supports different datastore configurations. Primarily, this boils down to a relational datastore choice between a distributed YugabyteDB SQL setting or an embedded H2 SQL setting, and whether or not to enable a [MinIO](https://www.min.io) object storage layer. Both Ubiquia's Core Flow Service and generated Belief States will use the configured relational datastore.
+
+Moreover, generated Belief States will automatically connect against the internal MinIO instance should MinIO be enabled. Thus, clients can upload binaries (or anything) to MinIO for later retrieval. ***Importantly, the metadata of these objects will be housed in the relational database.*** This last point is important for when multiple Ubiquia Agents are running against a distributed YugabyteDB cluster and may need specific artifacts available only locally to one agent. In this specific case, Ubiquia Agents will be aware of artifacts available locally to other agents and be able to retrieve them through the communication service.
 
 ### Datastores: Configuration
-Configuration of Ubiquia Datastores is defined via Helm per any values configuration per the below:
+
+Configuration of Ubiquia datastores is defined via Helm per any values configuration per the below:
 
 ```yaml
 ubiquia:
   agent:
-    database: 
+    database:
       h2:
         enabled: false
       yugabyte:
@@ -932,25 +798,31 @@ ubiquia:
 ```
 
 ## For Devs
-This section will contain a handful of useful commands, topics, concepts, or otherwise for developers using the Ubiquia framework.
+
+This section contains a handful of useful commands, topics, concepts, and other notes for developers using the Ubiquia framework.
 
 ### For Devs: Building Ubiquia
+
 The entire Ubiquia project can be built by invoking Gradle. This will task each subproject to build.
+
 ```bash
-$ ./gradlew clean build
+./gradlew clean build
 ```
 
 ### For Devs: Building Subprojects
-The subprojects of Ubiquia can be built by invoking specific subprojects via Gradle with a command.
 
-Generic Example:
+The subprojects of Ubiquia can be built by invoking specific subprojects via Gradle.
+
+Generic example:
+
 ```bash
-$ ./gradlew :<folder>:<folder>:<subproject>:<command>
+./gradlew :<folder>:<folder>:<subproject>:<command>
 ```
 
-Concrete Example:
+Concrete example:
+
 ```bash
-$ ./gradlew :services:core:java:core-flow-service:build
+./gradlew :services:core:java:core-flow-service:build
 ```
 
 ## Who Is This For?
@@ -959,76 +831,78 @@ $ ./gradlew :services:core:java:core-flow-service:build
 - **Backend developers** who want to design systems with declarative intent and runtime validation  
 - **Systems engineers** building distributed or autonomous orchestration platforms  
 - **Scientists & researchers** modeling intelligent ecosystems or recursive planners  
-- **DoD/IC technologists** looking to modernize simulation, orchestration, or planning infrastructure
+- **DoD/IC technologists** looking to modernize simulation, orchestration, or planning infrastructure  
 
 ---
 
 ## Advanced Topics
 
 ### Advanced Topics: Adapter Backpressure
-Ubiquia nodes leverage an inbox/outbox mechanism to ensure that they can "pop" messages off of the database queue. This is especially important when the database is distributed. Adapters provide a "backpressure" endpoint that can be used to show how how many records are in this queue, and the rate at which this queue is growing (or shrinking.)
 
-The nodes themselves provide this information, it is up to external entities to act upon that information. As of now, the plan is to have the Ubiquia Executive Command and/or Kubernetes autoscaling "scale up" nodes as necessary to alleviate this backpressure should a queue grow.
+Ubiquia nodes leverage an inbox/outbox mechanism to ensure that they can pop messages off of the database queue. This is especially important when the database is distributed. Adapters provide a backpressure endpoint that can be used to show how many records are in this queue, and the rate at which this queue is growing (or shrinking).
+
+The nodes themselves provide this information; it is up to external entities to act upon that information. As of now, the plan is to have the Ubiquia Executive Command and/or Kubernetes autoscaling scale up nodes as necessary to alleviate this backpressure should a queue grow.
 
 ### Advanced Topics: PostStartExecCommands
-It is sometimes necessary for components deployed within Ubiquia DAGs to have some form of "post start" hook. Ubiquia leverages the Kubernetes "PostStartExecComand" by allowing developers to configure an array of arguments that the component should invoke after it has come alive as a Kubernetes pod. 
 
-In fact, Ubiquia does this very thing with the "Workbench DAG" via the Ollama container. When the Ollama container (the so-called Workbench-LLM component) starts, it invokes the below command to pull down the latest Llama LLM.
+It is sometimes necessary for components deployed within Ubiquia DAGs to have some form of post-start hook. Ubiquia leverages the Kubernetes `PostStartExecCommand` by allowing developers to configure an array of arguments that the component should invoke after it has come alive as a Kubernetes pod.
 
 ```yaml
 name: Workbench-LLM
 
-  componentType: POD
-  modelType: Component
-  description: An LLM for our workbench.
+componentType: POD
+modelType: Component
+description: An LLM for our workbench.
 
-  image:
-    registry: ollama
-    repository: ollama
-    tag: 0.11.5
+image:
+  registry: ollama
+  repository: ollama
+  tag: 0.11.5
 
-  postStartExecCommands:
-    - /bin/sh
-    - -c
-    - |
-      set -eu
-      echo "Waiting for Ollama..."
-      i=0
-      while [ "$i" -lt 360 ]; do
-        if ollama list >/dev/null 2>&1; then
-          echo "Daemon up. Pulling model..."
-          ollama pull llama3.2
-          exit 0
-        fi
-        i=$((i+1))
-        sleep 1
-      done
-      echo "Ollama not ready after 360s" >&2
-      exit 1
+postStartExecCommands:
+  - /bin/sh
+  - -c
+  - |
+    set -eu
+    echo "Waiting for Ollama..."
+    i=0
+    while [ "$i" -lt 360 ]; do
+      if ollama list >/dev/null 2>&1; then
+        echo "Daemon up. Pulling model..."
+        ollama pull llama3.2
+        exit 0
+      fi
+      i=$((i+1))
+      sleep 1
+    done
+    echo "Ollama not ready after 360s" >&2
+    exit 1
 ```
 
 ## Glossary
 
 | Term | Definition |
 |------|------------|
-| **ACL (Agent Communication Language)** | A JSON Schema-based contract that defines the types of messages components and agents can send or receive. Enforces runtime validation of component I/O. |
+| **DDC (Domain Data Contract)** | A JSON Schema-based contract that defines the types of messages components and nodes can send or receive. Enforces runtime validation of component I/O. |
 | **Adapter** | A software component that connects nodes in a DAG and defines how messages are transported or transformed (e.g., `publish`, `merge`, `poll`). |
-| **Component** | A stateful microservice deployed as part of a DAG, capable of sending, receiving, and acting on messages according to ACLs. |
-| **Componentless Adapter** | An node node in a DAG that performs flow control (e.g., routing, polling, merging) but does not host an component implementation. |
-| **Belief State** | A shared, distributed, and SQL-backed representation of the system’s current knowledge. Agents can read from and write to it, supporting coordination and memory across the system. |
-| **Belief State Generator** | A codegen service that transforms ACLs into typed Java classes and Spring Boot REST services, enabling components to interact with the belief state in a schema-safe way. |
+| **Component** | A stateful microservice deployed as part of a DAG, capable of sending, receiving, and acting on messages according to DDCs. |
+| **Componentless Adapter** | A node in a DAG that performs flow control (e.g., routing, polling, merging) but does not host a component implementation. |
+| **Belief State** | A shared, distributed, and SQL-backed representation of the system’s current knowledge. Nodes can read from and write to it, supporting coordination and memory across the system. |
+| **Belief State Generator** | A codegen service that transforms DDCs into typed Java classes and Spring Boot REST services, enabling components to interact with the belief state in a schema-safe way. |
 | **Communication Service** | A reverse proxy and routing gateway that dynamically exposes core services and component/nodes based on DAG configuration. |
 | **DAO (Data Access Object)** | A component that abstracts and encapsulates database interactions, commonly used to query or persist belief state entities. |
 | **DAG (Directed Acyclic Graph)** | A directed graph with no cycles, used to define component topologies and message flow in Ubiquia. DAGs are authored in YAML and compiled into orchestrated services. |
 | **DAG Manifest** | A YAML configuration file that declares how a DAG and its components/nodes should be deployed, configured, and interconnected. |
 | **DTO (Data Transfer Object)** | A simple object used to encapsulate data transferred between layers or services in Ubiquia. Used heavily in REST APIs. |
 | **Flow Service** | A core Ubiquia microservice responsible for materializing DAGs into running components and nodes. Manages lifecycle, registration, and event querying. |
-| **MAO (Multi-Agent Orchestration)** | The process of managing and coordinating interactions among components and agents in a MAS. Ubiquia handles MAO through DAG deployment and node coordination. |
-| **MAS (Multi-Agent System)** | A system composed of multiple intelligent agents that interact or work together to perform tasks or solve problems. Ubiquia provides runtime infrastructure for these systems. |
-| **Schema Registry** | A repository of JSON Schemas (ACLs) that define I/O contracts for components and services. Used for validation, code generation, and schema evolution. |
+| **MAO (Multi-Agent Orchestration)** | The process of managing and coordinating interactions among components and nodes in a MAS. Ubiquia handles MAO through DAG deployment and node coordination. |
+| **MAS (Multi-Agent System)** | A system composed of multiple intelligent nodes that interact or work together to perform tasks or solve problems. Ubiquia provides runtime infrastructure for these systems. |
+| **Schema Registry** | A repository of JSON Schemas (DDCs) that define I/O contracts for components and services. Used for validation, code generation, and schema evolution. |
+
 ---
 
 ## Contributors
+
 * __Jeremy Case__: jeremycase@odysseyconsult.com
 
 ## License
