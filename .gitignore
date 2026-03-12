@@ -25,3 +25,5 @@ jacoco.xml
 
 # Helm charts
 deploy/helm/charts
+
+.claude

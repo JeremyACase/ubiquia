@@ -2,13 +2,17 @@ package org.ubiquia.common.library.dao.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.Timer;
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +23,11 @@ import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.dao.interfaces.InterfaceUbiquiaDaoController;
 import org.ubiquia.common.library.implementation.service.builder.UbiquiaIngressResponseBuilder;
+import org.ubiquia.common.library.implementation.service.telemetry.MicroMeterHelper;
 import org.ubiquia.common.library.implementation.service.visitor.PageValidator;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
+import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 import org.ubiquia.common.model.ubiquia.entity.AbstractModelEntity;
 
 /**
@@ -36,10 +42,13 @@ public abstract class GenericUbiquiaDaoController<
 
     protected final Pattern camelcaseRegex;
 
+    protected List<KeyValuePair> tags;
     @Autowired
     protected ObjectMapper objectMapper;
     @Autowired
     protected UbiquiaIngressResponseBuilder ingressResponseBuilder;
+    @Autowired(required = false)
+    protected MicroMeterHelper microMeterHelper;
     protected Class<T> persistedEntityClass;
     protected Class<D> persistedDTOClass;
     @Autowired
@@ -64,6 +73,16 @@ public abstract class GenericUbiquiaDaoController<
     }
 
     /**
+     * Post-application start method to manage some initialization.
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void onStart() {
+        this.getLogger().info("Processing post-startup initialization...");
+        this.tags = new ArrayList<>();
+        this.getLogger().info("...initialized.");
+    }
+
+    /**
      * GET from this controller to query data from the database.
      *
      * @param page               The page number to retrieve.
@@ -85,12 +104,22 @@ public abstract class GenericUbiquiaDaoController<
         throws NoSuchFieldException,
         JsonProcessingException {
 
+        Timer.Sample sample = null;
+        if (Objects.nonNull(this.microMeterHelper)) {
+            sample = this.microMeterHelper.startSample();
+        }
+
         var records = this.query(
             page,
             size,
             sortDescending,
             sortByFields,
             httpServletRequest);
+
+        if (Objects.nonNull(sample)) {
+            this.microMeterHelper.endSample(sample, "queryWithParams", this.tags);
+        }
+
         return records;
     }
 
@@ -104,6 +133,11 @@ public abstract class GenericUbiquiaDaoController<
     @GetMapping("/query/{id}")
     public ResponseEntity<D> queryModelWithId(@PathVariable("id") final String id)
         throws NoSuchFieldException, JsonProcessingException {
+
+        Timer.Sample sample = null;
+        if (Objects.nonNull(this.microMeterHelper)) {
+            sample = this.microMeterHelper.startSample();
+        }
 
         this.getLogger().info("Received a GET request for ID: {}", id);
 
@@ -127,6 +161,10 @@ public abstract class GenericUbiquiaDaoController<
         } else {
             var egress = this.convertPageHelper(records, this.getDataTransferObjectMapper());
             response = ResponseEntity.status(HttpStatus.OK).body(egress.getContent().get(0));
+        }
+
+        if (Objects.nonNull(sample)) {
+            this.microMeterHelper.endSample(sample, "queryModelWithId", this.tags);
         }
 
         return response;

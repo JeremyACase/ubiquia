@@ -19,7 +19,7 @@ import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.orchestrator.NodePayloadOrchestrator;
-import org.ubiquia.core.flow.service.telemetry.MicroMeterHelper;
+import org.ubiquia.common.library.implementation.service.telemetry.MicroMeterHelper;
 
 /**
  * A service that exposes adapter type logic.

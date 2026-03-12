@@ -1,5 +1,4 @@
-package org.ubiquia.core.flow.service.telemetry;
-
+package org.ubiquia.common.library.implementation.service.telemetry;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -13,6 +12,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 
+/**
+ * A helper service to use micrometer to feed Prometheus metrics.
+ */
 @ConditionalOnProperty(
     value = "management.endpoint.prometheus.enabled",
     havingValue = "true",
@@ -22,6 +24,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 public class MicroMeterHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(MicroMeterHelper.class);
+
     @Autowired
     private MeterRegistry meterRegistry;
 

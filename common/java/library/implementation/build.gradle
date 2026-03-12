@@ -17,6 +17,8 @@ dependencies {
     implementation project(':common:java:model:ubiquia')
     implementation project(':common:java:library:api')
 
+    implementation group: 'io.micrometer', name: 'micrometer-core', version: "${MICROMETER_VERSION}"
+
     testImplementation "com.h2database:h2:${H2_VERSION}"
     testImplementation "org.instancio:instancio-junit:${INSTANCIO_VERSION}"
 }

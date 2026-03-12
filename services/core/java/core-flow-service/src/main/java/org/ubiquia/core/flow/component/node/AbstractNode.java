@@ -28,7 +28,7 @@ import org.ubiquia.core.flow.service.command.node.NodeInboxPollCommand;
 import org.ubiquia.core.flow.service.decorator.node.NodeDecorator;
 import org.ubiquia.core.flow.service.logic.node.NodeInboxPollingLogic;
 import org.ubiquia.core.flow.service.orchestrator.NodePayloadOrchestrator;
-import org.ubiquia.core.flow.service.telemetry.MicroMeterHelper;
+import org.ubiquia.common.library.implementation.service.telemetry.MicroMeterHelper;
 import org.ubiquia.core.flow.service.visitor.StamperVisitor;
 import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
 

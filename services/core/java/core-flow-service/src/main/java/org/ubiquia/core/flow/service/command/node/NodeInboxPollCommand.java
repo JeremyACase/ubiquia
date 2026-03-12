@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.component.node.AbstractNode;
 import org.ubiquia.core.flow.service.io.Inbox;
-import org.ubiquia.core.flow.service.telemetry.MicroMeterHelper;
+import org.ubiquia.common.library.implementation.service.telemetry.MicroMeterHelper;
 
 /**
  * A service that exposes various methods common to all adapters.
