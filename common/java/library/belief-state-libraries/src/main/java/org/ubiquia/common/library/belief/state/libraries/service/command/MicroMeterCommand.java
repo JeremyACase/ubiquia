@@ -16,7 +16,7 @@ import org.ubiquia.common.model.domain.embeddable.KeyValuePair;
  * A command object to use micrometer to feed Prometheus metrics.
  */
 @ConditionalOnProperty(
-    value = "management.endpoint.info.prometheus.enabled",
+    value = "management.endpoint.prometheus.enabled",
     havingValue = "true",
     matchIfMissing = false
 )

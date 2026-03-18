@@ -15,7 +15,7 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: "${APACHE_COMMONS_VERSION}"
     implementation group: 'org.reflections', name: 'reflections', version: "${REFLECTIONS_VERSION}"
-    implementation group: 'io.micrometer', name: 'micrometer-core', version: "${MICROMETER_VERSION}"
+    implementation group: 'io.micrometer', name: 'micrometer-core'
 
     implementation project(':common:java:library:api')
     implementation project(':common:java:library:implementation')

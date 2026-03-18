@@ -16,10 +16,12 @@ spec:
 
   template:
     metadata:
+      {{- if .Values.telemetry.prometheus.enabled }}
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/path: '/actuator/prometheus'
         prometheus.io/port: "{{ .Values.convenience.variables.spring.port }}"
+      {{- end }}
       labels:
         {{- include "ubiquia.selectorLabels" . | nindent 8 }}
         {{- include "ubiquia.podLabels" . | nindent 8 }}

@@ -52,3 +52,10 @@ ubiquia:
 infrastructure:
   image:
     pullPolicy: Never
+
+telemetry:
+  prometheus:
+    enabled: true 
+    install: true
+  grafana: 
+    install: true

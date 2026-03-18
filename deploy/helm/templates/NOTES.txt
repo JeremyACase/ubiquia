@@ -70,6 +70,20 @@ Attempting to register Directed Acyclic Graphs (DAGs) with Flow Service:
 {{- end }}
 **************************************************
 {{- end }}
+{{ if and .Values.telemetry.prometheus.install .Values.telemetry.grafana.install }}
+**************************************************
+Grafana:
+
+Prometheus metrics and Grafana are installed. Dashboards can be accessed as follows:
+
+1. $ kubectl port-forward svc/ubiquia-grafana -n {{ .Release.Namespace }} 3000:80
+2. Navigate to "http://localhost:3000"
+{{ if .Values.devMode }}
+3. Log in using your username/password (this is "admin" when in dev mode.) 
+Retrieve the admin password from Kubernetes:
+4. $ kubectl get secret ubiquia-grafana -n {{ .Release.Namespace }} -o jsonpath="{.data.admin-password}" | base64 --decode
+{{ end }}
+{{ end }}
 {{- if .Values.ubiquia.agent.flowService.bootstrap.beliefState.deployments }}
 **************************************************
 Attempting to deploy Belief States:
