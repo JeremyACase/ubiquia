@@ -95,11 +95,9 @@ grafana:
     datasources:
       enabled: true
       label: grafana_datasource
-      searchNamespace: ALL
     dashboards:
       enabled: true
       label: grafana_dashboard
-      searchNamespace: ALL
 
 # Dependency Overrides
 minio:
