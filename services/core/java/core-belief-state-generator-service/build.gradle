@@ -45,7 +45,7 @@ dependencies {
 
     runtimeOnly "com.h2database:h2:${H2_VERSION}"
     runtimeOnly group: 'com.yugabyte', name: 'jdbc-yugabytedb', version:  "${YUGABYTE_DRIVER_VERSION}"
-    runtimeOnly "io.micrometer:micrometer-registry-prometheus:${MICROMETER_VERSION}"
+    runtimeOnly "io.micrometer:micrometer-registry-prometheus"
 
     testImplementation "org.instancio:instancio-junit:${INSTANCIO_VERSION}"
     testImplementation "org.springframework.boot:spring-boot-starter-test"

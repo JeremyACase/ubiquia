@@ -82,6 +82,25 @@ infrastructure:
   image:
     pullPolicy: IfNotPresent
 
+telemetry:
+  prometheus:
+    enabled: true
+    install: false
+  grafana:
+    install: false
+
+# Grafana dependency overrides — sidecar watches for ConfigMaps labelled grafana_datasource/grafana_dashboard
+grafana:
+  sidecar:
+    datasources:
+      enabled: true
+      label: grafana_datasource
+      searchNamespace: ALL
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      searchNamespace: ALL
+
 # Dependency Overrides
 minio:
   image:

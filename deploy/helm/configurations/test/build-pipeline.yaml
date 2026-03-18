@@ -37,3 +37,10 @@ ubiquia:
           registry: docker.io/ubiquia
           repository: test-belief-state-generator-service
           tag: latest
+
+telemetry:
+  prometheus:
+    enabled: false 
+    install: false
+  grafana: 
+    install: false

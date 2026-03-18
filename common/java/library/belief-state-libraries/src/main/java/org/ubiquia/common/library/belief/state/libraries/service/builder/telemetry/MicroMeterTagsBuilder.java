@@ -1,6 +1,7 @@
 package org.ubiquia.common.library.belief.state.libraries.service.builder.telemetry;
 
 
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -29,6 +30,11 @@ public class MicroMeterTagsBuilder {
         final AbstractDomainModelController controller) {
 
         var tags = new ArrayList<KeyValuePair>();
+        tags.add(new KeyValuePair("controller", controller.getClass().getSimpleName()));
+
+        var entityClass = (Class<?>) ((ParameterizedType) controller.getClass()
+            .getGenericSuperclass()).getActualTypeArguments()[0];
+        tags.add(new KeyValuePair("model", entityClass.getSimpleName()));
 
         return tags;
     }

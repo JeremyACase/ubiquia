@@ -79,6 +79,8 @@ public abstract class GenericUbiquiaDaoController<
     public void onStart() {
         this.getLogger().info("Processing post-startup initialization...");
         this.tags = new ArrayList<>();
+        this.tags.add(new KeyValuePair("controller", this.getClass().getSimpleName()));
+        this.tags.add(new KeyValuePair("model", this.persistedEntityClass.getSimpleName()));
         this.getLogger().info("...initialized.");
     }
 

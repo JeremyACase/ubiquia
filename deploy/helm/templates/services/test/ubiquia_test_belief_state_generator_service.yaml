@@ -23,17 +23,17 @@ data:
             enabled: true
           build:
             enabled: true
-          health:
-            probes:
-              enabled: true
-            show-components: always
-            show-details: always
-          prometheus:
+        health:
+          probes:
             enabled: true
+          show-components: always
+          show-details: always
+        prometheus:
+          enabled: {{ .Values.telemetry.prometheus.enabled }}
       endpoints:
         web:
           exposure:
-            include: info, prometheus, health
+            include: info, health{{- if .Values.telemetry.prometheus.enabled }}, prometheus{{- end }}
       metrics:
         tags:
           application: ${spring.application.name}

@@ -1,0 +1,167 @@
+{
+  "title": "Ubiquia Tags",
+  "uid": "ubiquia-tags",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "application",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(queryWithParams_seconds_count, application)",
+        "label": "Application",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": { "text": "All", "value": "$__all" },
+        "refresh": 2
+      },
+      {
+        "name": "controller",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(queryWithParams_seconds_count{application=~\"$application\"}, controller)",
+        "label": "Controller",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": { "text": "All", "value": "$__all" },
+        "refresh": 2
+      },
+      {
+        "name": "model",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(queryWithParams_seconds_count{application=~\"$application\", controller=~\"$controller\"}, model)",
+        "label": "Model",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": { "text": "All", "value": "$__all" },
+        "refresh": 2
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Top Controllers by Total Requests",
+      "type": "bargauge",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "datasource": "Prometheus",
+      "options": {
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "displayMode": "gradient"
+      },
+      "targets": [
+        {
+          "expr": "sort_desc(sum by (controller, model) (queryWithParams_seconds_count{application=~\"$application\", controller=~\"$controller\", model=~\"$model\"}))",
+          "legendFormat": "{{controller}} / {{model}}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short", "color": { "mode": "thresholds" } }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Top Controllers by P99 Latency",
+      "type": "bargauge",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "datasource": "Prometheus",
+      "options": {
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "displayMode": "gradient"
+      },
+      "targets": [
+        {
+          "expr": "sort_desc(histogram_quantile(0.99, sum by (controller, model, le) (rate(queryWithParams_seconds_bucket{application=~\"$application\", controller=~\"$controller\", model=~\"$model\"}[5m]))))",
+          "legendFormat": "{{controller}} / {{model}}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "s", "color": { "mode": "thresholds" } }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Request Rate Over Time (req/s)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum by (controller, model) (rate(queryWithParams_seconds_count{application=~\"$application\", controller=~\"$controller\", model=~\"$model\"}[1m]))",
+          "legendFormat": "{{controller}} / {{model}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": { "lineWidth": 2 } }
+      }
+    },
+    {
+      "id": 4,
+      "title": "P99 Latency Over Time (s)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum by (controller, model, le) (rate(queryWithParams_seconds_bucket{application=~\"$application\", controller=~\"$controller\", model=~\"$model\"}[1m])))",
+          "legendFormat": "{{controller}} / {{model}} p99"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "s", "custom": { "lineWidth": 2 } }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Request Summary Table",
+      "type": "table",
+      "gridPos": { "x": 0, "y": 16, "w": 24, "h": 8 },
+      "datasource": "Prometheus",
+      "options": {
+        "sortBy": [{ "displayName": "Total Requests", "desc": true }]
+      },
+      "targets": [
+        {
+          "expr": "sum by (application, controller, model) (queryWithParams_seconds_count{application=~\"$application\", controller=~\"$controller\", model=~\"$model\"})",
+          "legendFormat": "",
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.50, sum by (application, controller, model, le) (rate(queryWithParams_seconds_bucket{application=~\"$application\", controller=~\"$controller\", model=~\"$model\"}[5m])))",
+          "legendFormat": "",
+          "instant": true,
+          "refId": "B"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum by (application, controller, model, le) (rate(queryWithParams_seconds_bucket{application=~\"$application\", controller=~\"$controller\", model=~\"$model\"}[5m])))",
+          "legendFormat": "",
+          "instant": true,
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "left" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Value #A" }, "properties": [{ "id": "displayName", "value": "Total Requests" }, { "id": "unit", "value": "short" }] },
+          { "matcher": { "id": "byName", "options": "Value #B" }, "properties": [{ "id": "displayName", "value": "P50 Latency" }, { "id": "unit", "value": "s" }] },
+          { "matcher": { "id": "byName", "options": "Value #C" }, "properties": [{ "id": "displayName", "value": "P99 Latency" }, { "id": "unit", "value": "s" }] }
+        ]
+      },
+      "transformations": [
+        { "id": "merge", "options": {} }
+      ]
+    }
+  ]
+}
