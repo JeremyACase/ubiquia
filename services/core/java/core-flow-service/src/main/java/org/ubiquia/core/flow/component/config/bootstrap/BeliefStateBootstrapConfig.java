@@ -13,7 +13,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
  */
 @Component
 @ConditionalOnProperty(
-    value = "ubiquia.agent.flow-service.bootstrap.enabled",
+    value = "ubiquia.agent.flow-service.bootstrap.belief-state.enabled",
     havingValue = "true",
     matchIfMissing = false
 )

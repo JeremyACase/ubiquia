@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.19.0] 2026-03-23
+### Added
+- Docker Compose bare-metal deployment support (`deploy/compose/`)
+- `bare-metal-microweight-install.sh` script to stand up N flow service instances locally without Kubernetes
+### Changed
+- Flow service bootstrap config split into per-subsystem flags (`bootstrap.belief-state.enabled`, `bootstrap.domain-ontology.enabled`) replacing the single `bootstrap.enabled` flag
+- Fixed `application.yaml` YAML structure and config key naming (`flowService` → `flow-service`)
+- Flow service default log levels changed from DEBUG to INFO
+- Helm flow service configmap: removed redundant `graph.enabled` and `graph.directory` fields
+
 ## [0.17.0] 2026-03-11
 ### Added
 - Adding micrometer telemetry to core ubiquia code

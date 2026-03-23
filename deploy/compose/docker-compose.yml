@@ -1,0 +1,18 @@
+services:
+  core-flow-service:
+    build:
+      context: ../../services/core/java/core-flow-service
+      args:
+        OPENJDK_VERSION: "21"
+    ports:
+      - "8080"
+    volumes:
+      - ./config/application.yaml:/app/etc/application.yaml:ro
+      - ../helm/bootstrap/ontologies:/app/etc/domain-ontologies:ro
+      - ../helm/bootstrap/graphs:/app/etc/graphs:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s

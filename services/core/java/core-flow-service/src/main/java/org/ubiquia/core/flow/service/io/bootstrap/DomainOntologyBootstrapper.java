@@ -21,7 +21,7 @@ import org.ubiquia.core.flow.service.registrar.DomainOntologyRegistrar;
  * languages from file.
  */
 @ConditionalOnProperty(
-    value = "ubiquia.agent.flow-service.bootstrap.enabled",
+    value = "ubiquia.agent.flow-service.bootstrap.domain-ontology.enabled",
     havingValue = "true",
     matchIfMissing = false
 )

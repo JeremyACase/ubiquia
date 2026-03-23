@@ -98,8 +98,6 @@ data:
               enabled: true
               directory:  /app/etc/domain-ontologies/
             graph:
-              enabled: true
-              directory: /app/etc/graphs/
               deployments:
                 {{- range $v := .Values.ubiquia.agent.flowService.bootstrap.graph.deployments }}
                 - name: {{ $v.name }}
