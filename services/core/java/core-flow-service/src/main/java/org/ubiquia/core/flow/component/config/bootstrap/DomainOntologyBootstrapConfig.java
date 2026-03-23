@@ -11,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
  */
 @Component
 @ConditionalOnProperty(
-    value = "ubiquia.agent.flow-service.bootstrap.enabled",
+    value = "ubiquia.agent.flow-service.bootstrap.domain-ontology.enabled",
     havingValue = "true",
     matchIfMissing = false
 )

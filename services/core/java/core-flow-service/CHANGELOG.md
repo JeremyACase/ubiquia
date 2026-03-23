@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.19.0] 2026-03-23
+### Added
+- Docker Compose configuration for bare-metal single-service deployment
+### Changed
+- Bootstrap conditional properties split: `bootstrap.enabled` replaced by `bootstrap.belief-state.enabled` and `bootstrap.domain-ontology.enabled` for independent control of each bootstrapper
+- Config key renamed from `flowService` to `flow-service` for consistency with Spring Boot kebab-case convention
+- Fixed `application.yaml` structure: `server.port` was incorrectly nested under `spring`, now at root level
+- Default log levels reduced from DEBUG to INFO for `org.ubiquia` and `org.springdoc`
+
 ## [0.18.0] 2026-03-18
 ### Changed
 - Micrometer version now managed by Spring Boot BOM

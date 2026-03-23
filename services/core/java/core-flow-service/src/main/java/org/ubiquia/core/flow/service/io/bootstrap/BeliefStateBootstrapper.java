@@ -18,7 +18,7 @@ import org.ubiquia.core.flow.interfaces.InterfaceBootstrapper;
  * languages from file.
  */
 @ConditionalOnProperty(
-    value = "ubiquia.agent.flow-service.bootstrap.enabled",
+    value = "ubiquia.agent.flow-service.bootstrap.belief-state.enabled",
     havingValue = "true",
     matchIfMissing = false
 )

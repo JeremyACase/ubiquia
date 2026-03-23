@@ -1,5 +1,6 @@
 logging:
   level:
+    net.jimblackler: OFF
     org.springdoc: INFO
     org.ubiquia: INFO
 
@@ -11,20 +12,15 @@ management:
         enabled: true
       build:
         enabled: true
-      health:
-        probes:
-          enabled: true
-        show-components: always
-        show-details: always
-      prometheus:
+    health:
+      probes:
         enabled: true
+      show-components: always
+      show-details: always
   endpoints:
     web:
       exposure:
-        include: info, prometheus, health, mappings
-  metrics:
-    tags:
-      application: ubiquia-core-flow-service
+        include: info, health
 
 server:
   port: 8080
@@ -66,20 +62,18 @@ ubiquia:
   outbox:
     enabled: true
     frequency-milliseconds: 1000
-    # Current supported values are: DEFAULT
     mode: DEFAULT
   page:
     max-size: 100
   agent:
+    id: 0328ca73-4d50-409f-85a8-7168ce80bd96
     flow-service:
       bootstrap:
         belief-state:
           enabled: false
         domain-ontology:
           enabled: true
-          directory:  /app/etc/domain-ontologies/
+          directory: /app/etc/domain-ontologies/
         graph:
           enabled: true
           deployments:
-    # This is a default UUID for development purposes
-    id: 0328ca73-4d50-409f-85a8-7168ce80bd96
