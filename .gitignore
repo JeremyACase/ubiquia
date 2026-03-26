@@ -27,3 +27,6 @@ jacoco.xml
 deploy/helm/charts
 
 .claude
+
+# Python
+**/__pycache__
