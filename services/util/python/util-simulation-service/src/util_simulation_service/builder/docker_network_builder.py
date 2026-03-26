@@ -21,6 +21,7 @@ class DockerNetworkBuilder(NetworkBuilder):
         self._ensure_network(network.name)
         for agent in agents:
             self._connect(network.name, agent)
+            self._disconnect_default_bridge(agent)
 
     def _ensure_network(self, network_name: str) -> None:
         result = subprocess.run(
@@ -34,6 +35,19 @@ class DockerNetworkBuilder(NetworkBuilder):
         else:
             logger.info("Creating Docker network '%s'.", network_name)
             subprocess.run(["docker", "network", "create", network_name], check=True)
+
+    def _disconnect_default_bridge(self, agent: Agent) -> None:
+        result = subprocess.run(
+            ["docker", "network", "disconnect", "bridge", agent.name],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode == 0:
+            logger.info("Disconnected '%s' from default bridge.", agent.name)
+        elif "is not connected" in result.stderr or "No such container" in result.stderr:
+            pass  # already disconnected — nothing to do
+        else:
+            result.check_returncode()
 
     def _connect(self, network_name: str, agent: Agent) -> None:
         result = subprocess.run(

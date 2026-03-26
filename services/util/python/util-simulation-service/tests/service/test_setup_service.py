@@ -4,6 +4,7 @@ import pytest
 
 from util_simulation_service.builder.agent_builder import AgentBuilder
 from util_simulation_service.model.agent import Agent
+from util_simulation_service.model.agent_input import AgentInput
 from util_simulation_service.model.agent_mode import AgentMode
 from util_simulation_service.model.simulation_event import SimulationEvent
 from util_simulation_service.model.simulation_input import SimulationInput
@@ -12,10 +13,14 @@ from util_simulation_service.service.agent_factory import AgentFactory
 from util_simulation_service.service.setup_service import SetupService
 
 
-def _make_simulation_input(agents: list[str]) -> SimulationInput:
+def _agent_input(name: str, mode: AgentMode = AgentMode.MICROWEIGHT) -> AgentInput:
+    return AgentInput(name=name, mode=mode)
+
+
+def _make_simulation_input(agent_inputs: list[AgentInput]) -> SimulationInput:
     return SimulationInput(
         name="test-sim",
-        agents=agents,
+        agents=agent_inputs,
         events=[SimulationEvent(time_offset=TimeOffset(n=1.0), payload={})],
         networks=[],
         speed=1.0,
@@ -35,26 +40,49 @@ class TestSetupService:
         service = SetupService(agent_factory=_make_factory(builder))
 
         agents = service.run(
-            simulation_input=_make_simulation_input(["agent-a", "agent-b"]),
-            mode=AgentMode.MICROWEIGHT,
+            simulation_input=_make_simulation_input([
+                _agent_input("agent-a"),
+                _agent_input("agent-b"),
+            ])
         )
 
         assert len(agents) == 2
         assert agents[0].name == "agent-a"
         assert agents[1].name == "agent-b"
 
-    def test_run_calls_factory_with_correct_mode(self):
+    def test_run_calls_factory_with_per_agent_mode(self):
         builder = MagicMock(spec=AgentBuilder)
         builder.build.return_value = Agent(name="a", base_url="http://a")
         factory = _make_factory(builder)
         service = SetupService(agent_factory=factory)
 
         service.run(
-            simulation_input=_make_simulation_input(["a"]),
-            mode=AgentMode.KIND,
+            simulation_input=_make_simulation_input([_agent_input("a", AgentMode.KIND)])
         )
 
         factory.get_builder.assert_called_once_with(AgentMode.KIND)
+
+    def test_run_calls_correct_builder_per_agent_mode(self):
+        microweight_builder = MagicMock(spec=AgentBuilder)
+        microweight_builder.build.return_value = Agent(name="a", base_url="http://a")
+        kind_builder = MagicMock(spec=AgentBuilder)
+        kind_builder.build.return_value = Agent(name="b", base_url="http://b")
+
+        factory = MagicMock(spec=AgentFactory)
+        factory.get_builder.side_effect = lambda mode: (
+            microweight_builder if mode == AgentMode.MICROWEIGHT else kind_builder
+        )
+
+        service = SetupService(agent_factory=factory)
+        service.run(
+            simulation_input=_make_simulation_input([
+                _agent_input("a", AgentMode.MICROWEIGHT),
+                _agent_input("b", AgentMode.KIND),
+            ])
+        )
+
+        microweight_builder.build.assert_called_once_with("a")
+        kind_builder.build.assert_called_once_with("b")
 
     def test_run_calls_builder_for_each_agent(self):
         builder = MagicMock(spec=AgentBuilder)
@@ -62,8 +90,11 @@ class TestSetupService:
         service = SetupService(agent_factory=_make_factory(builder))
 
         service.run(
-            simulation_input=_make_simulation_input(["agent-a", "agent-b", "agent-c"]),
-            mode=AgentMode.MICROWEIGHT,
+            simulation_input=_make_simulation_input([
+                _agent_input("agent-a"),
+                _agent_input("agent-b"),
+                _agent_input("agent-c"),
+            ])
         )
 
         assert builder.build.call_count == 3
@@ -75,10 +106,7 @@ class TestSetupService:
         builder = MagicMock(spec=AgentBuilder)
         service = SetupService(agent_factory=_make_factory(builder))
 
-        agents = service.run(
-            simulation_input=_make_simulation_input([]),
-            mode=AgentMode.MICROWEIGHT,
-        )
+        agents = service.run(simulation_input=_make_simulation_input([]))
 
         assert agents == []
         builder.build.assert_not_called()
@@ -89,7 +117,4 @@ class TestSetupService:
         service = SetupService(agent_factory=_make_factory(builder))
 
         with pytest.raises(NotImplementedError):
-            service.run(
-                simulation_input=_make_simulation_input(["agent-a"]),
-                mode=AgentMode.MICROWEIGHT,
-            )
+            service.run(simulation_input=_make_simulation_input([_agent_input("agent-a")]))

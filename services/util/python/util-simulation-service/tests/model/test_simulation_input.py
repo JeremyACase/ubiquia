@@ -14,7 +14,10 @@ def _make_event(n: float = 1.0, unit: TimeUnit = TimeUnit.SECONDS) -> Simulation
 def _make_valid_input(**overrides) -> dict:
     base = {
         "name": "test-sim",
-        "agents": ["agent-a", "agent-b"],
+        "agents": [
+            {"name": "agent-a", "mode": "microweight"},
+            {"name": "agent-b", "mode": "microweight"},
+        ],
         "events": [_make_event()],
         "networks": [Network(name="net-1", agents=["agent-a"])],
         "speed": 1.0,
@@ -69,7 +72,7 @@ class TestSimulationInput:
         sim = SimulationInput.model_validate(
             {
                 "name": "test-sim",
-                "agents": ["agent-a"],
+                "agents": [{"name": "agent-a", "mode": "microweight"}],
                 "events": [
                     {
                         "type": "simulation",
@@ -89,7 +92,7 @@ class TestSimulationInput:
             SimulationInput.model_validate(
                 {
                     "name": "test-sim",
-                    "agents": ["agent-a"],
+                    "agents": [{"name": "agent-a", "mode": "microweight"}],
                     "events": [
                         {
                             "type": "unknown",

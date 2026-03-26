@@ -1,7 +1,6 @@
 import logging
 
 from util_simulation_service.model.agent import Agent
-from util_simulation_service.model.agent_mode import AgentMode
 from util_simulation_service.model.simulation_input import SimulationInput
 from util_simulation_service.service.agent_factory import AgentFactory
 
@@ -14,13 +13,13 @@ class SetupService:
     def __init__(self, agent_factory: AgentFactory):
         self._agent_factory = agent_factory
 
-    def run(self, simulation_input: SimulationInput, mode: AgentMode) -> list[Agent]:
-        logger.info("Setting up %d agent(s) in %s mode.", len(simulation_input.agents), mode.value)
-        builder = self._agent_factory.get_builder(mode)
+    def run(self, simulation_input: SimulationInput) -> list[Agent]:
+        logger.info("Setting up %d agent(s).", len(simulation_input.agents))
         agents = []
-        for agent_name in simulation_input.agents:
-            logger.info("Building agent: %s", agent_name)
-            agent = builder.build(agent_name)
+        for agent_input in simulation_input.agents:
+            logger.info("Building agent: %s (mode=%s)", agent_input.name, agent_input.mode.value)
+            builder = self._agent_factory.get_builder(agent_input.mode)
+            agent = builder.build(agent_input.name)
             logger.info("Agent ready: %s at %s", agent.name, agent.base_url)
             agents.append(agent)
         return agents

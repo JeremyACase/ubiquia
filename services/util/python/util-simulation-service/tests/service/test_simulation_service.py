@@ -22,7 +22,7 @@ def _write_input(tmp_path: pathlib.Path, data: dict) -> pathlib.Path:
 def _valid_payload(events: list[dict] | None = None) -> dict:
     return {
         "name": "test-sim",
-        "agents": ["agent-a"],
+        "agents": [{"name": "agent-a", "mode": "microweight"}],
         "events": events
         if events is not None
         else [

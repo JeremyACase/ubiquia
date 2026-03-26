@@ -1,6 +1,6 @@
 [project]
 name = "util-simulation-service"
-dynamic = ["version"]
+version = "0.0.0"
 description = "Ubiquia CLI utility service for simulating multi-agent flows."
 authors = [{ name = "Ubiquia", email = "dev@ubiquia.local" }]
 requires-python = ">=3.10"
@@ -8,6 +8,7 @@ dependencies = [
   "click>=8.1",
   "httpx>=0.27",
   "pydantic>=2.7",
+  "rich>=13.0",
 ]
 
 [project.optional-dependencies]
@@ -23,10 +24,6 @@ util-simulation-service = "util_simulation_service.main:cli"
 [build-system]
 requires = ["hatchling>=1.25.0"]
 build-backend = "hatchling.build"
-
-[tool.hatch.version]
-source = "env"
-variable = "UBIQUIA_VERSION"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/util_simulation_service"]
