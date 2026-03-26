@@ -8,8 +8,8 @@ from util_simulation_service.model.simulation_event import SimulationEvent
 class SimulationEventCommand(EventCommand):
     """Processes a SimulationEvent by dispatching its payload to the target agent."""
 
-    def __init__(self, agents: list[Agent], topology: NetworkTopology) -> None:
-        self._agents = {a.name: a for a in agents}
+    def __init__(self, agents: list[Agent] | None = None, topology: NetworkTopology | None = None) -> None:
+        self._agents = {a.name: a for a in agents} if agents else {}
         self._topology = topology
 
     def execute(self, event: Event) -> None:
