@@ -825,6 +825,66 @@ Concrete example:
 ./gradlew :services:core:java:core-flow-service:build
 ```
 
+### For Devs: Simulation CLI (`util-simulation-service`)
+
+The `util-simulation-service` is a CLI utility for exercising multi-agent flow deployments against a live Ubiquia environment.
+
+#### Installation
+
+From the repo root:
+
+```bash
+uv tool install -e services/util/python/util-simulation-service
+```
+
+#### Usage
+
+```bash
+# Top-level help
+util-simulation-service --help
+
+# Simulation subcommand help
+util-simulation-service simulation --help
+
+# Run a simulation
+util-simulation-service simulation run --input-file <path-to-simulation.json>
+```
+
+#### Simulation Input File
+
+The `--input-file` argument points to a JSON file describing the simulation. A ready-to-use example is included in the service:
+
+```bash
+util-simulation-service simulation run \
+  --input-file services/util/python/util-simulation-service/resources/simulation.json
+```
+
+The input file schema:
+
+```json
+{
+  "name": "dry-run",
+  "agents": [
+    {"name": "agent-0", "mode": "microweight"}
+  ],
+  "events": [],
+  "networks": [],
+  "speed": 1.0
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `name` | Identifier for this simulation run |
+| `agents` | List of agents to set up; each has a `name` and `mode` (`microweight` or `kind`) |
+| `events` | Simulation events to replay against the deployment |
+| `networks` | Docker network configuration for the simulation |
+| `speed` | Playback speed multiplier (`1.0` = real time) |
+
+The CLI must be run from within the git repository (it uses `git rev-parse --show-toplevel` to locate the repo root).
+
+---
+
 ## Who Is This For?
 
 - **ML engineers** who want LLM components with schema validation  

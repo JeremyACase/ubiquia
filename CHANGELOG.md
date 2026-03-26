@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.0] 2026-03-26
+### Added
+- `util-simulation-service`: builder pattern for agent/network provisioning (`MicroweightAgentBuilder`, `KindAgentBuilder`, `DockerNetworkBuilder`), `AgentFactory`, `SetupService`, `NetworkService`, `EventManager`, and `SimulationEventCommand` — completing the end-to-end `simulation run` CLI pipeline
+
 ## [0.19.0] 2026-03-23
 ### Added
 - Docker Compose bare-metal deployment support (`deploy/compose/`)
