@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.21.0] 2026-03-30
+### Added
+- JGroups TCP cluster support for `core-flow-service`: `FlowClusterService` manages a peer-to-peer channel and `ModelSynchronizationService` propagates stale model records to cluster peers on a configurable schedule
+- `SyncEntity` and `Sync` DTO to track which agents have received each model record
+- `SyncDtoMapper`, `SyncRepository`, and `ObjectMetadataRepository`
+- `findEntitiesNeedingSync()` query on `AbstractEntityRepository`
+- `FlowClusterSyncTestModule` for integration testing of cluster synchronization
+- Helm chart and `values.yaml` cluster configuration (`ubiquia.cluster.*`) including sync toggle and seed-host support
+
 ## [0.20.0] 2026-03-26
 ### Added
 - `util-simulation-service`: builder pattern for agent/network provisioning (`MicroweightAgentBuilder`, `KindAgentBuilder`, `DockerNetworkBuilder`), `AgentFactory`, `SetupService`, `NetworkService`, `EventManager`, and `SimulationEventCommand` — completing the end-to-end `simulation run` CLI pipeline

@@ -79,9 +79,18 @@ data:
         enabled: true
 
     ubiquia:
+      cluster:
+        flowService:
+          sync:
+            enabled: {{ .Values.ubiquia.cluster.flowService.sync.enabled | default false }}
+        name: {{ .Values.ubiquia.cluster.name | default "ubiquia-cluster" }}
+        port: {{ .Values.ubiquia.cluster.port | default 7800 }}
+        {{- if .Values.ubiquia.cluster.seedHosts }}
+        seed-hosts: {{ .Values.ubiquia.cluster.seedHosts }}
+        {{- end }}
       agent:
         id: {{ .Values.ubiquia.agent.id }}
-        flow-service:
+        flowService:
           bootstrap:
             enabled: {{ .Values.ubiquia.agent.flowService.bootstrap.enabled }}          
             belief-state:

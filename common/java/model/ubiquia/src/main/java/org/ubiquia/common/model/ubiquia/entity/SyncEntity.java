@@ -9,7 +9,7 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-public class UpdateEntity {
+public class SyncEntity {
 
     @Id
     private String id = null;
@@ -26,17 +26,15 @@ public class UpdateEntity {
     private OffsetDateTime createdAt = null;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "model_update_join_id", nullable = false)
+    @JoinColumn(name = "model_sync_join_id", nullable = false)
     private AbstractModelEntity model;
 
-    private String updateReason;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sync_agent_join_id", nullable = false)
+    private AgentEntity agent;
 
     @Transient
-    private String modelType = "Update";
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "update_agent_join_id", nullable = false)
-    private AgentEntity agent;
+    private String modelType = "Sync";
 
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
     public String getId() {
@@ -69,14 +67,6 @@ public class UpdateEntity {
 
     public void setAgent(AgentEntity agent) {
         this.agent = agent;
-    }
-
-    public String getUpdateReason() {
-        return updateReason;
-    }
-
-    public void setUpdateReason(String updateReason) {
-        this.updateReason = updateReason;
     }
 
     public AbstractModelEntity getModel() {

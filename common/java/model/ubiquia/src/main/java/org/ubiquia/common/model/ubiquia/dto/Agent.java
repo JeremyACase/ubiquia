@@ -20,6 +20,8 @@ public class Agent {
 
     private Set<Update> updates;
 
+    private Set<Sync> syncs;
+
     private List<Graph> deployedGraphs;
 
     private Set<ObjectMetadataEntity> objectMetadatas;
@@ -76,5 +78,13 @@ public class Agent {
 
     public void setUpdates(Set<Update> updates) {
         this.updates = updates;
+    }
+
+    public Set<Sync> getSyncs() {
+        return syncs;
+    }
+
+    public void setSyncs(Set<Sync> syncs) {
+        this.syncs = syncs;
     }
 }

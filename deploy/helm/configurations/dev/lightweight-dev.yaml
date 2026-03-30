@@ -3,6 +3,12 @@ logging:
 
 ubiquia:
   cluster:
+    flowService:
+      sync:
+        enabled: false
+    name: ubiquia-cluster
+    port: 7800
+    seedHosts:
   agent:
     database: 
       h2:
