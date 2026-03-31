@@ -39,6 +39,7 @@ dependencies {
     implementation "com.github.java-json-tools:json-schema-core:${JAVA_JSON_TOOLS}"
     implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
     implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"
+    implementation "org.jgroups:jgroups:${JGROUPS_VERSION}"
     implementation "org.reflections:reflections:${REFLECTIONS_VERSION}"
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${SPRING_DOC_VERSION}"
     implementation "org.springframework.kafka:spring-kafka:${SPRING_BOOT_KAFKA_VERSION}"

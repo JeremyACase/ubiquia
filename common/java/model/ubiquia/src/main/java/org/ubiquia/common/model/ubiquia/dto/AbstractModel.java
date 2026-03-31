@@ -43,6 +43,8 @@ public abstract class AbstractModel {
 
     private List<Update> updates;
 
+    private List<Sync> syncs;
+
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
     public String getId() {
         return this.id;
@@ -94,5 +96,13 @@ public abstract class AbstractModel {
 
     public void setUpdates(List<Update> updates) {
         this.updates = updates;
+    }
+
+    public List<Sync> getSyncs() {
+        return syncs;
+    }
+
+    public void setSyncs(List<Sync> syncs) {
+        this.syncs = syncs;
     }
 }

@@ -10,6 +10,7 @@ import org.ubiquia.common.test.helm.service.AbstractTestManager;
 import org.ubiquia.common.test.helm.service.TestRegistrar;
 import org.ubiquia.test.flow.service.module.ComponentDeploymentTestModule;
 import org.ubiquia.test.flow.service.module.ComponentTeardownTestModule;
+import org.ubiquia.test.flow.service.module.FlowClusterSyncTestModule;
 
 @Service
 public class TestManager extends AbstractTestManager {
@@ -23,12 +24,16 @@ public class TestManager extends AbstractTestManager {
     private ComponentTeardownTestModule componentTeardownTestModule;
 
     @Autowired
+    private FlowClusterSyncTestModule flowClusterSyncTestModule;
+
+    @Autowired
     private TestRegistrar testRegistrar;
 
     @Override
     public void registerTests() {
         this.testRegistrar.registerModule(this.componentDeploymentTestModule);
         this.testRegistrar.registerModule(this.componentTeardownTestModule);
+        this.testRegistrar.registerModule(this.flowClusterSyncTestModule);
     }
 
     @EventListener(ApplicationReadyEvent.class)

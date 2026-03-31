@@ -30,6 +30,9 @@ public class AgentEntity {
     @OneToMany(mappedBy = "agent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private Set<UpdateEntity> updates;
 
+    @OneToMany(mappedBy = "agent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    private Set<SyncEntity> syncs;
+
     @CreationTimestamp
     @Column(updatable = false)
     private OffsetDateTime createdAt = null;
@@ -97,5 +100,13 @@ public class AgentEntity {
 
     public void setUpdates(Set<UpdateEntity> updates) {
         this.updates = updates;
+    }
+
+    public Set<SyncEntity> getSyncs() {
+        return syncs;
+    }
+
+    public void setSyncs(Set<SyncEntity> syncs) {
+        this.syncs = syncs;
     }
 }

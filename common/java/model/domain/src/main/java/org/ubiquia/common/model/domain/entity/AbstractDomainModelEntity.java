@@ -7,8 +7,8 @@ import jakarta.validation.constraints.Pattern;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.ubiquia.common.model.domain.embeddable.KeyValuePair;
 
@@ -17,9 +17,14 @@ import org.ubiquia.common.model.domain.embeddable.KeyValuePair;
 public abstract class AbstractDomainModelEntity {
 
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String ubiquiaId = null;
+
+    @PrePersist
+    private void generateId() {
+        if (Objects.isNull(this.ubiquiaId)) {
+            this.ubiquiaId = UUID.randomUUID().toString();
+        }
+    }
 
     @CreationTimestamp
     @Column(updatable = false)

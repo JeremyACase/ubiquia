@@ -7,8 +7,8 @@ import jakarta.validation.constraints.Pattern;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 
@@ -17,9 +17,14 @@ import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 public abstract class AbstractModelEntity {
 
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id = null;
+
+    @PrePersist
+    private void generateId() {
+        if (Objects.isNull(this.id)) {
+            this.id = UUID.randomUUID().toString();
+        }
+    }
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -34,6 +39,9 @@ public abstract class AbstractModelEntity {
 
     @OneToMany(mappedBy = "model", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private Set<UpdateEntity> updates;
+
+    @OneToMany(mappedBy = "model", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    private Set<SyncEntity> syncs;
 
     @Transient
     private String modelType;
@@ -122,5 +130,13 @@ public abstract class AbstractModelEntity {
 
     public void setUpdates(Set<UpdateEntity> updates) {
         this.updates = updates;
+    }
+
+    public Set<SyncEntity> getSyncs() {
+        return syncs;
+    }
+
+    public void setSyncs(Set<SyncEntity> syncs) {
+        this.syncs = syncs;
     }
 }

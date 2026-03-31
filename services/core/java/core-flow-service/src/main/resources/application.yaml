@@ -60,6 +60,14 @@ springdoc:
     enabled: true
 
 ubiquia:
+  cluster:
+    flow-service:
+      sync:
+        enabled: false
+        frequency-milliseconds: 30000
+    name: ubiquia-cluster
+    port: 7800
+    seed-hosts: localhost[7800]
   kubernetes:
     enabled: false
     namespace: ubiquia
