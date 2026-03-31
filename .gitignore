@@ -29,5 +29,4 @@ deploy/helm/charts
 .claude
 
 # Python
-**/__pycache__/
-**/*.pyc
+**/__pycache__
