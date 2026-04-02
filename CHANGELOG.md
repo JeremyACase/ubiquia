@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.0] 2026-04-01
+### Added
+- `ClockService` in `common/java/library/implementation`: holds a controllable `java.time.Clock`, defaults to `Clock.systemUTC()`, and exposes `setTime(OffsetDateTime)` to fix the clock to a specific GMT instant
+- `SimulationController` in each core Java service (`core-flow-service`, `core-communication-service`, `core-belief-state-generator-service`): REST endpoint `POST .../simulation/clock/set` to update the service clock; conditional on `ubiquia.mode != PROD`
+- `ubiquia.mode` string property (DEV/TEST/PROD) in Helm `values.yaml`, propagated through all core-service configmaps into each `application.yaml`; replaces the previous top-level `devMode` boolean
+- `ClockBroadcastService` in `util-simulation-service`: broadcasts simulated wall-clock time to all core service clock endpoints on every agent before each event is dispatched (when `speed != 1.0`)
+
 ## [0.21.0] 2026-03-30
 ### Added
 - JGroups TCP cluster support for `core-flow-service`: `FlowClusterService` manages a peer-to-peer channel and `ModelSynchronizationService` propagates stale model records to cluster peers on a configurable schedule

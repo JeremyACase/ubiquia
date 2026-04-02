@@ -5,6 +5,12 @@ All notable changes to `util-simulation-service` will be documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning is inherited from the root Ubiquia project.
 
+## [0.22.0] - 2026-04-01
+### Added
+- `ClockBroadcastService`: broadcasts simulated wall-clock time (`start_time + event.time_offset`) to all 3 core service `SimulationController` endpoints on every agent before each event is dispatched, when `speed != 1.0`
+- `SimulationService` now accepts an optional `ClockBroadcastService` and calls it before each dispatch when running at non-real-time speed
+- `run_command.py` wires `ClockBroadcastService` into `SimulationService` automatically
+
 ## [0.20.0] - 2026-03-26
 
 ### Added

@@ -79,6 +79,7 @@ data:
         enabled: true
 
     ubiquia:
+      mode: {{ .Values.ubiquia.mode | default "PROD" }}
       cluster:
         flowService:
           sync:

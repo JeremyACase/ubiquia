@@ -2,6 +2,7 @@ logging:
   ubiquia: DEBUG
 
 ubiquia:
+  mode: TEST
   cluster:
     flowService:
       sync:

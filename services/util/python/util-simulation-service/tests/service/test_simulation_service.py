@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 
 from util_simulation_service.model.simulation_input import SimulationInput
+from util_simulation_service.service.clock_broadcast_service import ClockBroadcastService
 from util_simulation_service.service.event_manager import EventManager
 from util_simulation_service.service.simulation_service import SimulationService
 
@@ -41,10 +42,15 @@ def _load(tmp_path: pathlib.Path, data: dict) -> SimulationInput:
     return SimulationService.load(_write_input(tmp_path, data))
 
 
-def _service(simulation_input: SimulationInput, event_manager: EventManager | None = None) -> SimulationService:
+def _service(
+    simulation_input: SimulationInput,
+    event_manager: EventManager | None = None,
+    clock_broadcast_service: ClockBroadcastService | None = None,
+) -> SimulationService:
     return SimulationService(
         simulation_input=simulation_input,
         event_manager=event_manager or MagicMock(spec=EventManager),
+        clock_broadcast_service=clock_broadcast_service,
     )
 
 
@@ -166,3 +172,66 @@ class TestSimulationServiceRun:
             _service(simulation_input).run(start_time=_PAST)
 
         mock_sleep.assert_not_called()
+
+
+class TestSimulationServiceClockBroadcast:
+    def test_broadcast_called_once_per_event_when_speed_is_not_one(self, tmp_path):
+        payload = _valid_payload(
+            events=[
+                {"type": "simulation", "time_offset": {"n": 1.0, "unit": "seconds"}, "payload": {}},
+                {"type": "simulation", "time_offset": {"n": 2.0, "unit": "seconds"}, "payload": {}},
+            ]
+        )
+        payload["speed"] = 2.0
+        simulation_input = _load(tmp_path, payload)
+        broadcaster = MagicMock(spec=ClockBroadcastService)
+
+        _service(simulation_input, clock_broadcast_service=broadcaster).run(start_time=_PAST)
+
+        assert broadcaster.broadcast.call_count == 2
+
+    def test_broadcast_not_called_when_speed_is_one(self, tmp_path):
+        simulation_input = _load(tmp_path, _valid_payload())
+        broadcaster = MagicMock(spec=ClockBroadcastService)
+
+        _service(simulation_input, clock_broadcast_service=broadcaster).run(start_time=_PAST)
+
+        broadcaster.broadcast.assert_not_called()
+
+    def test_broadcast_not_called_when_no_broadcaster_provided(self, tmp_path):
+        payload = _valid_payload()
+        payload["speed"] = 5.0
+        simulation_input = _load(tmp_path, payload)
+
+        # Should complete without error — no broadcaster wired in
+        _service(simulation_input).run(start_time=_PAST)
+
+    def test_broadcast_receives_simulated_time_not_wall_clock_time(self, tmp_path):
+        offset_seconds = 30.0
+        payload = _valid_payload(
+            events=[{"type": "simulation", "time_offset": {"n": offset_seconds, "unit": "seconds"}, "payload": {}}]
+        )
+        payload["speed"] = 10.0
+        simulation_input = _load(tmp_path, payload)
+        broadcaster = MagicMock(spec=ClockBroadcastService)
+        start_time = datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+
+        _service(simulation_input, clock_broadcast_service=broadcaster).run(start_time=start_time)
+
+        broadcast_time = broadcaster.broadcast.call_args[0][0]
+        expected = start_time + timedelta(seconds=offset_seconds)
+        assert broadcast_time == expected
+
+    def test_broadcast_called_before_dispatch(self, tmp_path):
+        payload = _valid_payload()
+        payload["speed"] = 2.0
+        simulation_input = _load(tmp_path, payload)
+        broadcaster = MagicMock(spec=ClockBroadcastService)
+        event_manager = MagicMock(spec=EventManager)
+        call_order = []
+        broadcaster.broadcast.side_effect = lambda *_: call_order.append("broadcast")
+        event_manager.dispatch.side_effect = lambda *_: call_order.append("dispatch")
+
+        _service(simulation_input, event_manager, broadcaster).run(start_time=_PAST)
+
+        assert call_order == ["broadcast", "dispatch"]

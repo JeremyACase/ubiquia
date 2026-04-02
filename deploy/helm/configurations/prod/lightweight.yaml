@@ -2,6 +2,7 @@ logging:
   ubiquia: INFO
 
 ubiquia:
+  mode: PROD
   cluster:
   agent:
     database: 

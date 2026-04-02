@@ -60,6 +60,7 @@ springdoc:
     enabled: true
 
 ubiquia:
+  mode: PROD
   cluster:
     flow-service:
       sync:

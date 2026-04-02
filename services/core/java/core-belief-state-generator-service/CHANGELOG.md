@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.0] 2026-04-01
+### Added
+- `SimulationController`: REST endpoint `POST /ubiquia/core/belief-state-generator-service/simulation/clock/set` to update the service clock via `ClockService`; conditional on `ubiquia.mode != PROD`
+- `ubiquia.mode` property in `application.yaml` (default `PROD`), propagated from Helm configmap
+
 ## [0.18.0] 2026-03-18
 ### Changed
 - Micrometer version now managed by Spring Boot BOM
