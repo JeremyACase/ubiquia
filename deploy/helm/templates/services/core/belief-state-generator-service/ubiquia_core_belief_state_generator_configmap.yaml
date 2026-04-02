@@ -47,6 +47,7 @@ data:
         enabled: true
 
     ubiquia:
+      mode: {{ .Values.ubiquia.mode | default "PROD" }}
       agent:
         id: {{ .Values.ubiquia.agent.id }}
         database: 

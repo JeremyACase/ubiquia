@@ -9,6 +9,7 @@ from util_simulation_service.builder.microweight_agent_builder import Microweigh
 from util_simulation_service.command.simulation_event_command import SimulationEventCommand
 from util_simulation_service.service.agent_factory import AgentFactory
 from util_simulation_service.service.analysis_service import AnalysisService
+from util_simulation_service.service.clock_broadcast_service import ClockBroadcastService
 from util_simulation_service.service.event_manager import EventManager
 from util_simulation_service.service.network_service import NetworkService
 from util_simulation_service.service.setup_service import SetupService
@@ -54,6 +55,7 @@ def run(input_file: pathlib.Path):
         event_manager=EventManager(
             commands={"simulation": SimulationEventCommand(agents=agents, topology=topology)}
         ),
+        clock_broadcast_service=ClockBroadcastService(agents=agents),
     ).run()
 
     AnalysisService().run()
