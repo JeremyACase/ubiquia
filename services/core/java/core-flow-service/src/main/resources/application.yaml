@@ -60,7 +60,7 @@ springdoc:
     enabled: true
 
 ubiquia:
-  mode: PROD
+  mode: DEV
   cluster:
     flow-service:
       sync:
@@ -68,6 +68,7 @@ ubiquia:
         frequency-milliseconds: 30000
     name: ubiquia-cluster
     port: 7800
+    rejoin-delay-milliseconds: 5000
     seed-hosts: localhost[7800]
   kubernetes:
     enabled: false
@@ -85,10 +86,9 @@ ubiquia:
         belief-state:
           enabled: false
         domain-ontology:
-          enabled: true
+          enabled: false
           directory:  /app/etc/domain-ontologies/
         graph:
-          enabled: true
           deployments:
     # This is a default UUID for development purposes
     id: 0328ca73-4d50-409f-85a8-7168ce80bd96

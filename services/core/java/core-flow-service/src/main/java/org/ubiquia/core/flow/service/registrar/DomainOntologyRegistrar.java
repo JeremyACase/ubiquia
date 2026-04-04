@@ -54,6 +54,13 @@ public class DomainOntologyRegistrar {
         logger.info("Attempting to register domain ontology: {}",
             domainOntology.getName());
 
+        var existing = this.domainOntologyRepository.findByName(domainOntology.getName());
+        if (existing.isPresent()) {
+            logger.info("Domain ontology '{}' already registered; skipping.",
+                domainOntology.getName());
+            return this.domainOntologyDtoMapper.map(existing.get());
+        }
+
         var domainOntologyEntity = this.getEntityFrom(domainOntology);
         domainOntologyEntity = this.domainOntologyRepository.save(domainOntologyEntity);
 

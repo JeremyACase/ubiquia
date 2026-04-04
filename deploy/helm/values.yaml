@@ -76,6 +76,12 @@ ubiquia:
           registry: ubiquia
           repository: test-flow-service
           tag: latest
+    util:
+      simulationService:
+        image:
+          registry: ubiquia
+          repository: util-simulation-service
+          tag: latest
 
 k8s:
   serviceAccount:

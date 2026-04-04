@@ -1,3 +1,5 @@
+import pathlib
+
 import pytest
 from pydantic import ValidationError
 
@@ -103,3 +105,40 @@ class TestSimulationInput:
                     "speed": 1.0,
                 }
             )
+
+
+class TestSimulationInputBootstrap:
+    def test_bootstrap_is_optional(self):
+        sim = SimulationInput(**_make_valid_input())
+        assert sim.bootstrap is None
+
+    def test_bootstrap_with_valid_target_parses(self, tmp_path):
+        ontology_file = tmp_path / "ontology.yaml"
+        ontology_file.write_text("name: pets\n")
+        data = _make_valid_input(
+            bootstrap={
+                "domain_ontologies": [
+                    {"file": str(ontology_file), "targets": ["agent-a"]}
+                ]
+            }
+        )
+        sim = SimulationInput(**data)
+        assert len(sim.bootstrap.domain_ontologies) == 1
+        assert sim.bootstrap.domain_ontologies[0].targets == ["agent-a"]
+
+    def test_bootstrap_target_not_in_agents_raises(self, tmp_path):
+        ontology_file = tmp_path / "ontology.yaml"
+        ontology_file.write_text("name: pets\n")
+        data = _make_valid_input(
+            bootstrap={
+                "domain_ontologies": [
+                    {"file": str(ontology_file), "targets": ["agent-unknown"]}
+                ]
+            }
+        )
+        with pytest.raises(ValidationError, match="references agents not found"):
+            SimulationInput(**data)
+
+    def test_bootstrap_empty_domain_ontologies_is_valid(self):
+        sim = SimulationInput(**_make_valid_input(bootstrap={"domain_ontologies": []}))
+        assert sim.bootstrap.domain_ontologies == []

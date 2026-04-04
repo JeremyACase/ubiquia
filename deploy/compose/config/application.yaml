@@ -76,5 +76,4 @@ ubiquia:
           enabled: true
           directory: /app/etc/domain-ontologies/
         graph:
-          enabled: true
           deployments:

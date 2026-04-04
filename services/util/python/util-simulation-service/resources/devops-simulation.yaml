@@ -1,0 +1,19 @@
+name: devops-simulation
+agents:
+  - name: agent-a
+    mode: test
+    base_url: http://ubiquia-agent-a:8080
+  - name: agent-b
+    mode: test
+    base_url: http://ubiquia-agent-b:8080
+  - name: agent-c
+    mode: test
+    base_url: http://ubiquia-agent-c:8080
+bootstrap:
+  domain_ontologies:
+    - file: /app/etc/ontologies/pets.yaml
+      targets:
+        - agent-a
+events: []
+networks: []
+speed: 1.0

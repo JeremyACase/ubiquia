@@ -1,9 +1,0 @@
-{
-  "name": "dry-run",
-  "agents": [
-    {"name": "agent-0", "mode": "microweight"}
-  ],
-  "events": [],
-  "networks": [],
-  "speed": 1.0
-}
