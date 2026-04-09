@@ -1,12 +1,14 @@
 from pydantic import BaseModel, model_validator
 
 from util_simulation_service.model.agent_mode import AgentMode
+from util_simulation_service.model.time_offset import TimeOffset
 
 
 class AgentInput(BaseModel):
     name: str
     mode: AgentMode
     base_url: str | None = None
+    join_offset_time: TimeOffset | None = None
 
     @model_validator(mode="after")
     def validate_test_base_url(self) -> "AgentInput":

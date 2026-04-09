@@ -8,7 +8,7 @@ from util_simulation_service.model.agent_input import AgentInput
 from util_simulation_service.model.agent_mode import AgentMode
 from util_simulation_service.model.network import Network
 from util_simulation_service.model.network_topology import NetworkTopology
-from util_simulation_service.model.simulation_event import SimulationEvent
+from util_simulation_service.model.events.simulation_event import SimulationEvent
 from util_simulation_service.model.simulation_input import SimulationInput
 from util_simulation_service.model.time_offset import TimeOffset
 from util_simulation_service.service.network_service import NetworkService

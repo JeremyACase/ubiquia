@@ -1,8 +1,8 @@
 import pytest
 
 from util_simulation_service.command.simulation_event_command import SimulationEventCommand
-from util_simulation_service.model.event import Event
-from util_simulation_service.model.simulation_event import SimulationEvent
+from util_simulation_service.model.events.event import Event
+from util_simulation_service.model.events.simulation_event import SimulationEvent
 from util_simulation_service.model.time_offset import TimeOffset
 
 

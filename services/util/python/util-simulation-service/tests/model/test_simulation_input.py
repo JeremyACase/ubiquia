@@ -4,7 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from util_simulation_service.model.network import Network
-from util_simulation_service.model.simulation_event import SimulationEvent
+from util_simulation_service.model.events.simulation_event import SimulationEvent
 from util_simulation_service.model.simulation_input import SimulationInput
 from util_simulation_service.model.time_offset import TimeOffset, TimeUnit
 

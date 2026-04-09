@@ -19,9 +19,10 @@ class SetupService:
         self._agent_factory = agent_factory
 
     def run(self, simulation_input: SimulationInput) -> list[Agent]:
-        logger.info("Setting up %d agent(s).", len(simulation_input.agents))
+        immediate = [a for a in simulation_input.agents if a.join_offset_time is None]
+        logger.info("Setting up %d agent(s) (%d deferred).", len(immediate), len(simulation_input.agents) - len(immediate))
         agents = []
-        for agent_input in simulation_input.agents:
+        for agent_input in immediate:
             logger.info("Building agent: %s (mode=%s)", agent_input.name, agent_input.mode.value)
             if agent_input.mode == AgentMode.TEST:
                 agent = Agent(name=agent_input.name, base_url=agent_input.base_url)

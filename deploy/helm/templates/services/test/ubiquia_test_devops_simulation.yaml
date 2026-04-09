@@ -1,7 +1,7 @@
 ---
-# Shared application config for all three simulation test agents.
-# JGroup sync is enabled so that an ontology bootstrapped into agent-a
-# is automatically propagated to agent-b and agent-c.
+# Shared application config for all four simulation test agents.
+# JGroup sync is enabled so that an ontology bootstrapped into microweight-flow-service-a
+# is automatically propagated to b, c, and (once it joins) d.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -9,7 +9,6 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-weight": "-10"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 data:
   application.yaml: |
@@ -55,9 +54,9 @@ data:
             frequency-milliseconds: 10000
         name: ubiquia-cluster
         port: 7800
-        seed-hosts: ubiquia-agent-a[7800],ubiquia-agent-b[7800],ubiquia-agent-c[7800]
+        seed-hosts: microweight-flow-service-a[7800],microweight-flow-service-b[7800],microweight-flow-service-c[7800]
         sync:
-          peer-base-urls: http://ubiquia-agent-a:8080,http://ubiquia-agent-b:8080,http://ubiquia-agent-c:8080
+          peer-base-urls: http://microweight-flow-service-a:8080,http://microweight-flow-service-b:8080,http://microweight-flow-service-c:8080,http://microweight-flow-service-d:8080
       kubernetes:
         enabled: false
         namespace: {{ .Release.Namespace }}
@@ -86,7 +85,6 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-weight": "-10"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 data:
   pets.yaml: |
@@ -100,26 +98,31 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-weight": "-10"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 data:
   devops-simulation.yaml: |
     name: devops-simulation
     agents:
-      - name: agent-a
+      - name: microweight-flow-service-a
         mode: test
-        base_url: http://ubiquia-agent-a:8080
-      - name: agent-b
+        base_url: http://microweight-flow-service-a:8080
+      - name: microweight-flow-service-b
         mode: test
-        base_url: http://ubiquia-agent-b:8080
-      - name: agent-c
+        base_url: http://microweight-flow-service-b:8080
+      - name: microweight-flow-service-c
         mode: test
-        base_url: http://ubiquia-agent-c:8080
+        base_url: http://microweight-flow-service-c:8080
+      - name: microweight-flow-service-d
+        mode: test
+        base_url: http://microweight-flow-service-d:8080
+        join_offset_time:
+          n: 30
+          unit: seconds
     bootstrap:
       domain_ontologies:
         - file: /app/etc/ontologies/pets.yaml
           targets:
-            - agent-a
+            - microweight-flow-service-a
     events: []
     networks: []
     speed: 1.0
@@ -127,15 +130,14 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ubiquia-agent-a
+  name: microweight-flow-service-a
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   selector:
-    app: ubiquia-agent-a
+    app: microweight-flow-service-a
   ports:
     - name: http
       port: 8080
@@ -147,15 +149,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ubiquia-agent-b
+  name: microweight-flow-service-b
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   selector:
-    app: ubiquia-agent-b
+    app: microweight-flow-service-b
   ports:
     - name: http
       port: 8080
@@ -167,15 +168,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ubiquia-agent-c
+  name: microweight-flow-service-c
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   selector:
-    app: ubiquia-agent-c
+    app: microweight-flow-service-c
   ports:
     - name: http
       port: 8080
@@ -187,21 +187,20 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ubiquia-agent-a
+  name: microweight-flow-service-a
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ubiquia-agent-a
+      app: microweight-flow-service-a
   template:
     metadata:
       labels:
-        app: ubiquia-agent-a
+        app: microweight-flow-service-a
         sidecar.istio.io/inject: "false"
     spec:
       serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
@@ -213,7 +212,7 @@ spec:
             - name: UBIQUIA_AGENT_ID
               value: "aaaaaaaa-0000-0000-0000-000000000001"
             - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
-              value: "http://ubiquia-agent-a:8080"
+              value: "http://microweight-flow-service-a:8080"
           ports:
             - containerPort: 8080
             - containerPort: 7800
@@ -229,21 +228,20 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ubiquia-agent-b
+  name: microweight-flow-service-b
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ubiquia-agent-b
+      app: microweight-flow-service-b
   template:
     metadata:
       labels:
-        app: ubiquia-agent-b
+        app: microweight-flow-service-b
         sidecar.istio.io/inject: "false"
     spec:
       serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
@@ -255,7 +253,7 @@ spec:
             - name: UBIQUIA_AGENT_ID
               value: "bbbbbbbb-0000-0000-0000-000000000002"
             - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
-              value: "http://ubiquia-agent-b:8080"
+              value: "http://microweight-flow-service-b:8080"
           ports:
             - containerPort: 8080
             - containerPort: 7800
@@ -271,21 +269,20 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ubiquia-agent-c
+  name: microweight-flow-service-c
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ubiquia-agent-c
+      app: microweight-flow-service-c
   template:
     metadata:
       labels:
-        app: ubiquia-agent-c
+        app: microweight-flow-service-c
         sidecar.istio.io/inject: "false"
     spec:
       serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
@@ -297,7 +294,71 @@ spec:
             - name: UBIQUIA_AGENT_ID
               value: "cccccccc-0000-0000-0000-000000000003"
             - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
-              value: "http://ubiquia-agent-c:8080"
+              value: "http://microweight-flow-service-c:8080"
+          ports:
+            - containerPort: 8080
+            - containerPort: 7800
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: ubiquia-test-simulation-agent-config
+---
+# microweight-flow-service-d is deployed alongside the other agents but joins the
+# simulation later, controlled by join_offset_time in the scenario file. This verifies
+# that a late-joining member can discover the existing cluster and receive the synced
+# domain ontology.
+apiVersion: v1
+kind: Service
+metadata:
+  name: microweight-flow-service-d
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  selector:
+    app: microweight-flow-service-d
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: jgroups
+      port: 7800
+      targetPort: 7800
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microweight-flow-service-d
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microweight-flow-service-d
+  template:
+    metadata:
+      labels:
+        app: microweight-flow-service-d
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+      containers:
+        - name: flow-service
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: UBIQUIA_AGENT_ID
+              value: "dddddddd-0000-0000-0000-000000000004"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://microweight-flow-service-d:8080"
           ports:
             - containerPort: 8080
             - containerPort: 7800
@@ -317,7 +378,6 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-weight": "5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     sidecar.istio.io/inject: "false"
@@ -356,8 +416,9 @@ spec:
             exit 1
           }
 
-          wait_for_ontology "agent-b" "http://ubiquia-agent-b:8080" "pets"
-          wait_for_ontology "agent-c" "http://ubiquia-agent-c:8080" "pets"
+          wait_for_ontology "microweight-flow-service-b" "http://microweight-flow-service-b:8080" "pets"
+          wait_for_ontology "microweight-flow-service-c" "http://microweight-flow-service-c:8080" "pets"
+          wait_for_ontology "microweight-flow-service-d" "http://microweight-flow-service-d:8080" "pets"
 
           echo "🎉 JGroup sync verification passed — all agents received the domain ontology!"
 ---
@@ -368,7 +429,6 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-weight": "0"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     sidecar.istio.io/inject: "false"

@@ -6,7 +6,9 @@ import click
 from util_simulation_service.builder.docker_network_builder import DockerNetworkBuilder
 from util_simulation_service.builder.kind_agent_builder import KindAgentBuilder
 from util_simulation_service.builder.microweight_agent_builder import MicroweightAgentBuilder
+from util_simulation_service.command.agent_join_event_command import AgentJoinEventCommand
 from util_simulation_service.command.simulation_event_command import SimulationEventCommand
+from util_simulation_service.model.events.agent_join_event import AgentJoinEvent
 from util_simulation_service.model.agent_mode import AgentMode
 from util_simulation_service.model.network_topology import NetworkTopology
 from util_simulation_service.service.agent_factory import AgentFactory
@@ -45,12 +47,12 @@ def run(input_file: pathlib.Path):
     needs_repo_root = any(a.mode != AgentMode.TEST for a in simulation_input.agents)
     repo_root = _repo_root() if needs_repo_root else pathlib.Path(".")
 
-    agents = SetupService(
-        agent_factory=AgentFactory(
-            microweight_builder=MicroweightAgentBuilder(repo_root=repo_root),
-            kind_builder=KindAgentBuilder(repo_root=repo_root),
-        )
-    ).run(simulation_input=simulation_input)
+    agent_factory = AgentFactory(
+        microweight_builder=MicroweightAgentBuilder(repo_root=repo_root),
+        kind_builder=KindAgentBuilder(repo_root=repo_root),
+    )
+
+    agents = SetupService(agent_factory=agent_factory).run(simulation_input=simulation_input)
 
     # TEST-mode agents are already connected via Kubernetes networking — skip Docker.
     all_test = all(a.mode == AgentMode.TEST for a in simulation_input.agents)
@@ -66,12 +68,25 @@ def run(input_file: pathlib.Path):
             simulation_input.bootstrap.domain_ontologies
         )
 
+    # Synthesize a join event for every agent that declares a join_offset_time.
+    # These are merged into the simulation timeline so the agent is provisioned
+    # and registered at the correct simulated time.
+    join_events = [
+        AgentJoinEvent(time_offset=a.join_offset_time, agent=a)
+        for a in simulation_input.agents
+        if a.join_offset_time is not None
+    ]
+
     SimulationService(
         simulation_input=simulation_input,
         event_manager=EventManager(
-            commands={"simulation": SimulationEventCommand(agents=agents, topology=topology)}
+            commands={
+                "simulation": SimulationEventCommand(agents=agents, topology=topology),
+                "agent_join": AgentJoinEventCommand(agents=agents, agent_factory=agent_factory),
+            }
         ),
         clock_broadcast_service=ClockBroadcastService(agents=agents),
+        extra_events=join_events,
     ).run()
 
     AnalysisService().run()

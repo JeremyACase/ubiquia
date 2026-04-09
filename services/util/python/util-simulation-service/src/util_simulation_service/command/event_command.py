@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from util_simulation_service.model.event import Event
+from util_simulation_service.model.events.event import Event
 
 
 class EventCommand(ABC):
