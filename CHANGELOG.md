@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.23.0] 2026-04-08
+### Added
+- `AgentMode.TEST` in `util-simulation-service`: allows a simulation to target an already-running agent by supplying its `base_url` directly, skipping provisioning
+- `BootstrapInput` and `DomainOntologyBootstrapInput` models in `util-simulation-service`: declare domain ontology files and the agents they should be registered on
+- `DomainOntologyBootstrapService` in `util-simulation-service`: POSTs domain ontology YAML files to their target agents' registration endpoints with retry logic on connection failures
+- `SimulationInput.bootstrap` optional field: wires bootstrap inputs into the simulation pipeline with cross-validation against the declared agents list
+- YAML simulation scenario files (`simulation.yaml`, `three-agent-demo.yaml`, `devops-simulation.yaml`) replacing the previous JSON input format
+- `DomainOntologyRepository.findByName()` in `core-flow-service`
+- `FlowClusterService.rejoinIfSolo()` in `core-flow-service`: scheduled probe that reconnects a sole-member node using randomised jitter to prevent permanent cluster splits during rolling starts
+- `ubiquia_test_devops_simulation.yaml` Helm template for the devops simulation test service
+
+### Changed
+- `ModelSynchronizationService` in `core-flow-service` now syncs only `DomainOntologyEntity` records to peers; child entities (data contracts, graphs, nodes, components) are created by cascade on registration, removing the need to sync each type individually
+- `SetupService` in `util-simulation-service` bypasses the agent builder for TEST-mode agents and constructs the `Agent` directly from `base_url`
+
 ## [0.22.0] 2026-04-01
 ### Added
 - `ClockService` in `common/java/library/implementation`: holds a controllable `java.time.Clock`, defaults to `Clock.systemUTC()`, and exposes `setTime(OffsetDateTime)` to fix the clock to a specific GMT instant

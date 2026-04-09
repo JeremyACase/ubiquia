@@ -3,8 +3,12 @@ package org.ubiquia.core.flow.service.cluster;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import org.jgroups.Event;
+import org.jgroups.PhysicalAddress;
 import org.jgroups.stack.IpAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,32 +24,20 @@ import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.library.api.config.AgentConfig;
 import org.ubiquia.common.library.api.repository.AbstractEntityRepository;
 import org.ubiquia.common.library.api.repository.AgentRepository;
-import org.ubiquia.common.library.implementation.service.mapper.ComponentDtoMapper;
-import org.ubiquia.common.library.implementation.service.mapper.DomainDataContractDtoMapper;
 import org.ubiquia.common.library.implementation.service.mapper.DomainOntologyDtoMapper;
-import org.ubiquia.common.library.implementation.service.mapper.FlowDtoMapper;
 import org.ubiquia.common.library.implementation.service.mapper.GenericDtoMapper;
-import org.ubiquia.common.library.implementation.service.mapper.GraphDtoMapper;
-import org.ubiquia.common.library.implementation.service.mapper.NodeDtoMapper;
-import org.ubiquia.common.library.implementation.service.mapper.ObjectMetadataDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
 import org.ubiquia.common.model.ubiquia.entity.AbstractModelEntity;
 import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 import org.ubiquia.common.model.ubiquia.entity.SyncEntity;
-import org.ubiquia.core.flow.repository.ComponentRepository;
-import org.ubiquia.core.flow.repository.DomainDataContractRepository;
 import org.ubiquia.core.flow.repository.DomainOntologyRepository;
-import org.ubiquia.core.flow.repository.FlowRepository;
-import org.ubiquia.core.flow.repository.GraphRepository;
-import org.ubiquia.core.flow.repository.NodeRepository;
-import org.ubiquia.core.flow.repository.ObjectMetadataRepository;
 import org.ubiquia.core.flow.repository.SyncRepository;
 
 /**
- * A scheduled service that synchronizes AbstractModelEntity records with peer flow-service
- * instances discovered via the JGroups cluster. An entity is eligible for synchronization when
- * its {@code updatedAt} timestamp is newer than the {@code createdAt} of its most recent
- * {@link SyncEntity}, or when it has never been synced at all.
+ * A scheduled service that synchronizes {@link org.ubiquia.common.model.ubiquia.entity.DomainOntologyEntity}
+ * records with peer flow-service instances. Registering a domain ontology on the peer cascades
+ * creation of all child entities (data contracts, graphs, nodes, components), so only the
+ * top-level ontology needs to be pushed.
  *
  * <p>Enabled only when {@code ubiquia.cluster.flow-service.sync.enabled=true}.
  */
@@ -59,6 +51,9 @@ public class ModelSynchronizationService {
 
     private static final Logger logger =
         LoggerFactory.getLogger(ModelSynchronizationService.class);
+
+    private static final String DOMAIN_ONTOLOGY_REGISTER_PATH =
+        "/ubiquia/core/flow-service/domain-ontology/register/post";
 
     @Autowired
     private AgentConfig agentConfig;
@@ -76,53 +71,23 @@ public class ModelSynchronizationService {
     private SyncRepository syncRepository;
 
     @Autowired
-    private ComponentRepository componentRepository;
-
-    @Autowired
-    private DomainDataContractRepository domainDataContractRepository;
-
-    @Autowired
     private DomainOntologyRepository domainOntologyRepository;
-
-    @Autowired
-    private FlowRepository flowRepository;
-
-    @Autowired
-    private GraphRepository graphRepository;
-
-    @Autowired
-    private NodeRepository nodeRepository;
-
-    @Autowired
-    private ObjectMetadataRepository objectMetadataRepository;
-
-    @Autowired
-    private ComponentDtoMapper componentDtoMapper;
-
-    @Autowired
-    private DomainDataContractDtoMapper domainDataContractDtoMapper;
 
     @Autowired
     private DomainOntologyDtoMapper domainOntologyDtoMapper;
 
-    @Autowired
-    private FlowDtoMapper flowDtoMapper;
-
-    @Autowired
-    private GraphDtoMapper graphDtoMapper;
-
-    @Autowired
-    private NodeDtoMapper nodeDtoMapper;
-
-    @Autowired
-    private ObjectMetadataDtoMapper objectMetadataDtoMapper;
-
     @Value("${server.port}")
     private int serverPort;
 
+    @Value("${ubiquia.cluster.sync.peer-base-urls:}")
+    private String peerBaseUrlsConfig;
+
+    @Value("${ubiquia.cluster.sync.local-base-url:}")
+    private String localBaseUrl;
+
     /**
-     * Runs on a fixed delay and synchronizes all eligible entity types with every peer
-     * agent currently visible in the JGroups cluster view.
+     * Runs on a fixed delay and synchronizes domain ontologies with every peer agent
+     * currently visible in the cluster.
      */
     @Scheduled(
         fixedDelayString = "${ubiquia.cluster.flow-service.sync.frequency-milliseconds:30000}")
@@ -142,28 +107,16 @@ public class ModelSynchronizationService {
             return;
         }
 
-        this.trySync(componentRepository, componentDtoMapper,
-            "/ubiquia/core/flow-service/component/sync", peerUrls, agentEntity);
-        this.trySync(domainDataContractRepository, domainDataContractDtoMapper,
-            "/ubiquia/core/flow-service/domain-data-contract/sync", peerUrls, agentEntity);
         this.trySync(domainOntologyRepository, domainOntologyDtoMapper,
-            "/ubiquia/core/flow-service/domain-ontology/sync", peerUrls, agentEntity);
-        this.trySync(flowRepository, flowDtoMapper,
-            "/ubiquia/core/flow-service/flow/sync", peerUrls, agentEntity);
-        this.trySync(graphRepository, graphDtoMapper,
-            "/ubiquia/core/flow-service/graph/sync", peerUrls, agentEntity);
-        this.trySync(nodeRepository, nodeDtoMapper,
-            "/ubiquia/core/flow-service/node/sync", peerUrls, agentEntity);
-        this.trySync(objectMetadataRepository, objectMetadataDtoMapper,
-            "/ubiquia/core/flow-service/object-metadata/sync", peerUrls, agentEntity);
+            DOMAIN_ONTOLOGY_REGISTER_PATH, peerUrls, agentEntity);
 
         logger.info("...model synchronization complete.");
     }
 
     /**
      * Finds all entities of type {@code E} that are stale relative to their most recent sync
-     * record, maps them to DTOs, posts them to every peer, and records a {@link SyncEntity}
-     * for each successfully queued entity.
+     * record, maps them to DTOs, posts each one individually to the given endpoint on every peer,
+     * and records a {@link SyncEntity} for each entity once at least one peer has accepted it.
      */
     private <E extends AbstractModelEntity, D extends AbstractModel> void trySync(
         AbstractEntityRepository<E> repository,
@@ -195,31 +148,55 @@ public class ModelSynchronizationService {
 
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        var request = new HttpEntity<>(dtos, headers);
 
+        var atLeastOnePeerSucceeded = false;
         for (var peerUrl : peerUrls) {
             var fullUrl = peerUrl + endpointPath;
-            try {
-                this.restTemplate.postForEntity(fullUrl, request, Void.class);
-                logger.info("Synced {} record(s) to {}.", entities.size(), fullUrl);
-            } catch (Exception e) {
-                logger.warn("Failed to sync to {}: {}", fullUrl, e.getMessage());
+            var allSucceeded = true;
+            for (var dto : dtos) {
+                try {
+                    var request = new HttpEntity<>(dto, headers);
+                    this.restTemplate.postForEntity(fullUrl, request, Void.class);
+                } catch (Exception e) {
+                    logger.warn("Failed to sync to {}: {}", fullUrl, e.getMessage());
+                    allSucceeded = false;
+                }
+            }
+            if (allSucceeded) {
+                logger.info("Synced {} record(s) to {}.", dtos.size(), fullUrl);
+                atLeastOnePeerSucceeded = true;
             }
         }
 
-        for (var entity : entities) {
-            var syncEntity = new SyncEntity();
-            syncEntity.setModel(entity);
-            syncEntity.setAgent(agentEntity);
-            this.syncRepository.save(syncEntity);
+        if (atLeastOnePeerSucceeded) {
+            for (var entity : entities) {
+                var syncEntity = new SyncEntity();
+                syncEntity.setModel(entity);
+                syncEntity.setAgent(agentEntity);
+                this.syncRepository.save(syncEntity);
+            }
         }
     }
 
     /**
-     * Derives HTTP base URLs for all cluster members except the local node, using the IP
-     * address advertised by JGroups and the configured {@code server.port}.
+     * Derives HTTP base URLs for peer flow-service instances.
+     *
+     * <p>When {@code ubiquia.cluster.sync.peer-base-urls} is set (comma-separated), those URLs
+     * are used directly and {@code ubiquia.cluster.sync.local-base-url} is excluded from the
+     * list. This mode is preferred in environments (e.g. Kubernetes) where JGroups TCPPING
+     * discovery is unreliable due to all nodes starting simultaneously.
+     *
+     * <p>When the static list is absent, peers are derived from the live JGroups cluster view
+     * using the IP address advertised by each member and the configured {@code server.port}.
      */
     private List<String> resolvePeerUrls() {
+        if (!this.peerBaseUrlsConfig.isBlank()) {
+            return Arrays.stream(this.peerBaseUrlsConfig.split(","))
+                .map(String::trim)
+                .filter(url -> !url.isBlank() && !url.equals(this.localBaseUrl))
+                .collect(Collectors.toList());
+        }
+
         var urls = new ArrayList<String>();
         var channel = this.flowClusterService.getChannel();
 
@@ -232,7 +209,8 @@ public class ModelSynchronizationService {
             if (member.equals(localAddress)) {
                 continue;
             }
-            if (member instanceof IpAddress ipAddress) {
+            var physAddr = (PhysicalAddress) channel.down(new Event(Event.GET_PHYSICAL_ADDRESS, member));
+            if (physAddr instanceof IpAddress ipAddress) {
                 var host = ipAddress.getIpAddress().getHostAddress();
                 urls.add("http://" + host + ":" + serverPort);
             }

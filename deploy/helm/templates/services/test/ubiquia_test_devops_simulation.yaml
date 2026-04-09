@@ -1,0 +1,396 @@
+---
+# Shared application config for all three simulation test agents.
+# JGroup sync is enabled so that an ontology bootstrapped into agent-a
+# is automatically propagated to agent-b and agent-c.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-simulation-agent-config
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  application.yaml: |
+    logging:
+      level:
+        net.jimblackler: OFF
+        org.ubiquia: {{ .Values.logging.ubiquia }}
+
+    server:
+      port: 8080
+
+    spring:
+      application:
+        name: ubiquia-core-flow-service
+      datasource:
+        driverClassName: org.h2.Driver
+        url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
+        username: sa
+        password: sa
+        hikari:
+          transaction-isolation: TRANSACTION_READ_COMMITTED
+      h2:
+        console:
+          enabled: false
+      jackson:
+        date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+        deserialization:
+          fail-on-unknown-properties: true
+      jpa:
+        hibernate:
+          ddl-auto: create
+        properties:
+          hibernate:
+            generate_statistics: false
+            format_sql: true
+
+    ubiquia:
+      mode: TEST
+      cluster:
+        flow-service:
+          sync:
+            enabled: true
+            frequency-milliseconds: 10000
+        name: ubiquia-cluster
+        port: 7800
+        seed-hosts: ubiquia-agent-a[7800],ubiquia-agent-b[7800],ubiquia-agent-c[7800]
+        sync:
+          peer-base-urls: http://ubiquia-agent-a:8080,http://ubiquia-agent-b:8080,http://ubiquia-agent-c:8080
+      kubernetes:
+        enabled: false
+        namespace: {{ .Release.Namespace }}
+      outbox:
+        enabled: true
+        frequency-milliseconds: 1000
+        mode: DEFAULT
+      page:
+        max-size: 100
+      agent:
+        flow-service:
+          bootstrap:
+            belief-state:
+              enabled: false
+            domain-ontology:
+              enabled: false
+              directory: /app/etc/domain-ontologies/
+            graph:
+              deployments:
+---
+# Ontology files mounted into the simulation service container.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-simulation-ontologies
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  pets.yaml: |
+{{ .Files.Get "bootstrap/ontologies/pets.yaml" | indent 4 }}
+---
+# The devops-simulation scenario file mounted into the simulation service container.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-simulation-scenario
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  devops-simulation.yaml: |
+    name: devops-simulation
+    agents:
+      - name: agent-a
+        mode: test
+        base_url: http://ubiquia-agent-a:8080
+      - name: agent-b
+        mode: test
+        base_url: http://ubiquia-agent-b:8080
+      - name: agent-c
+        mode: test
+        base_url: http://ubiquia-agent-c:8080
+    bootstrap:
+      domain_ontologies:
+        - file: /app/etc/ontologies/pets.yaml
+          targets:
+            - agent-a
+    events: []
+    networks: []
+    speed: 1.0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubiquia-agent-a
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  selector:
+    app: ubiquia-agent-a
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: jgroups
+      port: 7800
+      targetPort: 7800
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubiquia-agent-b
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  selector:
+    app: ubiquia-agent-b
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: jgroups
+      port: 7800
+      targetPort: 7800
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubiquia-agent-c
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  selector:
+    app: ubiquia-agent-c
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: jgroups
+      port: 7800
+      targetPort: 7800
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubiquia-agent-a
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubiquia-agent-a
+  template:
+    metadata:
+      labels:
+        app: ubiquia-agent-a
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+      containers:
+        - name: flow-service
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: UBIQUIA_AGENT_ID
+              value: "aaaaaaaa-0000-0000-0000-000000000001"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://ubiquia-agent-a:8080"
+          ports:
+            - containerPort: 8080
+            - containerPort: 7800
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: ubiquia-test-simulation-agent-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubiquia-agent-b
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubiquia-agent-b
+  template:
+    metadata:
+      labels:
+        app: ubiquia-agent-b
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+      containers:
+        - name: flow-service
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: UBIQUIA_AGENT_ID
+              value: "bbbbbbbb-0000-0000-0000-000000000002"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://ubiquia-agent-b:8080"
+          ports:
+            - containerPort: 8080
+            - containerPort: 7800
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: ubiquia-test-simulation-agent-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubiquia-agent-c
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubiquia-agent-c
+  template:
+    metadata:
+      labels:
+        app: ubiquia-agent-c
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+      containers:
+        - name: flow-service
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: UBIQUIA_AGENT_ID
+              value: "cccccccc-0000-0000-0000-000000000003"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://ubiquia-agent-c:8080"
+          ports:
+            - containerPort: 8080
+            - containerPort: 7800
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: ubiquia-test-simulation-agent-config
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubiquia-test-devops-simulation-verify
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    sidecar.istio.io/inject: "false"
+spec:
+  serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+  restartPolicy: Never
+  containers:
+    - name: curl
+      image: curlimages/curl:8.6.0
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          set -e
+
+          wait_for_ontology() {
+            local AGENT_NAME=$1
+            local BASE_URL=$2
+            local ONTOLOGY_NAME=$3
+            local MAX_ATTEMPTS=24
+            local ATTEMPT=0
+
+            echo "Waiting for ontology '$ONTOLOGY_NAME' on $AGENT_NAME (JGroup sync)..."
+
+            while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+              RESPONSE=$(curl -s "$BASE_URL/ubiquia/core/flow-service/domain-ontology/query/params?page=0&size=100")
+              if echo "$RESPONSE" | grep -qE "\"name\"[[:space:]]*:[[:space:]]*\"$ONTOLOGY_NAME\""; then
+                echo "✅ Ontology '$ONTOLOGY_NAME' confirmed on $AGENT_NAME"
+                return 0
+              fi
+              ATTEMPT=$((ATTEMPT + 1))
+              echo "  Attempt $ATTEMPT/$MAX_ATTEMPTS — not yet present, retrying in 5s..."
+              sleep 5
+            done
+
+            echo "❌ Ontology '$ONTOLOGY_NAME' not found on $AGENT_NAME after $((MAX_ATTEMPTS * 5))s"
+            exit 1
+          }
+
+          wait_for_ontology "agent-b" "http://ubiquia-agent-b:8080" "pets"
+          wait_for_ontology "agent-c" "http://ubiquia-agent-c:8080" "pets"
+
+          echo "🎉 JGroup sync verification passed — all agents received the domain ontology!"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubiquia-test-devops-simulation
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    sidecar.istio.io/inject: "false"
+spec:
+  serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+  restartPolicy: Never
+  containers:
+    - name: simulation-runner
+      image: {{ include "ubiquia.util.simulationService.image" . }}
+      imagePullPolicy: IfNotPresent
+      command: ["util-simulation-service"]
+      args: ["simulation", "run", "--input-file", "/app/etc/scenario/devops-simulation.yaml"]
+      volumeMounts:
+        - name: scenario
+          mountPath: /app/etc/scenario/devops-simulation.yaml
+          subPath: devops-simulation.yaml
+        - name: ontologies
+          mountPath: /app/etc/ontologies/
+  volumes:
+    - name: scenario
+      configMap:
+        name: ubiquia-test-simulation-scenario
+    - name: ontologies
+      configMap:
+        name: ubiquia-test-simulation-ontologies

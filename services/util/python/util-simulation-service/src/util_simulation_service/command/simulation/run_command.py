@@ -7,9 +7,12 @@ from util_simulation_service.builder.docker_network_builder import DockerNetwork
 from util_simulation_service.builder.kind_agent_builder import KindAgentBuilder
 from util_simulation_service.builder.microweight_agent_builder import MicroweightAgentBuilder
 from util_simulation_service.command.simulation_event_command import SimulationEventCommand
+from util_simulation_service.model.agent_mode import AgentMode
+from util_simulation_service.model.network_topology import NetworkTopology
 from util_simulation_service.service.agent_factory import AgentFactory
 from util_simulation_service.service.analysis_service import AnalysisService
 from util_simulation_service.service.clock_broadcast_service import ClockBroadcastService
+from util_simulation_service.service.domain_ontology_bootstrap_service import DomainOntologyBootstrapService
 from util_simulation_service.service.event_manager import EventManager
 from util_simulation_service.service.network_service import NetworkService
 from util_simulation_service.service.setup_service import SetupService
@@ -31,13 +34,16 @@ def _repo_root() -> pathlib.Path:
     "--input-file",
     type=click.Path(exists=True, dir_okay=False, path_type=pathlib.Path),
     required=True,
-    help="JSON file describing the simulation (name, agents, events, networks, speed).",
+    help="YAML file describing the simulation (name, agents, events, networks, speed).",
 )
 def run(input_file: pathlib.Path):
     """Run a simulation against a live Ubiquia deployment."""
 
     simulation_input = SimulationService.load(input_file)
-    repo_root = _repo_root()
+
+    # Only resolve the repo root (requires git) when non-test agents are present.
+    needs_repo_root = any(a.mode != AgentMode.TEST for a in simulation_input.agents)
+    repo_root = _repo_root() if needs_repo_root else pathlib.Path(".")
 
     agents = SetupService(
         agent_factory=AgentFactory(
@@ -46,9 +52,19 @@ def run(input_file: pathlib.Path):
         )
     ).run(simulation_input=simulation_input)
 
-    topology = NetworkService(
-        network_builder=DockerNetworkBuilder()
-    ).run(simulation_input=simulation_input, agents=agents)
+    # TEST-mode agents are already connected via Kubernetes networking — skip Docker.
+    all_test = all(a.mode == AgentMode.TEST for a in simulation_input.agents)
+    if all_test:
+        topology = NetworkTopology()
+    else:
+        topology = NetworkService(
+            network_builder=DockerNetworkBuilder()
+        ).run(simulation_input=simulation_input, agents=agents)
+
+    if simulation_input.bootstrap is not None:
+        DomainOntologyBootstrapService(agents=agents).bootstrap(
+            simulation_input.bootstrap.domain_ontologies
+        )
 
     SimulationService(
         simulation_input=simulation_input,

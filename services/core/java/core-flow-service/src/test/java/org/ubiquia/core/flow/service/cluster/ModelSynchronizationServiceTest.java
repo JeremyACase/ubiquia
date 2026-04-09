@@ -3,6 +3,7 @@ package org.ubiquia.core.flow.service.cluster;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -11,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import java.net.InetAddress;
 import java.util.List;
+import org.jgroups.Event;
 import org.jgroups.JChannel;
 import org.jgroups.View;
 import org.jgroups.stack.IpAddress;
@@ -95,6 +97,7 @@ public class ModelSynchronizationServiceTest {
         when(mockChannel.getView()).thenReturn(mockView);
         when(mockChannel.getAddress()).thenReturn(localAddress);
         when(mockView.getMembers()).thenReturn(List.of(peerAddress));
+        when(mockChannel.down(isA(Event.class))).thenReturn(peerAddress);
 
         this.modelSynchronizationService.synchronize();
 
@@ -117,6 +120,7 @@ public class ModelSynchronizationServiceTest {
         when(mockChannel.getView()).thenReturn(mockView);
         when(mockChannel.getAddress()).thenReturn(localAddress);
         when(mockView.getMembers()).thenReturn(List.of(peerAddress));
+        when(mockChannel.down(isA(Event.class))).thenReturn(peerAddress);
 
         this.modelSynchronizationService.synchronize();
 

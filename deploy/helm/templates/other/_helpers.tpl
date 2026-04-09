@@ -89,3 +89,7 @@ Create the name of the service account to use
 {{- define "ubiquia.test.flowService.image" -}}
 {{ .Values.ubiquia.components.test.flowService.image.registry }}/{{ .Values.ubiquia.components.test.flowService.image.repository }}:{{ .Values.ubiquia.components.test.flowService.image.tag }}
 {{- end }}
+
+{{- define "ubiquia.util.simulationService.image" -}}
+{{ .Values.ubiquia.components.util.simulationService.image.registry }}/{{ .Values.ubiquia.components.util.simulationService.image.repository }}:{{ .Values.ubiquia.components.util.simulationService.image.tag }}
+{{- end }}

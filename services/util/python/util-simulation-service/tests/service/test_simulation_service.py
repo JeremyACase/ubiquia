@@ -1,9 +1,9 @@
-import json
 import pathlib
 from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, call, patch
 
 import pytest
+import yaml
 
 from util_simulation_service.model.simulation_input import SimulationInput
 from util_simulation_service.service.clock_broadcast_service import ClockBroadcastService
@@ -15,8 +15,8 @@ _PAST = datetime(2000, 1, 1, tzinfo=timezone.utc)
 
 
 def _write_input(tmp_path: pathlib.Path, data: dict) -> pathlib.Path:
-    f = tmp_path / "input.json"
-    f.write_text(json.dumps(data))
+    f = tmp_path / "input.yaml"
+    f.write_text(yaml.dump(data))
     return f
 
 
@@ -59,9 +59,9 @@ class TestSimulationServiceLoad:
         result = _load(tmp_path, _valid_payload())
         assert result.name == "test-sim"
 
-    def test_load_raises_on_invalid_json(self, tmp_path):
-        bad_file = tmp_path / "bad.json"
-        bad_file.write_text("not valid json")
+    def test_load_raises_on_invalid_yaml(self, tmp_path):
+        bad_file = tmp_path / "bad.yaml"
+        bad_file.write_text("{")
         with pytest.raises(Exception):
             SimulationService.load(bad_file)
 

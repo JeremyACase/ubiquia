@@ -5,6 +5,20 @@ All notable changes to `util-simulation-service` will be documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning is inherited from the root Ubiquia project.
 
+## [0.23.0] - 2026-04-08
+### Added
+- `AgentMode.TEST`: targets an already-running agent; requires `base_url` on the `AgentInput` (enforced by model validator)
+- `AgentInput.base_url` optional field with validator: required when `mode == TEST`, rejected otherwise
+- `BootstrapInput` model: aggregates a list of `DomainOntologyBootstrapInput` entries
+- `DomainOntologyBootstrapInput` model: pairs a YAML ontology `file` path with a list of target agent names
+- `SimulationInput.bootstrap` optional field: wires bootstrap config into the simulation; validates that all target names are declared in the agents list
+- `DomainOntologyBootstrapService`: reads each ontology YAML and POSTs it to each target agent's `/ubiquia/core/flow-service/domain-ontology/register/post` endpoint; retries up to 12 times on `ConnectError` with a 10 s interval
+- YAML simulation scenario files (`simulation.yaml`, `three-agent-demo.yaml`, `devops-simulation.yaml`)
+
+### Changed
+- `SetupService`: TEST-mode agents bypass the agent builder — an `Agent` is constructed directly from `AgentInput.base_url`
+- `run_command.py` updated to instantiate `DomainOntologyBootstrapService` and invoke it before the simulation run when `bootstrap` is present
+
 ## [0.22.0] - 2026-04-01
 ### Added
 - `ClockBroadcastService`: broadcasts simulated wall-clock time (`start_time + event.time_offset`) to all 3 core service `SimulationController` endpoints on every agent before each event is dispatched, when `speed != 1.0`

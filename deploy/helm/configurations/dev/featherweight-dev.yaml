@@ -62,7 +62,7 @@ infrastructure:
 
 telemetry:
   prometheus:
-    enabled: true 
-    install: true
+    enabled: false
+    install: false
   grafana: 
-    install: true
+    install: false

@@ -1,7 +1,8 @@
-import json
 import logging
 import pathlib
 import time
+
+import yaml
 from datetime import datetime, timedelta, timezone
 
 from util_simulation_service.model.simulation_input import SimulationInput
@@ -34,7 +35,7 @@ class SimulationService:
 
     @staticmethod
     def load(input_file: pathlib.Path) -> SimulationInput:
-        return SimulationInput.model_validate(json.loads(input_file.read_text()))
+        return SimulationInput.model_validate(yaml.safe_load(input_file.read_text()))
 
     def run(self, start_time: datetime | None = None) -> None:
         if start_time is None:

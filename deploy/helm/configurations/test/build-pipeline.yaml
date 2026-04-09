@@ -44,6 +44,12 @@ ubiquia:
           registry: docker.io/ubiquia
           repository: test-belief-state-generator-service
           tag: latest
+    util:
+      simulationService:
+        image:
+          registry: docker.io/ubiquia
+          repository: util-simulation-service
+          tag: latest
 
 telemetry:
   prometheus:

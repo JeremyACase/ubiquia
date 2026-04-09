@@ -1,0 +1,16 @@
+name: three-agent-demo
+agents:
+  - name: agent-a
+    mode: microweight
+  - name: agent-b
+    mode: microweight
+  - name: agent-c
+    mode: microweight
+bootstrap:
+  domain_ontologies:
+    - file: deploy/helm/bootstrap/ontologies/pets.yaml
+      targets:
+        - agent-a
+events: []
+networks: []
+speed: 1.0

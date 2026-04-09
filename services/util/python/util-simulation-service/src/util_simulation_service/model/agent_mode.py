@@ -6,3 +6,4 @@ class AgentMode(Enum):
 
     MICROWEIGHT = "microweight"
     KIND = "KIND"
+    TEST = "test"
