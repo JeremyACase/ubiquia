@@ -210,7 +210,7 @@ jobs:
 
       - name: Run Helm tests
         run: |
-          helm test ubiquia --logs -n ubiquia
+          helm test ubiquia -n ubiquia
 
       - name: Inspect resources after Helm test
         if: always()
