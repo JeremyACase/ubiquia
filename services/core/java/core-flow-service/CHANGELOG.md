@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.23.0] 2026-04-08
+### Added
+- `DomainOntologyRepository.findByName(String name)`: look up a domain ontology entity by name
+- `FlowClusterService.rejoinIfSolo()`: scheduled probe that disconnects and reconnects when this node is the sole cluster member, using random jitter in `[0, rejoin-delay-ms)` to stagger simultaneous reconnect attempts; configurable via `ubiquia.cluster.rejoin-delay-milliseconds` (default 5000)
+
+### Changed
+- `ModelSynchronizationService` now syncs only `DomainOntologyEntity` records to peers; registering a domain ontology cascades creation of all child entities, so per-type sync of data contracts, graphs, nodes, and components has been removed
+
 ## [0.22.0] 2026-04-01
 ### Added
 - `SimulationController`: REST endpoint `POST /ubiquia/core/flow-service/simulation/clock/set` to update the service clock via `ClockService`; conditional on `ubiquia.mode != PROD`
