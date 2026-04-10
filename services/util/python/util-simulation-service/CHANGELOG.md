@@ -5,6 +5,18 @@ All notable changes to `util-simulation-service` will be documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning is inherited from the root Ubiquia project.
 
+## [0.24.0] - 2026-04-09
+### Added
+- `AgentInput.join_offset_time` (`TimeOffset | None`): when set, the agent is excluded from initial provisioning and joined to the simulation at the specified time offset
+- `AgentJoinEvent` model (`model/events/agent_join_event.py`): internal event type synthesized by `run_command.py` from agents with `join_offset_time`; not part of the YAML scenario `events` union
+- `AgentJoinEventCommand`: `EventCommand` that provisions the agent on demand (TEST mode uses `base_url` directly; other modes delegate to `AgentFactory`) and appends it to the shared live-agent list
+- `SimulationService` accepts an `extra_events` parameter; these are merged with scenario-file events into the sorted dispatch timeline
+
+### Changed
+- `SetupService.run()` now filters out agents with `join_offset_time` set; only immediately-active agents are returned
+- `run_command.py` synthesizes `AgentJoinEvent` instances for deferred agents and registers `AgentJoinEventCommand` under the `"agent_join"` event type
+- Event models reorganized: `Event`, `SimulationEvent`, and `AgentJoinEvent` moved from `model/` into `model/events/`
+
 ## [0.23.0] - 2026-04-08
 ### Added
 - `AgentMode.TEST`: targets an already-running agent; requires `base_url` on the `AgentInput` (enforced by model validator)

@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.24.0] - 2026-04-09
+### Added
+- `AgentInput.join_offset_time` (`TimeOffset | None`): declares a deferred join time; agents with this field set are excluded from initial setup and provisioned at the specified simulation time offset instead
+- `AgentJoinEvent` model in `util-simulation-service`: internal event synthesized from `join_offset_time`; carries the `AgentInput` and is merged into the simulation timeline by `run_command.py`
+- `AgentJoinEventCommand` in `util-simulation-service`: provisions the joining agent on demand (TEST mode: connects to existing `base_url`; other modes: delegates to `AgentFactory`) and appends it to the shared live-agent list so clock broadcasts and event routing include it from that point forward
+- `SimulationService.extra_events` constructor parameter: additional events merged into the sorted timeline alongside scenario-file events
+- Fourth devops-simulation test agent `microweight-flow-service-d` with `join_offset_time: 30s`, verifying that a late-joining node receives the domain ontology via JGroups sync
+
+### Changed
+- `SetupService` now skips agents with `join_offset_time` set; deferred agents are logged and provisioned later via `AgentJoinEventCommand`
+- `run_command.py` synthesizes `AgentJoinEvent` instances for all deferred agents and registers `AgentJoinEventCommand` with the `EventManager`
+- Event models (`Event`, `SimulationEvent`, `AgentJoinEvent`) moved from `model/` into `model/events/` subfolder
+- Helm devops-simulation test agents renamed from `ubiquia-agent-{a,b,c}` to `microweight-flow-service-{a,b,c,d}`
+- `helm.sh/hook-weight` annotations removed from all devops-simulation test resources
+
+### Fixed
+- GitHub Actions `helm test --logs` error caused by Helm attempting to fetch pod logs from ConfigMap hook resources that had already been deleted by `hook-delete-policy: hook-succeeded`
+
 ## [0.23.0] 2026-04-08
 ### Added
 - `AgentMode.TEST` in `util-simulation-service`: allows a simulation to target an already-running agent by supplying its `base_url` directly, skipping provisioning

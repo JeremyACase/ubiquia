@@ -6,15 +6,16 @@ from util_simulation_service.builder.agent_builder import AgentBuilder
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.agent_input import AgentInput
 from util_simulation_service.model.agent_mode import AgentMode
-from util_simulation_service.model.simulation_event import SimulationEvent
+from util_simulation_service.model.events.simulation_event import SimulationEvent
 from util_simulation_service.model.simulation_input import SimulationInput
 from util_simulation_service.model.time_offset import TimeOffset
 from util_simulation_service.service.agent_factory import AgentFactory
 from util_simulation_service.service.setup_service import SetupService
 
 
-def _agent_input(name: str, mode: AgentMode = AgentMode.MICROWEIGHT) -> AgentInput:
-    return AgentInput(name=name, mode=mode)
+def _agent_input(name: str, mode: AgentMode = AgentMode.MICROWEIGHT, deferred: bool = False) -> AgentInput:
+    join_offset_time = TimeOffset(n=30.0) if deferred else None
+    return AgentInput(name=name, mode=mode, join_offset_time=join_offset_time)
 
 
 def _make_simulation_input(agent_inputs: list[AgentInput]) -> SimulationInput:
@@ -107,6 +108,36 @@ class TestSetupService:
         service = SetupService(agent_factory=_make_factory(builder))
 
         agents = service.run(simulation_input=_make_simulation_input([]))
+
+        assert agents == []
+        builder.build.assert_not_called()
+
+    def test_run_skips_deferred_agents(self):
+        builder = MagicMock(spec=AgentBuilder)
+        builder.build.side_effect = lambda name: Agent(name=name, base_url=f"http://{name}")
+        service = SetupService(agent_factory=_make_factory(builder))
+
+        agents = service.run(
+            simulation_input=_make_simulation_input([
+                _agent_input("agent-a"),
+                _agent_input("agent-d", deferred=True),
+            ])
+        )
+
+        assert len(agents) == 1
+        assert agents[0].name == "agent-a"
+        builder.build.assert_called_once_with("agent-a")
+
+    def test_run_with_all_deferred_returns_empty_list(self):
+        builder = MagicMock(spec=AgentBuilder)
+        service = SetupService(agent_factory=_make_factory(builder))
+
+        agents = service.run(
+            simulation_input=_make_simulation_input([
+                _agent_input("agent-a", deferred=True),
+                _agent_input("agent-b", deferred=True),
+            ])
+        )
 
         assert agents == []
         builder.build.assert_not_called()

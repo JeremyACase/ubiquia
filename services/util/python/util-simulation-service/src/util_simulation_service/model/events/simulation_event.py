@@ -1,6 +1,6 @@
 from typing import Any, Literal
 
-from util_simulation_service.model.event import Event
+from util_simulation_service.model.events.event import Event
 
 
 class SimulationEvent(Event):

@@ -28,10 +28,12 @@ class SimulationService:
         simulation_input: SimulationInput,
         event_manager: EventManager,
         clock_broadcast_service: ClockBroadcastService | None = None,
+        extra_events: list | None = None,
     ):
         self._simulation_input = simulation_input
         self._event_manager = event_manager
         self._clock_broadcast_service = clock_broadcast_service
+        self._extra_events = extra_events or []
 
     @staticmethod
     def load(input_file: pathlib.Path) -> SimulationInput:
@@ -43,7 +45,7 @@ class SimulationService:
 
         speed = self._simulation_input.speed
         sorted_events = sorted(
-            self._simulation_input.events,
+            list(self._simulation_input.events) + self._extra_events,
             key=lambda e: e.time_offset.to_seconds(),
         )
 

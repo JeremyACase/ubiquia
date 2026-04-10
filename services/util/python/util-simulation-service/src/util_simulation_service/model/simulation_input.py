@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, model_validator
 from util_simulation_service.model.agent_input import AgentInput
 from util_simulation_service.model.bootstrap_input import BootstrapInput
 from util_simulation_service.model.network import Network
-from util_simulation_service.model.simulation_event import SimulationEvent
+from util_simulation_service.model.events.simulation_event import SimulationEvent
 
 AnyEvent = Annotated[Union[SimulationEvent], Field(discriminator="type")]
 

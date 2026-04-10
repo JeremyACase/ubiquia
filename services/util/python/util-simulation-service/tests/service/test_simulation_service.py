@@ -5,7 +5,11 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 import yaml
 
+from util_simulation_service.model.agent_input import AgentInput
+from util_simulation_service.model.events.agent_join_event import AgentJoinEvent
+from util_simulation_service.model.agent_mode import AgentMode
 from util_simulation_service.model.simulation_input import SimulationInput
+from util_simulation_service.model.time_offset import TimeOffset
 from util_simulation_service.service.clock_broadcast_service import ClockBroadcastService
 from util_simulation_service.service.event_manager import EventManager
 from util_simulation_service.service.simulation_service import SimulationService
@@ -172,6 +176,61 @@ class TestSimulationServiceRun:
             _service(simulation_input).run(start_time=_PAST)
 
         mock_sleep.assert_not_called()
+
+
+class TestSimulationServiceExtraEvents:
+    def test_extra_events_are_dispatched(self, tmp_path):
+        simulation_input = _load(tmp_path, _valid_payload(events=[]))
+        event_manager = MagicMock(spec=EventManager)
+        join_event = AgentJoinEvent(
+            time_offset=TimeOffset(n=1.0),
+            agent=AgentInput(name="agent-d", mode=AgentMode.MICROWEIGHT),
+        )
+
+        SimulationService(
+            simulation_input=simulation_input,
+            event_manager=event_manager,
+            extra_events=[join_event],
+        ).run(start_time=_PAST)
+
+        event_manager.dispatch.assert_called_once_with(join_event)
+
+    def test_extra_events_sorted_with_scenario_events(self, tmp_path):
+        payload = _valid_payload(
+            events=[
+                {"type": "simulation", "time_offset": {"n": 3.0, "unit": "seconds"}, "payload": {"seq": 3}},
+                {"type": "simulation", "time_offset": {"n": 1.0, "unit": "seconds"}, "payload": {"seq": 1}},
+            ]
+        )
+        simulation_input = _load(tmp_path, payload)
+        event_manager = MagicMock(spec=EventManager)
+        join_event = AgentJoinEvent(
+            time_offset=TimeOffset(n=2.0),
+            agent=AgentInput(name="agent-d", mode=AgentMode.MICROWEIGHT),
+        )
+
+        SimulationService(
+            simulation_input=simulation_input,
+            event_manager=event_manager,
+            extra_events=[join_event],
+        ).run(start_time=_PAST)
+
+        assert event_manager.dispatch.call_count == 3
+        first, second, third = [c.args[0] for c in event_manager.dispatch.call_args_list]
+        assert first.time_offset.to_seconds() == 1.0
+        assert second is join_event
+        assert third.time_offset.to_seconds() == 3.0
+
+    def test_no_extra_events_behaves_as_before(self, tmp_path):
+        simulation_input = _load(tmp_path, _valid_payload())
+        event_manager = MagicMock(spec=EventManager)
+
+        SimulationService(
+            simulation_input=simulation_input,
+            event_manager=event_manager,
+        ).run(start_time=_PAST)
+
+        assert event_manager.dispatch.call_count == 1
 
 
 class TestSimulationServiceClockBroadcast:
