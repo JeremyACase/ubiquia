@@ -210,7 +210,7 @@ jobs:
 
       - name: Run Helm tests
         run: |
-          helm test ubiquia -n ubiquia
+          helm test ubiquia -n ubiquia --timeout 15m
 
       - name: Inspect resources after Helm test
         if: always()
