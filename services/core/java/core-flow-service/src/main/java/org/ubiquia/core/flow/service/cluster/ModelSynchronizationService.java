@@ -149,26 +149,26 @@ public class ModelSynchronizationService {
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        var atLeastOnePeerSucceeded = false;
+        var allPeersSucceeded = true;
         for (var peerUrl : peerUrls) {
             var fullUrl = peerUrl + endpointPath;
-            var allSucceeded = true;
+            var peerSucceeded = true;
             for (var dto : dtos) {
                 try {
                     var request = new HttpEntity<>(dto, headers);
                     this.restTemplate.postForEntity(fullUrl, request, Void.class);
                 } catch (Exception e) {
                     logger.warn("Failed to sync to {}: {}", fullUrl, e.getMessage());
-                    allSucceeded = false;
+                    peerSucceeded = false;
                 }
             }
-            if (allSucceeded) {
+            if (peerSucceeded) {
                 logger.info("Synced {} record(s) to {}.", dtos.size(), fullUrl);
-                atLeastOnePeerSucceeded = true;
             }
+            allPeersSucceeded = allPeersSucceeded && peerSucceeded;
         }
 
-        if (atLeastOnePeerSucceeded) {
+        if (allPeersSucceeded) {
             for (var entity : entities) {
                 var syncEntity = new SyncEntity();
                 syncEntity.setModel(entity);

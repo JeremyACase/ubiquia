@@ -5,9 +5,10 @@ from pydantic import BaseModel, Field, model_validator
 from util_simulation_service.model.agent_input import AgentInput
 from util_simulation_service.model.bootstrap_input import BootstrapInput
 from util_simulation_service.model.network import Network
+from util_simulation_service.model.events.partition_event import PartitionEvent
 from util_simulation_service.model.events.simulation_event import SimulationEvent
 
-AnyEvent = Annotated[Union[SimulationEvent], Field(discriminator="type")]
+AnyEvent = Annotated[Union[SimulationEvent, PartitionEvent], Field(discriminator="type")]
 
 
 class SimulationInput(BaseModel):
@@ -27,6 +28,21 @@ class SimulationInput(BaseModel):
                 raise ValueError(
                     f"Network '{network.name}' references agents not found in the agents list: {unknown}"
                 )
+        return self
+
+    @model_validator(mode="after")
+    def validate_partition_event_agents(self) -> "SimulationInput":
+        known = {a.name for a in self.agents}
+        for event in self.events:
+            if not isinstance(event, PartitionEvent):
+                continue
+            for network in event.networks:
+                unknown = [a for a in network.agents if a not in known]
+                if unknown:
+                    raise ValueError(
+                        f"Partition event network '{network.name}' references agents not found "
+                        f"in the agents list: {unknown}"
+                    )
         return self
 
     @model_validator(mode="after")

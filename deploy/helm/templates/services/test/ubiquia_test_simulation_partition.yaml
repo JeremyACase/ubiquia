@@ -1,0 +1,348 @@
+---
+# Agent config for the partition test. Cluster sync is deliberately disabled so
+# domain ontologies cannot propagate between agents via JGroups — the only way
+# agent-b could receive data bootstrapped to agent-a is if the simulation service
+# explicitly propagated it. After the partition event, agents are in separate
+# networks, so no cross-partition propagation should occur.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-partition-agent-config
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  application.yaml: |
+    logging:
+      level:
+        net.jimblackler: OFF
+        org.ubiquia: {{ .Values.logging.ubiquia }}
+
+    server:
+      port: 8080
+
+    spring:
+      application:
+        name: ubiquia-core-flow-service
+      datasource:
+        driverClassName: org.h2.Driver
+        url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
+        username: sa
+        password: sa
+        hikari:
+          transaction-isolation: TRANSACTION_READ_COMMITTED
+      h2:
+        console:
+          enabled: false
+      jackson:
+        date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+        deserialization:
+          fail-on-unknown-properties: true
+      jpa:
+        hibernate:
+          ddl-auto: create
+        properties:
+          hibernate:
+            generate_statistics: false
+            format_sql: true
+
+    ubiquia:
+      mode: TEST
+      cluster:
+        flow-service:
+          sync:
+            enabled: false
+        name: partition-test
+        port: 7800
+        seed-hosts: ""
+        sync:
+          peer-base-urls: ""
+      kubernetes:
+        enabled: false
+        namespace: {{ .Release.Namespace }}
+      outbox:
+        enabled: true
+        frequency-milliseconds: 1000
+        mode: DEFAULT
+      page:
+        max-size: 100
+      agent:
+        flow-service:
+          bootstrap:
+            belief-state:
+              enabled: false
+            domain-ontology:
+              enabled: false
+              directory: /app/etc/domain-ontologies/
+            graph:
+              deployments:
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-partition-ontologies
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  pets.yaml: |
+{{ .Files.Get "bootstrap/ontologies/pets.yaml" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-partition-scenario
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  partition-simulation.yaml: |
+    name: partition-simulation
+    agents:
+      - name: partition-flow-service-a
+        mode: test
+        base_url: http://partition-flow-service-a:8080
+      - name: partition-flow-service-b
+        mode: test
+        base_url: http://partition-flow-service-b:8080
+    bootstrap:
+      domain_ontologies:
+        - file: /app/etc/ontologies/pets.yaml
+          targets:
+            - partition-flow-service-a
+    events:
+      - type: partition
+        time_offset:
+          n: 30
+          unit: seconds
+        networks:
+          - name: net-a
+            agents:
+              - partition-flow-service-a
+          - name: net-b
+            agents:
+              - partition-flow-service-b
+    networks: []
+    speed: 1.0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: partition-flow-service-a
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  selector:
+    app: partition-flow-service-a
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: partition-flow-service-b
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  selector:
+    app: partition-flow-service-b
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: partition-flow-service-a
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: partition-flow-service-a
+  template:
+    metadata:
+      labels:
+        app: partition-flow-service-a
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+      containers:
+        - name: flow-service
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: UBIQUIA_AGENT_ID
+              value: "aaaaaaaa-1111-0000-0000-000000000001"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://partition-flow-service-a:8080"
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: ubiquia-test-partition-agent-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: partition-flow-service-b
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: partition-flow-service-b
+  template:
+    metadata:
+      labels:
+        app: partition-flow-service-b
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+      containers:
+        - name: flow-service
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: UBIQUIA_AGENT_ID
+              value: "bbbbbbbb-1111-0000-0000-000000000002"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://partition-flow-service-b:8080"
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: ubiquia-test-partition-agent-config
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubiquia-test-simulation-partition-verify
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    sidecar.istio.io/inject: "false"
+spec:
+  serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+  restartPolicy: Never
+  containers:
+    - name: curl
+      image: curlimages/curl:8.6.0
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          set -e
+
+          wait_for_ontology() {
+            local AGENT_NAME=$1
+            local BASE_URL=$2
+            local ONTOLOGY_NAME=$3
+            local MAX_ATTEMPTS=24
+            local ATTEMPT=0
+
+            echo "Waiting for ontology '$ONTOLOGY_NAME' on $AGENT_NAME..."
+
+            while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+              RESPONSE=$(curl -s "$BASE_URL/ubiquia/core/flow-service/domain-ontology/query/params?page=0&size=100")
+              if echo "$RESPONSE" | grep -qE "\"name\"[[:space:]]*:[[:space:]]*\"$ONTOLOGY_NAME\""; then
+                echo "✅ Ontology '$ONTOLOGY_NAME' confirmed on $AGENT_NAME"
+                return 0
+              fi
+              ATTEMPT=$((ATTEMPT + 1))
+              echo "  Attempt $ATTEMPT/$MAX_ATTEMPTS — not yet present, retrying in 5s..."
+              sleep 5
+            done
+
+            echo "❌ Ontology '$ONTOLOGY_NAME' not found on $AGENT_NAME after $((MAX_ATTEMPTS * 5))s"
+            exit 1
+          }
+
+          # Wait for the simulation to bootstrap the ontology to agent-a.
+          wait_for_ontology "partition-flow-service-a" "http://partition-flow-service-a:8080" "pets"
+
+          # Allow time for the partition event to have fired (t=30s) and for any
+          # accidental propagation window to have closed.
+          echo "Waiting 30s post-bootstrap to allow partition event to fire and settle..."
+          sleep 30
+
+          # Agent-b must not have the ontology — it was never bootstrapped to it and the
+          # partition event placed it in an isolated network, so no propagation should occur.
+          echo "Confirming 'pets' ontology is absent on partition-flow-service-b..."
+          RESPONSE=$(curl -s "http://partition-flow-service-b:8080/ubiquia/core/flow-service/domain-ontology/query/params?page=0&size=100")
+          if echo "$RESPONSE" | grep -qE "\"name\"[[:space:]]*:[[:space:]]*\"pets\""; then
+            echo "❌ 'pets' ontology unexpectedly found on partition-flow-service-b — partition did not isolate agents!"
+            exit 1
+          fi
+
+          echo "✅ partition-flow-service-b correctly has no 'pets' ontology"
+          echo "🎉 Partition verification passed — agents in separate networks cannot communicate!"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubiquia-test-simulation-partition
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    sidecar.istio.io/inject: "false"
+spec:
+  serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+  restartPolicy: Never
+  containers:
+    - name: simulation-runner
+      image: {{ include "ubiquia.util.simulationService.image" . }}
+      imagePullPolicy: IfNotPresent
+      command: ["util-simulation-service"]
+      args: ["simulation", "run", "--input-file", "/app/etc/scenario/partition-simulation.yaml"]
+      volumeMounts:
+        - name: scenario
+          mountPath: /app/etc/scenario/partition-simulation.yaml
+          subPath: partition-simulation.yaml
+        - name: ontologies
+          mountPath: /app/etc/ontologies/
+  volumes:
+    - name: scenario
+      configMap:
+        name: ubiquia-test-partition-scenario
+    - name: ontologies
+      configMap:
+        name: ubiquia-test-partition-ontologies

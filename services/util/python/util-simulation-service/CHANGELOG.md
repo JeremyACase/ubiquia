@@ -5,6 +5,16 @@ All notable changes to `util-simulation-service` will be documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning is inherited from the root Ubiquia project.
 
+## [0.25.0] - 2026-04-10
+### Added
+- `PartitionEvent` model (`model/events/partition_event.py`): scenario event that splits agents into named isolated networks at a specified time offset; discriminated by `type: "partition"` in the `AnyEvent` union
+- `PartitionEventCommand` (`command/partition_event_command.py`): applies a partition by updating the shared `NetworkTopology` so subsequent routing reflects the new network boundaries
+
+### Changed
+- `SimulationInput.AnyEvent` discriminated union now includes `PartitionEvent`
+- `run_command.py` registers `PartitionEventCommand` under the `"partition"` event type
+- `DomainOntologyBootstrapService._MAX_ATTEMPTS` raised from 12 to 24 (240 s total retry window) to accommodate CPU-contended simultaneous JVM startup in cluster test scenarios
+
 ## [0.24.0] - 2026-04-09
 ### Added
 - `AgentInput.join_offset_time` (`TimeOffset | None`): when set, the agent is excluded from initial provisioning and joined to the simulation at the specified time offset

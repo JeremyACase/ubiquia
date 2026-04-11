@@ -18,3 +18,7 @@ class NetworkTopology:
     def can_reach(self, source: str, target: str) -> bool:
         """Returns True if source and target share at least one network."""
         return target in self._peers.get(source, set())
+
+    def reset(self) -> None:
+        """Clear all peer relationships, ready for a new topology to be applied."""
+        self._peers.clear()
