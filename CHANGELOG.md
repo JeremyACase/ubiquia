@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.25.0] - 2026-04-10
+### Added
+- `PartitionEvent` model in `util-simulation-service`: scenario event that splits agents into named isolated networks at a specified time offset
+- `PartitionEventCommand` in `util-simulation-service`: applies a partition by updating the `NetworkTopology` to restrict which agents can communicate
+- Helm test `ubiquia_test_simulation_partition.yaml`: verifies that a domain ontology bootstrapped to `partition-flow-service-a` does not propagate to `partition-flow-service-b` after a partition event fires at t=30s
+- Helm test `ubiquia_test_simulation_cluster_synch.yaml`: verifies that a domain ontology bootstrapped to one cluster member is propagated to all other members (including a late-joining fourth agent) via JGroups sync
+
+### Changed
+- `SimulationInput.AnyEvent` union now includes `PartitionEvent` (discriminated by `type: "partition"`)
+- `run_command.py` registers `PartitionEventCommand` under the `"partition"` event type
+- `DomainOntologyBootstrapService._MAX_ATTEMPTS` raised from 12 to 24 (240 s retry window) to accommodate CPU-contended simultaneous JVM startup
+
+### Fixed
+- `ModelSynchronizationService.trySync()`: replaced `atLeastOnePeerSucceeded` logic with `allPeersSucceeded`; a `SyncEntity` is now only recorded when every peer has successfully acknowledged the sync, preventing peers that are temporarily unavailable at sync time from being permanently orphaned
+- Helm test hook-delete-policy on cluster-synch infrastructure resources (ConfigMaps, Services, Deployments) changed from `before-hook-creation,hook-succeeded` to `before-hook-creation`, preventing Helm from deleting them when the simulation-runner pod succeeds before the verify pod runs
+- Removed stale `ubiquia_test_devops_simulation.yaml` test template
+
 ## [0.24.0] - 2026-04-09
 ### Added
 - `AgentInput.join_offset_time` (`TimeOffset | None`): declares a deferred join time; agents with this field set are excluded from initial setup and provisioned at the specified simulation time offset instead

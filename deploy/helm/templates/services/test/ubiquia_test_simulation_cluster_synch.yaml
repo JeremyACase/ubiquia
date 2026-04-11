@@ -9,7 +9,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
 data:
   application.yaml: |
     logging:
@@ -85,12 +86,13 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
 data:
   pets.yaml: |
 {{ .Files.Get "bootstrap/ontologies/pets.yaml" | indent 4 }}
 ---
-# The devops-simulation scenario file mounted into the simulation service container.
+# The cluster-synch scenario file mounted into the simulation service container.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -98,10 +100,11 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
 data:
-  devops-simulation.yaml: |
-    name: devops-simulation
+  cluster-synch.yaml: |
+    name: cluster-synch
     agents:
       - name: microweight-flow-service-a
         mode: test
@@ -134,7 +137,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   selector:
     app: microweight-flow-service-a
@@ -153,7 +157,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   selector:
     app: microweight-flow-service-b
@@ -172,7 +177,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   selector:
     app: microweight-flow-service-c
@@ -191,7 +197,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   replicas: 1
   selector:
@@ -232,7 +239,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   replicas: 1
   selector:
@@ -273,7 +281,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   replicas: 1
   selector:
@@ -318,7 +327,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   selector:
     app: microweight-flow-service-d
@@ -337,7 +347,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   replicas: 1
   selector:
@@ -374,10 +385,11 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ubiquia-test-devops-simulation-verify
+  name: ubiquia-test-simulation-cluster-synch-verify
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
+    "helm.sh/hook-weight": "5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     sidecar.istio.io/inject: "false"
@@ -425,10 +437,11 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ubiquia-test-devops-simulation
+  name: ubiquia-test-simulation-cluster-synch
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
+    "helm.sh/hook-weight": "5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     sidecar.istio.io/inject: "false"
@@ -440,11 +453,11 @@ spec:
       image: {{ include "ubiquia.util.simulationService.image" . }}
       imagePullPolicy: IfNotPresent
       command: ["util-simulation-service"]
-      args: ["simulation", "run", "--input-file", "/app/etc/scenario/devops-simulation.yaml"]
+      args: ["simulation", "run", "--input-file", "/app/etc/scenario/cluster-synch.yaml"]
       volumeMounts:
         - name: scenario
-          mountPath: /app/etc/scenario/devops-simulation.yaml
-          subPath: devops-simulation.yaml
+          mountPath: /app/etc/scenario/cluster-synch.yaml
+          subPath: cluster-synch.yaml
         - name: ontologies
           mountPath: /app/etc/ontologies/
   volumes:

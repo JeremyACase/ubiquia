@@ -7,6 +7,7 @@ from util_simulation_service.builder.docker_network_builder import DockerNetwork
 from util_simulation_service.builder.kind_agent_builder import KindAgentBuilder
 from util_simulation_service.builder.microweight_agent_builder import MicroweightAgentBuilder
 from util_simulation_service.command.agent_join_event_command import AgentJoinEventCommand
+from util_simulation_service.command.partition_event_command import PartitionEventCommand
 from util_simulation_service.command.simulation_event_command import SimulationEventCommand
 from util_simulation_service.model.events.agent_join_event import AgentJoinEvent
 from util_simulation_service.model.agent_mode import AgentMode
@@ -83,6 +84,7 @@ def run(input_file: pathlib.Path):
             commands={
                 "simulation": SimulationEventCommand(agents=agents, topology=topology),
                 "agent_join": AgentJoinEventCommand(agents=agents, agent_factory=agent_factory),
+                "partition": PartitionEventCommand(topology=topology),
             }
         ),
         clock_broadcast_service=ClockBroadcastService(agents=agents),

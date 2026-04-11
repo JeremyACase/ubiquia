@@ -10,7 +10,7 @@ from util_simulation_service.model.domain_ontology_bootstrap_input import Domain
 logger = logging.getLogger(__name__)
 
 _DOMAIN_ONTOLOGY_ENDPOINT = "/ubiquia/core/flow-service/domain-ontology/register/post"
-_MAX_ATTEMPTS = 12
+_MAX_ATTEMPTS = 24
 _RETRY_INTERVAL_SECONDS = 10.0
 
 
