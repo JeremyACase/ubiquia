@@ -233,6 +233,68 @@ class TestSimulationServiceExtraEvents:
         assert event_manager.dispatch.call_count == 1
 
 
+class TestSimulationServiceRunReturnValue:
+    def test_run_returns_list(self, tmp_path):
+        simulation_input = _load(tmp_path, _valid_payload())
+        result = _service(simulation_input).run(start_time=_PAST)
+        assert isinstance(result, list)
+
+    def test_run_returns_one_record_per_event(self, tmp_path):
+        payload = _valid_payload(
+            events=[
+                {"type": "simulation", "time_offset": {"n": 1.0, "unit": "seconds"}, "payload": {}},
+                {"type": "simulation", "time_offset": {"n": 2.0, "unit": "seconds"}, "payload": {}},
+            ]
+        )
+        simulation_input = _load(tmp_path, payload)
+        result = _service(simulation_input).run(start_time=_PAST)
+        assert len(result) == 2
+
+    def test_run_records_contain_expected_keys(self, tmp_path):
+        simulation_input = _load(tmp_path, _valid_payload())
+        result = _service(simulation_input).run(start_time=_PAST)
+        record = result[0]
+        assert record["source"] == "simulation"
+        assert record["type"] == "simulation"
+        assert "time_offset_seconds" in record
+        assert "fired_at" in record
+        assert "details" in record
+        assert "_sort_time" in record
+
+    def test_run_records_time_offset_seconds(self, tmp_path):
+        payload = _valid_payload(
+            events=[{"type": "simulation", "time_offset": {"n": 5.0, "unit": "seconds"}, "payload": {}}]
+        )
+        simulation_input = _load(tmp_path, payload)
+        result = _service(simulation_input).run(start_time=_PAST)
+        assert result[0]["time_offset_seconds"] == 5.0
+
+    def test_run_returns_empty_list_when_no_events(self, tmp_path):
+        simulation_input = _load(tmp_path, _valid_payload(events=[]))
+        result = _service(simulation_input).run(start_time=_PAST)
+        assert result == []
+
+    def test_run_records_sort_time_matches_fired_at(self, tmp_path):
+        simulation_input = _load(tmp_path, _valid_payload())
+        result = _service(simulation_input).run(start_time=_PAST)
+        record = result[0]
+        assert record["_sort_time"] == record["fired_at"]
+
+    def test_run_extra_events_included_in_return(self, tmp_path):
+        simulation_input = _load(tmp_path, _valid_payload(events=[]))
+        join_event = AgentJoinEvent(
+            time_offset=TimeOffset(n=1.0),
+            agent=AgentInput(name="agent-d", mode=AgentMode.MICROWEIGHT),
+        )
+        result = SimulationService(
+            simulation_input=simulation_input,
+            event_manager=MagicMock(spec=EventManager),
+            extra_events=[join_event],
+        ).run(start_time=_PAST)
+        assert len(result) == 1
+        assert result[0]["type"] == "agent_join"
+
+
 class TestSimulationServiceClockBroadcast:
     def test_broadcast_called_once_per_event_when_speed_is_not_one(self, tmp_path):
         payload = _valid_payload(
