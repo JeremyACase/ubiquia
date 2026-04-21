@@ -5,14 +5,17 @@ import httpx
 import pytest
 
 from util_simulation_service.model.agent import Agent
+from util_simulation_service.model.agent_mode import AgentMode
 from util_simulation_service.service.clock_broadcast_service import (
     _CLOCK_ENDPOINTS,
+    _MICROWEIGHT_CLOCK_ENDPOINTS,
     ClockBroadcastService,
 )
 
 _TIME = datetime(2025, 6, 15, 12, 0, 0, tzinfo=timezone.utc)
 _AGENT_A = Agent(name="agent-a", base_url="http://localhost:8080")
 _AGENT_B = Agent(name="agent-b", base_url="http://localhost:8081")
+_MICROWEIGHT_AGENT = Agent(name="mw-agent", base_url="http://localhost:9090", mode=AgentMode.MICROWEIGHT)
 
 _PATCH = "util_simulation_service.service.clock_broadcast_service.httpx.Client"
 
@@ -95,3 +98,34 @@ class TestClockBroadcastServiceBroadcast:
 
         posted_urls = [c.args[0] for c in mock_inner.post.call_args_list]
         assert any(_AGENT_B.base_url in url for url in posted_urls)
+
+
+class TestClockBroadcastServiceMicroweight:
+    def test_microweight_agent_only_posts_to_flow_service(self):
+        mock_inner = _mock_client()
+        with patch(_PATCH) as MockClient:
+            MockClient.return_value.__enter__.return_value = mock_inner
+            ClockBroadcastService(agents=[_MICROWEIGHT_AGENT]).broadcast(_TIME)
+
+        assert mock_inner.post.call_count == len(_MICROWEIGHT_CLOCK_ENDPOINTS)
+        posted_urls = [c.args[0] for c in mock_inner.post.call_args_list]
+        assert all("/ubiquia/core/flow-service/" in url for url in posted_urls)
+
+    def test_microweight_agent_does_not_post_to_comm_or_belief_state(self):
+        mock_inner = _mock_client()
+        with patch(_PATCH) as MockClient:
+            MockClient.return_value.__enter__.return_value = mock_inner
+            ClockBroadcastService(agents=[_MICROWEIGHT_AGENT]).broadcast(_TIME)
+
+        posted_urls = [c.args[0] for c in mock_inner.post.call_args_list]
+        assert not any("communication-service" in url for url in posted_urls)
+        assert not any("belief-state-generator-service" in url for url in posted_urls)
+
+    def test_mixed_agents_use_correct_endpoint_sets(self):
+        mock_inner = _mock_client()
+        with patch(_PATCH) as MockClient:
+            MockClient.return_value.__enter__.return_value = mock_inner
+            ClockBroadcastService(agents=[_AGENT_A, _MICROWEIGHT_AGENT]).broadcast(_TIME)
+
+        expected_calls = len(_CLOCK_ENDPOINTS) + len(_MICROWEIGHT_CLOCK_ENDPOINTS)
+        assert mock_inner.post.call_count == expected_calls

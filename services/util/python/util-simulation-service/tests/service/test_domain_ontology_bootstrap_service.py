@@ -8,6 +8,7 @@ from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.domain_ontology_bootstrap_input import DomainOntologyBootstrapInput
 from util_simulation_service.service.domain_ontology_bootstrap_service import (
     _DOMAIN_ONTOLOGY_ENDPOINT,
+    _MAX_ATTEMPTS,
     DomainOntologyBootstrapService,
 )
 
@@ -131,3 +132,34 @@ class TestDomainOntologyBootstrapService:
             DomainOntologyBootstrapService(agents=[_AGENT_A]).bootstrap([])
 
         mock_inner.post.assert_not_called()
+
+    def test_transport_error_is_retried(self, tmp_path):
+        ontology_file = tmp_path / "ontology.yaml"
+        ontology_file.write_text("name: pets\n")
+        success = MagicMock(spec=httpx.Response)
+        success.raise_for_status.return_value = None
+        mock_inner = _mock_client(
+            side_effect=[httpx.RemoteProtocolError("disconnected"), success]
+        )
+
+        with patch(_PATCH) as MockClient:
+            MockClient.return_value.__enter__.return_value = mock_inner
+            with patch("util_simulation_service.service.domain_ontology_bootstrap_service.time.sleep"):
+                DomainOntologyBootstrapService(agents=[_AGENT_A]).bootstrap(
+                    [_entry(ontology_file, ["agent-a"])]
+                )
+
+        assert mock_inner.post.call_count == 2
+
+    def test_non_transport_error_is_not_retried(self, tmp_path):
+        ontology_file = tmp_path / "ontology.yaml"
+        ontology_file.write_text("name: pets\n")
+        mock_inner = _mock_client(side_effect=ValueError("bad payload"))
+
+        with patch(_PATCH) as MockClient:
+            MockClient.return_value.__enter__.return_value = mock_inner
+            DomainOntologyBootstrapService(agents=[_AGENT_A]).bootstrap(
+                [_entry(ontology_file, ["agent-a"])]
+            )
+
+        assert mock_inner.post.call_count == 1

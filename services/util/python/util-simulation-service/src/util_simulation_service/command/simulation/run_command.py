@@ -17,6 +17,7 @@ from util_simulation_service.service.analysis_service import AnalysisService
 from util_simulation_service.service.clock_broadcast_service import ClockBroadcastService
 from util_simulation_service.service.domain_ontology_bootstrap_service import DomainOntologyBootstrapService
 from util_simulation_service.service.event_dump_service import EventDumpService
+from util_simulation_service.service.graph_deployment_service import GraphDeploymentService
 from util_simulation_service.service.event_manager import EventManager
 from util_simulation_service.service.network_service import NetworkService
 from util_simulation_service.service.setup_service import SetupService
@@ -82,6 +83,11 @@ def run(input_file: pathlib.Path, output_path: pathlib.Path, output_file_name: s
         DomainOntologyBootstrapService(agents=agents).bootstrap(
             simulation_input.bootstrap.domain_ontologies
         )
+
+    graph_deployment_service = GraphDeploymentService(agents=agents)
+    for agent_input in simulation_input.agents:
+        if agent_input.graph_deployments and agent_input.join_offset_time is None:
+            graph_deployment_service.deploy(agent_input.name, agent_input.graph_deployments)
 
     # Synthesize a join event for every agent that declares a join_offset_time.
     # These are merged into the simulation timeline so the agent is provisioned

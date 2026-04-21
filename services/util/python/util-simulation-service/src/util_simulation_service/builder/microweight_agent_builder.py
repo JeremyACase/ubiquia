@@ -5,6 +5,7 @@ import uuid
 
 from util_simulation_service.builder.agent_builder import AgentBuilder
 from util_simulation_service.model.agent import Agent
+from util_simulation_service.model.agent_mode import AgentMode
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ class MicroweightAgentBuilder(AgentBuilder):
         self._run_container(agent_name, agent_id=agent_id)
         host_port = self._get_host_port(agent_name)
         logger.info("Container '%s' listening on http://localhost:%s.", agent_name, host_port)
-        return Agent(name=agent_name, base_url=f"http://localhost:{host_port}")
+        return Agent(name=agent_name, base_url=f"http://localhost:{host_port}", mode=AgentMode.MICROWEIGHT)
 
     def _build_image(self) -> None:
         logger.info("Building Docker image: %s.", _IMAGE_NAME)
@@ -62,6 +63,7 @@ class MicroweightAgentBuilder(AgentBuilder):
             "--name", name,
             "-p", _CONTAINER_PORT,
             "-e", f"UBIQUIA_AGENT_ID={agent_id}",
+            "-e", "UBIQUIA_MODE=TEST",
             "-v", f"{self._config}:/app/etc/application.yaml:ro",
             "-v", f"{self._ontologies}:/app/etc/domain-ontologies:ro",
         ]

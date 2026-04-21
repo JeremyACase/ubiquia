@@ -6,6 +6,7 @@ from util_simulation_service.model.events.agent_join_event import AgentJoinEvent
 from util_simulation_service.model.events.event import Event
 from util_simulation_service.model.agent_mode import AgentMode
 from util_simulation_service.service.agent_factory import AgentFactory
+from util_simulation_service.service.graph_deployment_service import GraphDeploymentService
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +31,15 @@ class AgentJoinEventCommand(EventCommand):
         logger.info("Agent joining simulation: %s (mode=%s)", agent_input.name, agent_input.mode.value)
 
         if agent_input.mode == AgentMode.TEST:
-            agent = Agent(name=agent_input.name, base_url=agent_input.base_url)
+            agent = Agent(name=agent_input.name, base_url=agent_input.base_url, mode=AgentMode.TEST)
         else:
             builder = self._agent_factory.get_builder(agent_input.mode)
             agent = builder.build(agent_input.name)
 
         self._agents.append(agent)
         logger.info("Agent joined: %s at %s", agent.name, agent.base_url)
+
+        if agent_input.graph_deployments:
+            GraphDeploymentService(agents=self._agents).deploy(
+                agent.name, agent_input.graph_deployments
+            )

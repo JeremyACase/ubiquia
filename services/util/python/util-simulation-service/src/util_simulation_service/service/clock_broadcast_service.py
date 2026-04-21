@@ -4,6 +4,7 @@ from datetime import datetime
 import httpx
 
 from util_simulation_service.model.agent import Agent
+from util_simulation_service.model.agent_mode import AgentMode
 
 logger = logging.getLogger(__name__)
 
@@ -13,14 +14,17 @@ _CLOCK_ENDPOINTS = [
     "/ubiquia/core/communication-service/simulation/clock/set",
 ]
 
+_MICROWEIGHT_CLOCK_ENDPOINTS = [
+    "/ubiquia/core/flow-service/simulation/clock/set",
+]
+
 
 class ClockBroadcastService:
     """Broadcasts a simulated time to the SimulationController on every core service
     of every known Ubiquia agent.
 
-    Failures for individual endpoints are logged as warnings and do not interrupt
-    the broadcast — services that are unavailable (e.g. microweight deployments
-    that only run core-flow-service) are silently skipped.
+    Microweight agents only run core-flow-service, so only that endpoint is
+    targeted for them. KIND and TEST agents receive the full set of endpoints.
     """
 
     def __init__(self, agents: list[Agent]) -> None:
@@ -35,7 +39,12 @@ class ClockBroadcastService:
         )
         with httpx.Client() as client:
             for agent in self._agents:
-                for path in _CLOCK_ENDPOINTS:
+                endpoints = (
+                    _MICROWEIGHT_CLOCK_ENDPOINTS
+                    if agent.mode == AgentMode.MICROWEIGHT
+                    else _CLOCK_ENDPOINTS
+                )
+                for path in endpoints:
                     self._try_post(client, agent, path, simulated_time)
 
     def _try_post(

@@ -1,0 +1,253 @@
+name: abstract-world
+modelType: DomainOntology
+author: Jeremy Case
+description: >
+  An intentionally abstract ontology. Colors stand in for Entities, Shapes stand
+  in for Actions those entities can take, and Regions stand in for Locations where
+  entities travel to perform actions.
+
+version:
+  major: 1
+  minor: 0
+  patch: 0
+
+tags:
+  - key: abstract
+    value: "true"
+
+domainDataContract:
+
+  modelType: DomainDataContract
+
+  schema:
+    type: object
+
+    definitions:
+
+      ColorType:
+        description: The color identity of an entity or region.
+        type: string
+        enum:
+          - RED
+          - BLUE
+          - GREEN
+          - YELLOW
+          - PURPLE
+          - ORANGE
+
+      ShapeType:
+        description: The shape identity of an action.
+        type: string
+        enum:
+          - CIRCLE
+          - SQUARE
+          - TRIANGLE
+          - HEXAGON
+          - STAR
+
+      Entity:
+        description: An abstract entity, identified by its color.
+        type: object
+        properties:
+          id:
+            type: string
+          color:
+            $ref: "#/definitions/ColorType"
+        required:
+          - id
+          - color
+
+      Action:
+        description: An abstract action an entity can take, identified by its shape.
+        type: object
+        properties:
+          shape:
+            $ref: "#/definitions/ShapeType"
+          intensity:
+            type: number
+            format: float
+            minimum: 0.0
+            maximum: 1.0
+            default: 0.5
+        required:
+          - shape
+
+      Region:
+        description: An abstract location, color-coded, where entities perform actions.
+        type: object
+        properties:
+          id:
+            type: string
+          color:
+            $ref: "#/definitions/ColorType"
+        required:
+          - id
+          - color
+
+      EntityActionEvent:
+        description: An event capturing an entity performing an action at a region.
+        type: object
+        properties:
+          entity:
+            $ref: "#/definitions/Entity"
+          action:
+            $ref: "#/definitions/Action"
+          region:
+            $ref: "#/definitions/Region"
+        required:
+          - entity
+          - action
+          - region
+
+    properties:
+      ColorType:
+        $ref: "#/definitions/ColorType"
+      ShapeType:
+        $ref: "#/definitions/ShapeType"
+      Entity:
+        $ref: "#/definitions/Entity"
+      Action:
+        $ref: "#/definitions/Action"
+      Region:
+        $ref: "#/definitions/Region"
+      EntityActionEvent:
+        $ref: "#/definitions/EntityActionEvent"
+
+graphs:
+
+  - name: abstract-world-dag
+
+    modelType: Graph
+
+    description: >
+      A simple abstract pipeline. An Entity is ingested, an Action is derived for
+      it at a Region, and the resulting EntityActionEvent is egressed downstream.
+
+    capabilities:
+      - AbstractWorldProcessing
+
+    components:
+
+      - name: EntityClassifierComponent
+        componentType: TEMPLATE
+        modelType: Component
+        description: Classifies an incoming Entity and associates it with an Action.
+        port: 5000
+        image:
+          registry: ubiquia
+          repository: abstract-world-entity-classifier
+          tag: latest
+
+        overrideSettings:
+          - flag: demo
+            key: componentType
+            value: TEMPLATE
+
+      - name: ActionProcessorComponent
+        componentType: TEMPLATE
+        modelType: Component
+        description: Derives a Region for the entity's Action and produces an EntityActionEvent.
+        port: 5001
+        image:
+          registry: ubiquia
+          repository: abstract-world-action-processor
+          tag: latest
+
+        overrideSettings:
+          - flag: demo
+            key: componentType
+            value: TEMPLATE
+
+    nodes:
+
+      - modelType: Node
+        nodeType: PUSH
+        name: EntityIngressNode
+        description: Ingress node — receives an Entity and begins the pipeline.
+        endpoint: /entity/ingest
+
+        inputSubSchemas:
+          - modelName: Entity
+
+        outputSubSchema:
+          modelName: Entity
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+              stimulateInputPayload: true
+
+      - modelType: Node
+        nodeType: HIDDEN
+        name: ActionProcessorNode
+        description: Processes the entity's action and pairs it with a region.
+        endpoint: /action/process
+
+        inputSubSchemas:
+          - modelName: Entity
+
+        outputSubSchema:
+          modelName: EntityActionEvent
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+
+      - modelType: Node
+        nodeType: EGRESS
+        name: RegionEgressNode
+        description: Egresses the EntityActionEvent to the downstream region store.
+        endpoint: http://abstract-world-region-store:8080/ubiquia/EntityActionEvent/add
+
+        inputSubSchemas:
+          - modelName: EntityActionEvent
+
+        egressSettings:
+          httpOutputType: POST
+          egressType: SYNCHRONOUS
+          egressConcurrency: 1
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+
+    edges:
+      - leftNodeName: EntityIngressNode
+        rightNodeNames:
+          - ActionProcessorNode
+      - leftNodeName: ActionProcessorNode
+        rightNodeNames:
+          - RegionEgressNode

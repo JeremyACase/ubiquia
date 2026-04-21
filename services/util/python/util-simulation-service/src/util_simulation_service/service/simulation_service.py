@@ -37,7 +37,18 @@ class SimulationService:
 
     @staticmethod
     def load(input_file: pathlib.Path) -> SimulationInput:
-        return SimulationInput.model_validate(yaml.safe_load(input_file.read_text()))
+        base = input_file.resolve().parent
+        data = yaml.safe_load(input_file.read_text())
+        # Resolve domain ontology file paths relative to the input file's directory
+        # so the YAML can use relative paths regardless of the working directory.
+        try:
+            for entry in data.get("bootstrap", {}).get("domain_ontologies", []):
+                p = pathlib.Path(entry["file"])
+                if not p.is_absolute():
+                    entry["file"] = str((base / p).resolve())
+        except (AttributeError, KeyError, TypeError):
+            pass
+        return SimulationInput.model_validate(data)
 
     def run(self, start_time: datetime | None = None) -> list[dict]:
         """Run the simulation and return a record for every event that fired.

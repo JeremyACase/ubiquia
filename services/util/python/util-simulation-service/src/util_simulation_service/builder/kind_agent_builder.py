@@ -5,6 +5,7 @@ import tempfile
 
 from util_simulation_service.builder.agent_builder import AgentBuilder
 from util_simulation_service.model.agent import Agent
+from util_simulation_service.model.agent_mode import AgentMode
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ class KindAgentBuilder(AgentBuilder):
 
         base_url = f"http://localhost:{host_port}"
         logger.info("KIND agent '%s' ready at %s.", agent_name, base_url)
-        return Agent(name=agent_name, base_url=base_url)
+        return Agent(name=agent_name, base_url=base_url, mode=AgentMode.KIND)
 
     def _ensure_cluster(self, cluster_name: str, host_port: int) -> None:
         result = subprocess.run(

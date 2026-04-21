@@ -1,0 +1,45 @@
+name: agent-join-simulation
+
+# Agent A and B start immediately; C joins at 30 seconds into simulated time.
+# Only agent-a receives the bootstrapped domain ontology.
+agents:
+  - name: agent-a
+    mode: microweight
+  - name: agent-b
+    mode: microweight
+  - name: agent-c
+    mode: microweight
+    join_offset_time:
+      n: 30
+      unit: seconds
+
+# Bootstrap the pets domain ontology to agent-a only.
+bootstrap:
+  domain_ontologies:
+    - file: ../../../../../deploy/helm/bootstrap/ontologies/pets.yaml
+      targets:
+        - agent-a
+
+# A single partition event at t=2 minutes consolidates all three agents into one
+# network once C has joined, and marks the natural end of the simulation.
+events:
+  - type: partition
+    time_offset:
+      n: 120
+      unit: seconds
+    networks:
+      - name: net-abc
+        agents:
+          - agent-a
+          - agent-b
+          - agent-c
+
+# A and B start in the same network; C is isolated until it joins at t=30s.
+networks:
+  - name: net-ab
+    agents:
+      - agent-a
+      - agent-b
+
+# Run at double speed: 2 simulated minutes complete in 1 real minute.
+speed: 2.0
