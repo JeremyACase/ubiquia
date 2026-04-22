@@ -26,7 +26,7 @@ def _make_simulation_input(agent_names: list[str], networks: list[Network]) -> S
     return SimulationInput(
         name="test-sim",
         agents=[_agent_input(n) for n in agent_names],
-        events=[SimulationEvent(time_offset=TimeOffset(n=1.0), payload={})],
+        events=[SimulationEvent(time_offset=TimeOffset(n=1.0), target_agent="agent-a", endpoint="/bootstrap/ingest", payload={})],
         networks=networks,
         speed=1.0,
     )

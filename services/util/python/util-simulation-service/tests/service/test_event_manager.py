@@ -8,7 +8,7 @@ from util_simulation_service.service.event_manager import EventManager
 
 
 def _simulation_event() -> SimulationEvent:
-    return SimulationEvent(time_offset=TimeOffset(n=1.0), payload={"key": "value"})
+    return SimulationEvent(time_offset=TimeOffset(n=1.0), target_agent="agent-a", endpoint="/bootstrap/ingest", payload={"key": "value"})
 
 
 class TestEventManager:

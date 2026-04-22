@@ -24,19 +24,21 @@ def _write_input(tmp_path: pathlib.Path, data: dict) -> pathlib.Path:
     return f
 
 
+def _sim_event(n: float, payload: dict | None = None) -> dict:
+    return {
+        "type": "simulation",
+        "time_offset": {"n": n, "unit": "seconds"},
+        "target_agent": "agent-a",
+        "endpoint": "/bootstrap/ingest",
+        "payload": payload or {},
+    }
+
+
 def _valid_payload(events: list[dict] | None = None) -> dict:
     return {
         "name": "test-sim",
         "agents": [{"name": "agent-a", "mode": "microweight"}],
-        "events": events
-        if events is not None
-        else [
-            {
-                "type": "simulation",
-                "time_offset": {"n": 1.0, "unit": "seconds"},
-                "payload": {"key": "value"},
-            }
-        ],
+        "events": events if events is not None else [_sim_event(1.0, {"key": "value"})],
         "networks": [],
         "speed": 1.0,
     }
@@ -86,8 +88,8 @@ class TestSimulationServiceRun:
     def test_run_dispatches_each_event(self, tmp_path):
         payload = _valid_payload(
             events=[
-                {"type": "simulation", "time_offset": {"n": 1.0, "unit": "seconds"}, "payload": {"a": 1}},
-                {"type": "simulation", "time_offset": {"n": 2.0, "unit": "seconds"}, "payload": {"b": 2}},
+                _sim_event(1.0, {"a": 1}),
+                _sim_event(2.0, {"b": 2}),
             ]
         )
         simulation_input = _load(tmp_path, payload)
@@ -101,9 +103,9 @@ class TestSimulationServiceRun:
         # Events intentionally out of order in the file.
         payload = _valid_payload(
             events=[
-                {"type": "simulation", "time_offset": {"n": 3.0, "unit": "seconds"}, "payload": {"seq": 3}},
-                {"type": "simulation", "time_offset": {"n": 1.0, "unit": "seconds"}, "payload": {"seq": 1}},
-                {"type": "simulation", "time_offset": {"n": 2.0, "unit": "seconds"}, "payload": {"seq": 2}},
+                _sim_event(3.0, {"seq": 3}),
+                _sim_event(1.0, {"seq": 1}),
+                _sim_event(2.0, {"seq": 2}),
             ]
         )
         simulation_input = _load(tmp_path, payload)
@@ -141,9 +143,7 @@ class TestSimulationServiceRun:
         assert before <= after
 
     def test_run_sleeps_until_fire_time(self, tmp_path):
-        payload = _valid_payload(
-            events=[{"type": "simulation", "time_offset": {"n": 10.0, "unit": "seconds"}, "payload": {}}]
-        )
+        payload = _valid_payload(events=[_sim_event(10.0)])
         simulation_input = _load(tmp_path, payload)
         start_time = datetime.now(timezone.utc)
 
@@ -155,9 +155,7 @@ class TestSimulationServiceRun:
         assert 9.0 < slept <= 10.0
 
     def test_run_applies_speed_multiplier(self, tmp_path):
-        payload = _valid_payload(
-            events=[{"type": "simulation", "time_offset": {"n": 10.0, "unit": "seconds"}, "payload": {}}]
-        )
+        payload = _valid_payload(events=[_sim_event(10.0)])
         payload["speed"] = 2.0
         simulation_input = _load(tmp_path, payload)
         start_time = datetime.now(timezone.utc)
@@ -198,8 +196,8 @@ class TestSimulationServiceExtraEvents:
     def test_extra_events_sorted_with_scenario_events(self, tmp_path):
         payload = _valid_payload(
             events=[
-                {"type": "simulation", "time_offset": {"n": 3.0, "unit": "seconds"}, "payload": {"seq": 3}},
-                {"type": "simulation", "time_offset": {"n": 1.0, "unit": "seconds"}, "payload": {"seq": 1}},
+                _sim_event(3.0, {"seq": 3}),
+                _sim_event(1.0, {"seq": 1}),
             ]
         )
         simulation_input = _load(tmp_path, payload)
@@ -242,8 +240,8 @@ class TestSimulationServiceRunReturnValue:
     def test_run_returns_one_record_per_event(self, tmp_path):
         payload = _valid_payload(
             events=[
-                {"type": "simulation", "time_offset": {"n": 1.0, "unit": "seconds"}, "payload": {}},
-                {"type": "simulation", "time_offset": {"n": 2.0, "unit": "seconds"}, "payload": {}},
+                _sim_event(1.0),
+                _sim_event(2.0),
             ]
         )
         simulation_input = _load(tmp_path, payload)
@@ -262,9 +260,7 @@ class TestSimulationServiceRunReturnValue:
         assert "_sort_time" in record
 
     def test_run_records_time_offset_seconds(self, tmp_path):
-        payload = _valid_payload(
-            events=[{"type": "simulation", "time_offset": {"n": 5.0, "unit": "seconds"}, "payload": {}}]
-        )
+        payload = _valid_payload(events=[_sim_event(5.0)])
         simulation_input = _load(tmp_path, payload)
         result = _service(simulation_input).run(start_time=_PAST)
         assert result[0]["time_offset_seconds"] == 5.0
@@ -299,8 +295,8 @@ class TestSimulationServiceClockBroadcast:
     def test_broadcast_called_once_per_event_when_speed_is_not_one(self, tmp_path):
         payload = _valid_payload(
             events=[
-                {"type": "simulation", "time_offset": {"n": 1.0, "unit": "seconds"}, "payload": {}},
-                {"type": "simulation", "time_offset": {"n": 2.0, "unit": "seconds"}, "payload": {}},
+                _sim_event(1.0),
+                _sim_event(2.0),
             ]
         )
         payload["speed"] = 2.0
@@ -329,9 +325,7 @@ class TestSimulationServiceClockBroadcast:
 
     def test_broadcast_receives_simulated_time_not_wall_clock_time(self, tmp_path):
         offset_seconds = 30.0
-        payload = _valid_payload(
-            events=[{"type": "simulation", "time_offset": {"n": offset_seconds, "unit": "seconds"}, "payload": {}}]
-        )
+        payload = _valid_payload(events=[_sim_event(offset_seconds)])
         payload["speed"] = 10.0
         simulation_input = _load(tmp_path, payload)
         broadcaster = MagicMock(spec=ClockBroadcastService)

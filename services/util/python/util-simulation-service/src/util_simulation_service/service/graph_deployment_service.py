@@ -64,6 +64,31 @@ class GraphDeploymentService:
                     "Deployed graph '%s' to '%s'.", deployment.graph_name, agent.name
                 )
                 return
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code < 500:
+                    if "already deployed" in exc.response.text:
+                        logger.warning(
+                            "Graph '%s' is already deployed on '%s'; skipping.",
+                            deployment.graph_name, agent.name,
+                        )
+                    else:
+                        logger.error(
+                            "Could not deploy graph '%s' to '%s': %s — response body: %s",
+                            deployment.graph_name, agent.name, exc, exc.response.text,
+                        )
+                    return
+                if attempt < _MAX_ATTEMPTS:
+                    logger.warning(
+                        "Agent '%s' returned %d (attempt %d/%d); retrying in %.0fs: %s",
+                        agent.name, exc.response.status_code, attempt, _MAX_ATTEMPTS,
+                        _RETRY_INTERVAL_SECONDS, exc,
+                    )
+                    time.sleep(_RETRY_INTERVAL_SECONDS)
+                else:
+                    logger.error(
+                        "Could not deploy graph '%s' to '%s' after %d attempts: %s",
+                        deployment.graph_name, agent.name, _MAX_ATTEMPTS, exc,
+                    )
             except httpx.TransportError as exc:
                 if attempt < _MAX_ATTEMPTS:
                     logger.warning(

@@ -11,6 +11,14 @@ logger = logging.getLogger(__name__)
 _FLOW_EVENT_PATH = "/ubiquia/core/flow-service/flow-event/query/params"
 
 
+def _strip_nulls(value: object) -> object:
+    if isinstance(value, dict):
+        return {k: _strip_nulls(v) for k, v in value.items() if v is not None}
+    if isinstance(value, list):
+        return [_strip_nulls(item) for item in value]
+    return value
+
+
 class EventDumpService:
     """Merges simulation-level events with agent flow events and writes a time-sorted JSON dump.
 
@@ -60,7 +68,7 @@ class EventDumpService:
 
         file_name = output_file_name or f"{simulation_name}-event-dump.json"
         output_path = output_dir / file_name
-        output_path.write_text(json.dumps(records, indent=2, default=str))
+        output_path.write_text(json.dumps([_strip_nulls(r) for r in records], indent=2, default=str))
         logger.info(
             "Event dump written to '%s' (%d record(s)).", output_path, len(records)
         )

@@ -61,7 +61,7 @@ class TestAgentJoinEventCommand:
 
     def test_execute_raises_on_wrong_event_type(self):
         command = AgentJoinEventCommand(agents=[], agent_factory=MagicMock(spec=AgentFactory))
-        wrong_event = SimulationEvent(time_offset=TimeOffset(n=1.0), payload={})
+        wrong_event = SimulationEvent(time_offset=TimeOffset(n=1.0), target_agent="agent-a", endpoint="/bootstrap/ingest", payload={})
 
         with pytest.raises(TypeError, match="Expected AgentJoinEvent"):
             command.execute(wrong_event)

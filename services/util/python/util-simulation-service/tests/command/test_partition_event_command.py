@@ -90,7 +90,7 @@ class TestPartitionEventCommand:
     def test_raises_on_wrong_event_type(self):
         topology = NetworkTopology()
         command = PartitionEventCommand(topology=topology)
-        wrong_event = SimulationEvent(time_offset=TimeOffset(n=1.0), payload={})
+        wrong_event = SimulationEvent(time_offset=TimeOffset(n=1.0), target_agent="agent-a", endpoint="/bootstrap/ingest", payload={})
 
         with pytest.raises(TypeError, match="Expected PartitionEvent"):
             command.execute(wrong_event)
