@@ -480,35 +480,6 @@ graphs:
               validateInputPayload: false
               validateOutputPayload: false
 
-      - modelType: Node
-        nodeType: EGRESS
-        name: MovementWorldStateUpdateEgressNode
-        description: POSTs the EntityArrivalEvent to the state-dag to update the world state.
-        endpoint: http://abstract-world-state-dag:8080/state/ingest
-
-        inputSubSchemas:
-          - modelName: EntityArrivalEvent
-
-        egressSettings:
-          httpOutputType: POST
-          egressType: SYNCHRONOUS
-          egressConcurrency: 1
-
-        nodeSettings:
-          persistInputPayload: true
-          persistOutputPayload: true
-          validateInputPayload: false
-          validateOutputPayload: false
-
-        overrideSettings:
-          - flag: demo
-            key: nodeSettings
-            value:
-              persistInputPayload: true
-              persistOutputPayload: true
-              validateInputPayload: false
-              validateOutputPayload: false
-
     edges:
       - leftNodeName: LocationAssignmentIngressNode
         rightNodeNames:
@@ -516,7 +487,6 @@ graphs:
       - leftNodeName: EntityMoverNode
         rightNodeNames:
           - ArrivalEgressNode
-          - MovementWorldStateUpdateEgressNode
 
   - name: action-processing-dag
 

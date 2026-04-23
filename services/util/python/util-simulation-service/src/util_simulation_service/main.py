@@ -3,6 +3,7 @@ import logging
 import click
 from rich.logging import RichHandler
 
+from util_simulation_service.command.graph.graph_group import graph
 from util_simulation_service.command.simulation.simulation_group import simulation
 
 logging.basicConfig(
@@ -18,6 +19,7 @@ def cli():
     """Ubiquia simulation utility for exercising multi-agent flow deployments."""
 
 
+cli.add_command(graph)
 cli.add_command(simulation)
 
 
