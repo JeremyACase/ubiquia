@@ -1,6 +1,7 @@
 import logging
 import pathlib
 import subprocess
+import time
 import uuid
 
 from util_simulation_service.builder.agent_builder import AgentBuilder
@@ -74,11 +75,23 @@ class MicroweightAgentBuilder(AgentBuilder):
 
     def _get_host_port(self, name: str) -> str:
         """Return the host port Docker assigned to the container's port 8080."""
-        result = subprocess.run(
-            ["docker", "port", name, _CONTAINER_PORT],
-            check=True,
-            capture_output=True,
-            text=True,
+        for attempt in range(10):
+            result = subprocess.run(
+                ["docker", "port", name, _CONTAINER_PORT],
+                capture_output=True,
+                text=True,
+            )
+            lines = result.stdout.splitlines()
+            if lines:
+                # Output: "0.0.0.0:32768\n" or ":::32768\n" — port is always the last colon-delimited token.
+                return lines[0].rsplit(":", 1)[-1]
+            time.sleep(0.5)
+
+        # Container never exposed the port — surface its logs to help diagnose.
+        logs = subprocess.run(
+            ["docker", "logs", name], capture_output=True, text=True
         )
-        # Output: "0.0.0.0:32768\n" or ":::32768\n" — port is always the last colon-delimited token.
-        return result.stdout.splitlines()[0].rsplit(":", 1)[-1]
+        raise RuntimeError(
+            f"Container '{name}' did not expose port {_CONTAINER_PORT} after 5 s.\n"
+            f"stdout: {logs.stdout}\nstderr: {logs.stderr}"
+        )

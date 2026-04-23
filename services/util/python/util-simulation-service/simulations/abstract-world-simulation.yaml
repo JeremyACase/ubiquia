@@ -13,13 +13,6 @@ agents:
           minor: 0
           patch: 0
         flag: demo
-      - graph_name: world-state-initializer-dag
-        domain_ontology_name: abstract-world
-        domain_version:
-          major: 1
-          minor: 0
-          patch: 0
-        flag: demo
       - graph_name: location-calculator-dag
         domain_ontology_name: abstract-world
         domain_version:
@@ -56,13 +49,6 @@ agents:
           minor: 0
           patch: 0
         flag: demo
-      - graph_name: world-state-initializer-dag
-        domain_ontology_name: abstract-world
-        domain_version:
-          major: 1
-          minor: 0
-          patch: 0
-        flag: demo
       - graph_name: location-calculator-dag
         domain_ontology_name: abstract-world
         domain_version:
@@ -92,15 +78,15 @@ bootstrap:
       targets:
         - agent-a
 
-# Events: an initial WorldState is seeded into agent-a's world-state-initializer-dag
-# at t=5s, and a partition event at t=2 minutes consolidates all agents into one network.
+# Events: an initial WorldState is seeded into agent-a at t=5s, and a partition event
+# at t=2 minutes consolidates all agents into one network.
 events:
   - type: simulation
     time_offset:
       n: 5
       unit: seconds
     target_agent: agent-a
-    endpoint: /bootstrap/ingest
+    endpoint: /graph/state-dag/node/stateingressnode/push
     payload:
       colors:
         - RED

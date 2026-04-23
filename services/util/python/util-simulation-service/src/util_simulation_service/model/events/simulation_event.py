@@ -8,3 +8,4 @@ class SimulationEvent(Event):
     target_agent: str
     endpoint: str
     payload: dict[str, Any]
+    response: dict[str, Any] | None = None

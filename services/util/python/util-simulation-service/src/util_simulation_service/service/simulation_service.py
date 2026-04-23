@@ -114,4 +114,18 @@ class SimulationService:
             )
 
         logger.info("Simulation '%s' complete.", self._simulation_input.name)
+
+        simulation_responses = [r for r in fired if r["type"] == "simulation"]
+        if simulation_responses:
+            logger.info("Simulation event responses (%d):", len(simulation_responses))
+            for record in simulation_responses:
+                details = record["details"]
+                logger.info(
+                    "  [%s] %s -> %s: %s",
+                    record["fired_at"],
+                    details["target_agent"],
+                    details["endpoint"],
+                    details.get("response"),
+                )
+
         return fired

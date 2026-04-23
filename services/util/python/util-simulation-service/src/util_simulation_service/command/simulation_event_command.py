@@ -32,8 +32,12 @@ class SimulationEventCommand(EventCommand):
         url = f"{agent.base_url}{event.endpoint}"
         logger.info("POSTing simulation event payload to '%s' at %s.", event.target_agent, url)
         try:
-            response = httpx.post(url, json=event.payload, timeout=10.0)
-            response.raise_for_status()
+            http_response = httpx.post(url, json=event.payload, timeout=10.0)
+            event.response = {"status_code": http_response.status_code, "body": http_response.text}
+            http_response.raise_for_status()
             logger.info("Simulation event payload accepted by '%s'.", event.target_agent)
+        except httpx.HTTPStatusError as exc:
+            logger.error("Could not deliver simulation event to '%s': %s", event.target_agent, exc)
         except Exception as exc:
+            event.response = {"error": str(exc)}
             logger.error("Could not deliver simulation event to '%s': %s", event.target_agent, exc)
