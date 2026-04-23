@@ -50,13 +50,15 @@ public class GraphFinder {
 
     @Transactional
     public Optional<GraphEntity> findDeployedGraphRecordWith(
+        final String graphName,
         final String domainOntologyName,
         final SemanticVersion domainOntologyVersion,
         final String agentId) {
 
         var graphRecord = this
             .graphRepository
-            .findByDomainOntologyNameAndDomainOntologyVersionMajorAndDomainOntologyVersionMinorAndDomainOntologyVersionPatchAndAgentsDeployingGraphId(
+            .findByNameAndDomainOntologyNameAndDomainOntologyVersionMajorAndDomainOntologyVersionMinorAndDomainOntologyVersionPatchAndAgentsDeployingGraphId(
+                graphName,
                 domainOntologyName,
                 domainOntologyVersion.getMajor(),
                 domainOntologyVersion.getMinor(),

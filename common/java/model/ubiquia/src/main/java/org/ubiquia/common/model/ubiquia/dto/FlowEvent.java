@@ -26,14 +26,6 @@ public class FlowEvent extends AbstractModel {
         return "FlowEvent";
     }
 
-    public Node getAdapter() {
-        return node;
-    }
-
-    public void setAdapter(Node node) {
-        this.node = node;
-    }
-
     public Object getInputPayload() {
         return inputPayload;
     }

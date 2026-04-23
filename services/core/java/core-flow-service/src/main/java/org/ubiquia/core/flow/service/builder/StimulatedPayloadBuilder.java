@@ -44,14 +44,14 @@ public class StimulatedPayloadBuilder {
             .get();
     }
 
-    public String buildStimulatedPayloadFor(final AbstractNode adapter)
+    public String buildStimulatedPayloadFor(final AbstractNode node)
         throws GenerationException, JsonProcessingException, JsonGeneratorException {
 
-        logger.info("Building a dummy stimulation payload for adapter: {}...",
-            adapter.getNodeContext().getNodeName());
+        logger.info("Building a dummy stimulation payload for node: {}...",
+            node.getNodeContext().getNodeName());
 
-        var adapterContext = adapter.getNodeContext();
-        var jsonSchema = this.cachedNodeSchemas.get(adapterContext.getNodeId());
+        var nodeContext = node.getNodeContext();
+        var jsonSchema = this.cachedNodeSchemas.get(nodeContext.getNodeId());
         var schemaStore = new SchemaStore(true);
         var generator = new Generator(
             this.jsonSchemaGeneratorConfiguration,

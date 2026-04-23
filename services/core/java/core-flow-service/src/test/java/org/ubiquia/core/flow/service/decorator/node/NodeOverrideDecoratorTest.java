@@ -39,7 +39,7 @@ public class NodeOverrideDecoratorTest {
     }
 
     @Test
-    public void testOverridesBaselineValues_isValid()
+    public void testOverridesBaselineValuesOne_isValid()
         throws JsonProcessingException,
         IllegalAccessException {
         var node = new Node();
@@ -47,15 +47,15 @@ public class NodeOverrideDecoratorTest {
         node.setNodeSettings(new NodeSettings());
         node.getNodeSettings().setPersistInputPayload(false);
 
-        var overriddenAdapterSettings = new NodeSettings();
-        overriddenAdapterSettings.setPersistInputPayload(true);
+        var overriddenNodeSettings = new NodeSettings();
+        overriddenNodeSettings.setPersistInputPayload(true);
 
         var overrideSettings = new OverrideSettingsStringified();
         overrideSettings.setFlag("test");
         overrideSettings.setKey("nodeSettings");
         overrideSettings.setValue(this
             .objectMapper
-            .writeValueAsString(overriddenAdapterSettings));
+            .writeValueAsString(overriddenNodeSettings));
 
         var overrideSettingsList = new ArrayList<OverrideSettingsStringified>();
         overrideSettingsList.add(overrideSettings);
@@ -70,6 +70,40 @@ public class NodeOverrideDecoratorTest {
 
         var isPersistInputPayload = node.getNodeSettings().getPersistInputPayload();
         Assertions.assertTrue(isPersistInputPayload);
+    }
+
+    @Test
+    public void testOverridesBaselineValuesTwo_isValid()
+        throws JsonProcessingException,
+        IllegalAccessException {
+        var node = new Node();
+
+        node.setNodeSettings(new NodeSettings());
+        node.getNodeSettings().setStimulateInputPayload(false);
+
+        var overriddenNodeSettings = new NodeSettings();
+        overriddenNodeSettings.setStimulateInputPayload(true);
+
+        var overrideSettings = new OverrideSettingsStringified();
+        overrideSettings.setFlag("test");
+        overrideSettings.setKey("nodeSettings");
+        overrideSettings.setValue(this
+            .objectMapper
+            .writeValueAsString(overriddenNodeSettings));
+
+        var overrideSettingsList = new ArrayList<OverrideSettingsStringified>();
+        overrideSettingsList.add(overrideSettings);
+
+        var deployment = new GraphDeployment();
+        deployment.setGraphSettings(new GraphSettings());
+        deployment.getGraphSettings().setFlag("test");
+
+        this
+            .nodeOverrideDecorator
+            .tryOverrideBaselineValues(node, overrideSettingsList, deployment);
+
+        var isStimulateInputPayload = node.getNodeSettings().getStimulateInputPayload();
+        Assertions.assertTrue(isStimulateInputPayload);
     }
 
     @Test

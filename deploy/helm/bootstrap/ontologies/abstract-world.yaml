@@ -299,7 +299,7 @@ graphs:
               persistOutputPayload: true
               validateInputPayload: false
               validateOutputPayload: false
-              stimulateInputPayload: false
+              stimulateInputPayload: true
 
       - modelType: Node
         nodeType: HIDDEN
@@ -422,7 +422,7 @@ graphs:
               persistOutputPayload: true
               validateInputPayload: false
               validateOutputPayload: false
-              stimulateInputPayload: true
+              stimulateInputPayload: false
 
       - modelType: Node
         nodeType: HIDDEN
