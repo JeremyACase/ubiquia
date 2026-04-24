@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.26.0] - 2026-04-24
+### Fixed
+- `FlowEventDtoMapper`: removed `FlowDtoMapper` dependency; now constructs a lightweight `Flow` stub (id only) when mapping a `FlowEvent`, avoiding unnecessary eagerly-loaded joins
+
 ## [0.22.0] 2026-04-01
 ### Added
 - `ClockService`: Spring `@Service` that holds a `volatile Clock` (defaults to `Clock.systemUTC()`), with `setTime(OffsetDateTime)` to fix it to a specific GMT instant, `getClock()`, and `getCurrentTime()`

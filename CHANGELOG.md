@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.26.0] - 2026-04-24
+### Added
+- `GraphDeploymentService` in `util-simulation-service`: deploys registered graphs to configured target agents' flow-service instances with retry logic; supports optional `flag`-based node overrides
+- `EventDumpService` in `util-simulation-service`: merges fired simulation events with flow-service events fetched from every agent, time-sorts all records, and writes a JSON dump file after each simulation run
+- `DagVisualizationService` in `util-simulation-service`: renders an ASCII visualization of every DAG in a domain ontology YAML file
+- `graph visualize` CLI command in `util-simulation-service`: renders all graphs in a domain ontology YAML as ASCII DAG diagrams
+- `GraphDeploymentInput` and `SemanticVersion` Pydantic models in `util-simulation-service`
+- `AgentInput.graph_deployments`: optional list of `GraphDeploymentInput` entries deployed to the target agent before the simulation run
+- `Agent.mode` field (defaults to `AgentMode.TEST`)
+- `abstract-world-simulation.yaml` simulation scenario and `abstract-world.yaml` domain ontology bootstrap
+- `--output-path` and `--output-file-name` options on `simulation run` controlling where the event dump is written
+
+### Changed
+- `SimulationService.run()` now returns `list[dict]` of fired event records consumed by `EventDumpService`
+- `SimulationService.load()` resolves domain ontology file paths relative to the input YAML's directory so relative paths work regardless of the working directory
+- Simulation scenario files reorganized into a `simulations/` subfolder; `simulation.yaml` renamed to `dry-run.yaml`, `three-agent-demo.yaml` removed
+
+### Fixed
+- `SimulationEventCommand.execute()` implemented: now POSTs the event payload to the target agent's endpoint via httpx (was previously `NotImplementedError`)
+- `GraphRepository`: duplicate-deployment check now includes `graphName`, preventing false conflicts when multiple graphs from the same ontology and version are deployed to the same agent
+- `GraphController`: now passes `graphName` to the duplicate check and logs an error on conflict; logs info on successful deployment
+- `FlowEventDtoMapper`: removed `FlowDtoMapper` dependency; constructs a lightweight `Flow` stub (id only) when mapping a `FlowEvent`
+- `Flow.getModelType()` override added, returning `"Flow"`
+- `FlowEvent`: deprecated `getAdapter()`/`setAdapter()` aliases removed
+
 ## [0.25.0] - 2026-04-10
 ### Added
 - `PartitionEvent` model in `util-simulation-service`: scenario event that splits agents into named isolated networks at a specified time offset

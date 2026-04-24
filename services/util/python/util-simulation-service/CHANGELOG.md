@@ -5,6 +5,28 @@ All notable changes to `util-simulation-service` will be documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning is inherited from the root Ubiquia project.
 
+## [0.26.0] - 2026-04-24
+### Added
+- `GraphDeploymentService` (`service/graph_deployment_service.py`): POSTs graph deployment requests to target agents' flow-service instances with up to 24 retries; 4xx errors are not retried; supports optional `flag`-based node override via `GraphDeploymentInput`
+- `EventDumpService` (`service/event_dump_service.py`): paginates the flow-service `/flow-event/query/params` endpoint on every agent, merges results with fired simulation events, time-sorts all records by `_sort_time`, strips null fields, and writes a JSON file
+- `DagVisualizationService` (`service/dag_visualization_service.py`): parses a domain ontology YAML and renders every graph as an indented ASCII box-and-arrow diagram
+- `graph visualize` CLI command (`command/graph/visualize_command.py` and `command/graph/graph_group.py`): top-level `graph` Click group with a `visualize` subcommand; registered on the root CLI in `main.py`
+- `GraphDeploymentInput` model (`model/graph_deployment_input.py`): `graph_name`, `domain_ontology_name`, `domain_version` (`SemanticVersion`), and optional `flag`
+- `SemanticVersion` model (`model/semantic_version.py`): `major`, `minor`, `patch` Pydantic fields
+- `AgentInput.graph_deployments` (`list[GraphDeploymentInput]`, default `[]`): graphs deployed before simulation run for agents without `join_offset_time`
+- `Agent.mode` field (`AgentMode`, default `AgentMode.TEST`)
+- `abstract-world-simulation.yaml` simulation scenario
+- `--output-path` and `--output-file-name` CLI options on `simulation run`
+
+### Changed
+- `SimulationService.run()` now returns `list[dict]`; each record contains `source`, `type`, `time_offset_seconds`, `fired_at`, `details`, and `_sort_time`
+- `SimulationService.load()` resolves domain ontology file paths relative to the input YAML's directory
+- `run_command.py` wires `GraphDeploymentService` and `EventDumpService` into the `simulation run` pipeline
+- Simulation scenario files reorganized into a `simulations/` subfolder; `simulation.yaml` renamed to `dry-run.yaml`; `three-agent-demo.yaml` removed
+
+### Fixed
+- `SimulationEventCommand.execute()` implemented: POSTs the event payload to the target agent's endpoint via httpx; captures status code and body in `event.response`; logs warnings on HTTP errors
+
 ## [0.25.0] - 2026-04-10
 ### Added
 - `PartitionEvent` model (`model/events/partition_event.py`): scenario event that splits agents into named isolated networks at a specified time offset; discriminated by `type: "partition"` in the `AnyEvent` union

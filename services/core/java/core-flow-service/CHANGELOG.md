@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.26.0] - 2026-04-24
+### Fixed
+- `GraphRepository`: duplicate-deployment query now includes `graphName` as a discriminator, preventing false conflicts when multiple graphs from the same domain ontology and version are deployed to the same agent
+- `GraphController.tryDeployGraph()`: passes `graphName` to the repository check; logs an error when a duplicate is detected and info when deployment succeeds
+
 ## [0.25.0] - 2026-04-10
 ### Fixed
 - `ModelSynchronizationService.trySync()`: replaced `atLeastOnePeerSucceeded` with `allPeersSucceeded`; a `SyncEntity` is now only persisted when every configured peer has accepted the sync payload, preventing peers that are temporarily unreachable at startup from being permanently skipped on subsequent sync cycles
