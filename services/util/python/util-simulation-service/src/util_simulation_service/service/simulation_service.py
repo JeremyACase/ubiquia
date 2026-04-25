@@ -37,9 +37,31 @@ class SimulationService:
 
     @staticmethod
     def load(input_file: pathlib.Path) -> SimulationInput:
-        return SimulationInput.model_validate(yaml.safe_load(input_file.read_text()))
+        base = input_file.resolve().parent
+        data = yaml.safe_load(input_file.read_text())
+        # Resolve domain ontology file paths relative to the input file's directory
+        # so the YAML can use relative paths regardless of the working directory.
+        try:
+            for entry in data.get("bootstrap", {}).get("domain_ontologies", []):
+                p = pathlib.Path(entry["file"])
+                if not p.is_absolute():
+                    entry["file"] = str((base / p).resolve())
+        except (AttributeError, KeyError, TypeError):
+            pass
+        return SimulationInput.model_validate(data)
 
-    def run(self, start_time: datetime | None = None) -> None:
+    def run(self, start_time: datetime | None = None) -> list[dict]:
+        """Run the simulation and return a record for every event that fired.
+
+        Each record contains:
+
+        * ``"source"`` — always ``"simulation"``
+        * ``"type"`` — the event type discriminator (e.g. ``"partition"``)
+        * ``"time_offset_seconds"`` — the declared offset from simulation start
+        * ``"fired_at"`` — ISO-8601 UTC timestamp of when the event was actually dispatched
+        * ``"details"`` — the full event serialised as a plain dict
+        * ``"_sort_time"`` — same as ``"fired_at"``; consumed by ``EventDumpService``
+        """
         if start_time is None:
             start_time = datetime.now(timezone.utc)
 
@@ -55,6 +77,8 @@ class SimulationService:
             len(sorted_events),
             speed,
         )
+
+        fired: list[dict] = []
 
         for i, event in enumerate(sorted_events, start=1):
             fire_at = start_time + timedelta(seconds=event.time_offset.to_seconds() / speed)
@@ -77,4 +101,31 @@ class SimulationService:
             )
             self._event_manager.dispatch(event)
 
+            fired_at = datetime.now(timezone.utc).isoformat()
+            fired.append(
+                {
+                    "source": "simulation",
+                    "type": event.type,
+                    "time_offset_seconds": event.time_offset.to_seconds(),
+                    "fired_at": fired_at,
+                    "details": event.model_dump(mode="json"),
+                    "_sort_time": fired_at,
+                }
+            )
+
         logger.info("Simulation '%s' complete.", self._simulation_input.name)
+
+        simulation_responses = [r for r in fired if r["type"] == "simulation"]
+        if simulation_responses:
+            logger.info("Simulation event responses (%d):", len(simulation_responses))
+            for record in simulation_responses:
+                details = record["details"]
+                logger.info(
+                    "  [%s] %s -> %s: %s",
+                    record["fired_at"],
+                    details["target_agent"],
+                    details["endpoint"],
+                    details.get("response"),
+                )
+
+        return fired

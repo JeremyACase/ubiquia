@@ -114,9 +114,14 @@ public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Gr
 
         var graphRecord = this
             .graphFinder
-            .findDeployedGraphRecordWith(domainOntologyName, version, this.agentConfig.getId());
+            .findDeployedGraphRecordWith(
+                graphName,
+                domainOntologyName,
+                version,
+                this.agentConfig.getId());
 
         if (graphRecord.isPresent()) {
+            this.getLogger().error("Not deploying graph; it is already deployed...");
             var json = this.objectMapper.writeValueAsString(deployment);
             throw new IllegalArgumentException("ERROR: Graph for Ubiquia Agent Id "
                 + this.agentConfig.getId()
@@ -142,6 +147,8 @@ public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Gr
 
         this.componentManager.tryDeployComponentsFor(deployment);
         this.nodeManager.tryDeployNodesFor(deployment);
+
+        this.getLogger().info("...deployed.");
 
         return deployment;
     }

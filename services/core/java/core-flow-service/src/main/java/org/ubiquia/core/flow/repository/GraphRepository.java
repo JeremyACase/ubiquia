@@ -15,10 +15,11 @@ public interface GraphRepository
         final Integer minor,
         final Integer patch);
 
-    Optional<GraphEntity> findByDomainOntologyNameAndDomainOntologyVersionMajorAndDomainOntologyVersionMinorAndDomainOntologyVersionPatchAndAgentsDeployingGraphId(
+    Optional<GraphEntity> findByNameAndDomainOntologyNameAndDomainOntologyVersionMajorAndDomainOntologyVersionMinorAndDomainOntologyVersionPatchAndAgentsDeployingGraphId(
+        final String graphName,
         final String domainOntologyName,
         final Integer major,
         final Integer minor,
         final Integer patch,
-        final String graphId);
+        final String agentId);
 }

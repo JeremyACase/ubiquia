@@ -1,14 +1,8 @@
 package org.ubiquia.common.model.ubiquia.dto;
 
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Set;
 import org.springframework.validation.annotation.Validated;
-import org.ubiquia.common.model.ubiquia.entity.AbstractModelEntity;
-import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
-import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 
 @Validated
 public class Flow extends AbstractModel {
@@ -16,6 +10,12 @@ public class Flow extends AbstractModel {
     private Graph graph;
 
     private List<FlowEvent> flowEvents;
+
+    @Override
+    public String getModelType() {
+        return "Flow";
+    }
+
 
     public Graph getGraph() {
         return graph;

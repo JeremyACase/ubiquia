@@ -1,0 +1,123 @@
+name: abstract-world-simulation
+
+# Agent A and B start immediately; C joins at 30 seconds into simulated time.
+# Only agent-a receives the bootstrapped domain ontology.
+agents:
+  - name: agent-a
+    mode: microweight
+    graph_deployments:
+      - graph_name: state-dag
+        domain_ontology_name: abstract-world
+        domain_version:
+          major: 1
+          minor: 0
+          patch: 0
+        flag: demo
+      - graph_name: location-calculator-dag
+        domain_ontology_name: abstract-world
+        domain_version:
+          major: 1
+          minor: 0
+          patch: 0
+        flag: demo
+      - graph_name: entity-movement-dag
+        domain_ontology_name: abstract-world
+        domain_version:
+          major: 1
+          minor: 0
+          patch: 0
+        flag: demo
+      - graph_name: action-processing-dag
+        domain_ontology_name: abstract-world
+        domain_version:
+          major: 1
+          minor: 0
+          patch: 0
+        flag: demo
+  - name: agent-b
+    mode: microweight
+  - name: agent-c
+    mode: microweight
+    join_offset_time:
+      n: 30
+      unit: seconds
+    graph_deployments:
+      - graph_name: state-dag
+        domain_ontology_name: abstract-world
+        domain_version:
+          major: 1
+          minor: 0
+          patch: 0
+        flag: demo
+      - graph_name: location-calculator-dag
+        domain_ontology_name: abstract-world
+        domain_version:
+          major: 1
+          minor: 0
+          patch: 0
+        flag: demo
+      - graph_name: entity-movement-dag
+        domain_ontology_name: abstract-world
+        domain_version:
+          major: 1
+          minor: 0
+          patch: 0
+        flag: demo
+      - graph_name: action-processing-dag
+        domain_ontology_name: abstract-world
+        domain_version:
+          major: 1
+          minor: 0
+          patch: 0
+        flag: demo
+
+# Bootstrap the abstract-world domain ontology to agent-a only.
+bootstrap:
+  domain_ontologies:
+    - file: ../../../../../deploy/helm/bootstrap/ontologies/abstract-world.yaml
+      targets:
+        - agent-a
+
+# Events: an initial WorldState is seeded into agent-a at t=5s, and a partition event
+# at t=2 minutes consolidates all agents into one network.
+events:
+  - type: simulation
+    time_offset:
+      n: 5
+      unit: seconds
+    target_agent: agent-a
+    endpoint: /graph/state-dag/node/stateingressnode/push
+    payload:
+      colors:
+        - RED
+        - BLUE
+        - GREEN
+      shapes:
+        - CIRCLE
+        - SQUARE
+        - TRIANGLE
+      letters:
+        - A
+        - B
+        - C
+
+  - type: partition
+    time_offset:
+      n: 120
+      unit: seconds
+    networks:
+      - name: net-abc
+        agents:
+          - agent-a
+          - agent-b
+          - agent-c
+
+# A and B start in the same network; C is isolated until it joins at t=30s.
+networks:
+  - name: net-ab
+    agents:
+      - agent-a
+      - agent-b
+
+# Run at double speed: 2 simulated minutes complete in 1 real minute.
+speed: 2.0

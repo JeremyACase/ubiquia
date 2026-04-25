@@ -25,7 +25,7 @@ class SetupService:
         for agent_input in immediate:
             logger.info("Building agent: %s (mode=%s)", agent_input.name, agent_input.mode.value)
             if agent_input.mode == AgentMode.TEST:
-                agent = Agent(name=agent_input.name, base_url=agent_input.base_url)
+                agent = Agent(name=agent_input.name, base_url=agent_input.base_url, mode=AgentMode.TEST)
             else:
                 builder = self._agent_factory.get_builder(agent_input.mode)
                 agent = builder.build(agent_input.name)

@@ -149,7 +149,7 @@ public class NodeDecorator {
                 nodeContext.getNodeSettings().getStimulateFrequencyMilliseconds(),
                 TimeUnit.MILLISECONDS);
             nodeContext.getTasks().add(task);
-            logger.info("...completed back pressure polling initialization...");
+            logger.info("...completed stimulation initialization...");
         } else {
             logger.debug("...node not configured for input stimulation; "
                 + "not initializing stimulation.");

@@ -1,0 +1,642 @@
+name: abstract-world
+modelType: DomainOntology
+author: Jeremy Case
+description: >
+  An intentionally abstract ontology. Colors stand in for Entities, Shapes stand
+  in for Actions those entities can take, and Regions stand in for Locations where
+  entities travel to perform actions.
+
+version:
+  major: 1
+  minor: 0
+  patch: 0
+
+tags:
+  - key: abstract
+    value: "true"
+
+domainDataContract:
+
+  modelType: DomainDataContract
+
+  schema:
+    type: object
+
+    definitions:
+
+      ColorType:
+        description: The color identity of an entity or region.
+        type: string
+        enum:
+          - RED
+          - BLUE
+          - GREEN
+          - YELLOW
+          - PURPLE
+          - ORANGE
+
+      ShapeType:
+        description: The shape identity of an action.
+        type: string
+        enum:
+          - CIRCLE
+          - SQUARE
+          - TRIANGLE
+          - HEXAGON
+          - STAR
+
+      LetterType:
+        description: A letter identifier used to label abstract state elements.
+        type: string
+        enum:
+          - A
+          - B
+          - C
+          - D
+          - E
+          - F
+
+      Entity:
+        description: An abstract entity, identified by its color.
+        type: object
+        properties:
+          id:
+            type: string
+          color:
+            $ref: "#/definitions/ColorType"
+        required:
+          - id
+          - color
+
+      Action:
+        description: An abstract action an entity can take, identified by its shape.
+        type: object
+        properties:
+          shape:
+            $ref: "#/definitions/ShapeType"
+          intensity:
+            type: number
+            format: float
+            minimum: 0.0
+            maximum: 1.0
+            default: 0.5
+        required:
+          - shape
+
+      Region:
+        description: An abstract location, color-coded, where entities perform actions.
+        type: object
+        properties:
+          id:
+            type: string
+          color:
+            $ref: "#/definitions/ColorType"
+        required:
+          - id
+          - color
+
+      WorldState:
+        description: >
+          A snapshot of the initialized abstract world, containing the active
+          colors, shapes, and letters in play.
+        type: object
+        properties:
+          colors:
+            type: array
+            items:
+              $ref: "#/definitions/ColorType"
+          shapes:
+            type: array
+            items:
+              $ref: "#/definitions/ShapeType"
+          letters:
+            type: array
+            items:
+              $ref: "#/definitions/LetterType"
+        required:
+          - colors
+          - shapes
+          - letters
+
+      LocationAssignment:
+        description: >
+          An assignment pairing an Entity with the target Region it should
+          move to, produced by the location calculator and consumed by the
+          movement DAG.
+        type: object
+        properties:
+          entity:
+            $ref: "#/definitions/Entity"
+          targetRegion:
+            $ref: "#/definitions/Region"
+        required:
+          - entity
+          - targetRegion
+
+      EntityArrivalEvent:
+        description: >
+          An event signalling that an Entity has arrived at a Region, produced
+          by the movement DAG and consumed by the action processing DAG.
+        type: object
+        properties:
+          entity:
+            $ref: "#/definitions/Entity"
+          region:
+            $ref: "#/definitions/Region"
+        required:
+          - entity
+          - region
+
+      EntityActionEvent:
+        description: An event capturing an entity performing an action at a region.
+        type: object
+        properties:
+          entity:
+            $ref: "#/definitions/Entity"
+          action:
+            $ref: "#/definitions/Action"
+          region:
+            $ref: "#/definitions/Region"
+        required:
+          - entity
+          - action
+          - region
+
+    properties:
+      ColorType:
+        $ref: "#/definitions/ColorType"
+      ShapeType:
+        $ref: "#/definitions/ShapeType"
+      LetterType:
+        $ref: "#/definitions/LetterType"
+      Entity:
+        $ref: "#/definitions/Entity"
+      Action:
+        $ref: "#/definitions/Action"
+      Region:
+        $ref: "#/definitions/Region"
+      WorldState:
+        $ref: "#/definitions/WorldState"
+      LocationAssignment:
+        $ref: "#/definitions/LocationAssignment"
+      EntityArrivalEvent:
+        $ref: "#/definitions/EntityArrivalEvent"
+      EntityActionEvent:
+        $ref: "#/definitions/EntityActionEvent"
+
+graphs:
+
+  - name: state-dag
+
+    modelType: Graph
+
+    description: >
+      Receives WorldState updates from any DAG in the abstract world.
+
+    capabilities:
+      - AbstractWorldStateInitialization
+
+    components:
+
+      - name: StateInitializerComponent
+        componentType: TEMPLATE
+        modelType: Component
+        description: Processes a WorldState payload and registers its colors, shapes, and letters.
+        port: 5000
+        image:
+          registry: ubiquia
+          repository: abstract-world-state-initializer
+          tag: latest
+
+        overrideSettings:
+          - flag: demo
+            key: componentType
+            value: TEMPLATE
+
+    nodes:
+
+      - modelType: Node
+        nodeType: PUSH
+        name: StateIngressNode
+        description: Receives a WorldState payload from any DAG for processing.
+        endpoint: /state/ingest
+
+        inputSubSchemas:
+          - modelName: WorldState
+
+        outputSubSchema:
+          modelName: WorldState
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+              stimulateInputPayload: false
+
+  - name: location-calculator-dag
+
+    modelType: Graph
+
+    description: >
+      Calculates a target Region (color) for each incoming Entity and POSTs
+      a LocationAssignment to the entity-movement-dag for execution.
+
+    capabilities:
+      - AbstractWorldLocationCalculation
+
+    components:
+
+      - name: LocationCalculatorComponent
+        componentType: TEMPLATE
+        modelType: Component
+        description: Derives a target Region for a given Entity based on the current world state.
+        port: 5000
+        image:
+          registry: ubiquia
+          repository: abstract-world-location-calculator
+          tag: latest
+
+        overrideSettings:
+          - flag: demo
+            key: componentType
+            value: TEMPLATE
+
+    nodes:
+
+      - modelType: Node
+        nodeType: PUSH
+        name: EntityIngressNode
+        description: Ingress node — receives an Entity and begins location calculation.
+        endpoint: /entity/ingest
+
+        inputSubSchemas:
+          - modelName: Entity
+
+        outputSubSchema:
+          modelName: Entity
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+              stimulateInputPayload: true
+
+      - modelType: Node
+        nodeType: HIDDEN
+        name: LocationCalculatorNode
+        description: Calculates the target Region for the Entity and produces a LocationAssignment.
+        endpoint: /location/calculate
+
+        inputSubSchemas:
+          - modelName: Entity
+
+        outputSubSchema:
+          modelName: LocationAssignment
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+
+      - modelType: Node
+        nodeType: EGRESS
+        name: LocationAssignmentEgressNode
+        description: POSTs the LocationAssignment to the entity-movement-dag for execution.
+        endpoint: http://abstract-world-entity-movement-dag:8080/location/assign
+
+        inputSubSchemas:
+          - modelName: LocationAssignment
+
+        egressSettings:
+          httpOutputType: POST
+          egressType: SYNCHRONOUS
+          egressConcurrency: 1
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+
+    edges:
+      - leftNodeName: EntityIngressNode
+        rightNodeNames:
+          - LocationCalculatorNode
+      - leftNodeName: LocationCalculatorNode
+        rightNodeNames:
+          - LocationAssignmentEgressNode
+
+  - name: entity-movement-dag
+
+    modelType: Graph
+
+    description: >
+      Receives a LocationAssignment and instructs the Entity to move to its
+      target Region. Produces an EntityArrivalEvent and POSTs it to both the
+      action-processing-dag and the state-dag.
+
+    capabilities:
+      - AbstractWorldEntityMovement
+
+    components:
+
+      - name: EntityMoverComponent
+        componentType: TEMPLATE
+        modelType: Component
+        description: Moves an Entity to its assigned target Region and records the arrival.
+        port: 5000
+        image:
+          registry: ubiquia
+          repository: abstract-world-entity-mover
+          tag: latest
+
+        overrideSettings:
+          - flag: demo
+            key: componentType
+            value: TEMPLATE
+
+    nodes:
+
+      - modelType: Node
+        nodeType: PUSH
+        name: LocationAssignmentIngressNode
+        description: Ingress node — receives a LocationAssignment and begins entity movement.
+        endpoint: /location/assign
+
+        inputSubSchemas:
+          - modelName: LocationAssignment
+
+        outputSubSchema:
+          modelName: LocationAssignment
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+              stimulateInputPayload: false
+
+      - modelType: Node
+        nodeType: HIDDEN
+        name: EntityMoverNode
+        description: Moves the Entity to its target Region and produces an EntityArrivalEvent.
+        endpoint: /entity/move
+
+        inputSubSchemas:
+          - modelName: LocationAssignment
+
+        outputSubSchema:
+          modelName: EntityArrivalEvent
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+
+      - modelType: Node
+        nodeType: EGRESS
+        name: ArrivalEgressNode
+        description: POSTs the EntityArrivalEvent to the action-processing-dag.
+        endpoint: http://abstract-world-action-processing-dag:8080/arrival/ingest
+
+        inputSubSchemas:
+          - modelName: EntityArrivalEvent
+
+        egressSettings:
+          httpOutputType: POST
+          egressType: SYNCHRONOUS
+          egressConcurrency: 1
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+
+    edges:
+      - leftNodeName: LocationAssignmentIngressNode
+        rightNodeNames:
+          - EntityMoverNode
+      - leftNodeName: EntityMoverNode
+        rightNodeNames:
+          - ArrivalEgressNode
+
+  - name: action-processing-dag
+
+    modelType: Graph
+
+    description: >
+      Processes the actions of entities upon arrival at a Region. Receives an
+      EntityArrivalEvent, derives the appropriate Action, and egresses a
+      complete EntityActionEvent to both the action store and the state-dag.
+
+    capabilities:
+      - AbstractWorldActionProcessing
+
+    components:
+
+      - name: ActionProcessorComponent
+        componentType: TEMPLATE
+        modelType: Component
+        description: Derives an Action for an Entity that has arrived at a Region and produces an EntityActionEvent.
+        port: 5000
+        image:
+          registry: ubiquia
+          repository: abstract-world-action-processor
+          tag: latest
+
+        overrideSettings:
+          - flag: demo
+            key: componentType
+            value: TEMPLATE
+
+    nodes:
+
+      - modelType: Node
+        nodeType: PUSH
+        name: ArrivalIngressNode
+        description: Ingress node — receives an EntityArrivalEvent and begins action processing.
+        endpoint: /arrival/ingest
+
+        inputSubSchemas:
+          - modelName: EntityArrivalEvent
+
+        outputSubSchema:
+          modelName: EntityArrivalEvent
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+              stimulateInputPayload: false
+
+      - modelType: Node
+        nodeType: HIDDEN
+        name: ActionDeriverNode
+        description: Derives the Action performed by the Entity at its Region and produces an EntityActionEvent.
+        endpoint: /action/derive
+
+        inputSubSchemas:
+          - modelName: EntityArrivalEvent
+
+        outputSubSchema:
+          modelName: EntityActionEvent
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+
+      - modelType: Node
+        nodeType: EGRESS
+        name: ActionEgressNode
+        description: Egresses the EntityActionEvent to the action store.
+        endpoint: http://abstract-world-action-store:8080/ubiquia/EntityActionEvent/add
+
+        inputSubSchemas:
+          - modelName: EntityActionEvent
+
+        egressSettings:
+          httpOutputType: POST
+          egressType: SYNCHRONOUS
+          egressConcurrency: 1
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+
+      - modelType: Node
+        nodeType: EGRESS
+        name: ActionWorldStateUpdateEgressNode
+        description: POSTs the EntityActionEvent to the state-dag to update the world state.
+        endpoint: http://abstract-world-state-dag:8080/state/ingest
+
+        inputSubSchemas:
+          - modelName: EntityActionEvent
+
+        egressSettings:
+          httpOutputType: POST
+          egressType: SYNCHRONOUS
+          egressConcurrency: 1
+
+        nodeSettings:
+          persistInputPayload: true
+          persistOutputPayload: true
+          validateInputPayload: false
+          validateOutputPayload: false
+
+        overrideSettings:
+          - flag: demo
+            key: nodeSettings
+            value:
+              persistInputPayload: true
+              persistOutputPayload: true
+              validateInputPayload: false
+              validateOutputPayload: false
+
+    edges:
+      - leftNodeName: ArrivalIngressNode
+        rightNodeNames:
+          - ActionDeriverNode
+      - leftNodeName: ActionDeriverNode
+        rightNodeNames:
+          - ActionEgressNode
+          - ActionWorldStateUpdateEgressNode

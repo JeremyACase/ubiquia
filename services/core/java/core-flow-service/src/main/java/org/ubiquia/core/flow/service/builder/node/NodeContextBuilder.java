@@ -50,7 +50,7 @@ public class NodeContextBuilder {
         context.setPollSettings(node.getPollSettings());
         context.setComponent(node.getComponent());
 
-        this.trySetAdapterContextEndpoint(context, node);
+        this.trySetNodeContextEndpoint(context, node);
 
         return context;
     }
@@ -63,7 +63,7 @@ public class NodeContextBuilder {
         return x / y;
     }
 
-    private void trySetAdapterContextEndpoint(
+    private void trySetNodeContextEndpoint(
         NodeContext nodeContext,
         final Node nodeData)
         throws URISyntaxException {

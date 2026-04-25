@@ -1,10 +1,12 @@
 import logging
 import pathlib
 import subprocess
+import time
 import uuid
 
 from util_simulation_service.builder.agent_builder import AgentBuilder
 from util_simulation_service.model.agent import Agent
+from util_simulation_service.model.agent_mode import AgentMode
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +38,7 @@ class MicroweightAgentBuilder(AgentBuilder):
         self._run_container(agent_name, agent_id=agent_id)
         host_port = self._get_host_port(agent_name)
         logger.info("Container '%s' listening on http://localhost:%s.", agent_name, host_port)
-        return Agent(name=agent_name, base_url=f"http://localhost:{host_port}")
+        return Agent(name=agent_name, base_url=f"http://localhost:{host_port}", mode=AgentMode.MICROWEIGHT)
 
     def _build_image(self) -> None:
         logger.info("Building Docker image: %s.", _IMAGE_NAME)
@@ -62,6 +64,7 @@ class MicroweightAgentBuilder(AgentBuilder):
             "--name", name,
             "-p", _CONTAINER_PORT,
             "-e", f"UBIQUIA_AGENT_ID={agent_id}",
+            "-e", "UBIQUIA_MODE=TEST",
             "-v", f"{self._config}:/app/etc/application.yaml:ro",
             "-v", f"{self._ontologies}:/app/etc/domain-ontologies:ro",
         ]
@@ -72,11 +75,23 @@ class MicroweightAgentBuilder(AgentBuilder):
 
     def _get_host_port(self, name: str) -> str:
         """Return the host port Docker assigned to the container's port 8080."""
-        result = subprocess.run(
-            ["docker", "port", name, _CONTAINER_PORT],
-            check=True,
-            capture_output=True,
-            text=True,
+        for attempt in range(10):
+            result = subprocess.run(
+                ["docker", "port", name, _CONTAINER_PORT],
+                capture_output=True,
+                text=True,
+            )
+            lines = result.stdout.splitlines()
+            if lines:
+                # Output: "0.0.0.0:32768\n" or ":::32768\n" — port is always the last colon-delimited token.
+                return lines[0].rsplit(":", 1)[-1]
+            time.sleep(0.5)
+
+        # Container never exposed the port — surface its logs to help diagnose.
+        logs = subprocess.run(
+            ["docker", "logs", name], capture_output=True, text=True
         )
-        # Output: "0.0.0.0:32768\n" or ":::32768\n" — port is always the last colon-delimited token.
-        return result.stdout.splitlines()[0].rsplit(":", 1)[-1]
+        raise RuntimeError(
+            f"Container '{name}' did not expose port {_CONTAINER_PORT} after 5 s.\n"
+            f"stdout: {logs.stdout}\nstderr: {logs.stderr}"
+        )

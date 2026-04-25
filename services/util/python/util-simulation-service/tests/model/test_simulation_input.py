@@ -10,7 +10,7 @@ from util_simulation_service.model.time_offset import TimeOffset, TimeUnit
 
 
 def _make_event(n: float = 1.0, unit: TimeUnit = TimeUnit.SECONDS) -> SimulationEvent:
-    return SimulationEvent(time_offset=TimeOffset(n=n, unit=unit), payload={"key": "value"})
+    return SimulationEvent(time_offset=TimeOffset(n=n, unit=unit), target_agent="agent-a", endpoint="/bootstrap/ingest", payload={"key": "value"})
 
 
 def _make_valid_input(**overrides) -> dict:
@@ -65,6 +65,8 @@ class TestSimulationInput:
     def test_event_payload_preserved(self):
         event = SimulationEvent(
             time_offset=TimeOffset(n=1.0),
+            target_agent="agent-a",
+            endpoint="/bootstrap/ingest",
             payload={"foo": "bar", "count": 42},
         )
         sim = SimulationInput(**_make_valid_input(events=[event]))
@@ -79,6 +81,8 @@ class TestSimulationInput:
                     {
                         "type": "simulation",
                         "time_offset": {"n": 1.0, "unit": "seconds"},
+                        "target_agent": "agent-a",
+                        "endpoint": "/bootstrap/ingest",
                         "payload": {"x": 1},
                     }
                 ],

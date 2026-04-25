@@ -49,7 +49,7 @@ class DomainOntologyBootstrapService:
                 response.raise_for_status()
                 logger.info("Successfully posted domain ontology to '%s'.", agent.name)
                 return
-            except httpx.ConnectError as exc:
+            except httpx.TransportError as exc:
                 if attempt < _MAX_ATTEMPTS:
                     logger.warning(
                         "Agent '%s' not reachable (attempt %d/%d); retrying in %.0fs: %s",

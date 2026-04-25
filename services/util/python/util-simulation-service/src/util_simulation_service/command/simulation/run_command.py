@@ -16,6 +16,8 @@ from util_simulation_service.service.agent_factory import AgentFactory
 from util_simulation_service.service.analysis_service import AnalysisService
 from util_simulation_service.service.clock_broadcast_service import ClockBroadcastService
 from util_simulation_service.service.domain_ontology_bootstrap_service import DomainOntologyBootstrapService
+from util_simulation_service.service.event_dump_service import EventDumpService
+from util_simulation_service.service.graph_deployment_service import GraphDeploymentService
 from util_simulation_service.service.event_manager import EventManager
 from util_simulation_service.service.network_service import NetworkService
 from util_simulation_service.service.setup_service import SetupService
@@ -39,7 +41,20 @@ def _repo_root() -> pathlib.Path:
     required=True,
     help="YAML file describing the simulation (name, agents, events, networks, speed).",
 )
-def run(input_file: pathlib.Path):
+@click.option(
+    "--output-path",
+    type=click.Path(file_okay=False, writable=True, path_type=pathlib.Path),
+    default=pathlib.Path("."),
+    show_default=True,
+    help="Directory in which the event dump JSON file is written.",
+)
+@click.option(
+    "--output-file-name",
+    type=str,
+    default=None,
+    help="Filename for the event dump (default: {simulation-name}-event-dump.json).",
+)
+def run(input_file: pathlib.Path, output_path: pathlib.Path, output_file_name: str | None):
     """Run a simulation against a live Ubiquia deployment."""
 
     simulation_input = SimulationService.load(input_file)
@@ -69,6 +84,11 @@ def run(input_file: pathlib.Path):
             simulation_input.bootstrap.domain_ontologies
         )
 
+    graph_deployment_service = GraphDeploymentService(agents=agents)
+    for agent_input in simulation_input.agents:
+        if agent_input.graph_deployments and agent_input.join_offset_time is None:
+            graph_deployment_service.deploy(agent_input.name, agent_input.graph_deployments)
+
     # Synthesize a join event for every agent that declares a join_offset_time.
     # These are merged into the simulation timeline so the agent is provisioned
     # and registered at the correct simulated time.
@@ -78,7 +98,7 @@ def run(input_file: pathlib.Path):
         if a.join_offset_time is not None
     ]
 
-    SimulationService(
+    fired_events = SimulationService(
         simulation_input=simulation_input,
         event_manager=EventManager(
             commands={
@@ -92,3 +112,10 @@ def run(input_file: pathlib.Path):
     ).run()
 
     AnalysisService().run()
+
+    EventDumpService(agents=agents).dump(
+        simulation_name=simulation_input.name,
+        fired_events=fired_events,
+        output_dir=output_path,
+        output_file_name=output_file_name,
+    )

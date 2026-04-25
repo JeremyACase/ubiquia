@@ -21,7 +21,6 @@ class DockerNetworkBuilder(NetworkBuilder):
         self._ensure_network(network.name)
         for agent in agents:
             self._connect(network.name, agent)
-            self._disconnect_default_bridge(agent)
 
     def _ensure_network(self, network_name: str) -> None:
         result = subprocess.run(
