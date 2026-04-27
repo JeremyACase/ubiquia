@@ -8,7 +8,7 @@ from util_simulation_service.model.simulation_input import SimulationInput
 
 logger = logging.getLogger(__name__)
 
-_DEFAULT_NETWORK_NAME = "default"
+_DEFAULT_NETWORK_NAME = "ubiquia-default"
 
 
 class NetworkService:

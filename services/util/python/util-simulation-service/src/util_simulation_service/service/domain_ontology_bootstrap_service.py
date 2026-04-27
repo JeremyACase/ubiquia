@@ -31,7 +31,7 @@ class DomainOntologyBootstrapService:
         with httpx.Client() as client:
             for entry in domain_ontologies:
                 logger.info("Bootstrapping domain ontology from '%s'.", entry.file)
-                payload = yaml.safe_load(entry.file.read_text())
+                payload = yaml.safe_load(entry.file.read_text(encoding="utf-8"))
                 for target in entry.targets:
                     agent = self._agents.get(target)
                     if agent is None:
