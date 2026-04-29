@@ -2,7 +2,7 @@ import pytest
 import httpx
 import respx
 
-from util_simulation_service.command.simulation_event_command import SimulationEventCommand
+from util_simulation_service.service.command.simulation_event_command import SimulationEventCommand
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.events.event import Event
 from util_simulation_service.model.events.simulation_event import SimulationEvent

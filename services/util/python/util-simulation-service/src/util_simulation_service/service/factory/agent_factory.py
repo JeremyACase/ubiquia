@@ -1,6 +1,6 @@
-from util_simulation_service.builder.agent_builder import AgentBuilder
-from util_simulation_service.builder.kind_agent_builder import KindAgentBuilder
-from util_simulation_service.builder.microweight_agent_builder import MicroweightAgentBuilder
+from util_simulation_service.service.builder.agent_builder import AgentBuilder
+from util_simulation_service.service.builder.kind_agent_builder import KindAgentBuilder
+from util_simulation_service.service.builder.microweight_agent_builder import MicroweightAgentBuilder
 from util_simulation_service.model.agent_mode import AgentMode
 
 

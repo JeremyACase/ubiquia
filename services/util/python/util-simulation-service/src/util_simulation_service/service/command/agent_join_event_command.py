@@ -1,12 +1,12 @@
 import logging
 
-from util_simulation_service.command.event_command import EventCommand
+from util_simulation_service.service.command.event_command import EventCommand
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.events.agent_join_event import AgentJoinEvent
 from util_simulation_service.model.events.event import Event
 from util_simulation_service.model.agent_mode import AgentMode
-from util_simulation_service.service.agent_factory import AgentFactory
-from util_simulation_service.service.graph_deployment_service import GraphDeploymentService
+from util_simulation_service.service.factory.agent_factory import AgentFactory
+from util_simulation_service.service.logic.pre_processing.graph_deployment_service import GraphDeploymentService
 
 logger = logging.getLogger(__name__)
 

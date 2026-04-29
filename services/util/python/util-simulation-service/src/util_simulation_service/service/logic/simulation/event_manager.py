@@ -1,6 +1,6 @@
 import logging
 
-from util_simulation_service.command.event_command import EventCommand
+from util_simulation_service.service.command.event_command import EventCommand
 from util_simulation_service.model.events.event import Event
 
 logger = logging.getLogger(__name__)

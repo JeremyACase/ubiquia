@@ -1,7 +1,7 @@
 import logging
 import subprocess
 
-from util_simulation_service.builder.network_builder import NetworkBuilder
+from util_simulation_service.service.builder.network_builder import NetworkBuilder
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.network import Network
 

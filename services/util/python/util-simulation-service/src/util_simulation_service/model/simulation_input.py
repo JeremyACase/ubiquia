@@ -7,6 +7,7 @@ from util_simulation_service.model.bootstrap_input import BootstrapInput
 from util_simulation_service.model.network import Network
 from util_simulation_service.model.events.partition_event import PartitionEvent
 from util_simulation_service.model.events.simulation_event import SimulationEvent
+from util_simulation_service.model.time_offset import TimeOffset
 
 AnyEvent = Annotated[Union[SimulationEvent, PartitionEvent], Field(discriminator="type")]
 
@@ -18,6 +19,7 @@ class SimulationInput(BaseModel):
     events: list[AnyEvent]
     networks: list[Network]
     speed: float = Field(gt=0, description="Playback speed multiplier (e.g. 2.0 = twice real-time).")
+    duration: TimeOffset | None = Field(default=None, description="Total scenario duration. All event offsets must fall within this window.")
 
     @model_validator(mode="after")
     def validate_network_agents(self) -> "SimulationInput":
@@ -57,3 +59,4 @@ class SimulationInput(BaseModel):
                     f"Domain ontology '{entry.file}' references agents not found in the agents list: {unknown}"
                 )
         return self
+

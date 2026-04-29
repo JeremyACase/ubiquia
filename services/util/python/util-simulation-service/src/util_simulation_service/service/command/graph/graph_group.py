@@ -1,6 +1,6 @@
 import click
 
-from util_simulation_service.command.graph.visualize_command import visualize
+from util_simulation_service.service.command.graph.visualize_command import visualize
 
 
 @click.group("graph")

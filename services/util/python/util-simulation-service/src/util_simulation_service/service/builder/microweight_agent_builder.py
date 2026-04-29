@@ -4,7 +4,7 @@ import subprocess
 import time
 import uuid
 
-from util_simulation_service.builder.agent_builder import AgentBuilder
+from util_simulation_service.service.builder.agent_builder import AgentBuilder
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.agent_mode import AgentMode
 

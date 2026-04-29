@@ -1,27 +1,32 @@
+import logging
 import pathlib
 import subprocess
 
 import click
 
-from util_simulation_service.builder.docker_network_builder import DockerNetworkBuilder
-from util_simulation_service.builder.kind_agent_builder import KindAgentBuilder
-from util_simulation_service.builder.microweight_agent_builder import MicroweightAgentBuilder
-from util_simulation_service.command.agent_join_event_command import AgentJoinEventCommand
-from util_simulation_service.command.partition_event_command import PartitionEventCommand
-from util_simulation_service.command.simulation_event_command import SimulationEventCommand
+from util_simulation_service.service.builder.docker_network_builder import DockerNetworkBuilder
+from util_simulation_service.service.builder.kind_agent_builder import KindAgentBuilder
+from util_simulation_service.service.builder.microweight_agent_builder import MicroweightAgentBuilder
+from util_simulation_service.service.command.agent_join_event_command import AgentJoinEventCommand
+from util_simulation_service.service.command.partition_event_command import PartitionEventCommand
+from util_simulation_service.service.command.simulation_event_command import SimulationEventCommand
 from util_simulation_service.model.events.agent_join_event import AgentJoinEvent
 from util_simulation_service.model.agent_mode import AgentMode
 from util_simulation_service.model.network_topology import NetworkTopology
-from util_simulation_service.service.agent_factory import AgentFactory
-from util_simulation_service.service.analysis_service import AnalysisService
-from util_simulation_service.service.clock_broadcast_service import ClockBroadcastService
-from util_simulation_service.service.domain_ontology_bootstrap_service import DomainOntologyBootstrapService
-from util_simulation_service.service.event_dump_service import EventDumpService
-from util_simulation_service.service.graph_deployment_service import GraphDeploymentService
-from util_simulation_service.service.event_manager import EventManager
-from util_simulation_service.service.network_service import NetworkService
-from util_simulation_service.service.setup_service import SetupService
-from util_simulation_service.service.simulation_service import SimulationService
+from util_simulation_service.service.factory.agent_factory import AgentFactory
+from util_simulation_service.service.logic.post_processing.analysis_service import AnalysisService
+from util_simulation_service.service.logic.simulation.clock_broadcast_service import ClockBroadcastService
+from util_simulation_service.service.logic.pre_processing.domain_ontology_bootstrap_service import DomainOntologyBootstrapService
+from util_simulation_service.service.logic.simulation.scenario_duration_logic_service import ScenarioDurationLogicService
+from util_simulation_service.service.logic.post_processing.event_dump_service import EventDumpService
+from util_simulation_service.service.logic.pre_processing.graph_deployment_service import GraphDeploymentService
+from util_simulation_service.service.logic.simulation.event_manager import EventManager
+from util_simulation_service.service.logic.pre_processing.network_service import NetworkService
+from util_simulation_service.service.logic.pre_processing.setup_service import SetupService
+from util_simulation_service.service.logic.simulation.simulation_service import SimulationService
+
+
+logger = logging.getLogger(__name__)
 
 
 def _repo_root() -> pathlib.Path:
@@ -58,6 +63,8 @@ def run(input_file: pathlib.Path, output_path: pathlib.Path, output_file_name: s
     """Run a simulation against a live Ubiquia deployment."""
 
     simulation_input = SimulationService.load(input_file)
+
+    logger.info("=== PRE-PROCESSING: '%s' ===", simulation_input.name)
 
     # Only resolve the repo root (requires git) when non-test agents are present.
     needs_repo_root = any(a.mode != AgentMode.TEST for a in simulation_input.agents)
@@ -98,6 +105,8 @@ def run(input_file: pathlib.Path, output_path: pathlib.Path, output_file_name: s
         if a.join_offset_time is not None
     ]
 
+    logger.info("=== SIMULATION STARTING: '%s' ===", simulation_input.name)
+
     fired_events = SimulationService(
         simulation_input=simulation_input,
         event_manager=EventManager(
@@ -107,9 +116,12 @@ def run(input_file: pathlib.Path, output_path: pathlib.Path, output_file_name: s
                 "partition": PartitionEventCommand(topology=topology),
             }
         ),
+        scenario_duration_service=ScenarioDurationLogicService(),
         clock_broadcast_service=ClockBroadcastService(agents=agents),
         extra_events=join_events,
     ).run()
+
+    logger.info("=== POST-PROCESSING: '%s' ===", simulation_input.name)
 
     AnalysisService().run()
 

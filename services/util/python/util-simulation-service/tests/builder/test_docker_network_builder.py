@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from util_simulation_service.builder.docker_network_builder import DockerNetworkBuilder
+from util_simulation_service.service.builder.docker_network_builder import DockerNetworkBuilder
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.network import Network
 
@@ -32,7 +32,7 @@ def _make_run_side_effect(network_exists: bool = False):
 
 class TestDockerNetworkBuilderBuild:
     def test_creates_network_when_absent(self):
-        with patch("util_simulation_service.builder.docker_network_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.docker_network_builder.subprocess.run",
                    side_effect=_make_run_side_effect(network_exists=False)) as mock_run:
             DockerNetworkBuilder().build(_network("my-network", ["a"]), [_agent("a")])
 
@@ -42,7 +42,7 @@ class TestDockerNetworkBuilderBuild:
         assert "my-network" in create_calls[0].args[0]
 
     def test_skips_network_creation_when_already_exists(self):
-        with patch("util_simulation_service.builder.docker_network_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.docker_network_builder.subprocess.run",
                    side_effect=_make_run_side_effect(network_exists=True)) as mock_run:
             DockerNetworkBuilder().build(_network("my-network", ["a"]), [_agent("a")])
 
@@ -51,7 +51,7 @@ class TestDockerNetworkBuilderBuild:
         assert len(create_calls) == 0
 
     def test_connects_each_agent_to_network(self):
-        with patch("util_simulation_service.builder.docker_network_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.docker_network_builder.subprocess.run",
                    side_effect=_make_run_side_effect()) as mock_run:
             DockerNetworkBuilder().build(
                 _network("my-network", ["agent-a", "agent-b"]),
@@ -65,7 +65,7 @@ class TestDockerNetworkBuilderBuild:
         assert "agent-b" in connected
 
     def test_connect_uses_correct_network_name(self):
-        with patch("util_simulation_service.builder.docker_network_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.docker_network_builder.subprocess.run",
                    side_effect=_make_run_side_effect()) as mock_run:
             DockerNetworkBuilder().build(_network("sim-net", ["a"]), [_agent("a")])
 
@@ -88,7 +88,7 @@ class TestDockerNetworkBuilderBuild:
                 result.stderr = ""
             return result
 
-        with patch("util_simulation_service.builder.docker_network_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.docker_network_builder.subprocess.run",
                    side_effect=_side_effect):
             # Should not raise despite returncode=1
             DockerNetworkBuilder().build(_network("my-network", ["agent-a"]), [_agent("agent-a")])
@@ -109,13 +109,13 @@ class TestDockerNetworkBuilderBuild:
                 result.stderr = ""
             return result
 
-        with patch("util_simulation_service.builder.docker_network_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.docker_network_builder.subprocess.run",
                    side_effect=_side_effect):
             with pytest.raises(subprocess.CalledProcessError):
                 DockerNetworkBuilder().build(_network("my-network", ["agent-a"]), [_agent("agent-a")])
 
     def test_no_agents_makes_no_connect_calls(self):
-        with patch("util_simulation_service.builder.docker_network_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.docker_network_builder.subprocess.run",
                    side_effect=_make_run_side_effect()) as mock_run:
             DockerNetworkBuilder().build(_network("my-network", []), [])
 

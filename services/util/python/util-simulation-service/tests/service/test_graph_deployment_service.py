@@ -6,12 +6,12 @@ import pytest
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.graph_deployment_input import GraphDeploymentInput
 from util_simulation_service.model.semantic_version import SemanticVersion
-from util_simulation_service.service.graph_deployment_service import (
+from util_simulation_service.service.logic.pre_processing.graph_deployment_service import (
     _DEPLOY_ENDPOINT,
     GraphDeploymentService,
 )
 
-_PATCH = "util_simulation_service.service.graph_deployment_service.httpx.Client"
+_PATCH = "util_simulation_service.service.logic.pre_processing.graph_deployment_service.httpx.Client"
 
 _AGENT = Agent(name="agent-a", base_url="http://localhost:8080")
 
@@ -103,7 +103,7 @@ class TestGraphDeploymentServiceDeploy:
         )
         with patch(_PATCH) as MockClient:
             MockClient.return_value.__enter__.return_value = mock_inner
-            with patch("util_simulation_service.service.graph_deployment_service.time.sleep"):
+            with patch("util_simulation_service.service.logic.pre_processing.graph_deployment_service.time.sleep"):
                 GraphDeploymentService(agents=[_AGENT]).deploy("agent-a", [_deployment()])
 
         assert mock_inner.post.call_count == 2

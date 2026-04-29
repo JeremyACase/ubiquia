@@ -3,7 +3,7 @@ import logging
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.agent_mode import AgentMode
 from util_simulation_service.model.simulation_input import SimulationInput
-from util_simulation_service.service.agent_factory import AgentFactory
+from util_simulation_service.service.factory.agent_factory import AgentFactory
 
 logger = logging.getLogger(__name__)
 

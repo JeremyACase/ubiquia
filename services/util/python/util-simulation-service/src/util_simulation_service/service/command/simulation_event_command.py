@@ -2,7 +2,7 @@ import logging
 
 import httpx
 
-from util_simulation_service.command.event_command import EventCommand
+from util_simulation_service.service.command.event_command import EventCommand
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.events.event import Event
 from util_simulation_service.model.events.simulation_event import SimulationEvent

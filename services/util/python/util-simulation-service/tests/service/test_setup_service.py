@@ -2,15 +2,15 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from util_simulation_service.builder.agent_builder import AgentBuilder
+from util_simulation_service.service.builder.agent_builder import AgentBuilder
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.agent_input import AgentInput
 from util_simulation_service.model.agent_mode import AgentMode
 from util_simulation_service.model.events.simulation_event import SimulationEvent
 from util_simulation_service.model.simulation_input import SimulationInput
 from util_simulation_service.model.time_offset import TimeOffset
-from util_simulation_service.service.agent_factory import AgentFactory
-from util_simulation_service.service.setup_service import SetupService
+from util_simulation_service.service.factory.agent_factory import AgentFactory
+from util_simulation_service.service.logic.pre_processing.setup_service import SetupService
 
 
 def _agent_input(name: str, mode: AgentMode = AgentMode.MICROWEIGHT, deferred: bool = False) -> AgentInput:

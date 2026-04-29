@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, call
 
 import pytest
 
-from util_simulation_service.builder.network_builder import NetworkBuilder
+from util_simulation_service.service.builder.network_builder import NetworkBuilder
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.agent_input import AgentInput
 from util_simulation_service.model.agent_mode import AgentMode
@@ -11,7 +11,7 @@ from util_simulation_service.model.network_topology import NetworkTopology
 from util_simulation_service.model.events.simulation_event import SimulationEvent
 from util_simulation_service.model.simulation_input import SimulationInput
 from util_simulation_service.model.time_offset import TimeOffset
-from util_simulation_service.service.network_service import NetworkService
+from util_simulation_service.service.logic.pre_processing.network_service import NetworkService
 
 
 def _agent(name: str) -> Agent:
@@ -88,7 +88,7 @@ class TestNetworkService:
 
         builder.build.assert_called_once()
         passed_network = builder.build.call_args[0][0]
-        assert passed_network.name == "default"
+        assert passed_network.name == "ubiquia-default"
 
     def test_default_network_contains_all_agents(self):
         builder = MagicMock(spec=NetworkBuilder)

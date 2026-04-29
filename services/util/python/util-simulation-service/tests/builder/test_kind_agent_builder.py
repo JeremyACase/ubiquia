@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from util_simulation_service.builder.kind_agent_builder import (
+from util_simulation_service.service.builder.kind_agent_builder import (
     KindAgentBuilder,
     _HELM_RELEASE,
     _IMAGE_NAME,
@@ -45,21 +45,21 @@ def _make_run_side_effect(cluster_exists: bool = False, helm_installed: bool = F
 
 class TestKindAgentBuilderBuild:
     def test_returns_agent_with_correct_name(self, repo_root):
-        with patch("util_simulation_service.builder.kind_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.kind_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect()):
             agent = KindAgentBuilder(repo_root).build("agent-a")
 
         assert agent.name == "agent-a"
 
     def test_returns_base_url_with_base_port(self, repo_root):
-        with patch("util_simulation_service.builder.kind_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.kind_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect()):
             agent = KindAgentBuilder(repo_root, base_port=9090).build("agent-a")
 
         assert agent.base_url == "http://localhost:9090"
 
     def test_each_build_increments_port(self, repo_root):
-        with patch("util_simulation_service.builder.kind_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.kind_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect()):
             builder = KindAgentBuilder(repo_root, base_port=8080)
             agent_a = builder.build("agent-a")
@@ -69,7 +69,7 @@ class TestKindAgentBuilderBuild:
         assert agent_b.base_url == "http://localhost:8081"
 
     def test_creates_cluster_when_not_present(self, repo_root):
-        with patch("util_simulation_service.builder.kind_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.kind_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect(cluster_exists=False)) as mock_run:
             KindAgentBuilder(repo_root).build("agent-a")
 
@@ -80,7 +80,7 @@ class TestKindAgentBuilderBuild:
         assert "--name" in cmd and "ubiquia-agent-a" in cmd
 
     def test_skips_cluster_creation_when_already_present(self, repo_root):
-        with patch("util_simulation_service.builder.kind_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.kind_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect(cluster_exists=True)) as mock_run:
             KindAgentBuilder(repo_root).build("agent-a")
 
@@ -100,7 +100,7 @@ class TestKindAgentBuilderBuild:
                 written_configs.append(pathlib.Path(config_path).read_text())
             return result
 
-        with patch("util_simulation_service.builder.kind_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.kind_agent_builder.subprocess.run",
                    side_effect=_side_effect):
             KindAgentBuilder(repo_root, base_port=9000).build("agent-a")
 
@@ -110,7 +110,7 @@ class TestKindAgentBuilderBuild:
         assert "hostPort: 9000" in config
 
     def test_builds_and_loads_docker_image(self, repo_root):
-        with patch("util_simulation_service.builder.kind_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.kind_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect()) as mock_run:
             KindAgentBuilder(repo_root).build("agent-a")
 
@@ -125,7 +125,7 @@ class TestKindAgentBuilderBuild:
         assert "ubiquia-agent-a" in load_calls[0].args[0]
 
     def test_applies_rbac_and_pv_manifests(self, repo_root):
-        with patch("util_simulation_service.builder.kind_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.kind_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect()) as mock_run:
             KindAgentBuilder(repo_root).build("agent-a")
 
@@ -144,7 +144,7 @@ class TestKindAgentBuilderBuild:
         ]
 
     def test_helm_install_on_fresh_cluster(self, repo_root):
-        with patch("util_simulation_service.builder.kind_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.kind_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect(helm_installed=False)) as mock_run:
             KindAgentBuilder(repo_root).build("agent-a")
 
@@ -154,7 +154,7 @@ class TestKindAgentBuilderBuild:
         assert "upgrade" not in action_calls[0].args[0]
 
     def test_helm_upgrade_on_existing_release(self, repo_root):
-        with patch("util_simulation_service.builder.kind_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.kind_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect(helm_installed=True)) as mock_run:
             KindAgentBuilder(repo_root).build("agent-a")
 
@@ -164,7 +164,7 @@ class TestKindAgentBuilderBuild:
         assert "install" not in action_calls[0].args[0]
 
     def test_helm_uses_featherweight_values(self, repo_root):
-        with patch("util_simulation_service.builder.kind_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.kind_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect()) as mock_run:
             KindAgentBuilder(repo_root).build("agent-a")
 
@@ -175,7 +175,7 @@ class TestKindAgentBuilderBuild:
         assert "featherweight-dev.yaml" in cmd
 
     def test_kubectl_commands_target_correct_context(self, repo_root):
-        with patch("util_simulation_service.builder.kind_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.kind_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect()) as mock_run:
             KindAgentBuilder(repo_root).build("agent-a")
 

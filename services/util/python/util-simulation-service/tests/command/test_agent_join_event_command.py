@@ -2,15 +2,15 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from util_simulation_service.builder.agent_builder import AgentBuilder
-from util_simulation_service.command.agent_join_event_command import AgentJoinEventCommand
+from util_simulation_service.service.builder.agent_builder import AgentBuilder
+from util_simulation_service.service.command.agent_join_event_command import AgentJoinEventCommand
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.agent_input import AgentInput
 from util_simulation_service.model.events.agent_join_event import AgentJoinEvent
 from util_simulation_service.model.agent_mode import AgentMode
 from util_simulation_service.model.events.simulation_event import SimulationEvent
 from util_simulation_service.model.time_offset import TimeOffset
-from util_simulation_service.service.agent_factory import AgentFactory
+from util_simulation_service.service.factory.agent_factory import AgentFactory
 
 
 def _join_event(name: str, mode: AgentMode = AgentMode.MICROWEIGHT, base_url: str | None = None) -> AgentJoinEvent:

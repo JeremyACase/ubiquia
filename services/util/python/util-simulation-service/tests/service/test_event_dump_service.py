@@ -6,7 +6,7 @@ import httpx
 import pytest
 
 from util_simulation_service.model.agent import Agent
-from util_simulation_service.service.event_dump_service import EventDumpService
+from util_simulation_service.service.logic.post_processing.event_dump_service import EventDumpService
 
 
 def _agent(name: str = "agent-a", base_url: str = "http://agent-a:8080") -> Agent:
@@ -271,7 +271,7 @@ class TestEventDumpServiceSorting:
 
         # Patch httpx.Client context manager to inject our mock
         import unittest.mock as mock
-        with mock.patch("util_simulation_service.service.event_dump_service.httpx.Client") as MockClient:
+        with mock.patch("util_simulation_service.service.logic.post_processing.event_dump_service.httpx.Client") as MockClient:
             MockClient.return_value.__enter__ = lambda s: client
             MockClient.return_value.__exit__ = MagicMock(return_value=False)
             client.get.return_value = _make_response({"content": [flow_event], "last": True})
@@ -289,7 +289,7 @@ class TestEventDumpServiceSorting:
         event_b = _flow_event("id-b", "2026-04-10T12:00:02Z")
 
         import unittest.mock as mock
-        with mock.patch("util_simulation_service.service.event_dump_service.httpx.Client") as MockClient:
+        with mock.patch("util_simulation_service.service.logic.post_processing.event_dump_service.httpx.Client") as MockClient:
             client = MagicMock()
             MockClient.return_value.__enter__ = lambda s: client
             MockClient.return_value.__exit__ = MagicMock(return_value=False)

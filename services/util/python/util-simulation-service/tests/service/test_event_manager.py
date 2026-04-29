@@ -1,10 +1,10 @@
 import pytest
 from unittest.mock import MagicMock
 
-from util_simulation_service.command.event_command import EventCommand
+from util_simulation_service.service.command.event_command import EventCommand
 from util_simulation_service.model.events.simulation_event import SimulationEvent
 from util_simulation_service.model.time_offset import TimeOffset
-from util_simulation_service.service.event_manager import EventManager
+from util_simulation_service.service.logic.simulation.event_manager import EventManager
 
 
 def _simulation_event() -> SimulationEvent:

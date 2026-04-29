@@ -6,8 +6,9 @@ import yaml
 from datetime import datetime, timedelta, timezone
 
 from util_simulation_service.model.simulation_input import SimulationInput
-from util_simulation_service.service.clock_broadcast_service import ClockBroadcastService
-from util_simulation_service.service.event_manager import EventManager
+from util_simulation_service.service.logic.simulation.clock_broadcast_service import ClockBroadcastService
+from util_simulation_service.service.logic.simulation.scenario_duration_logic_service import ScenarioDurationLogicService
+from util_simulation_service.service.logic.simulation.event_manager import EventManager
 
 logger = logging.getLogger(__name__)
 
@@ -27,11 +28,13 @@ class SimulationService:
         self,
         simulation_input: SimulationInput,
         event_manager: EventManager,
+        scenario_duration_service: ScenarioDurationLogicService,
         clock_broadcast_service: ClockBroadcastService | None = None,
         extra_events: list | None = None,
     ):
         self._simulation_input = simulation_input
         self._event_manager = event_manager
+        self._scenario_duration_service = scenario_duration_service
         self._clock_broadcast_service = clock_broadcast_service
         self._extra_events = extra_events or []
 
@@ -112,6 +115,17 @@ class SimulationService:
                     "_sort_time": fired_at,
                 }
             )
+
+        resolved_duration = self._scenario_duration_service.resolve(self._simulation_input)
+        end_time = start_time + timedelta(seconds=resolved_duration / speed)
+        remaining = (end_time - datetime.now(timezone.utc)).total_seconds()
+        if remaining > 0:
+            logger.info(
+                "Simulation '%s': all events fired; holding for %.2fs until scenario duration elapses.",
+                self._simulation_input.name,
+                remaining,
+            )
+            time.sleep(remaining)
 
         logger.info("Simulation '%s' complete.", self._simulation_input.name)
 

@@ -10,9 +10,10 @@ from util_simulation_service.model.events.agent_join_event import AgentJoinEvent
 from util_simulation_service.model.agent_mode import AgentMode
 from util_simulation_service.model.simulation_input import SimulationInput
 from util_simulation_service.model.time_offset import TimeOffset
-from util_simulation_service.service.clock_broadcast_service import ClockBroadcastService
-from util_simulation_service.service.event_manager import EventManager
-from util_simulation_service.service.simulation_service import SimulationService
+from util_simulation_service.service.logic.simulation.clock_broadcast_service import ClockBroadcastService
+from util_simulation_service.service.logic.simulation.event_manager import EventManager
+from util_simulation_service.service.logic.simulation.scenario_duration_logic_service import ScenarioDurationLogicService
+from util_simulation_service.service.logic.simulation.simulation_service import SimulationService
 
 # A fixed start time well in the past so no test ever sleeps.
 _PAST = datetime(2000, 1, 1, tzinfo=timezone.utc)
@@ -56,6 +57,7 @@ def _service(
     return SimulationService(
         simulation_input=simulation_input,
         event_manager=event_manager or MagicMock(spec=EventManager),
+        scenario_duration_service=ScenarioDurationLogicService(),
         clock_broadcast_service=clock_broadcast_service,
     )
 
@@ -147,12 +149,13 @@ class TestSimulationServiceRun:
         simulation_input = _load(tmp_path, payload)
         start_time = datetime.now(timezone.utc)
 
-        with patch("util_simulation_service.service.simulation_service.time.sleep") as mock_sleep:
+        with patch("util_simulation_service.service.logic.simulation.simulation_service.time.sleep") as mock_sleep:
             _service(simulation_input).run(start_time=start_time)
 
         assert mock_sleep.called
-        slept = mock_sleep.call_args[0][0]
-        assert 9.0 < slept <= 10.0
+        # First sleep is the event delay; subsequent sleep(s) are the duration hold.
+        event_sleep = mock_sleep.call_args_list[0][0][0]
+        assert 9.0 < event_sleep <= 10.0
 
     def test_run_applies_speed_multiplier(self, tmp_path):
         payload = _valid_payload(events=[_sim_event(10.0)])
@@ -160,17 +163,17 @@ class TestSimulationServiceRun:
         simulation_input = _load(tmp_path, payload)
         start_time = datetime.now(timezone.utc)
 
-        with patch("util_simulation_service.service.simulation_service.time.sleep") as mock_sleep:
+        with patch("util_simulation_service.service.logic.simulation.simulation_service.time.sleep") as mock_sleep:
             _service(simulation_input).run(start_time=start_time)
 
-        slept = mock_sleep.call_args[0][0]
-        # 10s offset / speed 2.0 = 5s real-time delay
-        assert 4.0 < slept <= 5.0
+        # First sleep is the event delay; 10s offset / speed 2.0 = 5s real-time.
+        event_sleep = mock_sleep.call_args_list[0][0][0]
+        assert 4.0 < event_sleep <= 5.0
 
     def test_run_does_not_sleep_for_past_events(self, tmp_path):
         simulation_input = _load(tmp_path, _valid_payload())
 
-        with patch("util_simulation_service.service.simulation_service.time.sleep") as mock_sleep:
+        with patch("util_simulation_service.service.logic.simulation.simulation_service.time.sleep") as mock_sleep:
             _service(simulation_input).run(start_time=_PAST)
 
         mock_sleep.assert_not_called()
@@ -188,6 +191,7 @@ class TestSimulationServiceExtraEvents:
         SimulationService(
             simulation_input=simulation_input,
             event_manager=event_manager,
+            scenario_duration_service=ScenarioDurationLogicService(),
             extra_events=[join_event],
         ).run(start_time=_PAST)
 
@@ -210,6 +214,7 @@ class TestSimulationServiceExtraEvents:
         SimulationService(
             simulation_input=simulation_input,
             event_manager=event_manager,
+            scenario_duration_service=ScenarioDurationLogicService(),
             extra_events=[join_event],
         ).run(start_time=_PAST)
 
@@ -226,6 +231,7 @@ class TestSimulationServiceExtraEvents:
         SimulationService(
             simulation_input=simulation_input,
             event_manager=event_manager,
+            scenario_duration_service=ScenarioDurationLogicService(),
         ).run(start_time=_PAST)
 
         assert event_manager.dispatch.call_count == 1
@@ -285,6 +291,7 @@ class TestSimulationServiceRunReturnValue:
         result = SimulationService(
             simulation_input=simulation_input,
             event_manager=MagicMock(spec=EventManager),
+            scenario_duration_service=ScenarioDurationLogicService(),
             extra_events=[join_event],
         ).run(start_time=_PAST)
         assert len(result) == 1
