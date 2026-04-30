@@ -1,9 +1,9 @@
 import pytest
 
-from util_simulation_service.builder.agent_builder import AgentBuilder
+from util_simulation_service.service.builder.agent_builder import AgentBuilder
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.agent_mode import AgentMode
-from util_simulation_service.service.agent_factory import AgentFactory
+from util_simulation_service.service.factory.agent_factory import AgentFactory
 
 
 def _stub_builder(base_url: str) -> AgentBuilder:

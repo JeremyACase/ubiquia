@@ -3,8 +3,8 @@ import logging
 import click
 from rich.logging import RichHandler
 
-from util_simulation_service.command.graph.graph_group import graph
-from util_simulation_service.command.simulation.simulation_group import simulation
+from util_simulation_service.service.command.graph.graph_group import graph
+from util_simulation_service.service.command.simulation.simulation_group import simulation
 
 logging.basicConfig(
     level=logging.INFO,

@@ -7,25 +7,16 @@ CLI for running multi-agent simulations against a live Ubiquia deployment.
 - Python 3.10+
 - [uv](https://docs.astral.sh/uv/)
 
-## Update the CLI
-
-From the `util-simulation-service` directory, sync dependencies and reinstall the package in editable mode:
-
-```bash
-uv sync
-uv pip install -e .
-```
-
 ## Run a simulation
 
 ```bash
-util-simulation-service simulation run --input-file simulations/devops-simulation.yaml
+uv run util-simulation-service simulation run --input-file simulations/devops-simulation.yaml
 ```
 
 By default the event dump is written to the current directory. Use `--output-path` and `--output-file-name` to change the destination:
 
 ```bash
-util-simulation-service simulation run \
+uv run util-simulation-service simulation run \
   --input-file simulations/devops-simulation.yaml \
   --output-path /tmp/results \
   --output-file-name my-run.json
@@ -49,7 +40,7 @@ Example files live in the `simulations/` directory.
 ## Other commands
 
 ```bash
-util-simulation-service --help
-util-simulation-service simulation --help
-util-simulation-service graph --help
+uv run util-simulation-service --help
+uv run util-simulation-service simulation --help
+uv run util-simulation-service graph --help
 ```

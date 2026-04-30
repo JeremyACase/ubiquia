@@ -6,7 +6,7 @@ import pytest
 
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.domain_ontology_bootstrap_input import DomainOntologyBootstrapInput
-from util_simulation_service.service.domain_ontology_bootstrap_service import (
+from util_simulation_service.service.logic.pre_processing.domain_ontology_bootstrap_service import (
     _DOMAIN_ONTOLOGY_ENDPOINT,
     _MAX_ATTEMPTS,
     DomainOntologyBootstrapService,
@@ -15,7 +15,7 @@ from util_simulation_service.service.domain_ontology_bootstrap_service import (
 _AGENT_A = Agent(name="agent-a", base_url="http://localhost:8080")
 _AGENT_B = Agent(name="agent-b", base_url="http://localhost:8081")
 
-_PATCH = "util_simulation_service.service.domain_ontology_bootstrap_service.httpx.Client"
+_PATCH = "util_simulation_service.service.logic.pre_processing.domain_ontology_bootstrap_service.httpx.Client"
 
 _ONTOLOGY_PAYLOAD = {"name": "pets", "version": {"major": 1, "minor": 0, "patch": 0}}
 
@@ -144,7 +144,7 @@ class TestDomainOntologyBootstrapService:
 
         with patch(_PATCH) as MockClient:
             MockClient.return_value.__enter__.return_value = mock_inner
-            with patch("util_simulation_service.service.domain_ontology_bootstrap_service.time.sleep"):
+            with patch("util_simulation_service.service.logic.pre_processing.domain_ontology_bootstrap_service.time.sleep"):
                 DomainOntologyBootstrapService(agents=[_AGENT_A]).bootstrap(
                     [_entry(ontology_file, ["agent-a"])]
                 )

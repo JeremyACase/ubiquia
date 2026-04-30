@@ -1,0 +1,23 @@
+name: udl-simulation
+agents:
+  - name: agent-0
+    mode: microweight
+    graph_deployments:
+      - graph_name: sensor-agent
+        domain_ontology_name: udl
+        domain_version:
+          major: 1
+          minor: 39
+          patch: 0
+        flag: demo
+bootstrap:
+  domain_ontologies:
+    - file: ../../../../../deploy/helm/bootstrap/ontologies/udl.yaml
+      targets:
+        - agent-0
+events: []
+networks:
+  - name: udl-net
+    agents:
+      - agent-0
+speed: 1.0

@@ -6,7 +6,7 @@ import pytest
 
 from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.agent_mode import AgentMode
-from util_simulation_service.service.clock_broadcast_service import (
+from util_simulation_service.service.logic.simulation.clock_broadcast_service import (
     _CLOCK_ENDPOINTS,
     _MICROWEIGHT_CLOCK_ENDPOINTS,
     ClockBroadcastService,
@@ -17,7 +17,7 @@ _AGENT_A = Agent(name="agent-a", base_url="http://localhost:8080")
 _AGENT_B = Agent(name="agent-b", base_url="http://localhost:8081")
 _MICROWEIGHT_AGENT = Agent(name="mw-agent", base_url="http://localhost:9090", mode=AgentMode.MICROWEIGHT)
 
-_PATCH = "util_simulation_service.service.clock_broadcast_service.httpx.Client"
+_PATCH = "util_simulation_service.service.logic.simulation.clock_broadcast_service.httpx.Client"
 
 
 def _mock_client(side_effects=None):

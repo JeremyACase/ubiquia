@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 import httpx
 import pytest
 
-from util_simulation_service.service.analysis_service import AnalysisService
+from util_simulation_service.service.logic.post_processing.analysis_service import AnalysisService
 
 
 def _mock_client(pages: list[dict]) -> httpx.Client:

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 
-from util_simulation_service.builder.microweight_agent_builder import (
+from util_simulation_service.service.builder.microweight_agent_builder import (
     MicroweightAgentBuilder,
     _CONTAINER_PORT,
     _IMAGE_NAME,
@@ -43,21 +43,21 @@ def _make_run_side_effect(repo_root: pathlib.Path, host_port: str = "32768"):
 
 class TestMicroweightAgentBuilderBuild:
     def test_returns_agent_with_correct_name(self, repo_root):
-        with patch("util_simulation_service.builder.microweight_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect(repo_root)):
             agent = MicroweightAgentBuilder(repo_root).build("agent-a")
 
         assert agent.name == "agent-a"
 
     def test_returns_agent_base_url_from_host_port(self, repo_root):
-        with patch("util_simulation_service.builder.microweight_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect(repo_root, host_port="45678")):
             agent = MicroweightAgentBuilder(repo_root).build("agent-a")
 
         assert agent.base_url == "http://localhost:45678"
 
     def test_builds_docker_image(self, repo_root):
-        with patch("util_simulation_service.builder.microweight_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect(repo_root)) as mock_run:
             MicroweightAgentBuilder(repo_root).build("agent-a")
 
@@ -70,7 +70,7 @@ class TestMicroweightAgentBuilderBuild:
         assert _IMAGE_NAME in cmd
 
     def test_runs_container_with_dynamic_port(self, repo_root):
-        with patch("util_simulation_service.builder.microweight_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect(repo_root)) as mock_run:
             MicroweightAgentBuilder(repo_root).build("agent-a")
 
@@ -82,7 +82,7 @@ class TestMicroweightAgentBuilderBuild:
         assert _IMAGE_NAME in cmd
 
     def test_runs_container_with_agent_id_env(self, repo_root):
-        with patch("util_simulation_service.builder.microweight_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect(repo_root)) as mock_run:
             MicroweightAgentBuilder(repo_root).build("agent-a")
 
@@ -93,7 +93,7 @@ class TestMicroweightAgentBuilderBuild:
         assert any(v.startswith("UBIQUIA_AGENT_ID=") for v in env_vals)
 
     def test_mounts_config_and_ontologies(self, repo_root):
-        with patch("util_simulation_service.builder.microweight_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect(repo_root)) as mock_run:
             MicroweightAgentBuilder(repo_root).build("agent-a")
 
@@ -106,7 +106,7 @@ class TestMicroweightAgentBuilderBuild:
         graphs_dir = repo_root / "deploy" / "helm" / "bootstrap" / "graphs"
         graphs_dir.mkdir(parents=True)
 
-        with patch("util_simulation_service.builder.microweight_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect(repo_root)) as mock_run:
             MicroweightAgentBuilder(repo_root).build("agent-a")
 
@@ -115,7 +115,7 @@ class TestMicroweightAgentBuilderBuild:
         assert "graphs:/app/etc/graphs:ro" in cmd
 
     def test_does_not_mount_graphs_when_absent(self, repo_root):
-        with patch("util_simulation_service.builder.microweight_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
                    side_effect=_make_run_side_effect(repo_root)) as mock_run:
             MicroweightAgentBuilder(repo_root).build("agent-a")
 
@@ -135,7 +135,7 @@ class TestMicroweightAgentBuilderBuild:
                 result.stdout = ""
             return result
 
-        with patch("util_simulation_service.builder.microweight_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
                    side_effect=_side_effect_with_existing) as mock_run:
             MicroweightAgentBuilder(repo_root).build("agent-a")
 
@@ -155,7 +155,7 @@ class TestMicroweightAgentBuilderBuild:
                 result.stdout = ""
             return result
 
-        with patch("util_simulation_service.builder.microweight_agent_builder.subprocess.run",
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
                    side_effect=_ipv6_side_effect):
             agent = MicroweightAgentBuilder(repo_root).build("agent-a")
 

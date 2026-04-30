@@ -1,6 +1,6 @@
 import pytest
 
-from util_simulation_service.command.partition_event_command import PartitionEventCommand
+from util_simulation_service.service.command.partition_event_command import PartitionEventCommand
 from util_simulation_service.model.events.partition_event import PartitionEvent
 from util_simulation_service.model.events.simulation_event import SimulationEvent
 from util_simulation_service.model.network import Network
