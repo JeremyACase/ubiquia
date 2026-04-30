@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.27.0] - 2026-04-30
+### Added
+- UDL domain ontology YAML (`deploy/helm/bootstrap/ontologies/udl.yaml`) added to Helm bootstrap ontologies
+- `udl-simulation.yaml` simulation scenario for exercising the UDL domain ontology
+- `ScenarioDurationLogicService` in `util-simulation-service`: resolves effective run duration from (1) user-defined `duration` field, (2) last-event offset + 5 s trailing buffer, or (3) a 60 s default; warns when any event offset exceeds a user-supplied duration
+
+### Changed
+- `util-simulation-service` service module restructured into `service/builder/`, `service/factory/`, and `service/logic/{pre_processing,post_processing,simulation}/` subdirectories for clearer separation of concerns
+
 ## [0.26.0] - 2026-04-24
 ### Added
 - `GraphDeploymentService` in `util-simulation-service`: deploys registered graphs to configured target agents' flow-service instances with retry logic; supports optional `flag`-based node overrides
