@@ -1,4 +1,7 @@
 # Patterns to ignore when building packages.
+# Ontologies exceeding Helm's 5 MB / Kubernetes ConfigMap 1 MB limits are excluded
+# from the chart and applied separately in CI via kubectl or the bootstrap service.
+bootstrap/ontologies/udl.yaml
 # This supports shell glob matching, relative path matching, and
 # negation (prefixed with !). Only one pattern per line.
 .DS_Store
