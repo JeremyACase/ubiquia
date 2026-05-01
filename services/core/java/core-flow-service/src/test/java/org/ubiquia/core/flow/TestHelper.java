@@ -11,7 +11,7 @@ import org.ubiquia.core.flow.component.node.AbstractNode;
 import org.ubiquia.core.flow.controller.DomainOntologyController;
 import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.repository.NodeRepository;
-import org.ubiquia.core.flow.service.logic.agent.AgentLogic;
+import org.ubiquia.core.flow.service.logic.agent.AgentInitializationLogic;
 import org.ubiquia.core.flow.service.manager.NodeManager;
 
 @Service
@@ -30,7 +30,7 @@ public class TestHelper {
     private NodeRepository nodeRepository;
 
     @Autowired
-    private AgentLogic agentLogic;
+    private AgentInitializationLogic agentLogic;
 
     public void setupAgentState() {
         this.nodeManager.teardownAllNodes();

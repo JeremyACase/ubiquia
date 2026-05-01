@@ -2,6 +2,7 @@ package org.ubiquia.core.flow.service.cluster;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
@@ -9,6 +10,7 @@ import org.jgroups.Receiver;
 import org.jgroups.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -43,6 +45,9 @@ public class FlowClusterService implements Receiver {
 
     @Value("${ubiquia.cluster.rejoin-delay-milliseconds:5000}")
     private long rejoinDelayMs;
+
+    @Autowired
+    private NetworkManagementService networkManagementService;
 
     private JChannel channel;
 
@@ -112,6 +117,11 @@ public class FlowClusterService implements Receiver {
     @Override
     public void viewAccepted(View newView) {
         logger.info("JGroups cluster view updated — members: {}", newView.getMembers());
+        if (newView.getMembers().size() == 1) {
+            this.networkManagementService.onSoloView();
+        } else {
+            this.networkManagementService.onClusterView();
+        }
     }
 
     @Override

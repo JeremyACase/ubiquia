@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.service.io.bootstrap.BeliefStateBootstrapper;
 import org.ubiquia.core.flow.service.io.bootstrap.DomainOntologyBootstrapper;
 import org.ubiquia.core.flow.service.k8s.ComponentOperator;
-import org.ubiquia.core.flow.service.logic.agent.AgentLogic;
+import org.ubiquia.core.flow.service.logic.agent.AgentInitializationLogic;
 
 
 /**
@@ -31,7 +31,7 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
     private ComponentOperator componentOperator;
 
     @Autowired
-    private AgentLogic agentLogic;
+    private AgentInitializationLogic agentLogic;
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {

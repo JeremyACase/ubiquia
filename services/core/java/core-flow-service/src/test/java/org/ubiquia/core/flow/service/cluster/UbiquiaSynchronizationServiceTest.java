@@ -38,7 +38,7 @@ import org.ubiquia.core.flow.repository.SyncRepository;
     "ubiquia.cluster.flow-service.sync.enabled=true",
     "server.port=8080"
 })
-public class ModelSynchronizationServiceTest {
+public class UbiquiaSynchronizationServiceTest {
 
     @MockBean
     private FlowClusterService flowClusterService;
@@ -47,7 +47,7 @@ public class ModelSynchronizationServiceTest {
     private RestTemplate restTemplate;
 
     @Autowired
-    private ModelSynchronizationService modelSynchronizationService;
+    private UbiquiaSynchronizationService ubiquiaSynchronizationService;
 
     @Autowired
     private DomainOntologyController domainOntologyController;
@@ -70,7 +70,7 @@ public class ModelSynchronizationServiceTest {
     public void assertSynchronize_withNullChannel_skipsSync() {
         when(flowClusterService.getChannel()).thenReturn(null);
 
-        this.modelSynchronizationService.synchronize();
+        this.ubiquiaSynchronizationService.synchronize();
 
         verify(restTemplate, never()).postForEntity(anyString(), any(), any());
     }
@@ -81,7 +81,7 @@ public class ModelSynchronizationServiceTest {
         when(mockChannel.getView()).thenReturn(null);
         when(flowClusterService.getChannel()).thenReturn(mockChannel);
 
-        this.modelSynchronizationService.synchronize();
+        this.ubiquiaSynchronizationService.synchronize();
 
         verify(restTemplate, never()).postForEntity(anyString(), any(), any());
     }
@@ -99,7 +99,7 @@ public class ModelSynchronizationServiceTest {
         when(mockView.getMembers()).thenReturn(List.of(peerAddress));
         when(mockChannel.down(isA(Event.class))).thenReturn(peerAddress);
 
-        this.modelSynchronizationService.synchronize();
+        this.ubiquiaSynchronizationService.synchronize();
 
         verify(restTemplate, never()).postForEntity(anyString(), any(), any());
     }
@@ -122,7 +122,7 @@ public class ModelSynchronizationServiceTest {
         when(mockView.getMembers()).thenReturn(List.of(peerAddress));
         when(mockChannel.down(isA(Event.class))).thenReturn(peerAddress);
 
-        this.modelSynchronizationService.synchronize();
+        this.ubiquiaSynchronizationService.synchronize();
 
         verify(restTemplate, atLeast(1)).postForEntity(anyString(), any(), eq(Void.class));
         Assertions.assertTrue(

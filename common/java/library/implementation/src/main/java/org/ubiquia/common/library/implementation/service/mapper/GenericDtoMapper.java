@@ -25,6 +25,9 @@ public abstract class GenericDtoMapper<
     @Autowired
     protected ObjectMapper objectMapper;
 
+    @Autowired
+    protected SyncDtoMapper syncDtoMapper;
+
     /**
      * Map from a list of entities to a list of DTOs.
      *
@@ -67,7 +70,7 @@ public abstract class GenericDtoMapper<
      * @param from The entity model to map from.
      * @param to   The DTO to map to.
      */
-    public void setAbstractEntityFields(F from, T to) {
+    public void setAbstractEntityFields(F from, T to) throws JsonProcessingException {
 
         if (Objects.nonNull(from) && Objects.nonNull(to)) {
             to.setCreatedAt(from.getCreatedAt());
@@ -79,6 +82,8 @@ public abstract class GenericDtoMapper<
             } else {
                 to.setTags(new ArrayList<>());
             }
+
+            to.setSyncs(this.syncDtoMapper.map(from.getSyncs()));
         }
     }
 }

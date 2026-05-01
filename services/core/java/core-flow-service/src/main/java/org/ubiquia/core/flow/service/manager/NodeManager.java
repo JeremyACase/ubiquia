@@ -3,6 +3,7 @@ package org.ubiquia.core.flow.service.manager;
 
 import jakarta.transaction.Transactional;
 import java.util.HashMap;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,6 @@ public class NodeManager {
             .graphFinder
             .findGraphWith(graphName, domainOntologyName, version);
 
-
         for (var nodeEntity : graphEntity.getNodes()) {
 
             var nodeId = nodeEntity.getId();
@@ -72,6 +72,16 @@ public class NodeManager {
                 logger.warn("WARNING: node {} for graph {} is already deployed...",
                     nodeEntity.getName(),
                     graphEntity);
+
+            } else if (Objects.nonNull(nodeEntity.getComponent())
+                && this.componentCardinalityVisitor.hasMatchingCardinality(
+                    nodeEntity.getComponent().getName(), graphDeployment)
+                && !this.componentCardinalityVisitor.isCardinalityEnabled(
+                    nodeEntity.getComponent().getName(), graphDeployment)) {
+
+                logger.info("...skipping node {} — component {} has cardinality < 1.",
+                    nodeEntity.getName(),
+                    nodeEntity.getComponent().getName());
 
             } else {
                 this.deployNodeFor(nodeEntity, graphEntity, graphDeployment);

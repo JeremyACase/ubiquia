@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.model.ubiquia.dto.Agent;
 import org.ubiquia.common.model.ubiquia.dto.Sync;
 import org.ubiquia.common.model.ubiquia.entity.SyncEntity;
 
@@ -16,8 +16,6 @@ import org.ubiquia.common.model.ubiquia.entity.SyncEntity;
  */
 @Service
 public class SyncDtoMapper {
-
-    private AgentDtoMapper agentDtoMapper;
 
     public List<Sync> map(final List<SyncEntity> froms) throws JsonProcessingException {
         var tos = new ArrayList<Sync>();
@@ -50,7 +48,9 @@ public class SyncDtoMapper {
             to.setModelType(from.getModelType());
             to.setCreatedAt(from.getCreatedAt());
 
-            to.setAgent(this.agentDtoMapper.map(from.getAgent()));
+            var agent = new Agent();
+            agent.setId(from.getAgent().getId());
+            to.setAgent(agent);
         }
         return to;
     }
