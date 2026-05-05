@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.28.0] - 2026-05-05
+### Added
+- `FlowEgressRelay`: prototype-scoped component that polls for `FlowMessageEntity` records targeting nodes not locally deployed and forwards them to configured peer agents via `POST /flow-message/receive`; one instance is created per peer agent by `UbiquiaSynchronizationService`
+- `FlowEgressFactory`: factory that instantiates `FlowEgressRelay` prototype beans
+- `FlowMessageController`: REST controller exposing `POST /ubiquia/core/flow-service/flow-message/receive`; accepts a `FlowMessage` DTO and delegates to `FlowMessageRegistrar`
+- `FlowMessageRegistrar`: creates the `FlowEntity` / `FlowEventEntity` / `FlowMessageEntity` chain when a flow message is received
+- `NetworkManagementService`: manages `NetworkEntity` membership for agents (supports simulation partition scenarios)
+- `NetworkRepository`: JPA repository for `NetworkEntity`
+- `AbstractSynchronizationService<E, D>`: generic base class for typed entity synchronization services
+- `DomainOntologySynchronizationService`: concrete sync implementation that propagates `DomainOntologyEntity` records to peer agents
+- `UbiquiaSynchronizationService`: scheduled orchestrator (conditional on `ubiquia.cluster.flow-service.sync.enabled=true`) that drives all registered `AbstractSynchronizationService` implementations and initialises `FlowEgressRelay` instances; replaces `ModelSynchronizationService`
+- `NodeManager.getLocalNodeIds()`: returns `Set<String>` of node IDs currently active in the local node map
+- `FlowMessageRepository.findAllByTargetNodeIdNotIn(Collection<String>, Pageable)`: paged query for orphaned flow messages
+
+### Removed
+- `ModelSynchronizationService`: superseded by `AbstractSynchronizationService` / `DomainOntologySynchronizationService` / `UbiquiaSynchronizationService`
+
+### Fixed
+- `FlowEgressRelay.forwardOrphanedMessages()`: guards against Hibernate 6's empty-collection `NOT IN` producing `NOT (1=1)` by falling back to `findAll(pageable)` when the local node set is empty
+- `FlowMessageRegistrarTest`: added required `inputSubSchemas` and `outputSubSchema` to the PUSH-type test node, resolving `IllegalArgumentException` from node validation
+
 ## [0.26.0] - 2026-04-24
 ### Fixed
 - `GraphRepository`: duplicate-deployment query now includes `graphName` as a discriminator, preventing false conflicts when multiple graphs from the same domain ontology and version are deployed to the same agent

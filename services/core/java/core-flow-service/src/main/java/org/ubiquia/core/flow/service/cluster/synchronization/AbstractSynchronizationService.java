@@ -2,7 +2,6 @@ package org.ubiquia.core.flow.service.cluster.synchronization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,7 @@ public abstract class AbstractSynchronizationService<
 
     protected abstract String getEndpointPath();
 
-    public void sync(final List<String> peerUrls, final AgentEntity agentEntity) {
+    public void sync(final List<String> peerUrls, final AgentEntity sourceAgent) {
 
         var endpointPath = this.getEndpointPath();
 
@@ -88,7 +87,7 @@ public abstract class AbstractSynchronizationService<
             for (var entity : entities) {
                 var syncEntity = new SyncEntity();
                 syncEntity.setModel(entity);
-                syncEntity.setAgent(agentEntity);
+                syncEntity.setSourceAgent(sourceAgent);
                 this.syncRepository.save(syncEntity);
             }
         }

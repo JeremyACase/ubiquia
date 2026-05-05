@@ -73,7 +73,7 @@ public class SyncMappingTest {
 
         var syncEntity = new SyncEntity();
         syncEntity.setModel(entity);
-        syncEntity.setAgent(agentEntity);
+        syncEntity.setSourceAgent(agentEntity);
         this.syncRepository.save(syncEntity);
 
         // Flush writes to DB and clear the first-level cache so the re-fetch

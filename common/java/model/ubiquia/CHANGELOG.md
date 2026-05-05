@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.28.0] - 2026-05-05
+### Added
+- `Network` DTO: model representing a named network of agents, with `List<Agent> agents`
+- `NetworkEntity`: JPA entity for network membership with `@OneToMany List<AgentEntity> agents`
+- `Agent` DTO: added `network: Network` field
+
+### Changed
+- `Sync` DTO: renamed `agent` field to `sourceAgent` (getter/setter updated accordingly)
+- `SyncEntity`: renamed `agent` field to `sourceAgent`; updated `@OneToMany mappedBy` in `AgentEntity` from `"agent"` to `"sourceAgent"`
+- `AgentEntity`: added `@ManyToOne NetworkEntity network` field; updated `syncs` collection `mappedBy` to `"sourceAgent"`
+- `FlowMessage` DTO: replaced deprecated `getTargetAdapter()`/`setTargetAdapter()` with `getTargetNode()`/`setTargetNode()`
+- `FlowMessageEntity`: renamed join column from `message_target_adapter_join_id` to `message_target_node_join_id`
+
 ## [0.26.0] - 2026-04-24
 ### Fixed
 - `Flow`: added `getModelType()` override returning `"Flow"`

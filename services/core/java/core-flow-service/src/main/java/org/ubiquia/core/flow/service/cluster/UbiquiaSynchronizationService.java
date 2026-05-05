@@ -3,6 +3,7 @@ package org.ubiquia.core.flow.service.cluster;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.config.AgentConfig;
 import org.ubiquia.common.library.api.repository.AgentRepository;
 import org.ubiquia.core.flow.service.cluster.synchronization.AbstractSynchronizationService;
+import org.ubiquia.core.flow.service.factory.FlowEgressFactory;
 
 /**
  * Scheduled orchestrator that drives all registered {@link AbstractSynchronizationService}
@@ -46,6 +48,9 @@ public class UbiquiaSynchronizationService {
     private FlowClusterService flowClusterService;
 
     @Autowired
+    private FlowEgressFactory flowEgressFactory;
+
+    @Autowired
     private List<AbstractSynchronizationService<?, ?>> synchronizationServices;
 
     @Value("${server.port}")
@@ -56,6 +61,13 @@ public class UbiquiaSynchronizationService {
 
     @Value("${ubiquia.cluster.sync.local-base-url:}")
     private String localBaseUrl;
+
+    @Scheduled(
+        fixedDelayString = "${ubiquia.cluster.flow-service.sync.frequency-milliseconds:30000}")
+    public void tryBuildEgressRelays() {
+        var peerUrls = this.resolvePeerUrls();
+        this.flowEgressFactory.tryBuildEgressFor(new HashSet<>(peerUrls));
+    }
 
     @Scheduled(
         fixedDelayString = "${ubiquia.cluster.flow-service.sync.frequency-milliseconds:30000}")

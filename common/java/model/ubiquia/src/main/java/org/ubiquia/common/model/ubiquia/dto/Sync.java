@@ -14,7 +14,7 @@ public class Sync {
 
     private AbstractModel model;
 
-    private Agent agent;
+    private Agent sourceAgent;
 
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
     public String getId() {
@@ -41,12 +41,12 @@ public class Sync {
         this.modelType = modelType;
     }
 
-    public Agent getAgent() {
-        return agent;
+    public Agent getSourceAgent() {
+        return sourceAgent;
     }
 
-    public void setAgent(Agent agent) {
-        this.agent = agent;
+    public void setSourceAgent(Agent sourceAgent) {
+        this.sourceAgent = sourceAgent;
     }
 
     public AbstractModel getModel() {

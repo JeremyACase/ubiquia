@@ -31,7 +31,7 @@ public class AgentEntity {
     @OneToMany(mappedBy = "agent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private Set<UpdateEntity> updates;
 
-    @OneToMany(mappedBy = "agent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @OneToMany(mappedBy = "sourceAgent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private Set<SyncEntity> syncs;
 
     @CreationTimestamp

@@ -4,6 +4,8 @@ package org.ubiquia.core.flow.service.manager;
 import jakarta.transaction.Transactional;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,6 +154,13 @@ public class NodeManager {
                 + " and version "
                 + deployment.getDomainVersion());
         }
+    }
+
+    public Set<String> getLocalNodeIds() {
+        return this.nodeMap.values()
+            .stream()
+            .flatMap(graphNodes -> graphNodes.keySet().stream())
+            .collect(Collectors.toSet());
     }
 
     private Boolean isNodeCurrentlyDeployedWith(final String graphName, final String nodeId) {

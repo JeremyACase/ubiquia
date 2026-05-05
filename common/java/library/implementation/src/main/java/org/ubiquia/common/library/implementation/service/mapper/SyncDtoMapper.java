@@ -49,8 +49,8 @@ public class SyncDtoMapper {
             to.setCreatedAt(from.getCreatedAt());
 
             var agent = new Agent();
-            agent.setId(from.getAgent().getId());
-            to.setAgent(agent);
+            agent.setId(from.getSourceAgent().getId());
+            to.setSourceAgent(agent);
         }
         return to;
     }
