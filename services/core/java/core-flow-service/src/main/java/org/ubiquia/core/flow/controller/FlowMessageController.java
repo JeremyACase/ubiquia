@@ -27,7 +27,7 @@ public class FlowMessageController implements InterfaceLogger {
 
     @PostMapping("/receive")
     public void receive(@RequestBody final FlowMessage flowMessage) {
-        logger.debug("Received incoming flow message for node {}.",
+        logger.info("Received incoming flow message for node {}.",
             flowMessage.getTargetNode().getId());
         this.flowMessageRegistrar.tryRegisterFlowMessage(flowMessage);
     }

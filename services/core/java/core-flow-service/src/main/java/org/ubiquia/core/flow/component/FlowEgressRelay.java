@@ -93,15 +93,22 @@ public class FlowEgressRelay {
         var localNodeIds = this.nodeManager.getLocalNodeIds();
         var sort = Sort.by("createdAt").ascending();
         var pageRequest = PageRequest.of(0, INBOX_PAGE_SIZE).withSort(sort);
+        var allMessages = this.flowMessageRepository.findAll(pageRequest);
         var page = localNodeIds.isEmpty()
-            ? this.flowMessageRepository.findAll(pageRequest)
+            ? allMessages
             : this.flowMessageRepository.findAllByTargetNodeIdNotIn(localNodeIds, pageRequest);
+
+        if (allMessages.hasContent() && !page.hasContent()) {
+            logger.info("Relay: {} message(s) in DB but all covered by local node IDs {}.",
+                allMessages.getTotalElements(), localNodeIds);
+        }
 
         if (!page.hasContent()) {
             return;
         }
 
-        logger.info("Forwarding {} orphaned message(s) to peers.", page.getContent().size());
+        logger.info("Forwarding {} orphaned message(s) to peers. Local node IDs: {}",
+            page.getContent().size(), localNodeIds);
 
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -120,7 +127,7 @@ public class FlowEgressRelay {
                         var request = new HttpEntity<>(dto, headers);
                         this.restTemplate.postForEntity(url, request, Void.class);
                         this.flowMessageRepository.deleteById(message.getId());
-                        logger.debug("Forwarded message {} to {}.", message.getId(), url);
+                        logger.info("Forwarded message {} to {}.", message.getId(), url);
                         break;
                     } catch (Exception e) {
                         logger.warn("Failed to forward message {} to {}: {}",

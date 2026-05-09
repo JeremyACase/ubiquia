@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.28.1] - 2026-05-08
+### Changed
+- `GraphRegistrar.tryAdaptComponentsToNodes()`: added reverse-direction pass over `graph.getNodes()` that links a node to its component via `node.getComponent()` when `component.getNode()` is null; fixes cardinality-based node skipping for agents that receive the graph via sync rather than registering it from YAML
+- All registrars (`GraphRegistrar`, `NodeRegistrar`, `ComponentRegistrar`, `DomainOntologyRegistrar`, `DomainDataContractRegistrar`): incoming DTO `id` is now preserved on newly-created entities so synced records share the same UUID as the originating agent
+- `FlowClusterService`: `bind_addr` is now configurable via `ubiquia.cluster.bind-addr` (default `GLOBAL`); value is propagated to JGroups via the `jgroups.bind_addr` system property
+- `jgroups-tcp.xml`: `TCP` element now reads `bind_addr` from `${jgroups.bind_addr:GLOBAL}`
+- `FlowMessageController`, `FlowMessageRegistrar`, `NodeManager`, `FlowEgressRelay`: key diagnostic log statements promoted from DEBUG to INFO
+
 ## [0.28.0] - 2026-05-05
 ### Added
 - `FlowEgressRelay`: prototype-scoped component that polls for `FlowMessageEntity` records targeting nodes not locally deployed and forwards them to configured peer agents via `POST /flow-message/receive`; one instance is created per peer agent by `UbiquiaSynchronizationService`

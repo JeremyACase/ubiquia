@@ -2,7 +2,8 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/jgroups.xsd">
 
-    <TCP bind_port="${jgroups.bind_port:7800}"
+    <TCP bind_addr="${jgroups.bind_addr:GLOBAL}"
+         bind_port="${jgroups.bind_port:7800}"
          recv_buf_size="5m"
          send_buf_size="5m"/>
 

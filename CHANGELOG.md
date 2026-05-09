@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.28.1] - 2026-05-08
+### Added
+- Helm test for the multi-hop egress relay chain (`ubiquia_test_simulation_egress_relay.yaml`): deploys three agents (A, B, C), bootstraps the `egress-relay-test` ontology to Agent A, deploys the graph with per-agent cardinality, injects flow messages targeting nodes on B and C, and verifies end-to-end relay delivery
+
+### Changed
+- `GraphRegistrar.tryAdaptComponentsToNodes()`: added reverse-direction pass that uses `node.component` from the DTO to establish component↔node links when `component.node` is null (handles synced DTOs received from peer agents)
+- All registrars (`GraphRegistrar`, `NodeRegistrar`, `ComponentRegistrar`, `DomainOntologyRegistrar`, `DomainDataContractRegistrar`): incoming DTO `id` is now preserved on the entity so synced records retain the same UUID as the source agent
+- `FlowClusterService`: JGroups `bind_addr` is now configurable via `ubiquia.cluster.bind-addr` (default `GLOBAL`); propagated through `jgroups.bind_addr` system property
+- `jgroups-tcp.xml`: added `bind_addr` attribute wired to the `jgroups.bind_addr` system property
+- `egress-relay-test.yaml`: each component now declares a `node` reference so component↔node links are established on the registering agent
+- All Helm test Pods missing `hook-delete-policy` now carry `before-hook-creation,hook-succeeded`; successful test pods are automatically deleted
+
+### Fixed
+- `AbstractModelEntity`: implemented `Persistable<String>` with a `@Transient boolean isNew` flag so Spring Data JPA always calls `persist()` for new entities even when an ID is pre-set, preventing spurious `merge()` calls that fail on unsaved FK references
+
+## [0.28.0] - 2026-05-05
+### Added
+- `FlowEgressRelay`: prototype-scoped component that polls for `FlowMessageEntity` records targeting nodes not locally deployed and forwards them to configured peer agents via `POST /flow-message/receive`; one instance is created per peer by `UbiquiaSynchronizationService`
+- `FlowEgressFactory`: factory that instantiates `FlowEgressRelay` prototype beans
+- `FlowMessageController`: REST endpoint `POST /ubiquia/core/flow-service/flow-message/receive`; accepts a `FlowMessage` DTO and delegates to `FlowMessageRegistrar`
+- `FlowMessageRegistrar`: creates the `FlowEntity` / `FlowEventEntity` / `FlowMessageEntity` chain on receipt of a forwarded flow message
+- `NetworkManagementService`: manages `NetworkEntity` agent membership (supports simulation partition scenarios)
+- `NetworkRepository`: JPA repository for `NetworkEntity`
+- `AbstractSynchronizationService<E, D>`: generic base for typed entity sync services
+- `DomainOntologySynchronizationService`: propagates `DomainOntologyEntity` records to peer agents
+- `UbiquiaSynchronizationService`: scheduled sync orchestrator (enabled by `ubiquia.cluster.flow-service.sync.enabled=true`); replaces `ModelSynchronizationService`
+- `NodeManager.getLocalNodeIds()`: returns the set of node UUIDs currently active in the local node map
+- `FlowMessageRepository.findAllByTargetNodeIdNotIn(Collection<String>, Pageable)`: paged query for orphaned flow messages
+- `Network` DTO and `NetworkEntity` JPA entity
+- `Agent` DTO: added `network` field
+
+### Changed
+- `Sync` DTO / `SyncEntity`: `agent` field renamed to `sourceAgent`
+- `AgentEntity`: added `network` foreign key; `syncs` `mappedBy` updated to `sourceAgent`
+- `FlowMessage` DTO: `targetAdapter` accessors replaced by `targetNode`
+- `FlowMessageEntity`: join column renamed from `message_target_adapter_join_id` to `message_target_node_join_id`
+- `FlowMessageDtoMapper`: maps `targetNode` (id-only stub) onto the outgoing DTO
+- `SyncDtoMapper`: updated to use `sourceAgent`
+
+### Removed
+- `ModelSynchronizationService`: superseded by `AbstractSynchronizationService` / `DomainOntologySynchronizationService` / `UbiquiaSynchronizationService`
+
 ## [0.27.0] - 2026-04-30
 ### Added
 - UDL domain ontology YAML (`deploy/helm/bootstrap/ontologies/udl.yaml`) added to Helm bootstrap ontologies

@@ -80,6 +80,6 @@ public class FlowMessageRegistrar {
         messageEntity.setTags(new HashSet<>());
         this.flowMessageRepository.save(messageEntity);
 
-        logger.debug("Registered incoming flow message for node {}.", nodeEntity.getName());
+        logger.info("Registered incoming flow message for node {}.", nodeEntity.getName());
     }
 }

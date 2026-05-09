@@ -37,6 +37,7 @@ graphs:
           repository: egress-relay-mock
           tag: latest
         node:
+          modelType: Node
           name: egress-node-a
 
       - name: egress-comp-b
@@ -48,6 +49,7 @@ graphs:
           repository: egress-relay-mock
           tag: latest
         node:
+          modelType: Node
           name: egress-node-b
 
       - name: egress-comp-c
@@ -59,6 +61,7 @@ graphs:
           repository: egress-relay-mock
           tag: latest
         node:
+          modelType: Node
           name: egress-node-c
 
     nodes:
@@ -105,10 +108,4 @@ graphs:
           validateInputPayload: false
           validateOutputPayload: false
 
-    edges:
-      - leftNodeName: egress-node-a
-        rightNodeNames:
-          - egress-node-b
-      - leftNodeName: egress-node-b
-        rightNodeNames:
-          - egress-node-c
+    edges: []

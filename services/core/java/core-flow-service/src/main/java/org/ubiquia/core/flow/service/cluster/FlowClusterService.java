@@ -43,6 +43,9 @@ public class FlowClusterService implements Receiver {
     @Value("${ubiquia.cluster.port}")
     private int port;
 
+    @Value("${ubiquia.cluster.bind-addr:GLOBAL}")
+    private String bindAddr;
+
     @Value("${ubiquia.cluster.rejoin-delay-milliseconds:5000}")
     private long rejoinDelayMs;
 
@@ -58,6 +61,7 @@ public class FlowClusterService implements Receiver {
 
         System.setProperty("jgroups.tcpping.initial_hosts", seedHosts);
         System.setProperty("jgroups.bind_port", String.valueOf(port));
+        System.setProperty("jgroups.bind_addr", this.bindAddr);
 
         this.channel = new JChannel("jgroups-tcp.xml");
         this.channel.setReceiver(this);

@@ -10,20 +10,35 @@ import java.util.Set;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.domain.Persistable;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class AbstractModelEntity {
+public abstract class AbstractModelEntity implements Persistable<String> {
 
     @Id
     private String id = null;
+
+    @Transient
+    private boolean isNew = true;
 
     @PrePersist
     private void generateId() {
         if (Objects.isNull(this.id)) {
             this.id = UUID.randomUUID().toString();
         }
+    }
+
+    @PostPersist
+    @PostLoad
+    private void markPersisted() {
+        this.isNew = false;
+    }
+
+    @Override
+    public boolean isNew() {
+        return this.isNew;
     }
 
     @CreationTimestamp

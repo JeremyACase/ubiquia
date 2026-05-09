@@ -51,7 +51,7 @@ public class DomainDataContractRegistrar {
             throw new IllegalArgumentException("ERROR: A domain data contract cannot be null!");
         }
 
-        var stringifiedSchema = this.objectMapper.writeValueAsString(domainOntology
+        var stringifiedSchema = this.stringify(domainOntology
             .getDomainDataContract()
             .getSchema());
 
@@ -65,9 +65,12 @@ public class DomainDataContractRegistrar {
         throws JsonProcessingException {
 
         var domainDataContractEntity = new DomainDataContractEntity();
+        if (Objects.nonNull(domainOntology.getDomainDataContract().getId())) {
+            domainDataContractEntity.setId(domainOntology.getDomainDataContract().getId());
+        }
         domainDataContractEntity.setDomainOntology(domainOntologyEntity);
 
-        var stringifiedSchema = this.objectMapper.writeValueAsString(domainOntology
+        var stringifiedSchema = this.stringify(domainOntology
             .getDomainDataContract()
             .getSchema());
 
@@ -80,5 +83,11 @@ public class DomainDataContractRegistrar {
         domainOntologyEntity.setDomainDataContract(domainDataContractEntity);
 
         return domainDataContractEntity;
+    }
+
+    private String stringify(final Object schema) throws JsonProcessingException {
+        return schema instanceof String
+            ? (String) schema
+            : this.objectMapper.writeValueAsString(schema);
     }
 }

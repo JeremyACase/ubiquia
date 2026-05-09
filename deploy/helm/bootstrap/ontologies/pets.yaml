@@ -320,8 +320,6 @@ graphs:
             key: componentType
             value: POD
 
-        node:
-          
 
     # This is a list of nodes that should be deployed with the graph. Nodes may or may not be associated with components.
     nodes:

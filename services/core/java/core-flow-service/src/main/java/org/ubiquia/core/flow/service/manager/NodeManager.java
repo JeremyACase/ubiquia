@@ -90,8 +90,9 @@ public class NodeManager {
             }
         }
 
-        logger.info("...completed deploying nodes for graph named {}.",
-            graphEntity.getName());
+        logger.info("...completed deploying nodes for graph named {}. Local node IDs now: {}",
+            graphEntity.getName(),
+            this.getLocalNodeIds());
     }
 
     /**

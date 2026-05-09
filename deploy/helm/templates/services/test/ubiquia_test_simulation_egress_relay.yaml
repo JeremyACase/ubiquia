@@ -1,7 +1,7 @@
 ---
 # Shared application config for all three egress-relay test agents.
-# Per-agent differences (peer-base-urls, agent ID, local-base-url, sync-enabled) are
-# injected as environment variables in each Deployment, overriding these defaults.
+# Per-agent differences (peer-base-urls, agent ID, server port, JGroups port) are
+# injected as environment variables in each container, overriding these defaults.
 #
 # Topology:
 #   Agent A (egress-node-a) ──egress──▶ Agent B (egress-node-b) ──egress──▶ Agent C (egress-node-c)
@@ -11,6 +11,10 @@
 #   A: egress-comp-a=1, egress-comp-b=0, egress-comp-c=0
 #   B: egress-comp-a=0, egress-comp-b=1, egress-comp-c=0
 #   C: egress-comp-a=0, egress-comp-b=0, egress-comp-c=0  ← all-zero; C is a sink
+#
+# All three agents run as containers in a single pod so JGroups can communicate over
+# localhost. Each container is assigned a unique HTTP port (8080/8081/8082) and a
+# unique JGroups port (7800/7801/7802), overriding the defaults below via env vars.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -58,13 +62,14 @@ data:
     ubiquia:
       mode: TEST
       cluster:
+        bind-addr: "loopback"
         flow-service:
           sync:
             enabled: true
             frequency-milliseconds: 10000
         name: egress-relay-cluster
         port: 7800
-        seed-hosts: "egress-relay-flow-service-a[7800],egress-relay-flow-service-b[7800],egress-relay-flow-service-c[7800]"
+        seed-hosts: "localhost[7800],localhost[7801],localhost[7802]"
         sync:
           peer-base-urls: ""
       kubernetes:
@@ -101,10 +106,11 @@ data:
   egress-relay-test.yaml: |
 {{ .Files.Get "bootstrap/ontologies/egress-relay-test.yaml" | indent 4 }}
 ---
+# Single Service exposing one HTTP port per agent container.
 apiVersion: v1
 kind: Service
 metadata:
-  name: egress-relay-flow-service-a
+  name: egress-relay-agents
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
@@ -112,60 +118,25 @@ metadata:
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   selector:
-    app: egress-relay-flow-service-a
+    app: egress-relay-agents
   ports:
-    - name: http
+    - name: agent-a-http
       port: 8080
       targetPort: 8080
-    - name: jgroups
-      port: 7800
-      targetPort: 7800
+    - name: agent-b-http
+      port: 8081
+      targetPort: 8081
+    - name: agent-c-http
+      port: 8082
+      targetPort: 8082
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: egress-relay-flow-service-b
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    "helm.sh/hook": test
-    "helm.sh/hook-weight": "0"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
-spec:
-  selector:
-    app: egress-relay-flow-service-b
-  ports:
-    - name: http
-      port: 8080
-      targetPort: 8080
-    - name: jgroups
-      port: 7800
-      targetPort: 7800
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: egress-relay-flow-service-c
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    "helm.sh/hook": test
-    "helm.sh/hook-weight": "0"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
-spec:
-  selector:
-    app: egress-relay-flow-service-c
-  ports:
-    - name: http
-      port: 8080
-      targetPort: 8080
-    - name: jgroups
-      port: 7800
-      targetPort: 7800
----
-# Agent A: deploys egress-node-a only. Its sole egress peer is Agent B.
+# Single Deployment with all three agents as sidecar containers.
+# Sharing a pod network namespace lets JGroups use localhost instead of Kubernetes DNS,
+# matching the way microweight agents run outside of Kubernetes in production.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: egress-relay-flow-service-a
+  name: egress-relay-agents
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
@@ -175,25 +146,30 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: egress-relay-flow-service-a
+      app: egress-relay-agents
   template:
     metadata:
       labels:
-        app: egress-relay-flow-service-a
+        app: egress-relay-agents
         sidecar.istio.io/inject: "false"
     spec:
       serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
       containers:
-        - name: flow-service
+        # Agent A: deploys egress-node-a only. Its sole egress peer is Agent B.
+        - name: flow-service-a
           image: {{ include "ubiquia.core.flowService.image" . }}
           imagePullPolicy: IfNotPresent
           env:
+            - name: SERVER_PORT
+              value: "8080"
+            - name: UBIQUIA_CLUSTER_PORT
+              value: "7800"
             - name: UBIQUIA_AGENT_ID
               value: "aaaaaaaa-3333-0000-0000-000000000001"
             - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
-              value: "http://egress-relay-flow-service-a:8080"
+              value: "http://localhost:8080"
             - name: UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS
-              value: "http://egress-relay-flow-service-b:8080"
+              value: "http://localhost:8081"
           ports:
             - containerPort: 8080
             - containerPort: 7800
@@ -201,97 +177,51 @@ spec:
             - name: config
               mountPath: /app/etc/application.yaml
               subPath: application.yaml
-      volumes:
-        - name: config
-          configMap:
-            name: ubiquia-test-egress-relay-agent-config
----
-# Agent B: deploys egress-node-b only. Its sole egress peer is Agent C.
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: egress-relay-flow-service-b
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    "helm.sh/hook": test
-    "helm.sh/hook-weight": "0"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: egress-relay-flow-service-b
-  template:
-    metadata:
-      labels:
-        app: egress-relay-flow-service-b
-        sidecar.istio.io/inject: "false"
-    spec:
-      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
-      containers:
-        - name: flow-service
+        # Agent B: deploys egress-node-b only. Its sole egress peer is Agent C.
+        - name: flow-service-b
           image: {{ include "ubiquia.core.flowService.image" . }}
           imagePullPolicy: IfNotPresent
           env:
+            - name: SERVER_PORT
+              value: "8081"
+            - name: UBIQUIA_CLUSTER_PORT
+              value: "7801"
             - name: UBIQUIA_AGENT_ID
               value: "bbbbbbbb-3333-0000-0000-000000000002"
             - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
-              value: "http://egress-relay-flow-service-b:8080"
+              value: "http://localhost:8081"
             - name: UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS
-              value: "http://egress-relay-flow-service-c:8080"
+              value: "http://localhost:8082"
           ports:
-            - containerPort: 8080
-            - containerPort: 7800
+            - containerPort: 8081
+            - containerPort: 7801
           volumeMounts:
             - name: config
               mountPath: /app/etc/application.yaml
               subPath: application.yaml
-      volumes:
-        - name: config
-          configMap:
-            name: ubiquia-test-egress-relay-agent-config
----
-# Agent C: all components at cardinality=0 (no nodes run locally). Cluster sync is
-# disabled — C is the terminal sink. FlowMessageRegistrar still creates a FlowEvent
-# when the message arrives, but because no node is locally deployed there is no
-# inbox-poll attempt and therefore no second FlowEvent from a failed processing call.
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: egress-relay-flow-service-c
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    "helm.sh/hook": test
-    "helm.sh/hook-weight": "0"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: egress-relay-flow-service-c
-  template:
-    metadata:
-      labels:
-        app: egress-relay-flow-service-c
-        sidecar.istio.io/inject: "false"
-    spec:
-      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
-      containers:
-        - name: flow-service
+        # Agent C: all components at cardinality=0 (no nodes run locally). Cluster sync is
+        # disabled — C is the terminal sink. FlowMessageRegistrar still creates a FlowEvent
+        # when the message arrives, but because no node is locally deployed there is no
+        # inbox-poll attempt and therefore no second FlowEvent from a failed processing call.
+        - name: flow-service-c
           image: {{ include "ubiquia.core.flowService.image" . }}
           imagePullPolicy: IfNotPresent
           env:
+            - name: SERVER_PORT
+              value: "8082"
+            - name: UBIQUIA_CLUSTER_PORT
+              value: "7802"
             - name: UBIQUIA_AGENT_ID
               value: "cccccccc-3333-0000-0000-000000000003"
             - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
-              value: "http://egress-relay-flow-service-c:8080"
+              value: "http://localhost:8082"
             - name: UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS
-              value: "http://egress-relay-flow-service-a:8080,http://egress-relay-flow-service-b:8080,http://egress-relay-flow-service-c:8080"
+              value: ""
             - name: UBIQUIA_CLUSTER_FLOW_SERVICE_SYNC_ENABLED
               value: "false"
           ports:
-            - containerPort: 8080
-            - containerPort: 7800
+            - containerPort: 8082
+            - containerPort: 7802
           volumeMounts:
             - name: config
               mountPath: /app/etc/application.yaml
@@ -425,34 +355,49 @@ spec:
             local URL=$2
             local BODY=$3
             echo "Deploying egress-relay-dag to $AGENT_NAME..."
-            curl -sf -X POST \
+            local RESPONSE HTTP_CODE
+            RESPONSE=$(curl -s -w '\n%{http_code}' -X POST \
               -H "Content-Type: application/json" \
               -d "$BODY" \
-              "$URL/ubiquia/core/flow-service/graph/deploy" >/dev/null
-            echo "  ✅ Deployed to $AGENT_NAME"
+              "$URL/ubiquia/core/flow-service/graph/deploy")
+            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+            if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+              echo "  ❌ Deploy failed (HTTP $HTTP_CODE):"
+              echo "$RESPONSE" | head -n -1
+              exit 1
+            fi
+            echo "  ✅ Deployed to $AGENT_NAME (HTTP $HTTP_CODE)"
           }
 
           inject_flow_message() {
             local AGENT_NAME=$1
             local URL=$2
             local NODE_ID=$3
+            local BODY="{\"modelType\":\"FlowMessage\",\"targetNode\":{\"modelType\":\"Node\",\"id\":\"$NODE_ID\"},\"payload\":\"{}\"}"
             echo "Injecting flow message targeting node '$NODE_ID' to $AGENT_NAME..."
-            curl -sf -X POST \
+            local RESPONSE HTTP_CODE
+            RESPONSE=$(curl -s -w '\n%{http_code}' -X POST \
               -H "Content-Type: application/json" \
-              -d "{\"targetNode\":{\"id\":\"$NODE_ID\"},\"payload\":\"{}\"}" \
-              "$URL/ubiquia/core/flow-service/flow-message/receive"
-            echo "  ✅ Message injected to $AGENT_NAME"
+              -d "$BODY" \
+              "$URL/ubiquia/core/flow-service/flow-message/receive")
+            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+            if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+              echo "  ❌ Inject failed (HTTP $HTTP_CODE):"
+              echo "$RESPONSE" | head -n -1
+              exit 1
+            fi
+            echo "  ✅ Message injected to $AGENT_NAME (HTTP $HTTP_CODE)"
           }
 
           # ── base URLs ─────────────────────────────────────────────────────────
-          URL_A="http://egress-relay-flow-service-a:8080"
-          URL_B="http://egress-relay-flow-service-b:8080"
-          URL_C="http://egress-relay-flow-service-c:8080"
+          URL_A="http://egress-relay-agents:8080"
+          URL_B="http://egress-relay-agents:8081"
+          URL_C="http://egress-relay-agents:8082"
 
           # ── step 1: wait for all agents ───────────────────────────────────────
-          wait_for_agent "egress-relay-flow-service-a" "$URL_A"
-          wait_for_agent "egress-relay-flow-service-b" "$URL_B"
-          wait_for_agent "egress-relay-flow-service-c" "$URL_C"
+          wait_for_agent "agent-a" "$URL_A"
+          wait_for_agent "agent-b" "$URL_B"
+          wait_for_agent "agent-c" "$URL_C"
 
           # ── step 2: upload domain ontology to Agent A ─────────────────────────
           echo "Uploading egress-relay-test ontology to Agent A..."
@@ -463,8 +408,8 @@ spec:
 
           # ── step 3–4: wait for sync chain A→B→C ──────────────────────────────
           # A syncs to B on its 10-second schedule; B then syncs to C on its schedule.
-          wait_for_ontology "egress-relay-flow-service-b" "$URL_B" "egress-relay-test"
-          wait_for_ontology "egress-relay-flow-service-c" "$URL_C" "egress-relay-test"
+          wait_for_ontology "agent-b" "$URL_B" "egress-relay-test"
+          wait_for_ontology "agent-c" "$URL_C" "egress-relay-test"
 
           # ── step 5: deploy graph with cardinality to each agent ───────────────
           deploy_graph "Agent A" "$URL_A" \
@@ -497,7 +442,7 @@ spec:
           inject_flow_message "Agent A" "$URL_A" "$NODE_B_ID"
 
           # ── step 8: confirm Agent B received the egressed message ─────────────
-          wait_for_flow_event "egress-relay-flow-service-b" "$URL_B"
+          wait_for_flow_event "agent-b" "$URL_B"
 
           # ── step 9: inject message targeting egress-node-c at Agent B ─────────
           # Agent B deploys egress-node-b only (comp-c cardinality=0), so the message
@@ -506,7 +451,7 @@ spec:
           inject_flow_message "Agent B" "$URL_B" "$NODE_C_ID"
 
           # ── step 10: verify Agent C has exactly one flow event ────────────────
-          wait_for_flow_event "egress-relay-flow-service-c" "$URL_C"
+          wait_for_flow_event "agent-c" "$URL_C"
 
           FINAL=$(curl -s "$URL_C/ubiquia/core/flow-service/flow-event/query/params?page=0&size=10" \
             | grep -o '"totalElements":[0-9]*' | cut -d':' -f2)
