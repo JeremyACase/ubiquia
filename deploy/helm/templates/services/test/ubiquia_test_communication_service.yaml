@@ -5,6 +5,7 @@ metadata:
   namespace: ubiquia
   annotations:
     "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     sidecar.istio.io/inject: "false"
 spec:

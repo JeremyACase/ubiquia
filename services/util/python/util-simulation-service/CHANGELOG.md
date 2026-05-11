@@ -5,6 +5,10 @@ All notable changes to `util-simulation-service` will be documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning is inherited from the root Ubiquia project.
 
+## [0.28.0] - 2026-05-05
+### Removed
+- `simulations/devops-simulation.yaml`: removed obsolete DevOps simulation scenario
+
 ## [0.26.0] - 2026-04-24
 ### Added
 - `GraphDeploymentService` (`service/graph_deployment_service.py`): POSTs graph deployment requests to target agents' flow-service instances with up to 24 retries; 4xx errors are not retried; supports optional `flag`-based node override via `GraphDeploymentInput`

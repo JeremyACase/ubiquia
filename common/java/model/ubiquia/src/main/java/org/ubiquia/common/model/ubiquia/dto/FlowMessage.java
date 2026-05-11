@@ -25,20 +25,20 @@ public class FlowMessage extends AbstractModel {
         this.flowEvent = flowEvent;
     }
 
-    @NotNull
-    public Node getTargetAdapter() {
-        return targetNode;
-    }
-
-    public void setTargetAdapter(Node targetNode) {
-        this.targetNode = targetNode;
-    }
-
     public String getPayload() {
         return payload;
     }
 
     public void setPayload(String payload) {
         this.payload = payload;
+    }
+
+    @NotNull
+    public Node getTargetNode() {
+        return targetNode;
+    }
+
+    public void setTargetNode(Node targetNode) {
+        this.targetNode = targetNode;
     }
 }

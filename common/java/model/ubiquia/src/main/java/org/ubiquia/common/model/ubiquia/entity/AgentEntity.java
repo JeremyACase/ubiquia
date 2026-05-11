@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.ubiquia.common.model.ubiquia.entity.NetworkEntity;
 
 /**
  * A model representing a single Ubiquia agent; installed via Helm. It does NOT inherit from
@@ -30,7 +31,7 @@ public class AgentEntity {
     @OneToMany(mappedBy = "agent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private Set<UpdateEntity> updates;
 
-    @OneToMany(mappedBy = "agent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @OneToMany(mappedBy = "sourceAgent", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private Set<SyncEntity> syncs;
 
     @CreationTimestamp
@@ -39,6 +40,10 @@ public class AgentEntity {
 
     @UpdateTimestamp
     private OffsetDateTime updatedAt = null;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "network_agent_join_id", nullable = true)
+    private NetworkEntity network;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     @JoinTable(
@@ -108,5 +113,13 @@ public class AgentEntity {
 
     public void setSyncs(Set<SyncEntity> syncs) {
         this.syncs = syncs;
+    }
+
+    public NetworkEntity getNetwork() {
+        return network;
+    }
+
+    public void setNetwork(NetworkEntity network) {
+        this.network = network;
     }
 }

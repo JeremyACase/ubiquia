@@ -92,7 +92,7 @@ data:
   pets.yaml: |
 {{ .Files.Get "bootstrap/ontologies/pets.yaml" | indent 4 }}
 ---
-# The cluster-synch scenario file mounted into the simulation service container.
+# The simulation-cluster-domain-ontology-synch scenario file mounted into the simulation service container.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -103,8 +103,8 @@ metadata:
     "helm.sh/hook-weight": "0"
     "helm.sh/hook-delete-policy": before-hook-creation
 data:
-  cluster-synch.yaml: |
-    name: cluster-synch
+  simulation-cluster-domain-ontology-synch.yaml: |
+    name: simulation-cluster-domain-ontology-synch
     agents:
       - name: microweight-flow-service-a
         mode: test
@@ -385,7 +385,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ubiquia-test-simulation-cluster-synch-verify
+  name: ubiquia-test-simulation-cluster-domain-ontology-synch-verify
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
@@ -437,7 +437,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ubiquia-test-simulation-cluster-synch
+  name: ubiquia-test-simulation-cluster-domain-ontology-synch
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
@@ -453,11 +453,11 @@ spec:
       image: {{ include "ubiquia.util.simulationService.image" . }}
       imagePullPolicy: IfNotPresent
       command: ["util-simulation-service"]
-      args: ["simulation", "run", "--input-file", "/app/etc/scenario/cluster-synch.yaml"]
+      args: ["simulation", "run", "--input-file", "/app/etc/scenario/simulation-cluster-domain-ontology-synch.yaml"]
       volumeMounts:
         - name: scenario
-          mountPath: /app/etc/scenario/cluster-synch.yaml
-          subPath: cluster-synch.yaml
+          mountPath: /app/etc/scenario/simulation-cluster-domain-ontology-synch.yaml
+          subPath: simulation-cluster-domain-ontology-synch.yaml
         - name: ontologies
           mountPath: /app/etc/ontologies/
   volumes:

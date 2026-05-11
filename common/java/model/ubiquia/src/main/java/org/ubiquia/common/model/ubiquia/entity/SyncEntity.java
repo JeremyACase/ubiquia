@@ -31,7 +31,7 @@ public class SyncEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sync_agent_join_id", nullable = false)
-    private AgentEntity agent;
+    private AgentEntity sourceAgent;
 
     @Transient
     private String modelType = "Sync";
@@ -61,12 +61,12 @@ public class SyncEntity {
         this.modelType = modelType;
     }
 
-    public AgentEntity getAgent() {
-        return agent;
+    public AgentEntity getSourceAgent() {
+        return sourceAgent;
     }
 
-    public void setAgent(AgentEntity agent) {
-        this.agent = agent;
+    public void setSourceAgent(AgentEntity sourceAgent) {
+        this.sourceAgent = sourceAgent;
     }
 
     public AbstractModelEntity getModel() {

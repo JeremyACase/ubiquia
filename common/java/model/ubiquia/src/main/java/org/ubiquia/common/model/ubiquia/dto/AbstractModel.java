@@ -27,6 +27,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
     @JsonSubTypes.Type(value = DomainDataContract.class, name = "DomainDataContract"),
     @JsonSubTypes.Type(value = ObjectMetadata.class, name = "ObjectMetadata"),
     @JsonSubTypes.Type(value = Graph.class, name = "Graph"),
+    @JsonSubTypes.Type(value = Network.class, name = "Network"),
 })
 public abstract class AbstractModel {
 

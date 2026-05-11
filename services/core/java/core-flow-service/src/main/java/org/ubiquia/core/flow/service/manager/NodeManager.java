@@ -3,6 +3,9 @@ package org.ubiquia.core.flow.service.manager;
 
 import jakarta.transaction.Transactional;
 import java.util.HashMap;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +66,6 @@ public class NodeManager {
             .graphFinder
             .findGraphWith(graphName, domainOntologyName, version);
 
-
         for (var nodeEntity : graphEntity.getNodes()) {
 
             var nodeId = nodeEntity.getId();
@@ -73,13 +75,24 @@ public class NodeManager {
                     nodeEntity.getName(),
                     graphEntity);
 
+            } else if (Objects.nonNull(nodeEntity.getComponent())
+                && this.componentCardinalityVisitor.hasMatchingCardinality(
+                    nodeEntity.getComponent().getName(), graphDeployment)
+                && !this.componentCardinalityVisitor.isCardinalityEnabled(
+                    nodeEntity.getComponent().getName(), graphDeployment)) {
+
+                logger.info("...skipping node {} — component {} has cardinality < 1.",
+                    nodeEntity.getName(),
+                    nodeEntity.getComponent().getName());
+
             } else {
                 this.deployNodeFor(nodeEntity, graphEntity, graphDeployment);
             }
         }
 
-        logger.info("...completed deploying nodes for graph named {}.",
-            graphEntity.getName());
+        logger.info("...completed deploying nodes for graph named {}. Local node IDs now: {}",
+            graphEntity.getName(),
+            this.getLocalNodeIds());
     }
 
     /**
@@ -142,6 +155,13 @@ public class NodeManager {
                 + " and version "
                 + deployment.getDomainVersion());
         }
+    }
+
+    public Set<String> getLocalNodeIds() {
+        return this.nodeMap.values()
+            .stream()
+            .flatMap(graphNodes -> graphNodes.keySet().stream())
+            .collect(Collectors.toSet());
     }
 
     private Boolean isNodeCurrentlyDeployedWith(final String graphName, final String nodeId) {

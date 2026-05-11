@@ -24,6 +24,8 @@ public class Agent {
 
     private List<Graph> deployedGraphs;
 
+    private Network network;
+
     private Set<ObjectMetadataEntity> objectMetadatas;
 
     @Pattern(regexp = "[a-f0-9]{8}(?:-[a-f0-9]{4}){4}[a-f0-9]{8}")
@@ -86,5 +88,13 @@ public class Agent {
 
     public void setSyncs(Set<Sync> syncs) {
         this.syncs = syncs;
+    }
+
+    public Network getNetwork() {
+        return network;
+    }
+
+    public void setNetwork(Network network) {
+        this.network = network;
     }
 }

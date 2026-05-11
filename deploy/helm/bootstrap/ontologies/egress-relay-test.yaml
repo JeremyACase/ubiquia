@@ -1,0 +1,111 @@
+name: egress-relay-test
+modelType: DomainOntology
+author: Test
+description: Minimal ontology for testing the FlowEgressRelay multi-hop chain.
+
+version:
+  major: 1
+  minor: 0
+  patch: 0
+
+domainDataContract:
+  modelType: DomainDataContract
+  schema:
+    type: object
+    definitions:
+      EgressPayload:
+        description: A pass-through payload for egress relay testing.
+        type: object
+        additionalProperties: true
+    properties:
+      EgressPayload:
+        $ref: "#/definitions/EgressPayload"
+
+graphs:
+  - name: egress-relay-dag
+    modelType: Graph
+    description: Three-node linear DAG for multi-hop egress relay testing. a→b→c.
+
+    components:
+
+      - name: egress-comp-a
+        modelType: Component
+        componentType: TEMPLATE
+        port: 5000
+        image:
+          registry: ubiquia
+          repository: egress-relay-mock
+          tag: latest
+        node:
+          modelType: Node
+          name: egress-node-a
+
+      - name: egress-comp-b
+        modelType: Component
+        componentType: TEMPLATE
+        port: 5000
+        image:
+          registry: ubiquia
+          repository: egress-relay-mock
+          tag: latest
+        node:
+          modelType: Node
+          name: egress-node-b
+
+      - name: egress-comp-c
+        modelType: Component
+        componentType: TEMPLATE
+        port: 5000
+        image:
+          registry: ubiquia
+          repository: egress-relay-mock
+          tag: latest
+        node:
+          modelType: Node
+          name: egress-node-c
+
+    nodes:
+
+      - modelType: Node
+        nodeType: PUSH
+        name: egress-node-a
+        endpoint: /process
+        inputSubSchemas:
+          - modelName: EgressPayload
+        outputSubSchema:
+          modelName: EgressPayload
+        nodeSettings:
+          persistInputPayload: false
+          persistOutputPayload: false
+          validateInputPayload: false
+          validateOutputPayload: false
+
+      - modelType: Node
+        nodeType: PUSH
+        name: egress-node-b
+        endpoint: /process
+        inputSubSchemas:
+          - modelName: EgressPayload
+        outputSubSchema:
+          modelName: EgressPayload
+        nodeSettings:
+          persistInputPayload: false
+          persistOutputPayload: false
+          validateInputPayload: false
+          validateOutputPayload: false
+
+      - modelType: Node
+        nodeType: PUSH
+        name: egress-node-c
+        endpoint: /process
+        inputSubSchemas:
+          - modelName: EgressPayload
+        outputSubSchema:
+          modelName: EgressPayload
+        nodeSettings:
+          persistInputPayload: false
+          persistOutputPayload: false
+          validateInputPayload: false
+          validateOutputPayload: false
+
+    edges: []

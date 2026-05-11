@@ -1,5 +1,6 @@
 package org.ubiquia.core.flow.repository;
 
+import java.util.Collection;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,5 +18,9 @@ public interface FlowMessageRepository extends AbstractEntityRepository<FlowMess
     List<FlowMessageEntity> findAllByTargetNodeIdAndFlowEventFlowId(
         final String targetNodeId,
         final String flowId);
+
+    Page<FlowMessageEntity> findAllByTargetNodeIdNotIn(
+        Collection<String> localNodeIds,
+        Pageable pageable);
 
 }

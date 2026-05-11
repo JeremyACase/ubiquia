@@ -3,6 +3,7 @@ package org.ubiquia.core.flow.service.registrar;
 
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +117,9 @@ public class DomainOntologyRegistrar {
     private DomainOntologyEntity getEntityFrom(final DomainOntology domainOntology) {
 
         var entity = new DomainOntologyEntity();
+        if (Objects.nonNull(domainOntology.getId())) {
+            entity.setId(domainOntology.getId());
+        }
         entity.setAuthor(domainOntology.getAuthor());
         entity.setDescription(domainOntology.getDescription());
         entity.setGraphs(new ArrayList<>());

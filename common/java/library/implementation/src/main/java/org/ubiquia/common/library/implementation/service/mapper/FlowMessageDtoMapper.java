@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
+import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.common.model.ubiquia.entity.FlowMessageEntity;
 
 @Service
@@ -19,6 +20,11 @@ public class FlowMessageDtoMapper extends GenericDtoMapper<FlowMessageEntity, Fl
         super.setAbstractEntityFields(from, to);
         to.setFlowEvent(this.flowEventDtoMapper.map(from.getFlowEvent()));
         to.setPayload(from.getPayload());
+
+        var targetNode = new Node();
+        targetNode.setId(from.getTargetNode().getId());
+        to.setTargetNode(targetNode);
+
         return to;
     }
 }

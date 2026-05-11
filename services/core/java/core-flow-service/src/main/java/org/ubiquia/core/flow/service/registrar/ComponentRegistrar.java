@@ -149,6 +149,9 @@ public class ComponentRegistrar {
         throws JsonProcessingException {
 
         var componentEntity = new ComponentEntity();
+        if (Objects.nonNull(componentRegistration.getId())) {
+            componentEntity.setId(componentRegistration.getId());
+        }
 
         if (Objects.nonNull(componentRegistration.getConfig())) {
 

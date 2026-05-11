@@ -14,7 +14,7 @@ public class FlowMessageEntity extends AbstractModelEntity {
     private FlowEventEntity flowEvent;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "message_target_adapter_join_id", nullable = false)
+    @JoinColumn(name = "message_target_node_join_id", nullable = false)
     private NodeEntity targetNode;
 
     @Lob

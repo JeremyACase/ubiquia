@@ -171,6 +171,45 @@ public class GraphRegistrar {
             }
         }
 
+        // Also handle synced DTOs where component.node is null but node.component is set
+        for (var node : graph.getNodes()) {
+            if (Objects.nonNull(node.getComponent())) {
+
+                var nodeRecord = nodeEntities
+                    .stream()
+                    .filter(x -> x.getName().equals(node.getName()))
+                    .findFirst();
+
+                if (nodeRecord.isEmpty()) {
+                    continue;
+                }
+                var nodeEntity = nodeRecord.get();
+
+                if (Objects.nonNull(nodeEntity.getComponent())) {
+                    continue;
+                }
+
+                var componentRecord = componentEntities
+                    .stream()
+                    .filter(x -> x.getName().equals(node.getComponent().getName()))
+                    .findFirst();
+
+                if (componentRecord.isEmpty()) {
+                    continue;
+                }
+                var componentEntity = componentRecord.get();
+
+                logger.info("...node {} adapted to component {} (via node→component link); connecting...",
+                    nodeEntity.getName(), componentEntity.getName());
+
+                nodeEntity.setComponent(componentEntity);
+                nodeEntity = this.nodeRepository.save(nodeEntity);
+                componentEntity.setNode(nodeEntity);
+                this.componentRepository.save(componentEntity);
+                logger.info("...completed adapting node to component.");
+            }
+        }
+
         logger.info("...completed adapting nodes to components.");
     }
 
@@ -222,6 +261,9 @@ public class GraphRegistrar {
     private GraphEntity tryGetGraphEntityFrom(final Graph graph) {
 
         var graphEntity = new GraphEntity();
+        if (Objects.nonNull(graph.getId())) {
+            graphEntity.setId(graph.getId());
+        }
         graphEntity.setAuthor(graph.getAuthor());
         graphEntity.setCapabilities(graph.getCapabilities());
         graphEntity.setDescription(graph.getDescription());

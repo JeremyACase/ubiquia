@@ -1,0 +1,473 @@
+---
+# Shared application config for all three egress-relay test agents.
+# Per-agent differences (peer-base-urls, agent ID, server port, JGroups port) are
+# injected as environment variables in each container, overriding these defaults.
+#
+# Topology:
+#   Agent A (egress-node-a) ──egress──▶ Agent B (egress-node-b) ──egress──▶ Agent C (egress-node-c)
+#
+# A's only peer is B; B's only peer is C; C has cluster sync disabled (terminal node).
+# Cardinality gates which node each agent deploys locally:
+#   A: egress-comp-a=1, egress-comp-b=0, egress-comp-c=0
+#   B: egress-comp-a=0, egress-comp-b=1, egress-comp-c=0
+#   C: egress-comp-a=0, egress-comp-b=0, egress-comp-c=0  ← all-zero; C is a sink
+#
+# All three agents run as containers in a single pod so JGroups can communicate over
+# localhost. Each container is assigned a unique HTTP port (8080/8081/8082) and a
+# unique JGroups port (7800/7801/7802), overriding the defaults below via env vars.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-egress-relay-agent-config
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  application.yaml: |
+    logging:
+      level:
+        net.jimblackler: OFF
+        org.ubiquia: {{ .Values.logging.ubiquia }}
+
+    server:
+      port: 8080
+
+    spring:
+      application:
+        name: ubiquia-core-flow-service
+      datasource:
+        driverClassName: org.h2.Driver
+        url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
+        username: sa
+        password: sa
+        hikari:
+          transaction-isolation: TRANSACTION_READ_COMMITTED
+      h2:
+        console:
+          enabled: false
+      jackson:
+        date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+        deserialization:
+          fail-on-unknown-properties: true
+      jpa:
+        hibernate:
+          ddl-auto: create
+        properties:
+          hibernate:
+            generate_statistics: false
+            format_sql: true
+
+    ubiquia:
+      mode: TEST
+      cluster:
+        bind-addr: "loopback"
+        flow-service:
+          sync:
+            enabled: true
+            frequency-milliseconds: 10000
+        name: egress-relay-cluster
+        port: 7800
+        seed-hosts: "localhost[7800],localhost[7801],localhost[7802]"
+        sync:
+          peer-base-urls: ""
+      kubernetes:
+        enabled: false
+        namespace: {{ .Release.Namespace }}
+      outbox:
+        enabled: true
+        frequency-milliseconds: 1000
+        mode: DEFAULT
+      page:
+        max-size: 100
+      agent:
+        flow-service:
+          bootstrap:
+            belief-state:
+              enabled: false
+            domain-ontology:
+              enabled: false
+              directory: /app/etc/domain-ontologies/
+            graph:
+              deployments:
+---
+# The egress-relay-test domain ontology mounted into the verify pod.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-egress-relay-ontologies
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  egress-relay-test.yaml: |
+{{ .Files.Get "bootstrap/ontologies/egress-relay-test.yaml" | indent 4 }}
+---
+# Single Service exposing one HTTP port per agent container.
+apiVersion: v1
+kind: Service
+metadata:
+  name: egress-relay-agents
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  selector:
+    app: egress-relay-agents
+  ports:
+    - name: agent-a-http
+      port: 8080
+      targetPort: 8080
+    - name: agent-b-http
+      port: 8081
+      targetPort: 8081
+    - name: agent-c-http
+      port: 8082
+      targetPort: 8082
+---
+# Single Deployment with all three agents as sidecar containers.
+# Sharing a pod network namespace lets JGroups use localhost instead of Kubernetes DNS,
+# matching the way microweight agents run outside of Kubernetes in production.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: egress-relay-agents
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: egress-relay-agents
+  template:
+    metadata:
+      labels:
+        app: egress-relay-agents
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+      containers:
+        # Agent A: deploys egress-node-a only. Its sole egress peer is Agent B.
+        - name: flow-service-a
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SERVER_PORT
+              value: "8080"
+            - name: UBIQUIA_CLUSTER_PORT
+              value: "7800"
+            - name: UBIQUIA_AGENT_ID
+              value: "aaaaaaaa-3333-0000-0000-000000000001"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://localhost:8080"
+            - name: UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS
+              value: "http://localhost:8081"
+          ports:
+            - containerPort: 8080
+            - containerPort: 7800
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+        # Agent B: deploys egress-node-b only. Its sole egress peer is Agent C.
+        - name: flow-service-b
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SERVER_PORT
+              value: "8081"
+            - name: UBIQUIA_CLUSTER_PORT
+              value: "7801"
+            - name: UBIQUIA_AGENT_ID
+              value: "bbbbbbbb-3333-0000-0000-000000000002"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://localhost:8081"
+            - name: UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS
+              value: "http://localhost:8082"
+          ports:
+            - containerPort: 8081
+            - containerPort: 7801
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+        # Agent C: all components at cardinality=0 (no nodes run locally). Cluster sync is
+        # disabled — C is the terminal sink. FlowMessageRegistrar still creates a FlowEvent
+        # when the message arrives, but because no node is locally deployed there is no
+        # inbox-poll attempt and therefore no second FlowEvent from a failed processing call.
+        - name: flow-service-c
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SERVER_PORT
+              value: "8082"
+            - name: UBIQUIA_CLUSTER_PORT
+              value: "7802"
+            - name: UBIQUIA_AGENT_ID
+              value: "cccccccc-3333-0000-0000-000000000003"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://localhost:8082"
+            - name: UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS
+              value: ""
+            - name: UBIQUIA_CLUSTER_FLOW_SERVICE_SYNC_ENABLED
+              value: "false"
+          ports:
+            - containerPort: 8082
+            - containerPort: 7802
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: ubiquia-test-egress-relay-agent-config
+---
+# Verify pod: orchestrates the full test without a simulation runner.
+#
+# Flow:
+#   1. Wait for all three agents to be healthy.
+#   2. Upload egress-relay-test.yaml to Agent A.
+#   3. Wait for the domain ontology to propagate A→B (via A's sync scheduler).
+#   4. Wait for the domain ontology to propagate B→C (via B's sync scheduler).
+#   5. Deploy egress-relay-dag to each agent with cardinality that gates which node
+#      each agent runs locally (comp-a=1 on A, comp-b=1 on B, comp-c=1 on C).
+#   6. Extract egress-node-b's and egress-node-c's IDs from Agent A's node registry.
+#      (IDs are consistent across agents because the ontology was registered once on A
+#      and propagated via sync — each agent saves the same entity UUIDs.)
+#   7. POST a flow message targeting egress-node-b to Agent A.
+#      A runs egress-node-a but NOT egress-node-b, so the FlowEgressRelay on A detects
+#      the message as orphaned and forwards it to Agent B (A's only peer).
+#   8. Poll Agent B until it has a flow event, confirming the first egress hop succeeded.
+#   9. POST a flow message targeting egress-node-c to Agent B.
+#      B runs egress-node-b but NOT egress-node-c, so B's relay forwards it to Agent C.
+#  10. Poll Agent C until it has exactly one flow event — the terminal proof that the
+#      full A→B→C egress chain delivered the message correctly.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubiquia-test-simulation-egress-relay-verify
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    sidecar.istio.io/inject: "false"
+spec:
+  serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+  restartPolicy: Never
+  containers:
+    - name: curl
+      image: curlimages/curl:8.6.0
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          set -e
+
+          # ── helpers ──────────────────────────────────────────────────────────
+
+          wait_for_agent() {
+            local NAME=$1
+            local URL=$2/actuator/health
+            local MAX=24
+            local N=0
+            echo "Waiting for $NAME to be healthy..."
+            while [ $N -lt $MAX ]; do
+              if curl -sf "$URL" >/dev/null 2>&1; then
+                echo "  ✅ $NAME is healthy"
+                return 0
+              fi
+              N=$((N+1))
+              echo "  Attempt $N/$MAX — not ready, retrying in 5s..."
+              sleep 5
+            done
+            echo "  ❌ $NAME did not become healthy after $((MAX*5))s"
+            exit 1
+          }
+
+          wait_for_ontology() {
+            local NAME=$1
+            local URL=$2
+            local ONTOLOGY=$3
+            local MAX=24
+            local N=0
+            echo "Waiting for ontology '$ONTOLOGY' on $NAME..."
+            while [ $N -lt $MAX ]; do
+              R=$(curl -s "$URL/ubiquia/core/flow-service/domain-ontology/query/params?page=0&size=100")
+              if echo "$R" | grep -qE "\"name\"[[:space:]]*:[[:space:]]*\"$ONTOLOGY\""; then
+                echo "  ✅ '$ONTOLOGY' confirmed on $NAME"
+                return 0
+              fi
+              N=$((N+1))
+              echo "  Attempt $N/$MAX — not yet present, retrying in 5s..."
+              sleep 5
+            done
+            echo "  ❌ '$ONTOLOGY' not found on $NAME after $((MAX*5))s"
+            exit 1
+          }
+
+          wait_for_flow_event() {
+            local NAME=$1
+            local URL=$2
+            local MAX=24
+            local N=0
+            echo "Waiting for a flow event on $NAME..."
+            while [ $N -lt $MAX ]; do
+              R=$(curl -s "$URL/ubiquia/core/flow-service/flow-event/query/params?page=0&size=10")
+              TOTAL=$(echo "$R" | grep -o '"totalElements":[0-9]*' | cut -d':' -f2)
+              if [ -n "$TOTAL" ] && [ "$TOTAL" -ge 1 ]; then
+                echo "  ✅ $NAME has $TOTAL flow event(s)"
+                return 0
+              fi
+              N=$((N+1))
+              echo "  Attempt $N/$MAX — no events yet, retrying in 5s..."
+              sleep 5
+            done
+            echo "  ❌ No flow event on $NAME after $((MAX*5))s"
+            exit 1
+          }
+
+          get_node_id() {
+            local URL=$1
+            local NODE_NAME=$2
+            local NODES
+            NODES=$(curl -s "$URL/ubiquia/core/flow-service/node/query/params?page=0&size=100")
+            # Split on '{' so each object is on its own line, find the one containing
+            # the target name, then extract the first "id":"<uuid>" from that line.
+            echo "$NODES" | tr '{' '\n' \
+              | grep "\"name\":\"$NODE_NAME\"" \
+              | grep -o '"id":"[^"]*"' \
+              | head -1 \
+              | cut -d'"' -f4
+          }
+
+          deploy_graph() {
+            local AGENT_NAME=$1
+            local URL=$2
+            local BODY=$3
+            echo "Deploying egress-relay-dag to $AGENT_NAME..."
+            local RESPONSE HTTP_CODE
+            RESPONSE=$(curl -s -w '\n%{http_code}' -X POST \
+              -H "Content-Type: application/json" \
+              -d "$BODY" \
+              "$URL/ubiquia/core/flow-service/graph/deploy")
+            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+            if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+              echo "  ❌ Deploy failed (HTTP $HTTP_CODE):"
+              echo "$RESPONSE" | head -n -1
+              exit 1
+            fi
+            echo "  ✅ Deployed to $AGENT_NAME (HTTP $HTTP_CODE)"
+          }
+
+          inject_flow_message() {
+            local AGENT_NAME=$1
+            local URL=$2
+            local NODE_ID=$3
+            local BODY="{\"modelType\":\"FlowMessage\",\"targetNode\":{\"modelType\":\"Node\",\"id\":\"$NODE_ID\"},\"payload\":\"{}\"}"
+            echo "Injecting flow message targeting node '$NODE_ID' to $AGENT_NAME..."
+            local RESPONSE HTTP_CODE
+            RESPONSE=$(curl -s -w '\n%{http_code}' -X POST \
+              -H "Content-Type: application/json" \
+              -d "$BODY" \
+              "$URL/ubiquia/core/flow-service/flow-message/receive")
+            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+            if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+              echo "  ❌ Inject failed (HTTP $HTTP_CODE):"
+              echo "$RESPONSE" | head -n -1
+              exit 1
+            fi
+            echo "  ✅ Message injected to $AGENT_NAME (HTTP $HTTP_CODE)"
+          }
+
+          # ── base URLs ─────────────────────────────────────────────────────────
+          URL_A="http://egress-relay-agents:8080"
+          URL_B="http://egress-relay-agents:8081"
+          URL_C="http://egress-relay-agents:8082"
+
+          # ── step 1: wait for all agents ───────────────────────────────────────
+          wait_for_agent "agent-a" "$URL_A"
+          wait_for_agent "agent-b" "$URL_B"
+          wait_for_agent "agent-c" "$URL_C"
+
+          # ── step 2: upload domain ontology to Agent A ─────────────────────────
+          echo "Uploading egress-relay-test ontology to Agent A..."
+          curl -sf -X POST \
+            -F "file=@/app/etc/ontologies/egress-relay-test.yaml;type=application/x-yaml" \
+            "$URL_A/ubiquia/core/flow-service/domain-ontology/register/upload" >/dev/null
+          echo "  ✅ Ontology registered on Agent A"
+
+          # ── step 3–4: wait for sync chain A→B→C ──────────────────────────────
+          # A syncs to B on its 10-second schedule; B then syncs to C on its schedule.
+          wait_for_ontology "agent-b" "$URL_B" "egress-relay-test"
+          wait_for_ontology "agent-c" "$URL_C" "egress-relay-test"
+
+          # ── step 5: deploy graph with cardinality to each agent ───────────────
+          deploy_graph "Agent A" "$URL_A" \
+            '{"graphName":"egress-relay-dag","domainOntologyName":"egress-relay-test","domainVersion":{"major":1,"minor":0,"patch":0},"cardinality":{"componentSettings":[{"componentName":"egress-comp-a","replicas":1},{"componentName":"egress-comp-b","replicas":0},{"componentName":"egress-comp-c","replicas":0}]}}'
+
+          deploy_graph "Agent B" "$URL_B" \
+            '{"graphName":"egress-relay-dag","domainOntologyName":"egress-relay-test","domainVersion":{"major":1,"minor":0,"patch":0},"cardinality":{"componentSettings":[{"componentName":"egress-comp-a","replicas":0},{"componentName":"egress-comp-b","replicas":1},{"componentName":"egress-comp-c","replicas":0}]}}'
+
+          deploy_graph "Agent C" "$URL_C" \
+            '{"graphName":"egress-relay-dag","domainOntologyName":"egress-relay-test","domainVersion":{"major":1,"minor":0,"patch":0},"cardinality":{"componentSettings":[{"componentName":"egress-comp-a","replicas":0},{"componentName":"egress-comp-b","replicas":0},{"componentName":"egress-comp-c","replicas":0}]}}'
+
+          # ── step 6: extract node IDs from Agent A ─────────────────────────────
+          # All agents have the same entity UUIDs because the ontology was registered
+          # once on A and replicated via the sync scheduler.
+          echo "Resolving node IDs from Agent A..."
+          NODE_B_ID=$(get_node_id "$URL_A" "egress-node-b")
+          NODE_C_ID=$(get_node_id "$URL_A" "egress-node-c")
+
+          if [ -z "$NODE_B_ID" ] || [ -z "$NODE_C_ID" ]; then
+            echo "❌ Failed to resolve node IDs (B=$NODE_B_ID, C=$NODE_C_ID)"
+            exit 1
+          fi
+          echo "  egress-node-b → $NODE_B_ID"
+          echo "  egress-node-c → $NODE_C_ID"
+
+          # ── step 7: inject message targeting egress-node-b at Agent A ─────────
+          # Agent A deploys egress-node-a only (comp-b cardinality=0), so the message
+          # for egress-node-b is orphaned at A. A's FlowEgressRelay forwards it to B
+          # (A's only configured peer).
+          inject_flow_message "Agent A" "$URL_A" "$NODE_B_ID"
+
+          # ── step 8: confirm Agent B received the egressed message ─────────────
+          wait_for_flow_event "agent-b" "$URL_B"
+
+          # ── step 9: inject message targeting egress-node-c at Agent B ─────────
+          # Agent B deploys egress-node-b only (comp-c cardinality=0), so the message
+          # for egress-node-c is orphaned at B. B's FlowEgressRelay forwards it to C
+          # (B's only configured peer).
+          inject_flow_message "Agent B" "$URL_B" "$NODE_C_ID"
+
+          # ── step 10: verify Agent C has exactly one flow event ────────────────
+          wait_for_flow_event "agent-c" "$URL_C"
+
+          FINAL=$(curl -s "$URL_C/ubiquia/core/flow-service/flow-event/query/params?page=0&size=10" \
+            | grep -o '"totalElements":[0-9]*' | cut -d':' -f2)
+
+          if [ "$FINAL" -ne 1 ]; then
+            echo "❌ Expected 1 flow event on Agent C, got $FINAL"
+            exit 1
+          fi
+
+          echo ""
+          echo "🎉 Egress relay chain verified — Agent C has exactly 1 flow event!"
+          echo "   A (egress-node-a) ──egress──▶ B (egress-node-b) ──egress──▶ C (egress-node-c) ✅"
+      volumeMounts:
+        - name: ontologies
+          mountPath: /app/etc/ontologies/
+  volumes:
+    - name: ontologies
+      configMap:
+        name: ubiquia-test-egress-relay-ontologies

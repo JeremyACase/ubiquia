@@ -102,8 +102,8 @@ metadata:
     "helm.sh/hook-weight": "0"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 data:
-  partition-simulation.yaml: |
-    name: partition-simulation
+  simulation-partition.yaml: |
+    name: simulation-partition
     agents:
       - name: partition-flow-service-a
         mode: test
@@ -332,11 +332,11 @@ spec:
       image: {{ include "ubiquia.util.simulationService.image" . }}
       imagePullPolicy: IfNotPresent
       command: ["util-simulation-service"]
-      args: ["simulation", "run", "--input-file", "/app/etc/scenario/partition-simulation.yaml"]
+      args: ["simulation", "run", "--input-file", "/app/etc/scenario/simulation-partition.yaml"]
       volumeMounts:
         - name: scenario
-          mountPath: /app/etc/scenario/partition-simulation.yaml
-          subPath: partition-simulation.yaml
+          mountPath: /app/etc/scenario/simulation-partition.yaml
+          subPath: simulation-partition.yaml
         - name: ontologies
           mountPath: /app/etc/ontologies/
   volumes:

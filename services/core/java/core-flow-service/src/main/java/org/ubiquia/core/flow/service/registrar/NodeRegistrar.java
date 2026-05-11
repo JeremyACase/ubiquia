@@ -211,6 +211,9 @@ public class NodeRegistrar {
         throws JsonProcessingException {
 
         var nodeEntity = new NodeEntity();
+        if (Objects.nonNull(node.getId())) {
+            nodeEntity.setId(node.getId());
+        }
         nodeEntity.setGraph(graphEntity);
         nodeEntity.setCommunicationServiceSettings(node.getCommunicationServiceSettings());
         nodeEntity.setNodeType(node.getNodeType());
