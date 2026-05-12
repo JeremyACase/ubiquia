@@ -1,0 +1,625 @@
+---
+# Shared application config for the two microweight edge agents.
+# Per-agent differences (port, JGroups port, agent ID, peer URLs) are injected via
+# environment variables in each container, overriding these defaults.
+#
+# Topology:
+#   ┌─────────────────────────────────────────────────────────────────┐
+#   │  Edge Cluster  (single pod — localhost JGroups)                 │
+#   │                                                                 │
+#   │  Edge Agent 1 (edge-node-1) ──JGroups──▶ Edge Agent 2          │
+#   │  localhost:8080 / JGroups:7800            (edge-node-2)        │
+#   │                                           localhost:8081 / 7801 │
+#   └────────────────────────────┬────────────────────────────────────┘
+#                                │  peer sync  (E1 → E2 → KIND)
+#                                ▼
+#                        KIND Agent  (kind-node)
+#                        mixed-scenario-kind-agent:8080
+#                        [separate K8s Deployment]
+#
+# Cardinality gates which node each agent deploys locally:
+#   Edge Agent 1: edge-comp-1=1, edge-comp-2=0, kind-comp=0
+#   Edge Agent 2: edge-comp-1=0, edge-comp-2=1, kind-comp=0
+#   KIND Agent:   edge-comp-1=0, edge-comp-2=0, kind-comp=0  ← pure sink
+#
+# Egress chain:
+#   inject @ E1 → (edge-node-2 not local) → relay to E2
+#   inject @ E2 → (kind-node not local)   → relay to KIND
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-dual-edge-kind-edge-config
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  application.yaml: |
+    logging:
+      level:
+        net.jimblackler: OFF
+        org.ubiquia: {{ .Values.logging.ubiquia }}
+
+    server:
+      port: 8080
+
+    spring:
+      application:
+        name: ubiquia-core-flow-service
+      datasource:
+        driverClassName: org.h2.Driver
+        url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
+        username: sa
+        password: sa
+        hikari:
+          transaction-isolation: TRANSACTION_READ_COMMITTED
+      h2:
+        console:
+          enabled: false
+      jackson:
+        date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+        deserialization:
+          fail-on-unknown-properties: true
+      jpa:
+        hibernate:
+          ddl-auto: create
+        properties:
+          hibernate:
+            generate_statistics: false
+            format_sql: true
+
+    ubiquia:
+      mode: TEST
+      cluster:
+        bind-addr: "loopback"
+        flow-service:
+          sync:
+            enabled: true
+            frequency-milliseconds: 10000
+        name: dual-edge-kind-egress-edge-cluster
+        port: 7800
+        seed-hosts: "localhost[7800],localhost[7801]"
+        sync:
+          peer-base-urls: ""
+      kubernetes:
+        enabled: false
+        namespace: {{ .Release.Namespace }}
+      outbox:
+        enabled: true
+        frequency-milliseconds: 1000
+        mode: DEFAULT
+      page:
+        max-size: 100
+      agent:
+        flow-service:
+          bootstrap:
+            belief-state:
+              enabled: false
+            domain-ontology:
+              enabled: false
+              directory: /app/etc/domain-ontologies/
+            graph:
+              deployments:
+---
+# Application config for the KIND agent.
+# The KIND agent runs as a standard independent K8s Deployment — its own pod, its own
+# JGroups cluster, no localhost coupling to the edge agents.  It receives egresssed
+# messages from Edge Agent 2 and, via the sync chain (E1→E2→KIND), accumulates node
+# registrations for both upstream edge nodes.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-dual-edge-kind-kind-config
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  application.yaml: |
+    logging:
+      level:
+        net.jimblackler: OFF
+        org.ubiquia: {{ .Values.logging.ubiquia }}
+
+    server:
+      port: 8080
+
+    spring:
+      application:
+        name: ubiquia-core-flow-service
+      datasource:
+        driverClassName: org.h2.Driver
+        url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
+        username: sa
+        password: sa
+        hikari:
+          transaction-isolation: TRANSACTION_READ_COMMITTED
+      h2:
+        console:
+          enabled: false
+      jackson:
+        date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+        deserialization:
+          fail-on-unknown-properties: true
+      jpa:
+        hibernate:
+          ddl-auto: create
+        properties:
+          hibernate:
+            generate_statistics: false
+            format_sql: true
+
+    ubiquia:
+      mode: TEST
+      cluster:
+        bind-addr: "loopback"
+        flow-service:
+          sync:
+            enabled: true
+            frequency-milliseconds: 10000
+        name: dual-edge-kind-egress-kind-cluster
+        port: 7800
+        seed-hosts: "localhost[7800]"
+        sync:
+          peer-base-urls: ""
+      kubernetes:
+        enabled: false
+        namespace: {{ .Release.Namespace }}
+      outbox:
+        enabled: true
+        frequency-milliseconds: 1000
+        mode: DEFAULT
+      page:
+        max-size: 100
+      agent:
+        flow-service:
+          bootstrap:
+            belief-state:
+              enabled: false
+            domain-ontology:
+              enabled: false
+              directory: /app/etc/domain-ontologies/
+            graph:
+              deployments:
+---
+# The dual-edge-kind-egress-test domain ontology mounted into the verify pod.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-dual-edge-kind-ontologies
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  dual-edge-kind-egress-test.yaml: |
+{{ .Files.Get "bootstrap/ontologies/dual-edge-kind-egress-test.yaml" | indent 4 }}
+---
+# Service exposing both edge agent HTTP ports from the shared pod.
+apiVersion: v1
+kind: Service
+metadata:
+  name: dual-edge-kind-edge-agents
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  selector:
+    app: dual-edge-kind-edge-agents
+  ports:
+    - name: edge-agent-1-http
+      port: 8080
+      targetPort: 8080
+    - name: edge-agent-2-http
+      port: 8081
+      targetPort: 8081
+---
+# Service exposing the KIND agent's HTTP port.
+apiVersion: v1
+kind: Service
+metadata:
+  name: dual-edge-kind-kind-agent
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  selector:
+    app: dual-edge-kind-kind-agent
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+# Deployment: two microweight edge agents as sidecars in a single pod.
+# Sharing the pod network lets JGroups use localhost, forming the edge cluster.
+# Edge Agent 1 peers with Edge Agent 2; Edge Agent 2 peers with the KIND agent.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dual-edge-kind-edge-agents
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dual-edge-kind-edge-agents
+  template:
+    metadata:
+      labels:
+        app: dual-edge-kind-edge-agents
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+      containers:
+        # Edge Agent 1: deploys edge-node-1 only. Relays orphaned messages to Edge Agent 2.
+        - name: flow-service-edge-1
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SERVER_PORT
+              value: "8080"
+            - name: UBIQUIA_CLUSTER_PORT
+              value: "7800"
+            - name: UBIQUIA_AGENT_ID
+              value: "aaaaaaaa-5555-0000-0000-000000000001"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://localhost:8080"
+            - name: UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS
+              value: "http://localhost:8081"
+          ports:
+            - containerPort: 8080
+            - containerPort: 7800
+          volumeMounts:
+            - name: edge-config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+        # Edge Agent 2: deploys edge-node-2 only. Relays orphaned messages to the KIND agent.
+        - name: flow-service-edge-2
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SERVER_PORT
+              value: "8081"
+            - name: UBIQUIA_CLUSTER_PORT
+              value: "7801"
+            - name: UBIQUIA_AGENT_ID
+              value: "bbbbbbbb-5555-0000-0000-000000000002"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://localhost:8081"
+            - name: UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS
+              value: "http://dual-edge-kind-kind-agent:8080"
+          ports:
+            - containerPort: 8081
+            - containerPort: 7801
+          volumeMounts:
+            - name: edge-config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+      volumes:
+        - name: edge-config
+          configMap:
+            name: ubiquia-test-dual-edge-kind-edge-config
+---
+# Deployment: the KIND agent as a standard independent K8s Deployment.
+# Not part of the edge JGroups cluster — receives egresssed messages from
+# Edge Agent 2 and accumulates edge node registrations via the sync chain.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dual-edge-kind-kind-agent
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dual-edge-kind-kind-agent
+  template:
+    metadata:
+      labels:
+        app: dual-edge-kind-kind-agent
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+      containers:
+        - name: flow-service-kind
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: UBIQUIA_AGENT_ID
+              value: "cccccccc-5555-0000-0000-000000000003"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://dual-edge-kind-kind-agent:8080"
+            - name: UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS
+              value: ""
+          ports:
+            - containerPort: 8080
+            - containerPort: 7800
+          volumeMounts:
+            - name: kind-config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+      volumes:
+        - name: kind-config
+          configMap:
+            name: ubiquia-test-dual-edge-kind-kind-config
+---
+# Verify pod: orchestrates the full test without a simulation runner.
+#
+# Flow:
+#   1.  Wait for all three agents to be healthy.
+#   2.  Upload dual-edge-kind-egress-test.yaml to Edge Agent 1.
+#   3.  Wait for the ontology to sync E1 → E2 (via peer-base-urls scheduler).
+#   4.  Wait for the ontology to sync E2 → KIND (via peer-base-urls scheduler).
+#   5.  Deploy dual-edge-kind-egress-dag to each agent with cardinality gates:
+#         Edge 1: edge-comp-1=1, edge-comp-2=0, kind-comp=0
+#         Edge 2: edge-comp-1=0, edge-comp-2=2, kind-comp=0
+#         KIND:   all=0  (pure sink)
+#   6.  Resolve node IDs from Edge Agent 1.
+#       (IDs are consistent across agents because the ontology was seeded once on
+#       Edge Agent 1 and propagated via sync — each agent saves the same UUIDs.)
+#   7.  POST a flow message targeting edge-node-2 to Edge Agent 1.
+#       Edge 1 has edge-node-2 at cardinality=0, so FlowEgressRelay forwards it
+#       to Edge Agent 2 (Edge 1's sole configured peer).
+#   8.  Poll Edge Agent 2 until it has ≥1 flow event (first egress hop confirmed).
+#   9.  POST a flow message targeting kind-node to Edge Agent 2.
+#       Edge 2 has kind-node at cardinality=0, so FlowEgressRelay forwards it to
+#       the KIND agent (Edge 2's sole configured peer).
+#  10.  Poll the KIND agent until it has exactly 1 flow event (second hop confirmed).
+#  11.  Verify the KIND agent's node registry contains edge-node-1 and edge-node-2,
+#       confirming the sync chain propagated the edge cluster's deployed state to KIND.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubiquia-test-simulation-dual-edge-kind-egress-verify
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    sidecar.istio.io/inject: "false"
+spec:
+  serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+  restartPolicy: Never
+  containers:
+    - name: curl
+      image: curlimages/curl:8.6.0
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          set -e
+
+          # ── helpers ──────────────────────────────────────────────────────────
+
+          wait_for_agent() {
+            local NAME=$1
+            local URL=$2/actuator/health
+            local MAX=24
+            local N=0
+            echo "Waiting for $NAME to be healthy..."
+            while [ $N -lt $MAX ]; do
+              if curl -sf "$URL" >/dev/null 2>&1; then
+                echo "  ✅ $NAME is healthy"
+                return 0
+              fi
+              N=$((N+1))
+              echo "  Attempt $N/$MAX — not ready, retrying in 5s..."
+              sleep 5
+            done
+            echo "  ❌ $NAME did not become healthy after $((MAX*5))s"
+            exit 1
+          }
+
+          wait_for_ontology() {
+            local NAME=$1
+            local URL=$2
+            local ONTOLOGY=$3
+            local MAX=24
+            local N=0
+            echo "Waiting for ontology '$ONTOLOGY' on $NAME..."
+            while [ $N -lt $MAX ]; do
+              R=$(curl -s "$URL/ubiquia/core/flow-service/domain-ontology/query/params?page=0&size=100")
+              if echo "$R" | grep -qE "\"name\"[[:space:]]*:[[:space:]]*\"$ONTOLOGY\""; then
+                echo "  ✅ '$ONTOLOGY' confirmed on $NAME"
+                return 0
+              fi
+              N=$((N+1))
+              echo "  Attempt $N/$MAX — not yet present, retrying in 5s..."
+              sleep 5
+            done
+            echo "  ❌ '$ONTOLOGY' not found on $NAME after $((MAX*5))s"
+            exit 1
+          }
+
+          wait_for_flow_event() {
+            local NAME=$1
+            local URL=$2
+            local MAX=24
+            local N=0
+            echo "Waiting for a flow event on $NAME..."
+            while [ $N -lt $MAX ]; do
+              R=$(curl -s "$URL/ubiquia/core/flow-service/flow-event/query/params?page=0&size=10")
+              TOTAL=$(echo "$R" | grep -o '"totalElements":[0-9]*' | cut -d':' -f2)
+              if [ -n "$TOTAL" ] && [ "$TOTAL" -ge 1 ]; then
+                echo "  ✅ $NAME has $TOTAL flow event(s)"
+                return 0
+              fi
+              N=$((N+1))
+              echo "  Attempt $N/$MAX — no events yet, retrying in 5s..."
+              sleep 5
+            done
+            echo "  ❌ No flow event on $NAME after $((MAX*5))s"
+            exit 1
+          }
+
+          get_node_id() {
+            local URL=$1
+            local NODE_NAME=$2
+            local NODES
+            NODES=$(curl -s "$URL/ubiquia/core/flow-service/node/query/params?page=0&size=100")
+            echo "$NODES" | tr '{' '\n' \
+              | grep "\"name\":\"$NODE_NAME\"" \
+              | grep -o '"id":"[^"]*"' \
+              | head -1 \
+              | cut -d'"' -f4
+          }
+
+          wait_for_node() {
+            local NAME=$1
+            local URL=$2
+            local NODE_NAME=$3
+            local MAX=24
+            local N=0
+            echo "Waiting for node '$NODE_NAME' in $NAME registry..."
+            while [ $N -lt $MAX ]; do
+              NODE_ID=$(get_node_id "$URL" "$NODE_NAME")
+              if [ -n "$NODE_ID" ]; then
+                echo "  ✅ '$NODE_NAME' confirmed in $NAME registry (id=$NODE_ID)"
+                return 0
+              fi
+              N=$((N+1))
+              echo "  Attempt $N/$MAX — not yet present, retrying in 5s..."
+              sleep 5
+            done
+            echo "  ❌ '$NODE_NAME' not found in $NAME registry after $((MAX*5))s"
+            exit 1
+          }
+
+          deploy_graph() {
+            local AGENT_NAME=$1
+            local URL=$2
+            local BODY=$3
+            echo "Deploying dual-edge-kind-egress-dag to $AGENT_NAME..."
+            local RESPONSE HTTP_CODE
+            RESPONSE=$(curl -s -w '\n%{http_code}' -X POST \
+              -H "Content-Type: application/json" \
+              -d "$BODY" \
+              "$URL/ubiquia/core/flow-service/graph/deploy")
+            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+            if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+              echo "  ❌ Deploy failed (HTTP $HTTP_CODE):"
+              echo "$RESPONSE" | head -n -1
+              exit 1
+            fi
+            echo "  ✅ Deployed to $AGENT_NAME (HTTP $HTTP_CODE)"
+          }
+
+          inject_flow_message() {
+            local AGENT_NAME=$1
+            local URL=$2
+            local NODE_ID=$3
+            local BODY="{\"modelType\":\"FlowMessage\",\"targetNode\":{\"modelType\":\"Node\",\"id\":\"$NODE_ID\"},\"payload\":\"{}\"}"
+            echo "Injecting flow message targeting node '$NODE_ID' to $AGENT_NAME..."
+            local RESPONSE HTTP_CODE
+            RESPONSE=$(curl -s -w '\n%{http_code}' -X POST \
+              -H "Content-Type: application/json" \
+              -d "$BODY" \
+              "$URL/ubiquia/core/flow-service/flow-message/receive")
+            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+            if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+              echo "  ❌ Inject failed (HTTP $HTTP_CODE):"
+              echo "$RESPONSE" | head -n -1
+              exit 1
+            fi
+            echo "  ✅ Message injected to $AGENT_NAME (HTTP $HTTP_CODE)"
+          }
+
+          # ── base URLs ─────────────────────────────────────────────────────────
+          URL_E1="http://dual-edge-kind-edge-agents:8080"
+          URL_E2="http://dual-edge-kind-edge-agents:8081"
+          URL_KIND="http://dual-edge-kind-kind-agent:8080"
+
+          # ── step 1: wait for all agents ───────────────────────────────────────
+          wait_for_agent "edge-agent-1" "$URL_E1"
+          wait_for_agent "edge-agent-2" "$URL_E2"
+          wait_for_agent "kind-agent"   "$URL_KIND"
+
+          # ── step 2: upload domain ontology to Edge Agent 1 ────────────────────
+          echo "Uploading dual-edge-kind-egress-test ontology to Edge Agent 1..."
+          curl -sf -X POST \
+            -F "file=@/app/etc/ontologies/dual-edge-kind-egress-test.yaml;type=application/x-yaml" \
+            "$URL_E1/ubiquia/core/flow-service/domain-ontology/register/upload" >/dev/null
+          echo "  ✅ Ontology registered on Edge Agent 1"
+
+          # ── step 3–4: wait for sync chain E1 → E2 → KIND ─────────────────────
+          wait_for_ontology "edge-agent-2" "$URL_E2"   "dual-edge-kind-egress-test"
+          wait_for_ontology "kind-agent"   "$URL_KIND" "dual-edge-kind-egress-test"
+
+          # ── step 5: deploy graph with cardinality to each agent ───────────────
+          deploy_graph "Edge Agent 1" "$URL_E1" \
+            '{"graphName":"dual-edge-kind-egress-dag","domainOntologyName":"dual-edge-kind-egress-test","domainVersion":{"major":1,"minor":0,"patch":0},"cardinality":{"componentSettings":[{"componentName":"edge-comp-1","replicas":1},{"componentName":"edge-comp-2","replicas":0},{"componentName":"kind-comp","replicas":0}]}}'
+
+          deploy_graph "Edge Agent 2" "$URL_E2" \
+            '{"graphName":"dual-edge-kind-egress-dag","domainOntologyName":"dual-edge-kind-egress-test","domainVersion":{"major":1,"minor":0,"patch":0},"cardinality":{"componentSettings":[{"componentName":"edge-comp-1","replicas":0},{"componentName":"edge-comp-2","replicas":1},{"componentName":"kind-comp","replicas":0}]}}'
+
+          deploy_graph "KIND Agent" "$URL_KIND" \
+            '{"graphName":"dual-edge-kind-egress-dag","domainOntologyName":"dual-edge-kind-egress-test","domainVersion":{"major":1,"minor":0,"patch":0},"cardinality":{"componentSettings":[{"componentName":"edge-comp-1","replicas":0},{"componentName":"edge-comp-2","replicas":0},{"componentName":"kind-comp","replicas":0}]}}'
+
+          # ── step 6: extract node IDs from Edge Agent 1 ───────────────────────
+          echo "Resolving node IDs from Edge Agent 1..."
+          NODE_E2_ID=$(get_node_id "$URL_E1" "edge-node-2")
+          NODE_KIND_ID=$(get_node_id "$URL_E1" "kind-node")
+
+          if [ -z "$NODE_E2_ID" ] || [ -z "$NODE_KIND_ID" ]; then
+            echo "❌ Failed to resolve node IDs (edge-node-2=$NODE_E2_ID, kind-node=$NODE_KIND_ID)"
+            exit 1
+          fi
+          echo "  edge-node-2 → $NODE_E2_ID"
+          echo "  kind-node   → $NODE_KIND_ID"
+
+          # ── step 7: inject message targeting edge-node-2 at Edge Agent 1 ─────
+          # Edge 1 has edge-node-2 at cardinality=0, so FlowEgressRelay forwards
+          # it to Edge Agent 2 (Edge 1's sole configured peer).
+          inject_flow_message "Edge Agent 1" "$URL_E1" "$NODE_E2_ID"
+
+          # ── step 8: confirm Edge Agent 2 received the egressed message ────────
+          wait_for_flow_event "edge-agent-2" "$URL_E2"
+
+          # ── step 9: inject message targeting kind-node at Edge Agent 2 ────────
+          # Edge 2 has kind-node at cardinality=0, so FlowEgressRelay forwards
+          # it to the KIND agent (Edge 2's sole configured peer).
+          inject_flow_message "Edge Agent 2" "$URL_E2" "$NODE_KIND_ID"
+
+          # ── step 10: confirm KIND agent received the egressed message ──────────
+          wait_for_flow_event "kind-agent" "$URL_KIND"
+
+          FINAL=$(curl -s "$URL_KIND/ubiquia/core/flow-service/flow-event/query/params?page=0&size=10" \
+            | grep -o '"totalElements":[0-9]*' | cut -d':' -f2)
+
+          if [ "$FINAL" -ne 1 ]; then
+            echo "❌ Expected 1 flow event on KIND agent, got $FINAL"
+            exit 1
+          fi
+
+          # ── step 11: verify KIND is aware of both edge nodes ──────────────────
+          # The sync chain (E1 → E2 → KIND) propagates node registrations so
+          # KIND should hold entries for edge-node-1 and edge-node-2.
+          wait_for_node "kind-agent" "$URL_KIND" "edge-node-1"
+          wait_for_node "kind-agent" "$URL_KIND" "edge-node-2"
+
+          echo ""
+          echo "🎉 Dual-edge-to-KIND egress test passed!"
+          echo "   Edge cluster (edge-node-1 + edge-node-2) ──egress──▶ KIND (kind-node) ✅"
+          echo "   KIND agent is aware of both edge nodes ✅"
+      volumeMounts:
+        - name: ontologies
+          mountPath: /app/etc/ontologies/
+  volumes:
+    - name: ontologies
+      configMap:
+        name: ubiquia-test-dual-edge-kind-ontologies
