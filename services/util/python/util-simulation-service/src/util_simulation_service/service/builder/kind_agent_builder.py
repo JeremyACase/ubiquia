@@ -43,7 +43,12 @@ class KindAgentBuilder(AgentBuilder):
         self._repo_root = repo_root
         self._next_port = base_port
 
-    def build(self, agent_name: str) -> Agent:
+    def build(
+        self,
+        agent_name: str,
+        sync_enabled: bool = False,
+        kubernetes_peer_urls: list[str] | None = None,
+    ) -> Agent:
         host_port = self._next_port
         self._next_port += 1
         cluster_name = f"ubiquia-{agent_name}"

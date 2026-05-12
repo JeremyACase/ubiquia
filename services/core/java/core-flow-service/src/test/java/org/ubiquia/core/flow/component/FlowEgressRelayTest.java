@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestClientException;
@@ -40,7 +39,7 @@ public class FlowEgressRelayTest {
     private RestTemplate restTemplate;
 
     @Autowired
-    private ApplicationContext applicationContext;
+    private FlowEgressRelay relay;
 
     @Autowired
     private DummyFactory dummyFactory;
@@ -67,7 +66,7 @@ public class FlowEgressRelayTest {
 
     @Test
     public void assertTryPollAndForward_withNoPeers_skipsForwarding() {
-        var relay = this.applicationContext.getBean(FlowEgressRelay.class);
+        var relay = this.relay;
 
         relay.tryPollAndForward();
 
@@ -76,7 +75,7 @@ public class FlowEgressRelayTest {
 
     @Test
     public void assertTryPollAndForward_withPeersAndNoMessages_skipsPost() {
-        var relay = this.applicationContext.getBean(FlowEgressRelay.class);
+        var relay = this.relay;
         var peerUrls = (Set<String>) ReflectionTestUtils.getField(relay, "peerBaseUrls");
         peerUrls.add("http://peer-a:8080");
 
@@ -112,7 +111,7 @@ public class FlowEgressRelayTest {
 
         this.nodeManager.teardownAllNodes();
 
-        var relay = this.applicationContext.getBean(FlowEgressRelay.class);
+        var relay = this.relay;
         var peerUrls = (Set<String>) ReflectionTestUtils.getField(relay, "peerBaseUrls");
         peerUrls.add("http://peer-a:8080");
 
@@ -150,7 +149,7 @@ public class FlowEgressRelayTest {
         when(this.restTemplate.postForEntity(anyString(), any(), any()))
             .thenThrow(new RestClientException("connection refused"));
 
-        var relay = this.applicationContext.getBean(FlowEgressRelay.class);
+        var relay = this.relay;
         var peerUrls = (Set<String>) ReflectionTestUtils.getField(relay, "peerBaseUrls");
         peerUrls.add("http://peer-a:8080");
 

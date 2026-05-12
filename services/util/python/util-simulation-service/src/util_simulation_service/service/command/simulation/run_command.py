@@ -112,7 +112,7 @@ def run(input_file: pathlib.Path, output_path: pathlib.Path, output_file_name: s
         event_manager=EventManager(
             commands={
                 "simulation": SimulationEventCommand(agents=agents, topology=topology),
-                "agent_join": AgentJoinEventCommand(agents=agents, agent_factory=agent_factory),
+                "agent_join": AgentJoinEventCommand(agents=agents, agent_factory=agent_factory, simulation_input=simulation_input),
                 "partition": PartitionEventCommand(topology=topology),
             }
         ),

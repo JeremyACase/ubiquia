@@ -23,10 +23,10 @@ import org.ubiquia.core.flow.repository.NetworkRepository;
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class NetworkManagementServiceTest {
+public class MicroweightNetworkManagerTest {
 
     @Autowired
-    private NetworkManagementService networkManagementService;
+    private MicroweightNetworkManager microweightNetworkManager;
 
     @Autowired
     private AgentConfig agentConfig;
@@ -70,7 +70,7 @@ public class NetworkManagementServiceTest {
 
         long networkCountBefore = this.networkRepository.count();
 
-        this.networkManagementService.onSoloView();
+        this.microweightNetworkManager.onSoloView();
 
         this.entityManager.flush();
         this.entityManager.clear();
@@ -90,7 +90,7 @@ public class NetworkManagementServiceTest {
 
         long networkCountBefore = this.networkRepository.count();
 
-        this.networkManagementService.onSoloView();
+        this.microweightNetworkManager.onSoloView();
 
         this.entityManager.flush();
         this.entityManager.clear();
@@ -117,7 +117,7 @@ public class NetworkManagementServiceTest {
         this.entityManager.flush();
         this.entityManager.clear();
 
-        this.networkManagementService.onClusterView();
+        this.microweightNetworkManager.onClusterView();
 
         this.entityManager.flush();
         this.entityManager.clear();
@@ -150,7 +150,7 @@ public class NetworkManagementServiceTest {
         this.entityManager.clear();
 
         Assertions.assertDoesNotThrow(
-            () -> this.networkManagementService.onClusterView(),
+            () -> this.microweightNetworkManager.onClusterView(),
             "Expected onClusterView to handle no-network state without throwing");
     }
 }

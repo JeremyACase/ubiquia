@@ -47,6 +47,7 @@ public class AgentInitializationLogic {
             entity.setId(this.agentConfig.getId());
             entity.setDeployedGraphs(new ArrayList<>());
             entity.setNetwork(network);
+            entity.setBaseUrl(this.agentConfig.getBaseUrl());
             entity = this.agentRepository.save(entity);
             logger.info("...created ubiquia agent entity with id: {} in network: {}",
                 entity.getId(), network.getId());

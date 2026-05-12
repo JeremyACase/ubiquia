@@ -9,8 +9,9 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
@@ -24,7 +25,6 @@ import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.manager.NodeManager;
 
 @Component
-@Scope("prototype")
 public class FlowEgressRelay {
 
     private static final Logger logger = LoggerFactory.getLogger(FlowEgressRelay.class);
@@ -51,19 +51,15 @@ public class FlowEgressRelay {
     private final Set<String> peerBaseUrls = ConcurrentHashMap.newKeySet();
     private ScheduledFuture<?> pollTask;
 
-    public void initialize(final Set<String> peerBaseUrls) {
-        this.peerBaseUrls.addAll(peerBaseUrls);
-
-        logger.info("Initializing FlowEgressRelay for {} peer(s)...", peerBaseUrls.size());
-
+    @PostConstruct
+    public void start() {
         var executor = new ScheduledThreadPoolExecutor(1);
         this.pollTask = executor.scheduleAtFixedRate(
             this::tryPollAndForward,
             POLL_FREQUENCY_MS,
             POLL_FREQUENCY_MS,
             TimeUnit.MILLISECONDS);
-
-        logger.info("...FlowEgressRelay initialized.");
+        logger.info("FlowEgressRelay started.");
     }
 
     public void updatePeers(final Set<String> peerBaseUrls) {
@@ -72,6 +68,7 @@ public class FlowEgressRelay {
         logger.debug("FlowEgressRelay peer set updated to {} peer(s).", peerBaseUrls.size());
     }
 
+    @PreDestroy
     public void teardown() {
         logger.info("Tearing down FlowEgressRelay.");
         if (Objects.nonNull(this.pollTask)) {

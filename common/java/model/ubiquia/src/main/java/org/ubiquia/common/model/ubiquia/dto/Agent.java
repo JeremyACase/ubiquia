@@ -24,6 +24,10 @@ public class Agent {
 
     private List<Graph> deployedGraphs;
 
+    private String baseUrl;
+
+    private boolean reachable = true;
+
     private Network network;
 
     private Set<ObjectMetadataEntity> objectMetadatas;
@@ -88,6 +92,22 @@ public class Agent {
 
     public void setSyncs(Set<Sync> syncs) {
         this.syncs = syncs;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    public boolean isReachable() {
+        return reachable;
+    }
+
+    public void setReachable(boolean reachable) {
+        this.reachable = reachable;
     }
 
     public Network getNetwork() {

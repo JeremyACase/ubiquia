@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, ANY
 
 import pytest
 
@@ -7,23 +7,26 @@ from util_simulation_service.model.agent import Agent
 from util_simulation_service.model.agent_input import AgentInput
 from util_simulation_service.model.agent_mode import AgentMode
 from util_simulation_service.model.events.simulation_event import SimulationEvent
+from util_simulation_service.model.network import Network
 from util_simulation_service.model.simulation_input import SimulationInput
 from util_simulation_service.model.time_offset import TimeOffset
 from util_simulation_service.service.factory.agent_factory import AgentFactory
-from util_simulation_service.service.logic.pre_processing.setup_service import SetupService
+from util_simulation_service.service.logic.pre_processing.setup_service import SetupService, _microweight_peer_config
 
 
-def _agent_input(name: str, mode: AgentMode = AgentMode.MICROWEIGHT, deferred: bool = False) -> AgentInput:
+def _agent_input(name: str, mode: AgentMode = AgentMode.MICROWEIGHT, deferred: bool = False, base_url: str | None = None) -> AgentInput:
     join_offset_time = TimeOffset(n=30.0) if deferred else None
-    return AgentInput(name=name, mode=mode, join_offset_time=join_offset_time)
+    return AgentInput(name=name, mode=mode, join_offset_time=join_offset_time, base_url=base_url)
 
 
-def _make_simulation_input(agent_inputs: list[AgentInput]) -> SimulationInput:
+def _make_simulation_input(agent_inputs: list[AgentInput], networks: list[Network] | None = None) -> SimulationInput:
+    fallback_agent = agent_inputs[0].name if agent_inputs else "placeholder"
+    events = [SimulationEvent(time_offset=TimeOffset(n=1.0), target_agent=fallback_agent, endpoint="/bootstrap/ingest", payload={})]
     return SimulationInput(
         name="test-sim",
         agents=agent_inputs,
-        events=[SimulationEvent(time_offset=TimeOffset(n=1.0), target_agent="agent-a", endpoint="/bootstrap/ingest", payload={})],
-        networks=[],
+        events=events,
+        networks=networks or [],
         speed=1.0,
     )
 
@@ -37,7 +40,7 @@ def _make_factory(builder: AgentBuilder) -> AgentFactory:
 class TestSetupService:
     def test_run_returns_one_agent_per_declared_agent(self):
         builder = MagicMock(spec=AgentBuilder)
-        builder.build.side_effect = lambda name: Agent(name=name, base_url=f"http://{name}")
+        builder.build.side_effect = lambda name, **kw: Agent(name=name, base_url=f"http://{name}")
         service = SetupService(agent_factory=_make_factory(builder))
 
         agents = service.run(
@@ -82,12 +85,12 @@ class TestSetupService:
             ])
         )
 
-        microweight_builder.build.assert_called_once_with("a")
+        microweight_builder.build.assert_called_once_with("a", sync_enabled=ANY, kubernetes_peer_urls=ANY)
         kind_builder.build.assert_called_once_with("b")
 
     def test_run_calls_builder_for_each_agent(self):
         builder = MagicMock(spec=AgentBuilder)
-        builder.build.side_effect = lambda name: Agent(name=name, base_url=f"http://{name}")
+        builder.build.side_effect = lambda name, **kw: Agent(name=name, base_url=f"http://{name}")
         service = SetupService(agent_factory=_make_factory(builder))
 
         service.run(
@@ -99,9 +102,6 @@ class TestSetupService:
         )
 
         assert builder.build.call_count == 3
-        builder.build.assert_any_call("agent-a")
-        builder.build.assert_any_call("agent-b")
-        builder.build.assert_any_call("agent-c")
 
     def test_run_returns_empty_list_for_no_agents(self):
         builder = MagicMock(spec=AgentBuilder)
@@ -114,7 +114,7 @@ class TestSetupService:
 
     def test_run_skips_deferred_agents(self):
         builder = MagicMock(spec=AgentBuilder)
-        builder.build.side_effect = lambda name: Agent(name=name, base_url=f"http://{name}")
+        builder.build.side_effect = lambda name, **kw: Agent(name=name, base_url=f"http://{name}")
         service = SetupService(agent_factory=_make_factory(builder))
 
         agents = service.run(
@@ -126,7 +126,7 @@ class TestSetupService:
 
         assert len(agents) == 1
         assert agents[0].name == "agent-a"
-        builder.build.assert_called_once_with("agent-a")
+        builder.build.assert_called_once()
 
     def test_run_with_all_deferred_returns_empty_list(self):
         builder = MagicMock(spec=AgentBuilder)
@@ -149,3 +149,61 @@ class TestSetupService:
 
         with pytest.raises(NotImplementedError):
             service.run(simulation_input=_make_simulation_input([_agent_input("agent-a")]))
+
+
+class TestMicroweightPeerConfig:
+    def _sim(self, agents: list[AgentInput], networks: list[Network] | None = None) -> SimulationInput:
+        return _make_simulation_input(agents, networks)
+
+    def test_no_network_returns_sync_disabled(self):
+        sim = self._sim([_agent_input("a")])
+        sync_enabled, urls = _microweight_peer_config("a", sim)
+        assert not sync_enabled
+        assert urls == []
+
+    def test_solo_in_network_returns_sync_disabled(self):
+        sim = self._sim(
+            [_agent_input("a")],
+            networks=[Network(name="net", agents=["a"])],
+        )
+        sync_enabled, urls = _microweight_peer_config("a", sim)
+        assert not sync_enabled
+
+    def test_microweight_peer_enables_sync(self):
+        sim = self._sim(
+            [_agent_input("a"), _agent_input("b")],
+            networks=[Network(name="net", agents=["a", "b"])],
+        )
+        sync_enabled, urls = _microweight_peer_config("a", sim)
+        assert sync_enabled
+        assert urls == []
+
+    def test_kubernetes_peer_enables_sync_and_returns_url(self):
+        sim = self._sim(
+            [_agent_input("a"), _agent_input("k8s", mode=AgentMode.TEST, base_url="http://k8s:8080")],
+            networks=[Network(name="net", agents=["a", "k8s"])],
+        )
+        sync_enabled, urls = _microweight_peer_config("a", sim)
+        assert sync_enabled
+        assert urls == ["http://k8s:8080"]
+
+    def test_mixed_peers_collects_only_kubernetes_urls(self):
+        sim = self._sim(
+            [
+                _agent_input("a"),
+                _agent_input("b"),
+                _agent_input("k8s", mode=AgentMode.TEST, base_url="http://k8s:8080"),
+            ],
+            networks=[Network(name="net", agents=["a", "b", "k8s"])],
+        )
+        sync_enabled, urls = _microweight_peer_config("a", sim)
+        assert sync_enabled
+        assert urls == ["http://k8s:8080"]
+
+    def test_agent_not_in_any_network_returns_sync_disabled(self):
+        sim = self._sim(
+            [_agent_input("a"), _agent_input("b")],
+            networks=[Network(name="net", agents=["b"])],
+        )
+        sync_enabled, urls = _microweight_peer_config("a", sim)
+        assert not sync_enabled

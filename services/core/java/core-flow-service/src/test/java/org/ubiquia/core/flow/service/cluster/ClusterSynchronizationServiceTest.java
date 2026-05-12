@@ -10,8 +10,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import jakarta.transaction.Transactional;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.jgroups.Event;
 import org.jgroups.JChannel;
 import org.jgroups.View;
@@ -26,9 +29,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
+import org.ubiquia.common.library.api.config.AgentConfig;
+import org.ubiquia.common.library.api.repository.AgentRepository;
+import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.controller.DomainOntologyController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
+import org.ubiquia.core.flow.repository.NetworkRepository;
 import org.ubiquia.core.flow.repository.SyncRepository;
 
 @SpringBootTest
@@ -38,16 +45,25 @@ import org.ubiquia.core.flow.repository.SyncRepository;
     "ubiquia.cluster.flow-service.sync.enabled=true",
     "server.port=8080"
 })
-public class UbiquiaSynchronizationServiceTest {
+public class ClusterSynchronizationServiceTest {
 
     @MockBean
-    private FlowClusterService flowClusterService;
+    private MicroweightClusterService microweightClusterService;
 
     @MockBean
     private RestTemplate restTemplate;
 
     @Autowired
-    private UbiquiaSynchronizationService ubiquiaSynchronizationService;
+    private ClusterSynchronizationService clusterSynchronizationService;
+
+    @Autowired
+    private AgentConfig agentConfig;
+
+    @Autowired
+    private AgentRepository agentRepository;
+
+    @Autowired
+    private NetworkRepository networkRepository;
 
     @Autowired
     private DomainOntologyController domainOntologyController;
@@ -68,9 +84,9 @@ public class UbiquiaSynchronizationServiceTest {
 
     @Test
     public void assertSynchronize_withNullChannel_skipsSync() {
-        when(flowClusterService.getChannel()).thenReturn(null);
+        when(microweightClusterService.getChannel()).thenReturn(null);
 
-        this.ubiquiaSynchronizationService.synchronize();
+        this.clusterSynchronizationService.synchronize();
 
         verify(restTemplate, never()).postForEntity(anyString(), any(), any());
     }
@@ -79,9 +95,9 @@ public class UbiquiaSynchronizationServiceTest {
     public void assertSynchronize_withNullView_skipsSync() {
         var mockChannel = mock(JChannel.class);
         when(mockChannel.getView()).thenReturn(null);
-        when(flowClusterService.getChannel()).thenReturn(mockChannel);
+        when(microweightClusterService.getChannel()).thenReturn(mockChannel);
 
-        this.ubiquiaSynchronizationService.synchronize();
+        this.clusterSynchronizationService.synchronize();
 
         verify(restTemplate, never()).postForEntity(anyString(), any(), any());
     }
@@ -93,13 +109,13 @@ public class UbiquiaSynchronizationServiceTest {
         var localAddress = new IpAddress(InetAddress.getByName("127.0.0.1"), 7800);
         var peerAddress = new IpAddress(InetAddress.getByName("192.168.1.100"), 7800);
 
-        when(flowClusterService.getChannel()).thenReturn(mockChannel);
+        when(microweightClusterService.getChannel()).thenReturn(mockChannel);
         when(mockChannel.getView()).thenReturn(mockView);
         when(mockChannel.getAddress()).thenReturn(localAddress);
         when(mockView.getMembers()).thenReturn(List.of(peerAddress));
         when(mockChannel.down(isA(Event.class))).thenReturn(peerAddress);
 
-        this.ubiquiaSynchronizationService.synchronize();
+        this.clusterSynchronizationService.synchronize();
 
         verify(restTemplate, never()).postForEntity(anyString(), any(), any());
     }
@@ -116,17 +132,43 @@ public class UbiquiaSynchronizationServiceTest {
         var localAddress = new IpAddress(InetAddress.getByName("127.0.0.1"), 7800);
         var peerAddress = new IpAddress(InetAddress.getByName("192.168.1.100"), 7800);
 
-        when(flowClusterService.getChannel()).thenReturn(mockChannel);
+        when(microweightClusterService.getChannel()).thenReturn(mockChannel);
         when(mockChannel.getView()).thenReturn(mockView);
         when(mockChannel.getAddress()).thenReturn(localAddress);
         when(mockView.getMembers()).thenReturn(List.of(peerAddress));
         when(mockChannel.down(isA(Event.class))).thenReturn(peerAddress);
 
-        this.ubiquiaSynchronizationService.synchronize();
+        this.clusterSynchronizationService.synchronize();
 
         verify(restTemplate, atLeast(1)).postForEntity(anyString(), any(), eq(Void.class));
         Assertions.assertTrue(
             this.syncRepository.count() > 0,
             "Expected SyncEntity records to be created after synchronization");
+    }
+
+    @Test
+    public void assertSynchronize_withKubernetesPeerInDatabase_postsToKubernetesPeerUrl()
+        throws Exception {
+        when(microweightClusterService.getChannel()).thenReturn(null);
+
+        // Persist a domain ontology so synchronization services have data to push.
+        var domainOntology = this.dummyFactory.generateDomainOntology();
+        this.domainOntologyController.register(domainOntology);
+
+        // Add a reachable K8s peer to the local agent's network.
+        // Fetch the network via networkRepository to avoid lazy-loading the detached agent entity.
+        var network = this.networkRepository.findAll().iterator().next();
+        var k8sPeer = new AgentEntity();
+        k8sPeer.setId(UUID.randomUUID().toString());
+        k8sPeer.setDeployedGraphs(new ArrayList<>());
+        k8sPeer.setBaseUrl("http://k8s-agent:8080");
+        k8sPeer.setReachable(true);
+        k8sPeer.setNetwork(network);
+        this.agentRepository.save(k8sPeer);
+
+        this.clusterSynchronizationService.synchronize();
+
+        verify(restTemplate, atLeast(1)).postForEntity(
+            org.mockito.ArgumentMatchers.contains("k8s-agent:8080"), any(), eq(Void.class));
     }
 }

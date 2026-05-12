@@ -17,9 +17,9 @@ import org.ubiquia.common.model.ubiquia.entity.NetworkEntity;
 import org.ubiquia.core.flow.repository.NetworkRepository;
 
 @Service
-public class NetworkManagementService {
+public class MicroweightNetworkManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(NetworkManagementService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MicroweightNetworkManager.class);
 
     @Autowired
     private AgentConfig agentConfig;

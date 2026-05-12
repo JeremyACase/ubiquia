@@ -41,6 +41,12 @@ public class AgentEntity {
     @UpdateTimestamp
     private OffsetDateTime updatedAt = null;
 
+    @Column(nullable = true)
+    private String baseUrl;
+
+    @Column(nullable = false)
+    private boolean reachable = true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "network_agent_join_id", nullable = true)
     private NetworkEntity network;
@@ -113,6 +119,22 @@ public class AgentEntity {
 
     public void setSyncs(Set<SyncEntity> syncs) {
         this.syncs = syncs;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    public boolean isReachable() {
+        return reachable;
+    }
+
+    public void setReachable(boolean reachable) {
+        this.reachable = reachable;
     }
 
     public NetworkEntity getNetwork() {

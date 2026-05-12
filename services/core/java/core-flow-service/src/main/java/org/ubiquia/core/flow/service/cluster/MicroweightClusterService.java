@@ -17,12 +17,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
- * Manages a JGroups TCP cluster channel for peer-to-peer communication between
- * microweight core-flow-service instances.
+ * Manages the microweight agent cluster channel, currently implemented with JGroups TCP.
  *
- * <p>Enabled by setting {@code ubiquia.sync.enabled=true}. Uses TCPPING for
- * static host discovery, suitable for Docker-based microweight deployments where
- * peer addresses are known at startup.
+ * <p>Responsible for maintaining membership and topology awareness among co-located
+ * microweight (Docker-based) Ubiquia agents. The underlying clustering technology may
+ * change, but this service will always own that responsibility.
+ *
+ * <p>Enabled by setting {@code ubiquia.cluster.flow-service.sync.enabled=true}.
  */
 @ConditionalOnProperty(
     value = "ubiquia.cluster.flow-service.sync.enabled",
@@ -30,9 +31,9 @@ import org.springframework.stereotype.Service;
     matchIfMissing = false
 )
 @Service
-public class FlowClusterService implements Receiver {
+public class MicroweightClusterService implements Receiver {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlowClusterService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MicroweightClusterService.class);
 
     @Value("${ubiquia.cluster.seed-hosts}")
     private String seedHosts;
@@ -50,7 +51,7 @@ public class FlowClusterService implements Receiver {
     private long rejoinDelayMs;
 
     @Autowired
-    private NetworkManagementService networkManagementService;
+    private MicroweightNetworkManager microweightNetworkManager;
 
     private JChannel channel;
 
@@ -122,9 +123,9 @@ public class FlowClusterService implements Receiver {
     public void viewAccepted(View newView) {
         logger.info("JGroups cluster view updated — members: {}", newView.getMembers());
         if (newView.getMembers().size() == 1) {
-            this.networkManagementService.onSoloView();
+            this.microweightNetworkManager.onSoloView();
         } else {
-            this.networkManagementService.onClusterView();
+            this.microweightNetworkManager.onClusterView();
         }
     }
 
