@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.28.3] - 2026-05-13
+### Fixed
+- `FlowEgressRelayTest`: call `relay.teardown()` in `@BeforeEach` to cancel the background scheduler before each test, eliminating the intermittent `ObjectOptimisticLockingFailureException` caused by the 500 ms poll task racing with explicit `tryPollAndForward()` calls to delete the same `FlowMessageEntity`
+
 ## [0.28.2] - 2026-05-12
 ### Added
 - Helm test `ubiquia_test_simulation_dual_edge_kind_egress.yaml`: verifies a two-agent edge cluster (microweight, JGroups over localhost) egressing a DAG to a central KIND agent; the verify pod confirms the KIND agent receives exactly one flow event and that its node registry contains both `edge-node-1` and `edge-node-2` via the `E1 → E2 → KIND` sync chain

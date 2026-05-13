@@ -61,6 +61,7 @@ public class FlowEgressRelayTest {
 
     @BeforeEach
     public void setup() {
+        this.relay.teardown();
         this.testHelper.setupAgentState();
     }
 
