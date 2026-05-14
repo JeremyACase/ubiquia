@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.28.2] - 2026-05-13
+### Fixed
+- `FlowEgressRelayTest`: call `relay.teardown()` in `@BeforeEach` to cancel the background scheduler before each test, eliminating the intermittent `ObjectOptimisticLockingFailureException` caused by the 500 ms poll task racing with explicit `tryPollAndForward()` calls to delete the same `FlowMessageEntity`
+
 ## [0.28.1] - 2026-05-08
 ### Changed
 - `GraphRegistrar.tryAdaptComponentsToNodes()`: added reverse-direction pass over `graph.getNodes()` that links a node to its component via `node.getComponent()` when `component.getNode()` is null; fixes cardinality-based node skipping for agents that receive the graph via sync rather than registering it from YAML

@@ -160,3 +160,43 @@ class TestMicroweightAgentBuilderBuild:
             agent = MicroweightAgentBuilder(repo_root).build("agent-a")
 
         assert agent.base_url == "http://localhost:54321"
+
+    def test_sync_disabled_by_default(self, repo_root):
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
+                   side_effect=_make_run_side_effect(repo_root)) as mock_run:
+            MicroweightAgentBuilder(repo_root).build("agent-a")
+
+        run_call = next(c for c in mock_run.call_args_list if c.args[0][:2] == ["docker", "run"])
+        env_vals = [run_call.args[0][i + 1] for i, v in enumerate(run_call.args[0]) if v == "-e"]
+        assert "UBIQUIA_CLUSTER_FLOW_SERVICE_SYNC_ENABLED=false" in env_vals
+
+    def test_sync_enabled_when_requested(self, repo_root):
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
+                   side_effect=_make_run_side_effect(repo_root)) as mock_run:
+            MicroweightAgentBuilder(repo_root).build("agent-a", sync_enabled=True)
+
+        run_call = next(c for c in mock_run.call_args_list if c.args[0][:2] == ["docker", "run"])
+        env_vals = [run_call.args[0][i + 1] for i, v in enumerate(run_call.args[0]) if v == "-e"]
+        assert "UBIQUIA_CLUSTER_FLOW_SERVICE_SYNC_ENABLED=true" in env_vals
+
+    def test_kubernetes_peer_urls_added_as_env_var(self, repo_root):
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
+                   side_effect=_make_run_side_effect(repo_root)) as mock_run:
+            MicroweightAgentBuilder(repo_root).build(
+                "agent-a",
+                sync_enabled=True,
+                kubernetes_peer_urls=["http://k8s-1:8080", "http://k8s-2:8080"],
+            )
+
+        run_call = next(c for c in mock_run.call_args_list if c.args[0][:2] == ["docker", "run"])
+        env_vals = [run_call.args[0][i + 1] for i, v in enumerate(run_call.args[0]) if v == "-e"]
+        assert "UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS=http://k8s-1:8080,http://k8s-2:8080" in env_vals
+
+    def test_no_peer_urls_env_var_when_empty(self, repo_root):
+        with patch("util_simulation_service.service.builder.microweight_agent_builder.subprocess.run",
+                   side_effect=_make_run_side_effect(repo_root)) as mock_run:
+            MicroweightAgentBuilder(repo_root).build("agent-a", sync_enabled=True, kubernetes_peer_urls=[])
+
+        run_call = next(c for c in mock_run.call_args_list if c.args[0][:2] == ["docker", "run"])
+        env_vals = [run_call.args[0][i + 1] for i, v in enumerate(run_call.args[0]) if v == "-e"]
+        assert not any(v.startswith("UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS") for v in env_vals)

@@ -1,6 +1,7 @@
 package org.ubiquia.common.library.api.repository;
 
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +10,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
+import org.ubiquia.common.model.ubiquia.entity.NetworkEntity;
 
 /**
  * An interface for Ubiquia Agent entities.
@@ -44,5 +46,11 @@ public interface AgentRepository
      */
     @Query("SELECT DISTINCT g.id FROM AgentEntity a JOIN a.deployedGraphs g WHERE a.id = :id")
     Page<String> findDeployedGraphIdsById(@Param("id") String id, Pageable pageable);
+
+    /** All agents in a network that have a baseUrl, regardless of reachability. Used by the heartbeat. */
+    List<AgentEntity> findByNetworkAndBaseUrlIsNotNull(NetworkEntity network);
+
+    /** Reachable agents in a network that have a baseUrl. Used by sync peer resolution. */
+    List<AgentEntity> findByNetworkAndBaseUrlIsNotNullAndReachableIsTrue(NetworkEntity network);
 
 }

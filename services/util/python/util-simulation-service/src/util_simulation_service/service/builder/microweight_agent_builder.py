@@ -30,12 +30,35 @@ class MicroweightAgentBuilder(AgentBuilder):
         self._ontologies = repo_root / "deploy" / "helm" / "bootstrap" / "ontologies"
         self._graphs = repo_root / "deploy" / "helm" / "bootstrap" / "graphs"
 
-    def build(self, agent_name: str) -> Agent:
+    def build(
+        self,
+        agent_name: str,
+        sync_enabled: bool = False,
+        kubernetes_peer_urls: list[str] | None = None,
+    ) -> Agent:
+        """Provision a microweight agent container.
+
+        Args:
+            agent_name: Docker container name and logical agent name.
+            sync_enabled: Whether to enable JGroups cluster sync
+                (True when the agent has at least one peer in its network).
+            kubernetes_peer_urls: Base URLs of Kubernetes (TEST-mode) peers in the
+                same network. Passed as UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS so the
+                agent can push cross-cluster synchronization payloads to them.
+        """
         self._build_image()
         self._remove_existing_container(agent_name)
         agent_id = str(uuid.uuid4())
-        logger.info("Starting microweight container '%s' (agent_id=%s).", agent_name, agent_id)
-        self._run_container(agent_name, agent_id=agent_id)
+        logger.info(
+            "Starting microweight container '%s' (agent_id=%s, sync=%s, k8s_peers=%d).",
+            agent_name, agent_id, sync_enabled, len(kubernetes_peer_urls or []),
+        )
+        self._run_container(
+            agent_name,
+            agent_id=agent_id,
+            sync_enabled=sync_enabled,
+            kubernetes_peer_urls=kubernetes_peer_urls or [],
+        )
         host_port = self._get_host_port(agent_name)
         logger.info("Container '%s' listening on http://localhost:%s.", agent_name, host_port)
         return Agent(name=agent_name, base_url=f"http://localhost:{host_port}", mode=AgentMode.MICROWEIGHT)
@@ -58,16 +81,25 @@ class MicroweightAgentBuilder(AgentBuilder):
             logger.info("Removing existing container '%s'.", name)
             subprocess.run(["docker", "rm", "-f", name], check=True)
 
-    def _run_container(self, name: str, agent_id: str) -> None:
+    def _run_container(
+        self,
+        name: str,
+        agent_id: str,
+        sync_enabled: bool,
+        kubernetes_peer_urls: list[str],
+    ) -> None:
         cmd = [
             "docker", "run", "-d",
             "--name", name,
             "-p", _CONTAINER_PORT,
             "-e", f"UBIQUIA_AGENT_ID={agent_id}",
             "-e", "UBIQUIA_MODE=TEST",
+            "-e", f"UBIQUIA_CLUSTER_FLOW_SERVICE_SYNC_ENABLED={'true' if sync_enabled else 'false'}",
             "-v", f"{self._config}:/app/etc/application.yaml:ro",
             "-v", f"{self._ontologies}:/app/etc/domain-ontologies:ro",
         ]
+        if kubernetes_peer_urls:
+            cmd += ["-e", f"UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS={','.join(kubernetes_peer_urls)}"]
         if self._graphs.exists():
             cmd += ["-v", f"{self._graphs}:/app/etc/graphs:ro"]
         cmd.append(_IMAGE_NAME)

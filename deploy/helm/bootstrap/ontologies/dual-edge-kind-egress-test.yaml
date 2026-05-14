@@ -1,0 +1,111 @@
+name: dual-edge-kind-egress-test
+modelType: DomainOntology
+author: Test
+description: Minimal ontology for testing egress from a two-agent edge cluster to a central KIND agent.
+
+version:
+  major: 1
+  minor: 0
+  patch: 0
+
+domainDataContract:
+  modelType: DomainDataContract
+  schema:
+    type: object
+    definitions:
+      MixedScenarioPayload:
+        description: A pass-through payload for mixed-scenario testing.
+        type: object
+        additionalProperties: true
+    properties:
+      MixedScenarioPayload:
+        $ref: "#/definitions/MixedScenarioPayload"
+
+graphs:
+  - name: dual-edge-kind-egress-dag
+    modelType: Graph
+    description: Three-node linear DAG for dual-edge-to-KIND egress testing. edge-1→edge-2→kind.
+
+    components:
+
+      - name: edge-comp-1
+        modelType: Component
+        componentType: TEMPLATE
+        port: 5000
+        image:
+          registry: ubiquia
+          repository: egress-relay-mock
+          tag: latest
+        node:
+          modelType: Node
+          name: edge-node-1
+
+      - name: edge-comp-2
+        modelType: Component
+        componentType: TEMPLATE
+        port: 5000
+        image:
+          registry: ubiquia
+          repository: egress-relay-mock
+          tag: latest
+        node:
+          modelType: Node
+          name: edge-node-2
+
+      - name: kind-comp
+        modelType: Component
+        componentType: TEMPLATE
+        port: 5000
+        image:
+          registry: ubiquia
+          repository: egress-relay-mock
+          tag: latest
+        node:
+          modelType: Node
+          name: kind-node
+
+    nodes:
+
+      - modelType: Node
+        nodeType: PUSH
+        name: edge-node-1
+        endpoint: /process
+        inputSubSchemas:
+          - modelName: MixedScenarioPayload
+        outputSubSchema:
+          modelName: MixedScenarioPayload
+        nodeSettings:
+          persistInputPayload: false
+          persistOutputPayload: false
+          validateInputPayload: false
+          validateOutputPayload: false
+
+      - modelType: Node
+        nodeType: PUSH
+        name: edge-node-2
+        endpoint: /process
+        inputSubSchemas:
+          - modelName: MixedScenarioPayload
+        outputSubSchema:
+          modelName: MixedScenarioPayload
+        nodeSettings:
+          persistInputPayload: false
+          persistOutputPayload: false
+          validateInputPayload: false
+          validateOutputPayload: false
+
+      - modelType: Node
+        nodeType: PUSH
+        name: kind-node
+        endpoint: /process
+        inputSubSchemas:
+          - modelName: MixedScenarioPayload
+        outputSubSchema:
+          modelName: MixedScenarioPayload
+        nodeSettings:
+          persistInputPayload: false
+          persistOutputPayload: false
+          validateInputPayload: false
+          validateOutputPayload: false
+
+    edges: []

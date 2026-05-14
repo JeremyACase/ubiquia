@@ -57,6 +57,18 @@ springdoc:
 
 ubiquia:
   mode: PROD
+  cluster:
+    flow-service:
+      sync:
+        enabled: false
+        frequency-milliseconds: 30000
+    heartbeat:
+      frequency-milliseconds: 15000
+      failure-threshold: 3
+    name: ubiquia-cluster
+    port: 7800
+    rejoin-delay-milliseconds: 5000
+    seed-hosts: localhost[7800]
   kubernetes:
     enabled: false
     namespace: ubiquia
@@ -68,6 +80,7 @@ ubiquia:
     max-size: 100
   agent:
     id: 0328ca73-4d50-409f-85a8-7168ce80bd96
+    base-url:
     flow-service:
       bootstrap:
         belief-state:

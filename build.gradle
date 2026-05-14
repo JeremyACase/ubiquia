@@ -14,7 +14,7 @@ plugins {
 
 allprojects {
     group = 'org.ubiquia'
-    version = '0.28.1'
+    version = '0.28.3'
 
     repositories {
         mavenCentral()

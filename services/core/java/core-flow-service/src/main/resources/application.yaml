@@ -66,6 +66,9 @@ ubiquia:
       sync:
         enabled: false
         frequency-milliseconds: 30000
+    heartbeat:
+      frequency-milliseconds: 15000
+      failure-threshold: 3
     name: ubiquia-cluster
     port: 7800
     rejoin-delay-milliseconds: 5000
@@ -92,3 +95,4 @@ ubiquia:
           deployments:
     # This is a default UUID for development purposes
     id: 0328ca73-4d50-409f-85a8-7168ce80bd96
+    base-url:

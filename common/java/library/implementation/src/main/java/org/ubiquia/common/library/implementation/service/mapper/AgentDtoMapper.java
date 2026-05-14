@@ -22,6 +22,8 @@ public class AgentDtoMapper {
             to.setId(from.getId());
             to.setCreatedAt(from.getCreatedAt());
             to.setUpdatedAt(from.getUpdatedAt());
+            to.setBaseUrl(from.getBaseUrl());
+            to.setReachable(from.isReachable());
             to.setDeployedGraphs(this.graphDtoMapper.map(from.getDeployedGraphs()));
         }
 
