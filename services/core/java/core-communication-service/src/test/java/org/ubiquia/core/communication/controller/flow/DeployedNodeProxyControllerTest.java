@@ -49,9 +49,7 @@ class DeployedNodeProxyControllerTest {
     void getProxiedUrls_returnsRegisteredEndpoints() throws Exception {
         when(nodeProxyManager.getRegisteredEndpoints()).thenReturn(List.of("a/b", "c/d"));
 
-        var base = "/ubiquia/core/communication-service/node-reverse-proxy";
-
-        mockMvc.perform(get(base + "/get-proxied-urls"))
+        mockMvc.perform(get("/ubiquia/core-communication-service/node/get-proxied-urls"))
             .andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$[*]").value(containsInAnyOrder("a/b", "c/d")));
@@ -61,8 +59,9 @@ class DeployedNodeProxyControllerTest {
 
     @Test
     void proxyToNode_get_forwardsStatusHeadersAndBody() throws Exception {
+        var graphName = "my-graph";
         var nodeName = "nodeA";
-        when(nodeProxyManager.getRegisteredEndpointForNodeName(nodeName)).thenReturn("graph-x/node-a");
+        when(nodeProxyManager.getRegisteredEndpointForNodeName(nodeName)).thenReturn("registered");
 
         var connection = mock(HttpURLConnection.class);
         when(connection.getResponseCode()).thenReturn(200);
@@ -80,18 +79,17 @@ class DeployedNodeProxyControllerTest {
                      when(mock.openConnection()).thenReturn(connection);
                  })) {
 
-            var base = "/ubiquia/core/communication-service/node-reverse-proxy";
-
-            mockMvc.perform(get(base + "/" + nodeName + "/foo/bar")
+            mockMvc.perform(get("/ubiquia/core-communication-service/" + graphName + "/node/" + nodeName + "/foo/bar")
                     .header("X-Inbound", "123"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("X-Downstream", "yes"))
                 .andExpect(content().string("OK"));
 
             verify(connection).setRequestMethod("GET");
-            verify(connection).setRequestProperty("X-Inbound", "123");
+            verify(connection).addRequestProperty("X-Inbound", "123");
 
-            var expected = flowUrl() + ":" + flowPort() + "/graph-x/node-a/foobar";
+            var expected = flowUrl() + ":" + flowPort()
+                + "/ubiquia/core-flow-service/" + graphName + "/node/" + nodeName.toLowerCase() + "/foo/bar";
             org.junit.jupiter.api.Assertions.assertTrue(
                 capturedTargetUrl.toString().contains(expected),
                 "Expected URL to contain: " + expected + " but was: " + capturedTargetUrl
@@ -101,8 +99,9 @@ class DeployedNodeProxyControllerTest {
 
     @Test
     void proxyToNode_post_streamsRequestBodyToDownstream() throws Exception {
+        var graphName = "my-graph";
         var nodeName = "nodeB";
-        when(nodeProxyManager.getRegisteredEndpointForNodeName(nodeName)).thenReturn("graph-y/node-b");
+        when(nodeProxyManager.getRegisteredEndpointForNodeName(nodeName)).thenReturn("registered");
 
         var downstreamBody = new ByteArrayOutputStream();
 
@@ -117,9 +116,7 @@ class DeployedNodeProxyControllerTest {
                      when(mock.openConnection()).thenReturn(connection);
                  })) {
 
-            var base = "/ubiquia/core/communication-service/node-reverse-proxy";
-
-            mockMvc.perform(post(base + "/" + nodeName + "/some/path")
+            mockMvc.perform(post("/ubiquia/core-communication-service/" + graphName + "/node/" + nodeName + "/some/path")
                     .contentType(MediaType.TEXT_PLAIN)
                     .content("hello downstream"))
                 .andExpect(status().isCreated())

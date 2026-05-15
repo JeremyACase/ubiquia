@@ -67,7 +67,7 @@ public class QueueNodeTest {
 
         this.testHelper.registerAndDeploy(domainOntology, graph);
 
-        var targetUrl = "http://localhost:8080/graph/"
+        var targetUrl = "http://localhost:8080/ubiquia/core-flow-service/"
             + graph.getName().toLowerCase()
             + "/node/"
             + queueNode.getName().toLowerCase()
@@ -123,7 +123,7 @@ public class QueueNodeTest {
 
         this.testHelper.registerAndDeploy(domainOntology, graph);
 
-        var targetUrl = "http://localhost:8080/graph/"
+        var targetUrl = "http://localhost:8080/ubiquia/core-flow-service/"
             + graph.getName().toLowerCase()
             + "/node/"
             + queueNode.getName().toLowerCase()

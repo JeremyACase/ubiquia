@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.29.0] - 2026-05-15
+### Fixed
+- `QueueNodeTest`: updated hardcoded endpoint URLs from `graph/{graph}/node/{node}/queue/{peek,pop}` to `ubiquia/core-flow-service/{graph}/node/{node}/queue/{peek,pop}` to match the new path registered by `NodeEndpointRecordBuilder`
+
 ## [0.28.2] - 2026-05-13
 ### Fixed
 - `FlowEgressRelayTest`: call `relay.teardown()` in `@BeforeEach` to cancel the background scheduler before each test, eliminating the intermittent `ObjectOptimisticLockingFailureException` caused by the 500 ms poll task racing with explicit `tryPollAndForward()` calls to delete the same `FlowMessageEntity`

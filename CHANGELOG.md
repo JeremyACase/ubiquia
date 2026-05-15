@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.29.0] - 2026-05-15
+### Changed
+- Node and component proxy URL patterns unified across `core-flow-service` and `core-communication-service`: deployed node endpoints now follow `ubiquia/core-flow-service/{graph}/node/{node}/{endpoint}` and are proxied at `ubiquia/core-communication-service/{graph}/node/{node}/{endpoint}`; deployed component endpoints follow `ubiquia/core-flow-service/{graph}/component/{component}/{endpoint}` and are proxied at `ubiquia/core-communication-service/{graph}/component/{component}/{endpoint}`
+- `NodeEndpointRecordBuilder.getBasePathFor()`: base path changed from `graph/{graph}/node/{node}` to `ubiquia/core-flow-service/{graph}/node/{node}`
+- `ComponentEndpointRecordBuilder.getBasePathFor()`: base path changed from `/graph/{graph}/component/{component}` to `/ubiquia/core-flow-service/{graph}/component/{component}`
+- `DeployedNodeProxyController`: re-mapped from `/ubiquia/core/communication-service/node-reverse-proxy/{nodeName}/**` to `/ubiquia/core-communication-service/{graph}/node/{node}/**`; fixed path-stripping bug (was removing all `/` characters), added hop-by-hop header filtering, connection timeouts, and error-stream forwarding
+- `DeployedComponentProxyController`: re-mapped from `/ubiquia/core/communication-service/component-reverse-proxy/{componentName}/**` to `/ubiquia/core-communication-service/{graph}/component/{component}/**`; diagnostics endpoint moved to `GET /ubiquia/core-communication-service/component/get-proxied-urls`
+- Helm test `ubiquia_test_communication_service.yaml`: added `GET /ubiquia/core-communication-service/node/get-proxied-urls` and `GET /ubiquia/core-communication-service/component/get-proxied-urls` smoke tests
+
 ## [0.28.3] - 2026-05-13
 ### Fixed
 - `FlowEgressRelayTest`: call `relay.teardown()` in `@BeforeEach` to cancel the background scheduler before each test, eliminating the intermittent `ObjectOptimisticLockingFailureException` caused by the 500 ms poll task racing with explicit `tryPollAndForward()` calls to delete the same `FlowMessageEntity`

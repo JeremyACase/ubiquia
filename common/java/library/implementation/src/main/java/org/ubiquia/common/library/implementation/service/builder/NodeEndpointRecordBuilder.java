@@ -49,7 +49,7 @@ public class NodeEndpointRecordBuilder {
     }
 
     public String getBasePathFor(final String graphName, final String nodeName) {
-        return "graph/"
+        return "ubiquia/core-flow-service/"
             + graphName.toLowerCase()
             + "/node/"
             + nodeName.toLowerCase();

@@ -27,11 +27,11 @@ import org.ubiquia.core.communication.service.manager.flow.ComponentProxyManager
  * Reverse proxy for component endpoints with smart HTML/CSS URL rewriting.
  *
  * <p>This controller forwards requests under
- * {@code /ubiquia/core/communication-service/component-reverse-proxy/{componentName}/**}
+ * {@code /ubiquia/core-communication-service/{graph}/component/{component}/**}
  * to a target component endpoint resolved via {@link ComponentProxyManager}. It:
  * </p>
  * <ul>
- *   <li>Derives the tail path after {@code {componentName}} and preserves query strings.</li>
+ *   <li>Derives the tail path after {@code {component}} and preserves query strings.</li>
  *   <li>Builds the upstream target from either an absolute registered URI or from
  *       {@link FlowServiceConfig} (host/port) + registered relative path.</li>
  *   <li>Skips hop-by-hop headers and forces {@code Accept-Encoding: identity} to allow
@@ -43,12 +43,12 @@ import org.ubiquia.core.communication.service.manager.flow.ComponentProxyManager
  * <p><strong>Notes</strong></p>
  * <ul>
  *   <li>Uses blocking I/O via {@link HttpURLConnection} (not reactive).</li>
- *   <li>Returns {@code 400 Bad Request} if {@code componentName} is unknown.</li>
+ *   <li>Returns {@code 400 Bad Request} if {@code component} is unknown.</li>
  *   <li>For error responses, streams {@code getErrorStream()} when available.</li>
  * </ul>
  */
 @RestController
-@RequestMapping("/ubiquia/core/communication-service/component-reverse-proxy")
+@RequestMapping("/ubiquia/core-communication-service")
 public class DeployedComponentProxyController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -88,7 +88,7 @@ public class DeployedComponentProxyController {
      *
      * @return list of registered endpoint strings for diagnostics/observability
      */
-    @GetMapping("/get-proxied-urls")
+    @GetMapping("/component/get-proxied-urls")
     public List<String> getProxiedUrls() {
         var result = this.componentProxyManager.getRegisteredEndpoints();
         return result;
@@ -97,7 +97,7 @@ public class DeployedComponentProxyController {
     /**
      * Main reverse-proxy entrypoint for a named component.
      *
-     * <p>Resolves {@code componentName} to an endpoint, derives the remainder (tail) of the path,
+     * <p>Resolves {@code component} to an endpoint, derives the remainder (tail) of the path,
      * chooses the upstream base (absolute endpoint vs. flow-service host/port), constructs the
      * target {@link URI}, and proxies the request/response with selective header copying. For
      * {@code text/html} and {@code text/css} responses, it performs URL rewriting so assets
@@ -106,14 +106,15 @@ public class DeployedComponentProxyController {
      * <p>Supported methods: {@code GET}, {@code HEAD}, {@code POST}, {@code PUT}, {@code PATCH},
      * {@code DELETE}.</p>
      *
-     * @param componentName logical name used to look up the registered component endpoint
-     * @param request       incoming client request
-     * @param response      outgoing response to client; status, headers, and body are populated
+     * @param graph     the graph name the component belongs to
+     * @param component logical name used to look up the registered component endpoint
+     * @param request   incoming client request
+     * @param response  outgoing response to client; status, headers, and body are populated
      * @throws IOException             on I/O errors while streaming request/response bodies
      * @throws ResponseStatusException with {@code 400 Bad Request} if the component is unknown
      */
     @RequestMapping(
-        value = "/{componentName}/**",
+        value = "/{graph}/component/{component}/**",
         method = {
             RequestMethod.GET, RequestMethod.HEAD,
             RequestMethod.POST, RequestMethod.PUT,
@@ -121,14 +122,15 @@ public class DeployedComponentProxyController {
         }
     )
     public void proxyToComponent(
-        @PathVariable final String componentName,
+        @PathVariable final String graph,
+        @PathVariable final String component,
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws IOException {
 
-        var endpoint = this.componentProxyManager.getRegisteredEndpointFor(componentName);
+        var endpoint = this.componentProxyManager.getRegisteredEndpointFor(component);
         if (endpoint == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No component registered with name: " + componentName);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No component registered with name: " + component);
         }
 
         // -------- derive proxied prefix + tail --------

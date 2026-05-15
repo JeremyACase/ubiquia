@@ -33,7 +33,7 @@ public class ComponentEndpointRecordBuilder {
     }
 
     public String getBasePathFor(final String graphName, final String componentName) {
-        return "/graph/"
+        return "/ubiquia/core-flow-service/"
             + graphName.toLowerCase()
             + "/component/"
             + componentName.toLowerCase();
