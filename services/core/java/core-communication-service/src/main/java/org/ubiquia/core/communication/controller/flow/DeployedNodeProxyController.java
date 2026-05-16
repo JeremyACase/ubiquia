@@ -5,191 +5,196 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.HandlerMapping;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.core.communication.service.manager.flow.NodeProxyManager;
 
 /**
- * Reverse proxy controller for adapter endpoints.
+ * Reverse proxy controller for deployed node endpoints.
  *
  * <p>
- * This controller exposes a generic reverse-proxy route under
- * {@code /ubiquia/communication-service/adapter-reverse-proxy}. Requests to
- * {@code /{adapterName}/**} are forwarded to a target adapter endpoint that is
- * dynamically looked up via {@link NodeProxyManager}. The final target URL is
- * constructed from the configured {@link FlowServiceConfig} host/port and the
- * registered adapter endpoint.
+ * Requests to {@code /ubiquia/core-communication-service/{graph}/{node}/**} are forwarded
+ * to the corresponding endpoint on the flow service at
+ * {@code /ubiquia/core-flow-service/{graph}/{node}/**}.
  * </p>
  *
  * <h3>Behavior</h3>
  * <ul>
  *   <li>Supported methods: {@code GET}, {@code POST}, {@code PUT}.</li>
- *   <li>All inbound headers are copied to the outbound request (subject to
- *       {@link HttpURLConnection} handling of restricted headers).</li>
- *   <li>For {@code POST}/{@code PUT}, the request body is streamed to the target.</li>
- *   <li>The downstream status code and headers are propagated back to the client,
- *       and the response body is streamed back.</li>
- * </ul>
- *
- * <h3>Implementation notes & limitations</h3>
- * <ul>
- *   <li>Networking is performed with {@link HttpURLConnection} and blocking I/O;
- *       this controller is not reactive.</li>
- *   <li>Path derivation removes the controller prefix and the {@code adapterName}.
- *       The current implementation also removes {@code '/'} characters when building
- *       {@code cleanedPath}; adjust if preserving sub-path separators is desired.</li>
- *   <li>Query parameters are not currently forwarded. If required, append the original
- *       query string to the target URL.</li>
- *   <li>On non-2xx responses, {@link HttpURLConnection#getInputStream()} may throw;
- *       consider reading {@code getErrorStream()} for error bodies.</li>
+ *   <li>Hop-by-hop headers are filtered from both request and response.</li>
+ *   <li>Request body is streamed for {@code POST}/{@code PUT} when present.</li>
+ *   <li>Query parameters are forwarded to the upstream target.</li>
+ *   <li>Returns {@code 400 Bad Request} if the node is not registered.</li>
+ *   <li>Error stream is forwarded for 4xx/5xx upstream responses.</li>
  * </ul>
  *
  * @see NodeProxyManager
  * @see FlowServiceConfig
  */
 @RestController
-@RequestMapping("/ubiquia/core/communication-service/node-reverse-proxy")
+@RequestMapping("/ubiquia/core-communication-service")
 public class DeployedNodeProxyController {
 
     private static final Logger logger = LoggerFactory.getLogger(DeployedNodeProxyController.class);
 
-    /**
-     * Registry for dynamically discovered/registered adapter endpoints.
-     */
+    private final Set<String> hopByHopHeaders;
+
     @Autowired
     private NodeProxyManager nodeProxyManager;
 
-    /**
-     * Base host/port configuration used to build the adapter target URL.
-     */
     @Autowired
     private FlowServiceConfig flowServiceConfig;
 
-    /**
-     * Autowired {@link WebClient}. Currently unused by this controller, which relies on
-     * {@link HttpURLConnection}; kept for parity with other controllers and potential future use.
-     */
-    @Autowired
-    private WebClient webClient;
+    public DeployedNodeProxyController() {
+        this.hopByHopHeaders = new HashSet<>(Arrays.asList(
+            "connection", "keep-alive", "proxy-authenticate", "proxy-authorization",
+            "te", "trailer", "transfer-encoding", "upgrade",
+            "host", "content-length", "content-encoding", "accept-encoding"
+        ));
+    }
 
     /**
-     * Returns the set of adapter endpoint paths currently registered for proxying.
+     * Returns the set of node endpoint paths currently registered for proxying.
      *
-     * <p>
-     * This is primarily a diagnostics/introspection endpoint to verify what the
-     * {@link NodeProxyManager} has registered.
-     * </p>
-     *
-     * @return a list of registered adapter endpoint strings
+     * @return a list of registered node endpoint strings
      */
-    @GetMapping("/get-proxied-urls")
+    @GetMapping("/node/get-proxied-urls")
     public List<String> getProxiedUrls() {
-        logger.info("Received request for currently proxied urls...");
+        logger.info("Received request for currently proxied node urls...");
         return this.nodeProxyManager.getRegisteredEndpoints();
     }
 
     /**
-     * Reverse-proxies a request addressed to {@code /{adapterName}/**} to the adapter's
-     * registered endpoint behind the Flow service.
+     * Reverse-proxies a request to the flow service node endpoint.
      *
      * <p>
-     * The method:
+     * Resolves the node registration, derives the tail path after {@code {node}}, constructs
+     * the upstream target at {@code /ubiquia/core-flow-service/{graph}/{node}/{tail}}, and
+     * proxies the request/response with selective header copying.
      * </p>
-     * <ol>
-     *   <li>Looks up the adapter's registered endpoint using {@link NodeProxyManager}.</li>
-     *   <li>Builds a target URL using {@link FlowServiceConfig#getUrl()} and {@link FlowServiceConfig#getPort()}.</li>
-     *   <li>Copies inbound headers to the outbound connection.</li>
-     *   <li>For {@code POST}/{@code PUT}, streams the request body to the target.</li>
-     *   <li>Propagates the downstream status, headers, and body to the client.</li>
-     * </ol>
      *
-     * <p><strong>Note:</strong> the current path cleaning removes all {@code '/'} characters from
-     * the trailing path. If your adapters require hierarchical paths, consider preserving
-     * separators when computing {@code cleanedPath}.</p>
-     *
-     * @param nodeName the logical adapter identifier used to resolve the target endpoint
-     * @param request     the incoming servlet request from the client
-     * @param response    the servlet response to write the proxied result into
-     * @throws IOException              if an I/O error occurs while forwarding the request/response
-     * @throws IllegalArgumentException if no adapter is registered under the given {@code adapterName}
+     * @param graph    the graph name the node belongs to
+     * @param node     the node name used to validate registration
+     * @param request  the incoming servlet request
+     * @param response the servlet response to write the proxied result into
+     * @throws IOException             on I/O errors while streaming request/response bodies
+     * @throws ResponseStatusException with {@code 400 Bad Request} if the node is unknown
      */
     @RequestMapping(
-        value = "/{nodeName}/**",
+        value = "/{graph}/node/{node}/**",
         method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT}
     )
     public void proxyToNode(
-        @PathVariable String nodeName,
-        HttpServletRequest request,
-        HttpServletResponse response) throws IOException {
+        @PathVariable final String graph,
+        @PathVariable final String node,
+        final HttpServletRequest request,
+        final HttpServletResponse response) throws IOException {
 
-        var registeredEndpoint = this.nodeProxyManager.getRegisteredEndpointForNodeName(nodeName);
-        if (Objects.nonNull(registeredEndpoint)) {
+        var registeredEndpoint = this.nodeProxyManager.getRegisteredEndpointForNodeName(node);
+        if (registeredEndpoint == null) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "No node registered with name: " + node);
+        }
 
-            var cleanedPath = request.getRequestURI()
-                .replace("/ubiquia/core/communication-service/node-reverse-proxy", "")
-                .replace(nodeName, "")
-                .replace("/", "");
+        // Extract the tail path after /{graph}/{node}
+        var pathWithin = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        var bestPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        var tail = new AntPathMatcher().extractPathWithinPattern(bestPattern, pathWithin);
+        var remainder = (tail == null) ? "" : tail;
 
-            var targetUrl = this.flowServiceConfig.getUrl()
-                + ":"
-                + this.flowServiceConfig.getPort()
-                + "/"
-                + registeredEndpoint
-                + "/"
-                + cleanedPath;
+        // Build the upstream URL: http://<flow-service>:<port>/ubiquia/core-flow-service/{graph}/node/{node}/{tail}
+        var serviceBase = this.flowServiceConfig.getUrl() + ":" + this.flowServiceConfig.getPort();
+        var targetUrl = serviceBase
+            + "/ubiquia/core-flow-service/"
+            + graph.toLowerCase()
+            + "/node/"
+            + node.toLowerCase()
+            + (remainder.isEmpty() ? "" : "/" + remainder);
 
-            logger.debug("Reverse proxying to URL {}...", targetUrl);
+        if (request.getQueryString() != null) {
+            targetUrl += "?" + request.getQueryString();
+        }
 
-            // Create a connection to the target
-            var url = new URL(targetUrl);
-            var connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod(request.getMethod());
+        logger.debug("Reverse proxying {} -> {}", request.getMethod(), targetUrl);
 
-            // Copy headers
-            Collections.list(request.getHeaderNames()).forEach(headerName -> {
-                Collections.list(request.getHeaders(headerName)).forEach(headerValue -> {
-                    connection.setRequestProperty(headerName, headerValue);
-                });
-            });
+        var conn = (HttpURLConnection) new URL(targetUrl).openConnection();
+        conn.setInstanceFollowRedirects(false);
+        conn.setRequestMethod(request.getMethod());
+        conn.setConnectTimeout(10_000);
+        conn.setReadTimeout(60_000);
 
-            // Copy body if needed
-            if ("POST".equalsIgnoreCase(request.getMethod())
-                || "PUT".equalsIgnoreCase(request.getMethod())) {
-                connection.setDoOutput(true);
-                IOUtils.copy(request.getInputStream(), connection.getOutputStream());
-            }
-
-            // Forward response status and headers
-            response.setStatus(connection.getResponseCode());
-            connection.getHeaderFields().forEach((headerName, headerValues) -> {
-                if (headerName != null) {
-                    headerValues.forEach(headerValue -> response.addHeader(headerName, headerValue));
+        // Copy request headers, skipping hop-by-hop
+        var headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            var h = headerNames.nextElement();
+            if (h != null && !this.hopByHopHeaders.contains(h.toLowerCase(Locale.ROOT))) {
+                var vals = request.getHeaders(h);
+                while (vals.hasMoreElements()) {
+                    conn.addRequestProperty(h, vals.nextElement());
                 }
-            });
-
-            // Forward response body
-            try (var adapterStream = connection.getInputStream();
-                 var clientStream = response.getOutputStream()) {
-
-                var buffer = new byte[8192];
-
-                int bytesRead;
-                while ((bytesRead = adapterStream.read(buffer)) != -1) {
-                    clientStream.write(buffer, 0, bytesRead);
-                }
-                clientStream.flush();
             }
-        } else {
-            throw new IllegalArgumentException("ERROR: No node registered with name: "
-                + nodeName);
+        }
+
+        // Stream request body for POST/PUT
+        if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
+            var hasBody = request.getContentLengthLong() > 0
+                || request.getHeader("Transfer-Encoding") != null;
+            if (hasBody) {
+                conn.setDoOutput(true);
+                try (var in = request.getInputStream()) {
+                    IOUtils.copy(in, conn.getOutputStream());
+                    conn.getOutputStream().flush();
+                }
+            }
+        }
+
+        int status;
+        try {
+            status = conn.getResponseCode();
+        } catch (IOException e) {
+            status = HttpStatus.BAD_GATEWAY.value();
+        }
+        response.setStatus(status);
+
+        // Copy response headers, skipping hop-by-hop
+        var upstreamHeaders = conn.getHeaderFields();
+        if (upstreamHeaders != null) {
+            for (var entry : upstreamHeaders.entrySet()) {
+                var name = entry.getKey();
+                var values = entry.getValue();
+                if (name != null
+                    && !this.hopByHopHeaders.contains(name.toLowerCase(Locale.ROOT))
+                    && values != null) {
+                    for (var v : values) {
+                        response.addHeader(name, v);
+                    }
+                }
+            }
+        }
+
+        // Stream response body
+        try (var out = response.getOutputStream()) {
+            if (status >= 400) {
+                var err = conn.getErrorStream();
+                if (err != null) {
+                    IOUtils.copy(err, out);
+                    out.flush();
+                }
+            } else {
+                try (var upstream = conn.getInputStream()) {
+                    IOUtils.copy(upstream, out);
+                    out.flush();
+                }
+            }
         }
     }
 }

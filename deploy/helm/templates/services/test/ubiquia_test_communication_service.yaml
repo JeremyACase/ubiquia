@@ -83,4 +83,10 @@ spec:
           AGENT_ID=test-agent-id
           test_endpoint_allowing_any_non_404 GET "$BASE_URL/ubiquia/core/communication-service/flow-service/agent/${AGENT_ID}/get-deployed-graph-ids?page=0&size=10" "Proxy: Get Deployed Graph IDs"
 
+          # -- Deployed node proxy --
+          test_endpoint GET "$BASE_URL/ubiquia/core-communication-service/node/get-proxied-urls" 200 "Deployed Node Proxy: Get Proxied URLs"
+
+          # -- Deployed component proxy --
+          test_endpoint GET "$BASE_URL/ubiquia/core-communication-service/component/get-proxied-urls" 200 "Deployed Component Proxy: Get Proxied URLs"
+
           echo "🎉 All endpoint checks passed!"
