@@ -40,6 +40,7 @@ dependencies {
     implementation "io.kubernetes:client-java:${KUBECTL_CLIENT_VERSION}"
     implementation "io.kubernetes:client-java-extended:${KUBECTL_CLIENT_VERSION}"
     implementation "org.jgroups:jgroups:${JGROUPS_VERSION}"
+    implementation "org.jgroups.kubernetes:jgroups-kubernetes:2.0.1.Final"
     implementation "org.reflections:reflections:${REFLECTIONS_VERSION}"
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${SPRING_DOC_VERSION}"
     implementation "org.springframework.kafka:spring-kafka:${SPRING_BOOT_KAFKA_VERSION}"
@@ -47,7 +48,6 @@ dependencies {
     implementation "net.jimblackler:jsongenerator:0.4.7"
 
     runtimeOnly "com.h2database:h2:${H2_VERSION}"
-    runtimeOnly group: 'com.yugabyte', name: 'jdbc-yugabytedb', version:  "${YUGABYTE_DRIVER_VERSION}"
     runtimeOnly "io.micrometer:micrometer-registry-prometheus"
 
     testImplementation "com.h2database:h2:${H2_VERSION}"

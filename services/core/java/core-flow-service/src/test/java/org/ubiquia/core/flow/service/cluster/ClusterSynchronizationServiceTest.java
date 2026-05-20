@@ -34,6 +34,7 @@ import org.ubiquia.common.library.api.repository.AgentRepository;
 import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.controller.DomainOntologyController;
+import org.ubiquia.core.flow.service.cluster.synchronization.microweight.MicroweightClusterService;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 import org.ubiquia.core.flow.repository.NetworkRepository;
 import org.ubiquia.core.flow.repository.SyncRepository;

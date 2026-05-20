@@ -20,22 +20,18 @@ ubiquia:
   cluster:
     flowService:
       sync:
-        enabled: false
+        enabled: true
     name: ubiquia-cluster
     port: 7800
     seedHosts:
   agent:
     # This is a default UUID for development purposes
     id: 0328ca73-4d50-409f-85a8-7168ce80bd96
-    database: 
+    database:
       ddlAutoSetting: create
-      h2:
-        enabled: false
-      yugabyte:
-        enabled: true
       # ANSI Database Level Isolation (https://en.wikipedia.org/wiki/Isolation_(database_systems))
       # values are: TRANSACTION_READ_UNCOMMITTED (0), TRANSACTION_READ_COMMITTED (1), TRANSACTION_REPEATABLE_READ (2), TRANSACTION_SERIALIZABLE (3)
-      transactionIsolation: TRANSACTION_READ_COMMITTED 
+      transactionIsolation: TRANSACTION_READ_COMMITTED
     storage:
       minio:
         enabled: true
@@ -120,12 +116,3 @@ minio:
     registry: docker.io
     tag: 2025.7.21-debian-12-r2
 
-yugabyte:
-  enableLoadBalancer: false
-  replicas:
-    master: 1
-    tserver: 1
-  storage: 
-    ephemeral: true
-  istioCompatibility:
-    enabled: false

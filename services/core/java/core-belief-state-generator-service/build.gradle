@@ -44,7 +44,6 @@ dependencies {
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${SPRING_DOC_VERSION}"
 
     runtimeOnly "com.h2database:h2:${H2_VERSION}"
-    runtimeOnly group: 'com.yugabyte', name: 'jdbc-yugabytedb', version:  "${YUGABYTE_DRIVER_VERSION}"
     runtimeOnly "io.micrometer:micrometer-registry-prometheus"
 
     testImplementation "org.instancio:instancio-junit:${INSTANCIO_VERSION}"
@@ -114,6 +113,10 @@ def filesExcludingModules = { Project p ->
     }.collect { it.file }.toSet()
 
     cfg.filter { !bannedFiles.contains(it) }
+}
+
+clean {
+    delete "belief-state-libs"
 }
 
 task copyRuntimeLibs(type: Copy) {

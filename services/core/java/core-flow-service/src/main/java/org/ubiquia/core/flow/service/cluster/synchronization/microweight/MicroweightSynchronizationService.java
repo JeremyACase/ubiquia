@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.cluster;
+package org.ubiquia.core.flow.service.cluster.synchronization.microweight;
 
 import java.util.ArrayList;
 import java.util.Arrays;

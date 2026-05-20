@@ -50,11 +50,6 @@ data:
       mode: {{ .Values.ubiquia.mode | default "PROD" }}
       agent:
         id: {{ .Values.ubiquia.agent.id }}
-        database: 
-          h2: 
-            enabled: {{ .Values.ubiquia.agent.database.h2.enabled }}
-          yugabyte: 
-            enabled: {{ .Values.ubiquia.agent.database.yugabyte.enabled }}
         storage:
           minio:
             enabled: {{ .Values.ubiquia.agent.storage.minio.enabled }}

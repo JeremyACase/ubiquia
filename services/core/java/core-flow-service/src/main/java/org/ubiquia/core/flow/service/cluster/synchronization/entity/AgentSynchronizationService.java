@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.cluster.synchronization;
+package org.ubiquia.core.flow.service.cluster.synchronization.entity;
 
 import java.util.List;
 import org.slf4j.Logger;

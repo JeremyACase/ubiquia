@@ -14,10 +14,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EnableAspectJAutoProxy
 @ComponentScan(basePackages = {"org.ubiquia.*"})
-@EntityScan(basePackages = {
-    "org.ubiquia.domain.generated",
-    "org.ubiquia.common.model.ubiquia.entity"})
-@EnableJpaRepositories(basePackages = {"org.ubiquia.common.library", "org.ubiquia.domain.generated"})
+@EntityScan(basePackages = {"org.ubiquia.domain.generated", "org.ubiquia.common.library.belief.state.libraries.entity"})
+@EnableJpaRepositories(basePackages = {"org.ubiquia.domain.generated", "org.ubiquia.common.library.belief.state.libraries.repository"})
 public class Application {
 
     /**

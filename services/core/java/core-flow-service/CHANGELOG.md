@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.0] - 2026-05-18
+### Added
+- `IntraKubernetesReplicaClusterService`: JGroups KUBE_PING channel providing leader election among K8s pod replicas; only the elected leader runs scheduled work (sync, egress relay update, heartbeat)
+- `IntraKubernetesHeartbeatService`: periodic `/actuator/health` probing of remote agents; marks agents `reachable=false` after a configurable failure threshold and lifts tombstones on recovery; conditional on `ubiquia.kubernetes.enabled=true`
+- `IntraKubernetesSynchronizationService`: queries the local database for agents in the same network with a non-null `baseUrl` and `reachable=true` to build the list of K8s peer URLs for the sync cycle
+- `jgroups-kube.xml`: JGroups protocol stack config using `KUBE_PING` for automatic pod discovery within the cluster namespace
+- `jgroups-kubernetes:2.0.1.Final` runtime dependency
+
+### Changed
+- `ClusterSynchronizationService`: injected `Optional<IntraKubernetesReplicaClusterService>`; `synchronize()` and `tryBuildEgressRelays()` now skip if not leader; `resolvePeerUrls()` now combines microweight JGroups URLs with `IntraKubernetesSynchronizationService` DB-sourced URLs; `KubernetesSynchronizationService` field renamed to `intraKubernetesSynchronizationService`
+- Package reorganization — `cluster.synchronization` subpackages introduced:
+  - `entity`: `AbstractSynchronizationService`, `AgentSynchronizationService`, `DomainOntologySynchronizationService`
+  - `microweight`: `MicroweightNetworkManager`, `MicroweightClusterService`, `MicroweightSynchronizationService`
+  - `kubernetes`: `IntraKubernetesReplicaClusterService`, `IntraKubernetesHeartbeatService`, `IntraKubernetesSynchronizationService`
+
+### Removed
+- `jdbc-yugabytedb` runtime dependency
+- `KubernetesReplicaClusterService`, `KubernetesHeartbeatService`, `KubernetesSynchronizationService` from `cluster` package (replaced by `IntraKubernetes*` equivalents in `cluster.synchronization.kubernetes`)
+
 ## [0.29.0] - 2026-05-15
 ### Fixed
 - `QueueNodeTest`: updated hardcoded endpoint URLs from `graph/{graph}/node/{node}/queue/{peek,pop}` to `ubiquia/core-flow-service/{graph}/node/{node}/queue/{peek,pop}` to match the new path registered by `NodeEndpointRecordBuilder`

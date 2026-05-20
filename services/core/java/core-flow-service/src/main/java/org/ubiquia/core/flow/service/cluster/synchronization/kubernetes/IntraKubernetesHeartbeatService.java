@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.cluster;
+package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes;
 
 import jakarta.transaction.Transactional;
 import java.time.Duration;
@@ -30,9 +30,10 @@ import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
  */
 @ConditionalOnProperty(value = "ubiquia.kubernetes.enabled", havingValue = "true")
 @Service
-public class KubernetesHeartbeatService {
+public class IntraKubernetesHeartbeatService {
 
-    private static final Logger logger = LoggerFactory.getLogger(KubernetesHeartbeatService.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(IntraKubernetesHeartbeatService.class);
     private static final String HEALTH_PATH = "/actuator/health";
 
     @Autowired
@@ -41,13 +42,16 @@ public class KubernetesHeartbeatService {
     @Autowired
     private AgentRepository agentRepository;
 
+    @Autowired
+    private IntraKubernetesReplicaClusterService replicaClusterService;
+
     @Value("${ubiquia.cluster.heartbeat.failure-threshold:3}")
     private int failureThreshold;
 
     private final RestTemplate healthTemplate;
     private final ConcurrentHashMap<String, Integer> consecutiveFailures = new ConcurrentHashMap<>();
 
-    public KubernetesHeartbeatService(final RestTemplateBuilder builder) {
+    public IntraKubernetesHeartbeatService(final RestTemplateBuilder builder) {
         this.healthTemplate = builder
             .connectTimeout(Duration.ofSeconds(3))
             .readTimeout(Duration.ofSeconds(3))
@@ -57,6 +61,10 @@ public class KubernetesHeartbeatService {
     @Scheduled(fixedDelayString = "${ubiquia.cluster.heartbeat.frequency-milliseconds:15000}")
     @Transactional
     public void checkPeerHealth() {
+        if (!this.replicaClusterService.isLeader()) {
+            logger.debug("Heartbeat skipped: not the replica cluster leader.");
+            return;
+        }
         var myAgent = this.agentRepository.findById(this.agentConfig.getId()).orElse(null);
         if (myAgent == null || myAgent.getNetwork() == null) {
             logger.debug("Heartbeat skipped: local agent has no network assigned.");

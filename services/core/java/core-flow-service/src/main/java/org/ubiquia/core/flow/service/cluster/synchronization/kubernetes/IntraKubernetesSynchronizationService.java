@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.cluster;
+package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes;
 
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -15,15 +15,15 @@ import org.ubiquia.common.library.api.repository.AgentRepository;
  * this agent's network that have a {@code baseUrl} and are currently reachable.
  *
  * <p>These records are populated when microweight agents push their registration to a Kubernetes
- * peer via {@link org.ubiquia.core.flow.service.cluster.synchronization.AgentSynchronizationService}.
- * The {@link KubernetesHeartbeatService} is responsible for marking agents unreachable when
+ * peer via {@link org.ubiquia.core.flow.service.cluster.synchronization.entity.AgentSynchronizationService}.
+ * The {@link IntraKubernetesHeartbeatService} is responsible for marking agents unreachable when
  * probes fail, which causes them to be excluded here until they recover.
  */
 @Service
-public class KubernetesSynchronizationService {
+public class IntraKubernetesSynchronizationService {
 
     private static final Logger logger =
-        LoggerFactory.getLogger(KubernetesSynchronizationService.class);
+        LoggerFactory.getLogger(IntraKubernetesSynchronizationService.class);
 
     @Autowired
     private AgentConfig agentConfig;

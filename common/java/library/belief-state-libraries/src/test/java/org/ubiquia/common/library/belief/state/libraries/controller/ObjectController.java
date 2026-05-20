@@ -4,7 +4,6 @@ import io.minio.errors.MinioException;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,21 +13,19 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
+import org.ubiquia.common.library.belief.state.libraries.entity.ObjectMetadataEntity;
+import org.ubiquia.common.library.belief.state.libraries.repository.ObjectMetadataEntityRepository;
+import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
+import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.ObjectMetadataEntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.io.MinioService;
 import org.ubiquia.common.library.belief.state.libraries.service.io.ObjectMetadataService;
-import org.ubiquia.common.library.dao.component.EntityDao;
-import org.ubiquia.common.library.dao.controller.GenericUbiquiaDaoController;
-import org.ubiquia.common.library.implementation.service.mapper.ObjectMetadataDtoMapper;
-import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
-import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;
+import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractIngressDtoMapper;
+import org.ubiquia.common.model.domain.dto.ObjectMetadataDto;
 
 @RestController
 @RequestMapping("/ubiquia/belief-state-service/object")
 @Transactional
-public class ObjectController extends GenericUbiquiaDaoController<
-    ObjectMetadataEntity,
-    ObjectMetadata> {
+public class ObjectController extends AbstractDomainModelController<ObjectMetadataEntity, ObjectMetadataDto> {
 
     private static final Logger logger = LoggerFactory.getLogger(ObjectController.class);
 
@@ -39,10 +36,13 @@ public class ObjectController extends GenericUbiquiaDaoController<
     private ObjectMetadataService objectMetadataService;
 
     @Autowired
-    private ObjectMetadataDtoMapper dtoMapper;
+    private ObjectMetadataEntityRepository objectMetadataEntityRepository;
 
     @Autowired
-    private EntityDao<ObjectMetadataEntity> entityDao;
+    private ObjectMetadataEntityRelationshipBuilder objectMetadataEntityRelationshipBuilder;
+
+    @Autowired
+    private AbstractIngressDtoMapper<ObjectMetadataDto, ObjectMetadataEntity> ingressMapper;
 
     @Autowired(required = false)
     private MinioService minioService;
@@ -53,23 +53,24 @@ public class ObjectController extends GenericUbiquiaDaoController<
     }
 
     @Override
-    public EntityDao<ObjectMetadataEntity> getDataAccessObject() {
-        return this.entityDao;
+    public EntityRelationshipBuilder<ObjectMetadataEntity> getEntityRelationshipBuilder() {
+        return this.objectMetadataEntityRelationshipBuilder;
     }
 
     @Override
-    public InterfaceEntityToDtoMapper<
-        ObjectMetadataEntity,
-        ObjectMetadata> getDataTransferObjectMapper() {
-        return this.dtoMapper;
+    public AbstractIngressDtoMapper<ObjectMetadataDto, ObjectMetadataEntity> getIngressMapper() {
+        return this.ingressMapper;
+    }
+
+    @Override
+    public ObjectMetadataEntityRepository getEntityRepository() {
+        return this.objectMetadataEntityRepository;
     }
 
     @PostMapping("/upload")
-    public ObjectMetadata uploadFile(
+    public ObjectMetadataDto uploadFile(
         @RequestParam("file") MultipartFile file)
-        throws IOException,
-        MinioException,
-        SQLException {
+        throws IOException, MinioException {
 
         this.getLogger().info("Received a request to upload file {} to bucket {}...",
             file.getName(),
@@ -81,7 +82,7 @@ public class ObjectController extends GenericUbiquiaDaoController<
         }
 
         var metadata = this.objectMetadataService.persistObjectMetadata(this.domainName, file);
-        this.minioService.uploadFile(this.domainName, metadata.getId(), file);
+        this.minioService.uploadFile(this.domainName, metadata.getUbiquiaId(), file);
         this.getLogger().info("...object stored: {}",
             this.objectMapper.writeValueAsString(metadata));
 
@@ -104,19 +105,15 @@ public class ObjectController extends GenericUbiquiaDaoController<
             logger.info("MinioException: {}", e.getMessage());
         }
 
-        ResponseEntity<byte[]> response = null;
         if (Objects.isNull(data)) {
             this.getLogger().info("...no file found in that bucket...");
-            response = ResponseEntity.notFound().build();
-        } else {
-            this.getLogger().debug("...file found; retrieving...");
-            response = ResponseEntity
-                .ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
-                    + filename + "\"")
-                .body(data.readAllBytes());
+            return ResponseEntity.notFound().build();
         }
 
-        return response;
+        this.getLogger().debug("...file found; retrieving...");
+        return ResponseEntity
+            .ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+            .body(data.readAllBytes());
     }
 }

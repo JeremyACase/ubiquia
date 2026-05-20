@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +15,15 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.config.AgentConfig;
 import org.ubiquia.common.library.api.repository.AgentRepository;
 import org.ubiquia.core.flow.component.FlowEgressRelay;
-import org.ubiquia.core.flow.service.cluster.synchronization.AbstractSynchronizationService;
-import org.ubiquia.core.flow.service.cluster.synchronization.AgentSynchronizationService;
+import org.ubiquia.core.flow.service.cluster.synchronization.entity.AbstractSynchronizationService;
+import org.ubiquia.core.flow.service.cluster.synchronization.entity.AgentSynchronizationService;
+import org.ubiquia.core.flow.service.cluster.synchronization.kubernetes.IntraKubernetesReplicaClusterService;
+import org.ubiquia.core.flow.service.cluster.synchronization.kubernetes.IntraKubernetesSynchronizationService;
+import org.ubiquia.core.flow.service.cluster.synchronization.microweight.MicroweightSynchronizationService;
 
 /**
  * Top-level sync orchestrator. Combines peer URLs from {@link MicroweightSynchronizationService}
- * (JGroups/static) and {@link KubernetesSynchronizationService} (DB-discovered), then drives
+ * (JGroups/static) and {@link IntraKubernetesSynchronizationService} (DB-discovered), then drives
  * all registered {@link AbstractSynchronizationService} implementations against the full peer set.
  *
  * <p>Enabled only when {@code ubiquia.cluster.flow-service.sync.enabled=true}.
@@ -42,10 +46,13 @@ public class ClusterSynchronizationService {
     private AgentRepository agentRepository;
 
     @Autowired
+    private Optional<IntraKubernetesReplicaClusterService> replicaClusterService;
+
+    @Autowired
     private MicroweightSynchronizationService microweightSynchronizationService;
 
     @Autowired
-    private KubernetesSynchronizationService kubernetesSynchronizationService;
+    private IntraKubernetesSynchronizationService intraKubernetesSynchronizationService;
 
     @Autowired
     private AgentSynchronizationService agentSynchronizationService;
@@ -59,6 +66,10 @@ public class ClusterSynchronizationService {
     @Scheduled(
         fixedDelayString = "${ubiquia.cluster.flow-service.sync.frequency-milliseconds:30000}")
     public void tryBuildEgressRelays() {
+        if (!this.isLeader()) {
+            logger.debug("Egress relay update skipped: not the replica cluster leader.");
+            return;
+        }
         this.flowEgressRelay.updatePeers(new HashSet<>(this.resolvePeerUrls()));
     }
 
@@ -72,6 +83,10 @@ public class ClusterSynchronizationService {
             return;
         }
 
+        if (!this.isLeader()) {
+            logger.debug("Synchronization skipped: not the replica cluster leader.");
+            return;
+        }
         logger.info("Starting synchronization with {} peer(s)...", peerUrls.size());
 
         var agentEntity = this.agentRepository.findById(this.agentConfig.getId()).orElse(null);
@@ -92,7 +107,13 @@ public class ClusterSynchronizationService {
     private List<String> resolvePeerUrls() {
         var urls = new LinkedHashSet<String>();
         urls.addAll(this.microweightSynchronizationService.resolvePeerUrls());
-        urls.addAll(this.kubernetesSynchronizationService.resolvePeerUrls());
+        urls.addAll(this.intraKubernetesSynchronizationService.resolvePeerUrls());
         return List.copyOf(urls);
+    }
+
+    private boolean isLeader() {
+        return this.replicaClusterService
+            .map(IntraKubernetesReplicaClusterService::isLeader)
+            .orElse(true);
     }
 }

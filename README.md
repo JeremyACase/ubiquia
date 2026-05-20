@@ -591,8 +591,6 @@ If cardinality is not explicitly defined at deploy time, Ubiquia will default to
 
 Ubiquia allows clients to deploy fully RESTful, schema-validating, queryable **Belief State** services directly from a **Domain Data Contract (DDC)**. These services are automatically deployed into Kubernetes and support both ingestion and querying of relational data out of the box.
 
-When configured to run against YugabyteDB, these belief states will be distributed and automatically sync with other belief states also connected to the same logical YugabyteDB cluster.
-
 ---
 
 ### Belief States: Querying Data
@@ -776,22 +774,15 @@ Multiselect response:
 
 ## Datastores
 
-Ubiquia supports different datastore configurations. Primarily, this boils down to a relational datastore choice between a distributed YugabyteDB SQL setting or an embedded H2 SQL setting, and whether or not to enable a [MinIO](https://www.min.io) object storage layer. Both Ubiquia's Core Flow Service and generated Belief States will use the configured relational datastore.
+Ubiquia uses an embedded H2 SQL database for all agents — both microweight and Kubernetes-based. This makes every agent fully self-contained with no external database infrastructure required. An optional [MinIO](https://www.min.io) object storage layer can be enabled for binary artifact storage.
 
-Moreover, generated Belief States will automatically connect against the internal MinIO instance should MinIO be enabled. Thus, clients can upload binaries (or anything) to MinIO for later retrieval. ***Importantly, the metadata of these objects will be housed in the relational database.*** This last point is important for when multiple Ubiquia Agents are running against a distributed YugabyteDB cluster and may need specific artifacts available only locally to one agent. In this specific case, Ubiquia Agents will be aware of artifacts available locally to other agents and be able to retrieve them through the communication service.
+When MinIO is enabled, generated Belief States automatically connect to the internal MinIO instance. Clients can upload binaries (or anything) to MinIO for later retrieval, with object metadata stored in the relational database. Ubiquia Agents in the same network are aware of artifacts held by peers and can retrieve them through the communication service.
 
 ### Datastores: Configuration
-
-Configuration of Ubiquia datastores is defined via Helm per any values configuration per the below:
 
 ```yaml
 ubiquia:
   agent:
-    database:
-      h2:
-        enabled: false
-      yugabyte:
-        enabled: true
     storage:
       minio:
         enabled: true

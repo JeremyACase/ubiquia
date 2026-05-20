@@ -4,9 +4,3 @@ logging:
 ubiquia:
   mode: PROD
   cluster:
-  agent:
-    database: 
-      h2:
-        enabled: false
-      yugabyte:
-        enabled: true
