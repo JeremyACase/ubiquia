@@ -2,14 +2,11 @@ dependencies:
 - name: minio
   repository: https://charts.bitnami.com/bitnami
   version: 17.0.21
-- name: yugabyte
-  repository: https://charts.yugabyte.com
-  version: 2025.2.0
 - name: prometheus
   repository: https://prometheus-community.github.io/helm-charts
   version: 27.3.0
 - name: grafana
   repository: https://grafana.github.io/helm-charts
   version: 8.10.4
-digest: sha256:ccd80ceba55962a2a287a84ecdd22d03c48dc272b270ce75398ead24ded723aa
-generated: "2026-03-12T12:37:43.4612514-10:00"
+digest: sha256:3138c116db2291d073bf961e8253c50d87237d76f98359dfb0cc4e0b03416547
+generated: "2026-05-18T16:07:44.3383568-08:00"

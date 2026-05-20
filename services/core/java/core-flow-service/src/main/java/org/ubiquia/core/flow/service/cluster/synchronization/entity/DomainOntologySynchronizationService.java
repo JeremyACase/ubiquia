@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.cluster.synchronization;
+package org.ubiquia.core.flow.service.cluster.synchronization.entity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

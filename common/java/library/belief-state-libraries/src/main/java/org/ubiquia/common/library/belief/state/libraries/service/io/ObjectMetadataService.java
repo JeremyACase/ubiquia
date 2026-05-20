@@ -1,62 +1,35 @@
 package org.ubiquia.common.library.belief.state.libraries.service.io;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.ubiquia.common.library.api.config.AgentConfig;
-import org.ubiquia.common.library.api.repository.AgentRepository;
+import org.ubiquia.common.library.belief.state.libraries.entity.ObjectMetadataEntity;
 import org.ubiquia.common.library.belief.state.libraries.repository.ObjectMetadataEntityRepository;
-import org.ubiquia.common.library.implementation.service.mapper.ObjectMetadataDtoMapper;
-import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
-import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;
-import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
+import org.ubiquia.common.library.belief.state.libraries.service.mapper.ObjectMetadataEgressDtoMapper;
+import org.ubiquia.common.model.domain.dto.ObjectMetadataDto;
 
-/**
- * A service meant to store relational object metadata in a relational database for any
- * Ubiquia objects stored in object storages.
- */
+@ConditionalOnProperty(value = "ubiquia.agent.storage.minio.enabled", havingValue = "true")
 @Service
 public class ObjectMetadataService {
 
     private static final Logger logger = LoggerFactory.getLogger(ObjectMetadataService.class);
 
     @Autowired
-    private DataSource dataSource;
-
-    @Autowired
     private ObjectMetadataEntityRepository objectMetadataEntityRepository;
 
     @Autowired
-    private ObjectMetadataDtoMapper objectMetadataDtoMapper;
+    private ObjectMetadataEgressDtoMapper objectMetadataEgressDtoMapper;
 
-    @Autowired
-    private AgentRepository agentRepository;
-
-    @Autowired
-    private AgentConfig agentConfig;
-
-    /**
-     * Persist the object metadata into the relational database.
-     *
-     * @param bucketName The object bucket where the file is going to be persisted.
-     * @param file       The file upload.
-     * @return Metadata about the file.
-     * @throws JsonProcessingException Exceptions from parsing JSON.
-     * @throws SQLException            Exceptions from SQL database.
-     */
     @Transactional
-    public ObjectMetadata persistObjectMetadata(
+    public ObjectMetadataDto persistObjectMetadata(
         final String bucketName,
         final MultipartFile file)
-        throws JsonProcessingException, SQLException {
+        throws JsonProcessingException {
 
         logger.info("Received a request to persist object data for "
                 + "\nFilename: {}"
@@ -64,109 +37,18 @@ public class ObjectMetadataService {
             file.getName(),
             bucketName);
 
-        var agent = this.getUbiquiaAgent();
-        var objectMetadataEntity = this.buildMetadataEntityFrom(file, bucketName, agent);
-        logger.info("...persisted entity with id: {}", objectMetadataEntity.getId());
-        var dto = this.objectMetadataDtoMapper.map(objectMetadataEntity);
-        return dto;
-    }
+        var entity = new ObjectMetadataEntity();
+        entity.setBucketName(bucketName);
+        entity.setSize(file.getSize());
+        entity.setContentType(file.getContentType());
+        entity.setOriginalFilename(file.getOriginalFilename());
+        entity = this.objectMetadataEntityRepository.save(entity);
 
-    /**
-     * Helper method to build metadata from a file.
-     *
-     * @param file       The file to build metadata from.
-     * @param bucketName The bucket where the file will be uploaded.
-     * @param agent      The Ubiquia agent that will be housing the data.
-     * @return Persisted metadata.
-     */
-    @Transactional
-    private ObjectMetadataEntity buildMetadataEntityFrom(
-        final MultipartFile file,
-        final String bucketName,
-        final AgentEntity agent) {
-
-        var metadataEntity = new ObjectMetadataEntity();
-        metadataEntity.setBucketName(bucketName);
-        metadataEntity.setSize(file.getSize());
-        metadataEntity.setContentType(file.getContentType());
-        metadataEntity.setOriginalFilename(file.getOriginalFilename());
-        metadataEntity.setAgent(agent);
-        metadataEntity = this.objectMetadataEntityRepository.save(metadataEntity);
-
-        return metadataEntity;
-    }
-
-    /**
-     * Fetch this Ubiquia agent information from the relational database.
-     *
-     * @return The database record for this Ubiquia agent.
-     * @throws SQLException Exceptions from database stuff.
-     */
-    @Transactional
-    private AgentEntity getUbiquiaAgent() throws SQLException {
-        var agentRecord = this.agentRepository
-            .findById(this.agentConfig.getId());
-
-        if (agentRecord.isEmpty()) {
-            logger.error("ERROR: Could not find agent with ID: {}",
-                this.agentConfig.getId());
-
-            if (this.isRunningH2()) {
-                this.initializeInMemoryDatabaseAgent();
-                agentRecord = this.agentRepository.findById(
-                    this.agentConfig.getId());
-            }
+        logger.info("...persisted entity with id: {}", entity.getUbiquiaId());
+        try {
+            return (ObjectMetadataDto) this.objectMetadataEgressDtoMapper.map(entity);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to map ObjectMetadataEntity to DTO", e);
         }
-        var agent = agentRecord.get();
-
-        logger.debug("...persisting metadata against agent id '{}'...",
-            this.agentConfig.getId());
-        return agent;
-    }
-
-    /**
-     * Determine whether or not we're running in H2.
-     *
-     * @return Whether or not this Ubiquia agent is running with an H2 database.
-     * @throws SQLException Exception from SQL stuff.
-     */
-    @Transactional
-    private Boolean isRunningH2() throws SQLException {
-
-        var isRunningH2 = false;
-        logger.info("...determining what database service is running against...");
-        try (var conn = dataSource.getConnection()) {
-            var metaData = conn.getMetaData();
-            var url = metaData.getURL();
-            var dbName = metaData.getDatabaseProductName();
-
-            logger.info("...service is running against: {} at URL {}",
-                dbName,
-                url);
-
-            if (url.contains("h2")) {
-                isRunningH2 = true;
-            }
-        }
-        return isRunningH2;
-    }
-
-    /**
-     * Initialize our H2 database with the Ubiquia information since we cannot get it from an
-     * external database.
-     */
-    @Transactional
-    public void initializeInMemoryDatabaseAgent() {
-        logger.info("...service is running a local in-memory database; " +
-                "initializing inter agent id: {}...",
-            this.agentConfig.getId());
-
-        var entity = new AgentEntity();
-        entity.setDeployedGraphs(new ArrayList<>());
-        entity.setId(this.agentConfig.getId());
-        entity = this.agentRepository.save(entity);
-        logger.info("...created ubiquia agent entity with id: {}", entity.getId());
-
-        logger.info("...finished initialization.");
     }
 }

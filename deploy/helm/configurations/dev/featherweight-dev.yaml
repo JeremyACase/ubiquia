@@ -11,11 +11,6 @@ ubiquia:
     port: 7800
     seedHosts:
   agent:
-    database: 
-      h2:
-        enabled: true
-      yugabyte:
-        enabled: false
     flowService:  
       bootstrap:
         enabled: true

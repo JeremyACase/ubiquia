@@ -9,12 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,19 +22,21 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestPart;
 import io.swagger.v3.oas.annotations.Parameter;
-import org.ubiquia.common.library.api.interfaces.InterfaceEntityToDtoMapper;
+import org.ubiquia.common.library.belief.state.libraries.controller.AbstractDomainModelController;
+import org.ubiquia.common.library.belief.state.libraries.entity.ObjectMetadataEntity;
+import org.ubiquia.common.library.belief.state.libraries.repository.ObjectMetadataEntityRepository;
+import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
+import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.ObjectMetadataEntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.io.MinioService;
 import org.ubiquia.common.library.belief.state.libraries.service.io.ObjectMetadataService;
-import org.ubiquia.common.library.dao.component.EntityDao;
-import org.ubiquia.common.library.dao.controller.GenericUbiquiaDaoController;
-import org.ubiquia.common.library.implementation.service.mapper.ObjectMetadataDtoMapper;
-import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
-import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;
+import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractIngressDtoMapper;
+import org.ubiquia.common.model.domain.dto.ObjectMetadataDto;
 
+@ConditionalOnProperty(value = "ubiquia.agent.storage.minio.enabled", havingValue = "true")
 @RestController
 @RequestMapping("/ubiquia/belief-state-service/object")
 @Transactional
-public class ObjectController extends GenericUbiquiaDaoController<ObjectMetadataEntity, ObjectMetadata> {
+public class ObjectController extends AbstractDomainModelController<ObjectMetadataEntity, ObjectMetadataDto> {
 
     private static final Logger logger = LoggerFactory.getLogger(ObjectController.class);
 
@@ -45,10 +47,13 @@ public class ObjectController extends GenericUbiquiaDaoController<ObjectMetadata
     private ObjectMetadataService objectMetadataService;
 
     @Autowired
-    private ObjectMetadataDtoMapper dtoMapper;
+    private ObjectMetadataEntityRepository objectMetadataEntityRepository;
 
     @Autowired
-    private EntityDao<ObjectMetadataEntity> entityDao;
+    private ObjectMetadataEntityRelationshipBuilder objectMetadataEntityRelationshipBuilder;
+
+    @Autowired
+    private AbstractIngressDtoMapper<ObjectMetadataDto, ObjectMetadataEntity> ingressMapper;
 
     @Autowired(required = false)
     private MinioService minioService;
@@ -59,13 +64,18 @@ public class ObjectController extends GenericUbiquiaDaoController<ObjectMetadata
     }
 
     @Override
-    public EntityDao<ObjectMetadataEntity> getDataAccessObject() {
-        return this.entityDao;
+    public EntityRelationshipBuilder<ObjectMetadataEntity> getEntityRelationshipBuilder() {
+        return this.objectMetadataEntityRelationshipBuilder;
     }
 
     @Override
-    public InterfaceEntityToDtoMapper<ObjectMetadataEntity, ObjectMetadata> getDataTransferObjectMapper() {
-        return this.dtoMapper;
+    public AbstractIngressDtoMapper<ObjectMetadataDto, ObjectMetadataEntity> getIngressMapper() {
+        return this.ingressMapper;
+    }
+
+    @Override
+    public ObjectMetadataEntityRepository getEntityRepository() {
+        return this.objectMetadataEntityRepository;
     }
 
     @PostMapping(
@@ -79,7 +89,6 @@ public class ObjectController extends GenericUbiquiaDaoController<ObjectMetadata
             required = true,
             content = @Content(
                 mediaType = MediaType.MULTIPART_FORM_DATA_VALUE
-                // No nested schema/properties needed for Swagger UI to render a file input
             )
         ),
         responses = {
@@ -88,18 +97,17 @@ public class ObjectController extends GenericUbiquiaDaoController<ObjectMetadata
             @ApiResponse(responseCode = "500", description = "Server error")
         }
     )
-    public ObjectMetadata uploadFile(
+    public ObjectMetadataDto uploadFile(
         @Parameter(
             description = "File to upload",
             required = true,
             content = @Content(
-                // Helps some versions render correctly, but not strictly required:
                 mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
                 schema = @Schema(type = "string", format = "binary")
             )
         )
         @RequestPart("file") MultipartFile file
-    ) throws IOException, MinioException, SQLException {
+    ) throws IOException, MinioException {
 
         this.getLogger().info("Received a request to upload file {} to bucket {}...",
             file.getOriginalFilename(), this.domainName);
@@ -109,7 +117,7 @@ public class ObjectController extends GenericUbiquiaDaoController<ObjectMetadata
         }
 
         var metadata = this.objectMetadataService.persistObjectMetadata(this.domainName, file);
-        this.minioService.uploadFile(this.domainName, metadata.getId(), file);
+        this.minioService.uploadFile(this.domainName, metadata.getUbiquiaId(), file);
         this.getLogger().info("...object stored: {}", this.objectMapper.writeValueAsString(metadata));
 
         return metadata;

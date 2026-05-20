@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.cluster;
+package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -16,10 +16,10 @@ import org.ubiquia.core.flow.repository.NetworkRepository;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class KubernetesSynchronizationServiceTest {
+public class IntraKubernetesSynchronizationServiceTest {
 
     @Autowired
-    private KubernetesSynchronizationService kubernetesSynchronizationService;
+    private IntraKubernetesSynchronizationService intraKubernetesSynchronizationService;
 
     @Autowired
     private AgentConfig agentConfig;
@@ -40,7 +40,7 @@ public class KubernetesSynchronizationServiceTest {
 
     @Test
     public void assertResolvePeerUrls_withNoPeers_returnsEmpty() {
-        var urls = this.kubernetesSynchronizationService.resolvePeerUrls();
+        var urls = this.intraKubernetesSynchronizationService.resolvePeerUrls();
         Assertions.assertTrue(urls.isEmpty(), "Expected empty peer list when no peers exist");
     }
 
@@ -55,7 +55,7 @@ public class KubernetesSynchronizationServiceTest {
         peer.setNetwork(network);
         this.agentRepository.save(peer);
 
-        var urls = this.kubernetesSynchronizationService.resolvePeerUrls();
+        var urls = this.intraKubernetesSynchronizationService.resolvePeerUrls();
 
         Assertions.assertEquals(1, urls.size());
         Assertions.assertTrue(urls.contains("http://k8s-peer:8080"));
@@ -72,7 +72,7 @@ public class KubernetesSynchronizationServiceTest {
         peer.setNetwork(network);
         this.agentRepository.save(peer);
 
-        var urls = this.kubernetesSynchronizationService.resolvePeerUrls();
+        var urls = this.intraKubernetesSynchronizationService.resolvePeerUrls();
 
         Assertions.assertTrue(urls.isEmpty(), "Expected unreachable peer to be excluded");
     }
@@ -88,7 +88,7 @@ public class KubernetesSynchronizationServiceTest {
         peer.setNetwork(network);
         this.agentRepository.save(peer);
 
-        var urls = this.kubernetesSynchronizationService.resolvePeerUrls();
+        var urls = this.intraKubernetesSynchronizationService.resolvePeerUrls();
 
         Assertions.assertTrue(urls.isEmpty(), "Expected peer with no baseUrl to be excluded");
     }
@@ -99,7 +99,7 @@ public class KubernetesSynchronizationServiceTest {
         myAgent.setBaseUrl("http://self:8080");
         this.agentRepository.save(myAgent);
 
-        var urls = this.kubernetesSynchronizationService.resolvePeerUrls();
+        var urls = this.intraKubernetesSynchronizationService.resolvePeerUrls();
 
         Assertions.assertFalse(urls.contains("http://self:8080"),
             "Expected local agent to be excluded from its own peer list");
@@ -111,7 +111,7 @@ public class KubernetesSynchronizationServiceTest {
         myAgent.setNetwork(null);
         this.agentRepository.save(myAgent);
 
-        var urls = this.kubernetesSynchronizationService.resolvePeerUrls();
+        var urls = this.intraKubernetesSynchronizationService.resolvePeerUrls();
 
         Assertions.assertTrue(urls.isEmpty(), "Expected empty peer list when agent has no network");
     }

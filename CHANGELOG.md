@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.1] - 2026-05-19
+### Added
+- `ObjectMetadataEntity`: belief-state-owned JPA entity extending `AbstractDomainModelEntity`; replaces dependency on core `org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity`
+- `ObjectMetadataDto`: DTO in `common/java/model/domain` extending `AbstractDomainModel`; replaces dependency on core `org.ubiquia.common.model.ubiquia.dto.ObjectMetadata`
+- `ObjectMetadataEgressDtoMapper`, `ObjectMetadataIngressDtoMapper`, `ObjectMetadataEntityRelationshipBuilder`: belief-state-libraries mappers and relationship builder for the new entity
+
+### Changed
+- `ObjectMetadataEntityRepository`: now extends `EntityRepository<ObjectMetadataEntity>` (belief-state entity) instead of core `AbstractEntityRepository<ObjectMetadataEntity>`
+- `ObjectMetadataService`: removed all core entity dependencies (`AgentEntity`, `AgentConfig`, `AgentRepository`, `DataSource`); service now only stores file metadata without agent tracking
+- `ObjectController.java.template`: updated to extend `AbstractDomainModelController<ObjectMetadataEntity, ObjectMetadataDto>` using belief-state types
+- `Application.java.template`: `@EntityScan` and `@EnableJpaRepositories` extended to include `org.ubiquia.common.library.belief.state.libraries` packages so the `ObjectMetadataEntityRepository` bean is registered in generated services
+- `core-belief-state-generator-service/build.gradle`: `clean` task now deletes `belief-state-libs/` to ensure stale JARs are not used when recompiling generated code
+
+### Fixed
+- Generated belief state services failing to start with `ObjectMetadataEntityRepository` bean not found
+
+## [0.30.0] - 2026-05-18
+### Added
+- `IntraKubernetesReplicaClusterService`: JGroups KUBE_PING channel for automatic leader election among K8s pod replicas within the same Deployment; non-leaders skip all scheduled tasks (sync, egress relay update, heartbeat)
+- `IntraKubernetesHeartbeatService`: periodic HTTP health probing of remote agents registered in this agent's network; tombstones unreachable peers and lifts tombstones on recovery
+- `IntraKubernetesSynchronizationService`: resolves HTTP peer URLs for K8s agents by querying the local database for reachable agents with a configured `baseUrl`
+- `jgroups-kube.xml`: JGroups stack config using `KUBE_PING` for pod discovery within a Kubernetes namespace
+- Helm `serviceaccount-rbac.yaml`: `Role` and `RoleBinding` granting `get`/`list` on `pods` and `endpoints`, required for KUBE_PING
+- `ADR_Edge_Cluster_Synchronization.md`: new architecture decision record covering JGroups TCP peer discovery and application-layer HTTP synchronization for microweight edge agents
+- `jgroups-kubernetes:2.0.1.Final` dependency in `core-flow-service`
+
+### Changed
+- `ClusterSynchronizationService`: `synchronize()` and `tryBuildEgressRelays()` now gate on `IntraKubernetesReplicaClusterService.isLeader()`; when `ubiquia.kubernetes.enabled` is false the service always acts as leader (backwards-compatible for microweight-only deployments)
+- Cluster service packages reorganized: `AbstractSynchronizationService`, `AgentSynchronizationService`, `DomainOntologySynchronizationService` moved to `cluster.synchronization.entity`; `MicroweightNetworkManager`, `MicroweightClusterService`, `MicroweightSynchronizationService` moved to `cluster.synchronization.microweight`; Kubernetes services moved to `cluster.synchronization.kubernetes` and renamed with `IntraKubernetes` prefix
+- Helm `ubiquia_core_flow_deployment.yaml`: `flowService` replica count now configurable via `ubiquia.components.core.flowService.replicas` (default 1) instead of being hardcoded
+- `ADR_NewSQL.md`: added `[2.0.0] - 2026-05-18` status entry marking YugabyteDB deprecated
+
+### Removed
+- YugabyteDB removed from the codebase: `jdbc-yugabytedb` driver dropped from all service `build.gradle` files; `wait-for-ysql` init container removed from Helm flow-service deployment; all `h2.enabled`/`yugabyte.enabled` config toggles removed from Helm values and configuration overlays; YugabyteDB Helm templates and documentation removed
+
 ## [0.29.0] - 2026-05-15
 ### Changed
 - Node and component proxy URL patterns unified across `core-flow-service` and `core-communication-service`: deployed node endpoints now follow `ubiquia/core-flow-service/{graph}/node/{node}/{endpoint}` and are proxied at `ubiquia/core-communication-service/{graph}/node/{node}/{endpoint}`; deployed component endpoints follow `ubiquia/core-flow-service/{graph}/component/{component}/{endpoint}` and are proxied at `ubiquia/core-communication-service/{graph}/component/{component}/{endpoint}`

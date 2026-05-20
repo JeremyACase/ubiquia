@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.cluster.synchronization;
+package org.ubiquia.core.flow.service.cluster.synchronization.entity;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;

@@ -22,12 +22,6 @@ public class BeliefStateGenerationSupportProcessor {
     @Value("${ubiquia.agent.storage.minio.enabled:false}")
     private Boolean minioEnabled;
 
-    @Value("${ubiquia.agent.database.h2.enabled:false}")
-    private boolean h2Enabled;
-
-    @Value("${ubiquia.agent.database.yugabyte.enabled:false}")
-    private boolean yugabyteEnabled;
-
     @Autowired
     private AgentConfig agentConfig;
 
@@ -53,7 +47,7 @@ public class BeliefStateGenerationSupportProcessor {
         tokenMap.put("{MINIO_ENABLED}", String.valueOf(this.minioEnabled));
         tokenMap.put("{UBIQUIA_AGENT_ID}", this.agentConfig.getId());
 
-        tokenMap.putAll(this.resolveDbTokensFromBooleans());
+        tokenMap.putAll(this.resolveDbTokens());
 
         this.copyAndReplacePlaceholders(
             "template/java/support/application.yaml.template",
@@ -61,28 +55,12 @@ public class BeliefStateGenerationSupportProcessor {
             tokenMap);
     }
 
-    private Map<String, String> resolveDbTokensFromBooleans() {
-        // Require exactly one true to avoid ambiguous configs
-        if (this.h2Enabled == this.yugabyteEnabled) {
-            throw new IllegalStateException(
-                "Exactly one database must be enabled: " +
-                    "ubiquia.agent.database.h2.enabled=" + this.h2Enabled + ", " +
-                    "ubiquia.agent.database.yugabyte.enabled=" + this.yugabyteEnabled
-            );
-        }
-
+    private Map<String, String> resolveDbTokens() {
         var tokens = new HashMap<String, String>();
-        if (this.yugabyteEnabled) {
-            tokens.put("{DB_DRIVER_CLASS}", "com.yugabyte.Driver");
-            tokens.put("{DB_URL}", "jdbc:yugabytedb://yb-tservers:5433/yugabyte?autoReconnect=true");
-            tokens.put("{DB_USERNAME}", "yugabyte");
-            tokens.put("{DB_PASSWORD}", "yugabyte");
-        } else { // H2 selected
-            tokens.put("{DB_DRIVER_CLASS}", "org.h2.Driver");
-            tokens.put("{DB_URL}", "jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1");
-            tokens.put("{DB_USERNAME}", "sa");
-            tokens.put("{DB_PASSWORD}", "sa");
-        }
+        tokens.put("{DB_DRIVER_CLASS}", "org.h2.Driver");
+        tokens.put("{DB_URL}", "jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1");
+        tokens.put("{DB_USERNAME}", "sa");
+        tokens.put("{DB_PASSWORD}", "sa");
         return tokens;
     }
 

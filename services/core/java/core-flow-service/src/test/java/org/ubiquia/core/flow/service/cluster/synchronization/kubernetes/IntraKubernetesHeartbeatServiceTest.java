@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.cluster;
+package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -35,10 +35,10 @@ import org.ubiquia.core.flow.repository.NetworkRepository;
     "ubiquia.kubernetes.enabled=true",
     "ubiquia.cluster.heartbeat.failure-threshold=2"
 })
-public class KubernetesHeartbeatServiceTest {
+public class IntraKubernetesHeartbeatServiceTest {
 
     @Autowired
-    private KubernetesHeartbeatService heartbeatService;
+    private IntraKubernetesHeartbeatService heartbeatService;
 
     @Autowired
     private AgentConfig agentConfig;

@@ -3,7 +3,13 @@
 ## Decision
 Ubiquia will allow for a NewSQL distributed database as the persistence layer to any given Ubiquia Agent's "Belief State" as well as for Ubiquia itself to managed data flows. When configured this way, this persistence layer will itself be globally-distributed cluster where nodes within the cluster reside within Ubiquia agents.
 
-## Status 
+## Status
+
+### [2.0.0] - 2026-05-18
+- **Deprecated.** YugabyteDB has been removed from the codebase. All agents now use H2 as
+  their embedded SQL database. Inter-agent synchronization is handled at the application layer
+  by Ubiquia's `ClusterSynchronizationService` and peer-registration mechanism. See
+  `ADR_SQL.md` for the current database strategy.
 
 ### [1.0.0] - 2025-07-01
 - Accepted.

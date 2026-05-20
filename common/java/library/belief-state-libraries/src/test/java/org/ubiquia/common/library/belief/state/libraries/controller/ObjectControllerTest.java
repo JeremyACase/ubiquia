@@ -5,10 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.containers.MinIOContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.ubiquia.common.library.api.config.AgentConfig;
-import org.ubiquia.common.library.api.repository.AgentRepository;
-import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
-import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
+import org.ubiquia.common.model.domain.dto.ObjectMetadataDto;
 
 @SpringBootTest
 @Testcontainers
@@ -45,29 +39,12 @@ public class ObjectControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private AgentConfig agentConfig;
-    @Autowired
-    private AgentRepository agentRepository;
 
     @DynamicPropertySource
     static void configureMinio(DynamicPropertyRegistry registry) {
         registry.add("minio.url", () -> minioContainer.getS3URL());
         registry.add("minio.username", () -> "testUsername");
         registry.add("minio.password", () -> "testPassword");
-    }
-
-    @BeforeEach
-    @Transactional
-    public void setup() {
-        var record = this.agentRepository.findById(this.agentConfig.getId());
-        if (record.isEmpty()) {
-
-            var entity = new AgentEntity();
-            entity.setDeployedGraphs(new ArrayList<>());
-            entity.setId(this.agentConfig.getId());
-            entity = this.agentRepository.save(entity);
-        }
     }
 
     @Test
@@ -92,10 +69,10 @@ public class ObjectControllerTest {
             .getResponse()
             .getContentAsString();
 
-        var json = this.objectMapper.readValue(response, ObjectMetadata.class);
+        var metadata = this.objectMapper.readValue(response, ObjectMetadataDto.class);
 
         var url = "http://localhost:8080/ubiquia/belief-state-service/object/download/"
-            + json.getId();
+            + metadata.getUbiquiaId();
 
         var downloadResponse = this.mockMvc.perform(MockMvcRequestBuilders
                 .get(url)
@@ -103,8 +80,7 @@ public class ObjectControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
             .andReturn();
-        String body = downloadResponse.getResponse().getContentAsString();
-        assertEquals("Hello, world!", body);
+        assertEquals("Hello, world!", downloadResponse.getResponse().getContentAsString());
     }
 
     @Test

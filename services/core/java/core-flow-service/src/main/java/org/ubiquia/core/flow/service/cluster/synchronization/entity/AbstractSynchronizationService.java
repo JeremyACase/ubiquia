@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.cluster.synchronization;
+package org.ubiquia.core.flow.service.cluster.synchronization.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
