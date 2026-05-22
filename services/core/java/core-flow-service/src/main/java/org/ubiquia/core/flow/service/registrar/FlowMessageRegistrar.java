@@ -3,6 +3,7 @@ package org.ubiquia.core.flow.service.registrar;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,5 +82,46 @@ public class FlowMessageRegistrar {
         this.flowMessageRepository.save(messageEntity);
 
         logger.info("Registered incoming flow message for node {}.", nodeEntity.getName());
+    }
+
+    @Transactional
+    public void tryRegisterSync(final FlowMessage dto) {
+        if (Objects.nonNull(dto.getId()) && this.flowMessageRepository.existsById(dto.getId())) {
+            logger.debug("FlowMessage {} already exists; skipping.", dto.getId());
+            return;
+        }
+
+        if (Objects.isNull(dto.getFlowEvent()) || Objects.isNull(dto.getFlowEvent().getId())) {
+            logger.warn("Cannot sync-register FlowMessage: missing flow event reference.");
+            return;
+        }
+        var flowEventOpt = this.flowEventRepository.findById(dto.getFlowEvent().getId());
+        if (flowEventOpt.isEmpty()) {
+            logger.warn("Cannot sync-register FlowMessage: FlowEvent {} not found.",
+                dto.getFlowEvent().getId());
+            return;
+        }
+
+        if (Objects.isNull(dto.getTargetNode()) || Objects.isNull(dto.getTargetNode().getId())) {
+            logger.warn("Cannot sync-register FlowMessage: missing target node reference.");
+            return;
+        }
+        var nodeOpt = this.nodeRepository.findById(dto.getTargetNode().getId());
+        if (nodeOpt.isEmpty()) {
+            logger.warn("Cannot sync-register FlowMessage: Node {} not found.",
+                dto.getTargetNode().getId());
+            return;
+        }
+
+        var entity = new FlowMessageEntity();
+        if (Objects.nonNull(dto.getId())) {
+            entity.setId(dto.getId());
+        }
+        entity.setFlowEvent(flowEventOpt.get());
+        entity.setTargetNode(nodeOpt.get());
+        entity.setPayload(dto.getPayload());
+        entity.setTags(new HashSet<>());
+        this.flowMessageRepository.save(entity);
+        logger.info("Sync-registered FlowMessage {}.", entity.getId());
     }
 }

@@ -32,6 +32,7 @@ import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.library.api.config.AgentConfig;
 import org.ubiquia.common.library.api.repository.AgentRepository;
 import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
+import org.ubiquia.common.model.ubiquia.entity.SyncEntity;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.controller.DomainOntologyController;
 import org.ubiquia.core.flow.service.cluster.synchronization.microweight.MicroweightClusterService;
@@ -106,6 +107,14 @@ public class ClusterSynchronizationServiceTest {
 
     @Test
     public void assertSynchronize_withPeerButNoEntitiesNeedingSync_skipsPost() throws Exception {
+        // The NetworkEntity created on startup always needs sync unless we pre-seed a SyncEntity.
+        var agentEntity = this.agentRepository.findById(this.agentConfig.getId()).orElseThrow();
+        var network = this.networkRepository.findAll().iterator().next();
+        var syncEntity = new SyncEntity();
+        syncEntity.setModel(network);
+        syncEntity.setSourceAgent(agentEntity);
+        this.syncRepository.save(syncEntity);
+
         var mockChannel = mock(JChannel.class);
         var mockView = mock(View.class);
         var localAddress = new IpAddress(InetAddress.getByName("127.0.0.1"), 7800);

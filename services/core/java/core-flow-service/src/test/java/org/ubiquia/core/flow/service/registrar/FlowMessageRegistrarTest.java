@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
@@ -89,5 +90,133 @@ public class FlowMessageRegistrarTest {
         Assertions.assertEquals(0L, this.flowRepository.count());
         Assertions.assertEquals(0L, this.flowEventRepository.count());
         Assertions.assertEquals(0L, this.flowMessageRepository.count());
+    }
+
+    @Test
+    public void assertTryRegisterSync_withMissingFlowEvent_createsNoEntity() {
+        var flowEventDto = new FlowEvent();
+        flowEventDto.setId("aaaaaaaa-0000-0000-0000-000000000000");
+        var nodeDto = new Node();
+        nodeDto.setId("bbbbbbbb-0000-0000-0000-000000000000");
+        var msg = new FlowMessage();
+        msg.setFlowEvent(flowEventDto);
+        msg.setTargetNode(nodeDto);
+        msg.setPayload("{}");
+
+        this.flowMessageRegistrar.tryRegisterSync(msg);
+
+        Assertions.assertEquals(0L, this.flowMessageRepository.count());
+    }
+
+    @Test
+    public void assertTryRegisterSync_withMissingNode_createsNoEntity() throws Exception {
+        var ontology = this.dummyFactory.generateDomainOntology();
+        var graph = ontology.getGraphs().get(0);
+        var node = this.dummyFactory.generateNode();
+        node.setNodeType(NodeType.PUSH);
+        node.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Person"));
+        node.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(node);
+        this.testHelper.registerAndDeploy(ontology, graph);
+
+        var nodeEntity = this.nodeRepository
+            .findByGraphNameAndName(graph.getName(), node.getName())
+            .orElseThrow();
+        var seedMsg = new FlowMessage();
+        var seedNode = new Node();
+        seedNode.setId(nodeEntity.getId());
+        seedMsg.setTargetNode(seedNode);
+        seedMsg.setPayload("{}");
+        this.flowMessageRegistrar.tryRegisterFlowMessage(seedMsg);
+
+        var flowEvent = this.flowEventRepository.findAll().iterator().next();
+        var flowEventDto = new FlowEvent();
+        flowEventDto.setId(flowEvent.getId());
+
+        var msg = new FlowMessage();
+        msg.setFlowEvent(flowEventDto);
+        var missingNode = new Node();
+        missingNode.setId("cccccccc-0000-0000-0000-000000000000");
+        msg.setTargetNode(missingNode);
+        msg.setPayload("{}");
+
+        this.flowMessageRegistrar.tryRegisterSync(msg);
+
+        Assertions.assertEquals(1L, this.flowMessageRepository.count());
+    }
+
+    @Test
+    public void assertTryRegisterSync_withValidParents_createsEntity() throws Exception {
+        var ontology = this.dummyFactory.generateDomainOntology();
+        var graph = ontology.getGraphs().get(0);
+        var node = this.dummyFactory.generateNode();
+        node.setNodeType(NodeType.PUSH);
+        node.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Person"));
+        node.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(node);
+        this.testHelper.registerAndDeploy(ontology, graph);
+
+        var nodeEntity = this.nodeRepository
+            .findByGraphNameAndName(graph.getName(), node.getName())
+            .orElseThrow();
+        var seedMsg = new FlowMessage();
+        var seedNode = new Node();
+        seedNode.setId(nodeEntity.getId());
+        seedMsg.setTargetNode(seedNode);
+        seedMsg.setPayload("{}");
+        this.flowMessageRegistrar.tryRegisterFlowMessage(seedMsg);
+
+        var flowEvent = this.flowEventRepository.findAll().iterator().next();
+        var flowEventDto = new FlowEvent();
+        flowEventDto.setId(flowEvent.getId());
+
+        var msg = new FlowMessage();
+        msg.setFlowEvent(flowEventDto);
+        var nodeDto = new Node();
+        nodeDto.setId(nodeEntity.getId());
+        msg.setTargetNode(nodeDto);
+        msg.setPayload("{\"sync\":true}");
+
+        this.flowMessageRegistrar.tryRegisterSync(msg);
+
+        Assertions.assertEquals(2L, this.flowMessageRepository.count());
+    }
+
+    @Test
+    public void assertTryRegisterSync_withDuplicateId_doesNotCreateDuplicate() throws Exception {
+        var ontology = this.dummyFactory.generateDomainOntology();
+        var graph = ontology.getGraphs().get(0);
+        var node = this.dummyFactory.generateNode();
+        node.setNodeType(NodeType.PUSH);
+        node.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Person"));
+        node.setOutputSubSchema(this.dummyFactory.buildSubSchema("Dog"));
+        graph.getNodes().add(node);
+        this.testHelper.registerAndDeploy(ontology, graph);
+
+        var nodeEntity = this.nodeRepository
+            .findByGraphNameAndName(graph.getName(), node.getName())
+            .orElseThrow();
+        var seedMsg = new FlowMessage();
+        var seedNode = new Node();
+        seedNode.setId(nodeEntity.getId());
+        seedMsg.setTargetNode(seedNode);
+        seedMsg.setPayload("{}");
+        this.flowMessageRegistrar.tryRegisterFlowMessage(seedMsg);
+
+        var existing = this.flowMessageRepository.findAll().iterator().next();
+        var flowEventDto = new FlowEvent();
+        flowEventDto.setId(existing.getFlowEvent().getId());
+
+        var msg = new FlowMessage();
+        msg.setId(existing.getId());
+        msg.setFlowEvent(flowEventDto);
+        var nodeDto = new Node();
+        nodeDto.setId(nodeEntity.getId());
+        msg.setTargetNode(nodeDto);
+        msg.setPayload("{}");
+
+        this.flowMessageRegistrar.tryRegisterSync(msg);
+
+        Assertions.assertEquals(1L, this.flowMessageRepository.count());
     }
 }

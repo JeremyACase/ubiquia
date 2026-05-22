@@ -31,4 +31,10 @@ public class FlowMessageController implements InterfaceLogger {
             flowMessage.getTargetNode().getId());
         this.flowMessageRegistrar.tryRegisterFlowMessage(flowMessage);
     }
+
+    @PostMapping("/register/post")
+    public void register(@RequestBody final FlowMessage flowMessage) {
+        logger.info("Received sync-register request for FlowMessage id {}.", flowMessage.getId());
+        this.flowMessageRegistrar.tryRegisterSync(flowMessage);
+    }
 }
