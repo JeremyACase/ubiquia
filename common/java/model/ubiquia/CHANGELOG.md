@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.31.0] - 2026-05-21
+### Added
+- `AgentEntity.baseUrl`: nullable column storing the HTTP base URL of the agent; populated during initialization from `AgentConfig` and used by heartbeat and sync services for peer discovery
+- `AgentEntity.reachable`: non-null boolean column (default `true`) managed by `IntraKubernetesHeartbeatService`; unreachable agents are excluded from sync peer resolution
+
 ## [0.28.1] - 2026-05-08
 ### Fixed
 - `AbstractModelEntity`: implemented `Persistable<String>` (`@Transient boolean isNew = true`, `@PrePersist generateId()`, `@PostPersist @PostLoad markPersisted()`) so Spring Data JPA always issues `persist()` for new entities even when their ID is pre-set, preventing `merge()` calls that fail on unsaved FK references

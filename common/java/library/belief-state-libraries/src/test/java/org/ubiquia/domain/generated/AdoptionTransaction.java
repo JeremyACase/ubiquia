@@ -100,7 +100,7 @@ public class AdoptionTransaction extends BaseModel {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (Objects.isNull(o) || getClass() != o.getClass()) {
             return false;
         }
         AdoptionTransaction adoptionTransaction = (AdoptionTransaction) o;
@@ -130,7 +130,7 @@ public class AdoptionTransaction extends BaseModel {
      * (except the first line).
      */
     private String toIndentedString(Object o) {
-        if (o == null) {
+        if (Objects.isNull(o)) {
             return "null";
         }
         return o.toString().replace("\n", "\n    ");

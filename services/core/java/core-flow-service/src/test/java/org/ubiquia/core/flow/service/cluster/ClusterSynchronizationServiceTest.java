@@ -44,6 +44,7 @@ import org.ubiquia.core.flow.repository.SyncRepository;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(properties = {
     "ubiquia.cluster.flow-service.sync.enabled=true",
+    "ubiquia.cluster.sync.microweight.enabled=true",
     "server.port=8080"
 })
 public class ClusterSynchronizationServiceTest {

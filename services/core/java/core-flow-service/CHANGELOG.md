@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.31.0] - 2026-05-21
+### Added
+- `ExtraKubernetesSynchronizationService`: resolves HTTP peer URLs from `ubiquia.cluster.kubernetes.extra.peer-base-urls` (comma-separated); when `ExtraKubernetesHeartbeatService` is active only reachable peers are returned, otherwise all configured URLs are returned
+- `ExtraKubernetesHeartbeatService`: periodic `/actuator/health` probing of extra-cluster peers; tracks consecutive failures and tombstones peers that exceed the threshold; conditional on `ubiquia.kubernetes.enabled=true`
+- `NetworkRepository`: `JpaRepository` for `NetworkEntity`
+
+### Changed
+- `ClusterSynchronizationService`: injected `ExtraKubernetesSynchronizationService`; `resolvePeerUrls()` now combines microweight, intra-Kubernetes DB-sourced, and extra-Kubernetes config-driven URLs; both `@Scheduled` methods now carry `initialDelay` equal to the sync frequency to prevent a startup race with agent initialization
+- `AgentInitializationLogic`: sets `baseUrl` on newly created `AgentEntity` from `AgentConfig.getBaseUrl()`
+
+### Fixed
+- Race condition where the sync scheduler fired before `ApplicationReadyEvent` completed agent database initialization, causing a one-time `Cannot sync: agent record not found` error on startup
+
 ## [0.30.0] - 2026-05-18
 ### Added
 - `IntraKubernetesReplicaClusterService`: JGroups KUBE_PING channel providing leader election among K8s pod replicas; only the elected leader runs scheduled work (sync, egress relay update, heartbeat)

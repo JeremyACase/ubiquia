@@ -106,7 +106,7 @@ public class Person extends BaseModel {
     }
 
     public Person addPetsItem(Animal petsItem) {
-        if (this.pets == null) {
+        if (Objects.isNull(this.pets)) {
             this.pets = new ArrayList<>();
         }
         this.pets.add(petsItem);
@@ -140,7 +140,7 @@ public class Person extends BaseModel {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (Objects.isNull(o) || getClass() != o.getClass()) {
             return false;
         }
         Person personDto = (Person) o;
@@ -172,7 +172,7 @@ public class Person extends BaseModel {
      * (except the first line).
      */
     private String toIndentedString(Object o) {
-        if (o == null) {
+        if (Objects.isNull(o)) {
             return "null";
         }
         return o.toString().replace("\n", "\n    ");

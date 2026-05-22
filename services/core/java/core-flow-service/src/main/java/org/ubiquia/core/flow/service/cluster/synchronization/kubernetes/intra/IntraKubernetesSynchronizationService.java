@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes;
+package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes.intra;
 
 import jakarta.transaction.Transactional;
 import java.util.List;

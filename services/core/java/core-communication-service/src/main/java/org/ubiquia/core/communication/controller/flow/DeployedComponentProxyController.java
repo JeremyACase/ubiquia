@@ -129,7 +129,7 @@ public class DeployedComponentProxyController {
     ) throws IOException {
 
         var endpoint = this.componentProxyManager.getRegisteredEndpointFor(component);
-        if (endpoint == null) {
+        if (Objects.isNull(endpoint)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No component registered with name: " + component);
         }
 
@@ -137,11 +137,11 @@ public class DeployedComponentProxyController {
         var pathWithin = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         var bestPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         var tail = new AntPathMatcher().extractPathWithinPattern(bestPattern, pathWithin);
-        var remainder = (tail == null) ? "" : tail;
+        var remainder = (Objects.isNull(tail)) ? "" : tail;
 
         String proxiedPrefix;
-        if (pathWithin != null) {
-            proxiedPrefix = pathWithin.substring(0, pathWithin.length() - ((tail == null) ? 0 : tail.length()));
+        if (Objects.nonNull(pathWithin)) {
+            proxiedPrefix = pathWithin.substring(0, pathWithin.length() - ((Objects.isNull(tail)) ? 0 : tail.length()));
         } else {
             var uri = request.getRequestURI();
             proxiedPrefix = uri.substring(0, Math.max(uri.lastIndexOf('/') + 1, 0));
@@ -176,8 +176,8 @@ public class DeployedComponentProxyController {
         var headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             var h = headerNames.nextElement();
-            var lower = (h == null) ? "" : h.toLowerCase(Locale.ROOT);
-            var shouldCopy = h != null && !this.hopByHopHeaders.contains(lower);
+            var lower = (Objects.isNull(h)) ? "" : h.toLowerCase(Locale.ROOT);
+            var shouldCopy = Objects.nonNull(h) && !this.hopByHopHeaders.contains(lower);
             if (Boolean.TRUE.equals(shouldCopy)) {
                 var vals = request.getHeaders(h);
                 while (vals.hasMoreElements()) {
@@ -206,15 +206,15 @@ public class DeployedComponentProxyController {
 
         // Copy response headers (skip hop-by-hop; rewrite Location if root-absolute)
         var upstreamHeaders = conn.getHeaderFields();
-        if (upstreamHeaders != null) {
+        if (Objects.nonNull(upstreamHeaders)) {
             for (var e : upstreamHeaders.entrySet()) {
                 var name = e.getKey();
                 var values = e.getValue();
-                var nameIsNull = (name == null);
+                var nameIsNull = (Objects.isNull(name));
                 var lname = nameIsNull ? "" : name.toLowerCase(Locale.ROOT);
                 var skip = nameIsNull || this.hopByHopHeaders.contains(lname);
 
-                if (!skip && values != null) {
+                if (!skip && Objects.nonNull(values)) {
                     if ("location".equals(lname)) {
                         for (var v : values) {
                             response.addHeader(name, this.rewriteLocationIfNeeded(v, proxiedPrefix));
@@ -259,7 +259,7 @@ public class DeployedComponentProxyController {
         try (var out = response.getOutputStream()) {
             if (status >= 400) {
                 var err = conn.getErrorStream();
-                var canCopy = err != null && !Boolean.TRUE.equals(isHead);
+                var canCopy = Objects.nonNull(err) && !Boolean.TRUE.equals(isHead);
                 if (Boolean.TRUE.equals(canCopy)) {
                     IOUtils.copy(err, out);
                     out.flush();
@@ -306,16 +306,16 @@ public class DeployedComponentProxyController {
      */
     private URI buildServiceBase(final String hostUrl, final Integer port, final URI endpointPath) {
         var baseHost = hostUrl;
-        var lower = (hostUrl == null) ? "" : hostUrl.toLowerCase(Locale.ROOT);
-        if (hostUrl == null || !(lower.startsWith("http://") || lower.startsWith("https://"))) {
-            baseHost = "http://" + (hostUrl == null ? "localhost" : hostUrl);
+        var lower = (Objects.isNull(hostUrl)) ? "" : hostUrl.toLowerCase(Locale.ROOT);
+        if (Objects.isNull(hostUrl) || !(lower.startsWith("http://") || lower.startsWith("https://"))) {
+            baseHost = "http://" + (Objects.isNull(hostUrl) ? "localhost" : hostUrl);
         }
         var b = UriComponentsBuilder
             .fromHttpUrl(this.stripTrailingSlash(baseHost))
             .port(port)
             .path("/")
             .path(this.stripLeadingSlash(Objects.toString(endpointPath.getPath(), "")));
-        if (endpointPath.getQuery() != null && !endpointPath.getQuery().isEmpty()) {
+        if (Objects.nonNull(endpointPath.getQuery()) && !endpointPath.getQuery().isEmpty()) {
             b.query(endpointPath.getQuery());
         }
         var result = b.build(true).toUri();
@@ -333,14 +333,14 @@ public class DeployedComponentProxyController {
      */
     private URI buildTargetUri(final URI base, final String remainder, final String rawQuery) {
         var b = UriComponentsBuilder.fromUri(base);
-        if (remainder != null && !remainder.isEmpty()) {
+        if (Objects.nonNull(remainder) && !remainder.isEmpty()) {
             b.path("/").path(this.stripLeadingSlash(remainder));
         }
         var baseQuery = base.getQuery();
-        if (rawQuery != null && !rawQuery.isEmpty()) {
-            var combined = (baseQuery != null && !baseQuery.isEmpty()) ? baseQuery + "&" + rawQuery : rawQuery;
+        if (Objects.nonNull(rawQuery) && !rawQuery.isEmpty()) {
+            var combined = (Objects.nonNull(baseQuery) && !baseQuery.isEmpty()) ? baseQuery + "&" + rawQuery : rawQuery;
             b.query(combined);
-        } else if (baseQuery != null && !baseQuery.isEmpty()) {
+        } else if (Objects.nonNull(baseQuery) && !baseQuery.isEmpty()) {
             b.query(baseQuery);
         }
         var result = b.build(true).toUri();
@@ -358,12 +358,12 @@ public class DeployedComponentProxyController {
      */
     private Boolean hasRequestBody(final String method, final HttpServletRequest request) {
         var result = Boolean.FALSE;
-        if (method != null) {
+        if (Objects.nonNull(method)) {
             switch (method) {
                 case "POST":
                 case "PUT":
                 case "PATCH":
-                    result = (request.getContentLengthLong() > 0) || (request.getHeader("Transfer-Encoding") != null);
+                    result = (request.getContentLengthLong() > 0) || (Objects.nonNull(request.getHeader("Transfer-Encoding")));
                     break;
                 default:
                     result = Boolean.FALSE;
@@ -396,7 +396,7 @@ public class DeployedComponentProxyController {
      * @return fragment without leading {@code /}
      */
     private String stripLeadingSlash(final String s) {
-        var result = (s == null) ? "" : s.replaceFirst("^/+", "");
+        var result = (Objects.isNull(s)) ? "" : s.replaceFirst("^/+", "");
         return result;
     }
 
@@ -407,7 +407,7 @@ public class DeployedComponentProxyController {
      * @return string without trailing {@code /}
      */
     private String stripTrailingSlash(final String s) {
-        var result = (s == null) ? "" : s.replaceFirst("/+$", "");
+        var result = (Objects.isNull(s)) ? "" : s.replaceFirst("/+$", "");
         return result;
     }
 
@@ -420,7 +420,7 @@ public class DeployedComponentProxyController {
     private Charset charsetFrom(final String contentType) {
         Charset result;
         try {
-            if (contentType != null && contentType.toLowerCase(Locale.ROOT).contains("charset=")) {
+            if (Objects.nonNull(contentType) && contentType.toLowerCase(Locale.ROOT).contains("charset=")) {
                 var parts = contentType.split("(?i)charset=");
                 var v = parts[1].trim().replaceAll("[;\\s].*$", "");
                 result = Charset.forName(v);
@@ -442,7 +442,7 @@ public class DeployedComponentProxyController {
      */
     private String contentTypeWithCharset(final String ct, final String charset) {
         String result;
-        if (ct == null || ct.isBlank()) {
+        if (Objects.isNull(ct) || ct.isBlank()) {
             result = "text/html; charset=" + charset;
         } else {
             result = ct.replaceAll("(?i);\\s*charset=[^;]+", "") + "; charset=" + charset;
@@ -460,7 +460,7 @@ public class DeployedComponentProxyController {
      */
     private String rewriteLocationIfNeeded(final String location, final String proxiedPrefix) {
         String result;
-        if (location == null || location.isBlank()) {
+        if (Objects.isNull(location) || location.isBlank()) {
             result = location;
         } else if (location.startsWith("/")) {
             result = proxiedPrefix + this.stripLeadingSlash(location);
@@ -552,7 +552,7 @@ public class DeployedComponentProxyController {
      */
     private Boolean isStaticAsset(final String path) {
         Boolean result;
-        if (path == null) {
+        if (Objects.isNull(path)) {
             result = Boolean.FALSE;
         } else {
             var p = path.toLowerCase(Locale.ROOT);

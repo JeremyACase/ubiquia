@@ -17,6 +17,7 @@ package org.ubiquia.domain.generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import java.util.Objects;
 /**
  * Gets or Sets ColorType
  */
@@ -67,7 +68,7 @@ public enum ColorType {
      * @return URL query string
      */
     public String toUrlQueryString(String prefix) {
-        if (prefix == null) {
+        if (Objects.isNull(prefix)) {
             prefix = "";
         }
 

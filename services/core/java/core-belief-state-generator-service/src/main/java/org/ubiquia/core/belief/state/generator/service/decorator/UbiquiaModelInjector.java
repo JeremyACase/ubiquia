@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 @Service
 public class UbiquiaModelInjector {
 
@@ -33,7 +34,7 @@ public class UbiquiaModelInjector {
         var root = (ObjectNode) node;
 
         var defs = (ObjectNode) root.get("definitions");
-        if (defs == null) {
+        if (Objects.isNull(defs)) {
             defs = this.objectMapper.createObjectNode();
             root.set("definitions", defs);
         }

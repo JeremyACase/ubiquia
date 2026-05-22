@@ -1,0 +1,308 @@
+---
+# Shared application config for both K8s DB sync test agents.
+# kubernetes.enabled=false so the intra JGroups replica cluster never starts;
+# ExtraKubernetesSynchronizationService (no conditional) handles cross-agent discovery
+# using the peer URLs injected per-agent via environment variables.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-k8s-db-synch-config
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
+data:
+  application.yaml: |
+    logging:
+      level:
+        net.jimblackler: OFF
+        org.ubiquia: {{ .Values.logging.ubiquia }}
+
+    server:
+      port: 8080
+
+    spring:
+      application:
+        name: ubiquia-core-flow-service
+      datasource:
+        driverClassName: org.h2.Driver
+        url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
+        username: sa
+        password: sa
+        hikari:
+          transaction-isolation: TRANSACTION_READ_COMMITTED
+      h2:
+        console:
+          enabled: false
+      jackson:
+        date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+        deserialization:
+          fail-on-unknown-properties: true
+      jpa:
+        hibernate:
+          ddl-auto: create
+        properties:
+          hibernate:
+            generate_statistics: false
+            format_sql: true
+
+    ubiquia:
+      mode: TEST
+      kubernetes:
+        enabled: false
+        namespace: {{ .Release.Namespace }}
+      cluster:
+        flow-service:
+          sync:
+            enabled: true
+            frequency-milliseconds: 10000
+      outbox:
+        enabled: true
+        frequency-milliseconds: 1000
+        mode: DEFAULT
+      page:
+        max-size: 100
+      agent:
+        flow-service:
+          bootstrap:
+            belief-state:
+              enabled: false
+            domain-ontology:
+              directory: /app/etc/domain-ontologies/
+            graph:
+              deployments:
+                enabled: false
+---
+# Ontology files to mount into k8s-flow-service-a for bootstrapping.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-k8s-db-synch-ontologies
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
+data:
+  pets.yaml: |
+{{ .Files.Get "bootstrap/ontologies/pets.yaml" | indent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8s-flow-service-a
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  selector:
+    app: k8s-flow-service-a
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8s-flow-service-b
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  selector:
+    app: k8s-flow-service-b
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+# Agent A: bootstraps the pets domain ontology, then syncs it to Agent B.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-flow-service-a
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-flow-service-a
+  template:
+    metadata:
+      labels:
+        app: k8s-flow-service-a
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+      containers:
+        - name: flow-service
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: UBIQUIA_AGENT_ID
+              value: "aaaaaaaa-1111-0000-0000-000000000001"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://k8s-flow-service-a:8080"
+            - name: UBIQUIA_CLUSTER_KUBERNETES_EXTRA_PEER_BASE_URLS
+              value: "http://k8s-flow-service-b:8080"
+            - name: UBIQUIA_AGENT_FLOW_SERVICE_BOOTSTRAP_DOMAIN_ONTOLOGY_ENABLED
+              value: "true"
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+            - name: ontologies
+              mountPath: /app/etc/domain-ontologies/
+      volumes:
+        - name: config
+          configMap:
+            name: ubiquia-test-k8s-db-synch-config
+        - name: ontologies
+          configMap:
+            name: ubiquia-test-k8s-db-synch-ontologies
+---
+# Agent B: starts with no ontologies; the test asserts it receives pets via sync.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-flow-service-b
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-flow-service-b
+  template:
+    metadata:
+      labels:
+        app: k8s-flow-service-b
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+      containers:
+        - name: flow-service
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: UBIQUIA_AGENT_ID
+              value: "bbbbbbbb-2222-0000-0000-000000000002"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://k8s-flow-service-b:8080"
+            - name: UBIQUIA_CLUSTER_KUBERNETES_EXTRA_PEER_BASE_URLS
+              value: "http://k8s-flow-service-a:8080"
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: ubiquia-test-k8s-db-synch-config
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubiquia-test-kubernetes-db-synch-verify
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    sidecar.istio.io/inject: "false"
+spec:
+  serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+  restartPolicy: Never
+  initContainers:
+    - name: wait-for-services
+      image: curlimages/curl:8.6.0
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          for svc in k8s-flow-service-a k8s-flow-service-b; do
+            echo "Waiting for $svc to be healthy..."
+            until [ "$(curl -s -o /dev/null -w '%{http_code}' http://$svc:8080/actuator/health)" = "200" ]; do
+              echo "  $svc not healthy yet, retrying in 5s..."
+              sleep 5
+            done
+            echo "  $svc is healthy."
+          done
+  containers:
+    - name: curl
+      image: curlimages/curl:8.6.0
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          set -e
+
+          wait_for_health() {
+            local AGENT_NAME=$1
+            local BASE_URL=$2
+            local MAX_ATTEMPTS=24
+            local ATTEMPT=0
+
+            echo "Waiting for $AGENT_NAME to become healthy..."
+
+            while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+              HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/actuator/health" || true)
+              if [ "$HTTP_CODE" = "200" ]; then
+                echo "  $AGENT_NAME is healthy"
+                return 0
+              fi
+              ATTEMPT=$((ATTEMPT + 1))
+              echo "  Attempt $ATTEMPT/$MAX_ATTEMPTS — HTTP $HTTP_CODE, retrying in 5s..."
+              sleep 5
+            done
+
+            echo "  $AGENT_NAME did not become healthy after $((MAX_ATTEMPTS * 5))s"
+            exit 1
+          }
+
+          wait_for_ontology() {
+            local AGENT_NAME=$1
+            local BASE_URL=$2
+            local ONTOLOGY_NAME=$3
+            local MAX_ATTEMPTS=24
+            local ATTEMPT=0
+
+            echo "Waiting for ontology '$ONTOLOGY_NAME' on $AGENT_NAME..."
+
+            while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+              RESPONSE=$(curl -s "$BASE_URL/ubiquia/core/flow-service/domain-ontology/query/params?page=0&size=100")
+              if echo "$RESPONSE" | grep -qE "\"name\"[[:space:]]*:[[:space:]]*\"$ONTOLOGY_NAME\""; then
+                echo "  Ontology '$ONTOLOGY_NAME' confirmed on $AGENT_NAME"
+                return 0
+              fi
+              ATTEMPT=$((ATTEMPT + 1))
+              echo "  Attempt $ATTEMPT/$MAX_ATTEMPTS — not yet present, retrying in 5s..."
+              sleep 5
+            done
+
+            echo "  Ontology '$ONTOLOGY_NAME' not found on $AGENT_NAME after $((MAX_ATTEMPTS * 5))s"
+            exit 1
+          }
+
+          wait_for_health "k8s-flow-service-a" "http://k8s-flow-service-a:8080"
+          wait_for_health "k8s-flow-service-b" "http://k8s-flow-service-b:8080"
+          wait_for_ontology "k8s-flow-service-a" "http://k8s-flow-service-a:8080" "pets"
+          wait_for_ontology "k8s-flow-service-b" "http://k8s-flow-service-b:8080" "pets"
+
+          echo "K8s DB sync verification passed — pets ontology synchronized from k8s-flow-service-a to k8s-flow-service-b!"

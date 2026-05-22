@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes;
+package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes.intra;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 /**
  * Manages a JGroups cluster among replicas of this K8s Deployment using KUBE_PING
  * for automatic pod discovery. Only active when {@code ubiquia.kubernetes.enabled=true}.
@@ -61,7 +62,7 @@ public class IntraKubernetesReplicaClusterService implements Receiver {
 
     @PreDestroy
     public void stop() {
-        if (this.channel != null) {
+        if (Objects.nonNull(this.channel)) {
             logger.info("Closing K8s replica cluster channel.");
             this.channel.close();
         }
@@ -73,11 +74,11 @@ public class IntraKubernetesReplicaClusterService implements Receiver {
      * this is consistent across all members of the cluster.
      */
     public boolean isLeader() {
-        if (this.channel == null) {
+        if (Objects.isNull(this.channel)) {
             return false;
         }
         View view = this.channel.getView();
-        if (view == null || view.getMembers().isEmpty()) {
+        if (Objects.isNull(view) || view.getMembers().isEmpty()) {
             return false;
         }
         return view.getMembers().get(0).equals(this.channel.getAddress());

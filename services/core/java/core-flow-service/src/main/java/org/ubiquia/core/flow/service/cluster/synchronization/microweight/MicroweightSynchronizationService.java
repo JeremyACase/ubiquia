@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
  * service) or from the live JGroups cluster view.
  */
 @ConditionalOnProperty(
-    value = "ubiquia.cluster.flow-service.sync.enabled",
+    value = "ubiquia.cluster.sync.microweight.enabled",
     havingValue = "true",
     matchIfMissing = false
 )

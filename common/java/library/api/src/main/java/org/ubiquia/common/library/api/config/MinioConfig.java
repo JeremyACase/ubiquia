@@ -2,6 +2,7 @@ package org.ubiquia.common.library.api.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import java.util.Objects;
 
 /**
  * A bean to be used for service configuration. Makes for consistent Helm injection.
@@ -15,7 +16,7 @@ public class MinioConfig {
     private String url;
 
     public String getUrl() {
-        return url != null ? url : System.getenv("MINIO_URL");
+        return Objects.nonNull(url) ? url : System.getenv("MINIO_URL");
     }
 
     public void setUrl(String url) {
@@ -23,7 +24,7 @@ public class MinioConfig {
     }
 
     public String getUsername() {
-        return username != null ? username : System.getenv("MINIO_ACCESS_KEY");
+        return Objects.nonNull(username) ? username : System.getenv("MINIO_ACCESS_KEY");
     }
 
     public void setUsername(String username) {
@@ -31,7 +32,7 @@ public class MinioConfig {
     }
 
     public String getPassword() {
-        return password != null ? password : System.getenv("MINIO_SECRET_KEY");
+        return Objects.nonNull(password) ? password : System.getenv("MINIO_SECRET_KEY");
     }
 
     public void setPassword(String password) {

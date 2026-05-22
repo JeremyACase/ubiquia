@@ -9,6 +9,7 @@ import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.languages.JavaClientCodegen;
 import org.openapitools.codegen.model.ModelsMap;
 
+import java.util.Objects;
 /**
  * Post-processor that figures out JPA relationship metadata and
  * stores it in vendor-extensions every template can use.
@@ -62,7 +63,7 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
 
         var modelName = stripSupportSuffix(filename);
         var model = modelIndex.get(modelName);
-        if (model == null) {
+        if (Objects.isNull(model)) {
             super.postProcessFile(file, fileType);
             return;
         }
@@ -91,11 +92,11 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
     }
 
     private boolean isSkippable(CodegenModel m) {
-        return m == null || m.isEnum || m.isAlias || !m.getIsModel() || isEmbeddable(m);
+        return Objects.isNull(m) || m.isEnum || m.isAlias || !m.getIsModel() || isEmbeddable(m);
     }
 
     private boolean isModelRef(CodegenProperty p) {
-        return p.isModel || (p.isContainer && p.items != null && p.items.isModel);
+        return p.isModel || (p.isContainer && Objects.nonNull(p.items) && p.items.isModel);
     }
 
     private CodegenModel getTargetModel(CodegenProperty p) {
@@ -186,9 +187,9 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
                 v.put("x-collection-table-name", ownerLower + "_" + p.name);
 
                 // ElementCollection: only for collections whose element type is an embeddable
-                if (p.isContainer && p.items != null && p.items.isModel) {
+                if (p.isContainer && Objects.nonNull(p.items) && p.items.isModel) {
                     var elem = modelIndex.get(p.items.baseType);
-                    if (elem != null && isEmbeddable(elem)) {
+                    if (Objects.nonNull(elem) && isEmbeddable(elem)) {
                         v.put("x-element-collection", Boolean.TRUE);
                         hasElementCollections = true;
                     }
@@ -202,7 +203,7 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
     }
 
     private String toOwnerLower(String classname) {
-        if (classname == null || classname.isEmpty()) return "";
+        if (Objects.isNull(classname) || classname.isEmpty()) return "";
         // lowerCamel “Entity” stays part of the name here (matches your current codegen names)
         return classname.substring(0, 1).toLowerCase() + classname.substring(1);
     }
@@ -217,12 +218,12 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
         Side right;
 
         void addSide(CodegenModel mdl, CodegenProperty prop) {
-            if (left == null) left = new Side(mdl, prop);
-            else if (right == null) right = new Side(mdl, prop);
+            if (Objects.isNull(left)) left = new Side(mdl, prop);
+            else if (Objects.isNull(right)) right = new Side(mdl, prop);
         }
 
         boolean isBidirectional() {
-            return left != null && right != null;
+            return Objects.nonNull(left) && Objects.nonNull(right);
         }
 
         Cardinality cardOf(Side s) {
@@ -230,7 +231,7 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
         }
 
         RelationType jointType() {
-            if (left == null || right == null) return RelationType.ONE_TO_ONE;
+            if (Objects.isNull(left) || Objects.isNull(right)) return RelationType.ONE_TO_ONE;
             var l = cardOf(left);
             var r = cardOf(right);
             if (l == ONE && r == ONE) return RelationType.ONE_TO_ONE;
@@ -245,23 +246,23 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
         }
 
         void stampExtensions() {
-            if (left != null) stamp(left, right);
-            if (right != null) stamp(right, left);
+            if (Objects.nonNull(left)) stamp(left, right);
+            if (Objects.nonNull(right)) stamp(right, left);
         }
 
         private void stamp(Side me, Side other) {
             if (isEmbeddable(me.model)) return;
 
             var v = me.prop.vendorExtensions;
-            v.put("x-is-owning-side", me.owningSide || other == null);
+            v.put("x-is-owning-side", me.owningSide || Objects.isNull(other));
 
-            if (other != null) {
+            if (Objects.nonNull(other)) {
                 v.put("x-mapped-by", other.prop.name);
                 v.put("x-related-classname", other.model.classname);
             }
 
             var meMany = me.prop.isContainer;
-            var otherMany = other != null && other.prop.isContainer;
+            var otherMany = Objects.nonNull(other) && other.prop.isContainer;
 
             var o2o = !meMany && !otherMany;
             var m2m = meMany && otherMany;

@@ -321,7 +321,7 @@ public class FilterDao<T> {
         var joinedPath = join.get(finalFieldName);
 
         // ...validate finalField presence...
-        if (finalField == null) {
+        if (Objects.isNull(finalField)) {
             throw new NoSuchFieldException("Final field '"
                 + finalFieldName
                 + "' not found in keychain: "

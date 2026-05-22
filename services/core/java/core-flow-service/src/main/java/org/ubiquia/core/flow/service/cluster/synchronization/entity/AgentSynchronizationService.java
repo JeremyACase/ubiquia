@@ -14,6 +14,7 @@ import org.ubiquia.common.library.api.repository.AgentRepository;
 import org.ubiquia.common.library.implementation.service.mapper.AgentDtoMapper;
 import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 
+import java.util.Objects;
 /**
  * Pushes this agent's own record to peer agents so they can track it for heartbeat monitoring.
  *
@@ -45,15 +46,15 @@ public class AgentSynchronizationService {
         }
 
         var agentEntity = this.agentRepository.findById(this.agentConfig.getId()).orElse(null);
-        if (agentEntity == null
-            || agentEntity.getBaseUrl() == null
+        if (Objects.isNull(agentEntity)
+            || Objects.isNull(agentEntity.getBaseUrl())
             || agentEntity.getBaseUrl().isBlank()) {
             logger.debug("Skipping agent registration push: no baseUrl configured on this agent.");
             return;
         }
 
         var dto = this.mapAgent(agentEntity);
-        if (dto == null) {
+        if (Objects.isNull(dto)) {
             return;
         }
 

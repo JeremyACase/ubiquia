@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
  * <p>Enabled by setting {@code ubiquia.cluster.flow-service.sync.enabled=true}.
  */
 @ConditionalOnProperty(
-    value = "ubiquia.cluster.flow-service.sync.enabled",
+    value = "ubiquia.cluster.sync.microweight.enabled",
     havingValue = "true",
     matchIfMissing = false
 )
@@ -74,7 +74,7 @@ public class MicroweightClusterService implements Receiver {
 
     @PreDestroy
     public void stop() {
-        if (this.channel != null) {
+        if (Objects.nonNull(this.channel)) {
             logger.info("Closing JGroups cluster channel '{}'.", clusterName);
             this.channel.close();
         }
@@ -89,11 +89,11 @@ public class MicroweightClusterService implements Receiver {
     @Scheduled(fixedDelayString = "${ubiquia.cluster.rejoin-delay-milliseconds:5000}",
                initialDelayString = "${ubiquia.cluster.rejoin-delay-milliseconds:5000}")
     public void rejoinIfSolo() throws InterruptedException {
-        if (this.channel == null) {
+        if (Objects.isNull(this.channel)) {
             return;
         }
         var view = this.channel.getView();
-        if (view == null || view.getMembers().size() > 1) {
+        if (Objects.isNull(view) || view.getMembers().size() > 1) {
             return;
         }
 
@@ -106,7 +106,7 @@ public class MicroweightClusterService implements Receiver {
 
         // Re-check after the sleep — a peer may have already joined us.
         view = this.channel.getView();
-        if (view != null && view.getMembers().size() > 1) {
+        if (Objects.nonNull(view) && view.getMembers().size() > 1) {
             return;
         }
 

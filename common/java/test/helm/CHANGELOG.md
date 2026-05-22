@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.31.0] - 2026-05-21
+### Added
+- `ubiquia_test_kubernetes_db_synch.yaml`: new Helm test; two independent K8s flow-service Deployments (`k8s-flow-service-a`, `k8s-flow-service-b`) with a shared H2 database; asserts that the `pets` ontology bootstrapped into service-a is propagated to service-b via `ExtraKubernetesSynchronizationService` within the sync window
+- `ubiquia-test-k8s-db-synch-config` ConfigMap: shared application config for both agents (H2 in-memory, sync enabled, `ubiquia.kubernetes.enabled=false`)
+- `ubiquia-test-k8s-db-synch-ontologies` ConfigMap: mounts `pets.yaml` into service-a for ontology bootstrapping
+
+### Fixed
+- `ubiquia_test_kubernetes_db_synch.yaml`: replaced `busybox` `nslookup` init container with `curlimages/curl` health-check loop; `nslookup` in busybox treats short hostnames as absolute (no search domain appended), causing permanent DNS failures in Kubernetes
+- `ubiquia_test_simulation_dual_edge_kind_egress.yaml`: added `UBIQUIA_CLUSTER_SYNC_MICROWEIGHT_ENABLED=true` to `flow-service-edge-1` and `flow-service-edge-2` containers; `MicroweightSynchronizationService` (and its peer URL resolution) is gated on this property — without it, `UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS` had no effect and ontology sync never ran
+- `ubiquia_test_simulation_egress_relay.yaml`: same fix — added `UBIQUIA_CLUSTER_SYNC_MICROWEIGHT_ENABLED=true` to `flow-service-a` and `flow-service-b` containers
+
 ## [0.28.2] - 2026-05-12
 ### Added
 - `ubiquia_test_simulation_dual_edge_kind_egress.yaml`: two microweight edge agents sharing a pod form a JGroups cluster and relay a DAG message hop-by-hop to a central KIND agent (separate Deployment); the verify pod asserts the KIND agent received exactly one flow event and holds node registry entries for both edge nodes synced via the `E1 → E2 → KIND` peer chain

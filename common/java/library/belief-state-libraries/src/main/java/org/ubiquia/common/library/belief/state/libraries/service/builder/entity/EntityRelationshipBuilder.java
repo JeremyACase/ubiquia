@@ -120,7 +120,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractDomainModelEnt
         for (var key : this.cachedEntityListFieldMap.keySet()) {
             var values = (List<?>) key.get(entity);
             key.set(entity, new ArrayList<>()); // reset to collect updated objects
-            if (values != null) {
+            if (Objects.nonNull(values)) {
                 for (var value : values) {
                     this.handleBidirectionalRelationship(
                         entity,
@@ -134,7 +134,7 @@ public abstract class EntityRelationshipBuilder<T extends AbstractDomainModelEnt
         for (var key : this.cachedEntitySetFieldMap.keySet()) {
             var values = (Set<?>) key.get(entity);
             key.set(entity, new HashSet<>());
-            if (values != null) {
+            if (Objects.nonNull(values)) {
                 for (var value : values) {
                     handleBidirectionalRelationship(
                         entity,

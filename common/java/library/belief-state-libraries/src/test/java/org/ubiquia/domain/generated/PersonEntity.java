@@ -125,7 +125,7 @@ public class PersonEntity extends BaseModelEntity {
     }
 
     public PersonEntity addPetsItem(AnimalEntity petsItem) {
-        if (this.pets == null) {
+        if (Objects.isNull(this.pets)) {
             this.pets = new ArrayList<>();
         }
         this.pets.add(petsItem);
@@ -159,7 +159,7 @@ public class PersonEntity extends BaseModelEntity {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (Objects.isNull(o) || getClass() != o.getClass()) {
             return false;
         }
         PersonEntity personEntity = (PersonEntity) o;
@@ -191,7 +191,7 @@ public class PersonEntity extends BaseModelEntity {
      * (except the first line).
      */
     private String toIndentedString(Object o) {
-        if (o == null) {
+        if (Objects.isNull(o)) {
             return "null";
         }
         return o.toString().replace("\n", "\n    ");

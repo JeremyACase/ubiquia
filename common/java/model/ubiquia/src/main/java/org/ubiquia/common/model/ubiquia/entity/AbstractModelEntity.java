@@ -129,7 +129,7 @@ public abstract class AbstractModelEntity implements Persistable<String> {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (Objects.isNull(o) || getClass() != o.getClass()) {
             return false;
         }
         AbstractModelEntity aentity = (AbstractModelEntity) o;

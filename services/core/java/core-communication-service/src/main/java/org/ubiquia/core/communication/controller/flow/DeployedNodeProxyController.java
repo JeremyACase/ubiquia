@@ -100,7 +100,7 @@ public class DeployedNodeProxyController {
         final HttpServletResponse response) throws IOException {
 
         var registeredEndpoint = this.nodeProxyManager.getRegisteredEndpointForNodeName(node);
-        if (registeredEndpoint == null) {
+        if (Objects.isNull(registeredEndpoint)) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST, "No node registered with name: " + node);
         }
@@ -109,7 +109,7 @@ public class DeployedNodeProxyController {
         var pathWithin = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         var bestPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         var tail = new AntPathMatcher().extractPathWithinPattern(bestPattern, pathWithin);
-        var remainder = (tail == null) ? "" : tail;
+        var remainder = (Objects.isNull(tail)) ? "" : tail;
 
         // Build the upstream URL: http://<flow-service>:<port>/ubiquia/core-flow-service/{graph}/node/{node}/{tail}
         var serviceBase = this.flowServiceConfig.getUrl() + ":" + this.flowServiceConfig.getPort();
@@ -120,7 +120,7 @@ public class DeployedNodeProxyController {
             + node.toLowerCase()
             + (remainder.isEmpty() ? "" : "/" + remainder);
 
-        if (request.getQueryString() != null) {
+        if (Objects.nonNull(request.getQueryString())) {
             targetUrl += "?" + request.getQueryString();
         }
 
@@ -136,7 +136,7 @@ public class DeployedNodeProxyController {
         var headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             var h = headerNames.nextElement();
-            if (h != null && !this.hopByHopHeaders.contains(h.toLowerCase(Locale.ROOT))) {
+            if (Objects.nonNull(h) && !this.hopByHopHeaders.contains(h.toLowerCase(Locale.ROOT))) {
                 var vals = request.getHeaders(h);
                 while (vals.hasMoreElements()) {
                     conn.addRequestProperty(h, vals.nextElement());
@@ -147,7 +147,7 @@ public class DeployedNodeProxyController {
         // Stream request body for POST/PUT
         if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
             var hasBody = request.getContentLengthLong() > 0
-                || request.getHeader("Transfer-Encoding") != null;
+                || Objects.nonNull(request.getHeader("Transfer-Encoding"));
             if (hasBody) {
                 conn.setDoOutput(true);
                 try (var in = request.getInputStream()) {
@@ -167,13 +167,13 @@ public class DeployedNodeProxyController {
 
         // Copy response headers, skipping hop-by-hop
         var upstreamHeaders = conn.getHeaderFields();
-        if (upstreamHeaders != null) {
+        if (Objects.nonNull(upstreamHeaders)) {
             for (var entry : upstreamHeaders.entrySet()) {
                 var name = entry.getKey();
                 var values = entry.getValue();
-                if (name != null
+                if (Objects.nonNull(name)
                     && !this.hopByHopHeaders.contains(name.toLowerCase(Locale.ROOT))
-                    && values != null) {
+                    && Objects.nonNull(values)) {
                     for (var v : values) {
                         response.addHeader(name, v);
                     }
@@ -185,7 +185,7 @@ public class DeployedNodeProxyController {
         try (var out = response.getOutputStream()) {
             if (status >= 400) {
                 var err = conn.getErrorStream();
-                if (err != null) {
+                if (Objects.nonNull(err)) {
                     IOUtils.copy(err, out);
                     out.flush();
                 }

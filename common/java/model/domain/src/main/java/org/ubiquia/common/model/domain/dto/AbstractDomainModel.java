@@ -69,7 +69,7 @@ public abstract class AbstractDomainModel {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (Objects.isNull(o) || getClass() != o.getClass()) {
             return false;
         }
         AbstractDomainModel aentity = (AbstractDomainModel) o;
