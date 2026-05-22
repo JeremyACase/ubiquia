@@ -117,7 +117,7 @@ public class AdoptionTransactionEntity extends BaseModelEntity {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (Objects.isNull(o) || getClass() != o.getClass()) {
             return false;
         }
         AdoptionTransactionEntity adoptionTransactionEntity = (AdoptionTransactionEntity) o;
@@ -147,7 +147,7 @@ public class AdoptionTransactionEntity extends BaseModelEntity {
      * (except the first line).
      */
     private String toIndentedString(Object o) {
-        if (o == null) {
+        if (Objects.isNull(o)) {
             return "null";
         }
         return o.toString().replace("\n", "\n    ");

@@ -53,11 +53,13 @@ data:
           sync:
             enabled: true
             frequency-milliseconds: 10000
+        sync:
+          microweight:
+            enabled: true
+          peer-base-urls: http://microweight-flow-service-a:8080,http://microweight-flow-service-b:8080,http://microweight-flow-service-c:8080,http://microweight-flow-service-d:8080
         name: ubiquia-cluster
         port: 7800
         seed-hosts: microweight-flow-service-a[7800],microweight-flow-service-b[7800],microweight-flow-service-c[7800]
-        sync:
-          peer-base-urls: http://microweight-flow-service-a:8080,http://microweight-flow-service-b:8080,http://microweight-flow-service-c:8080,http://microweight-flow-service-d:8080
       kubernetes:
         enabled: false
         namespace: {{ .Release.Namespace }}

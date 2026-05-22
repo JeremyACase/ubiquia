@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dao.QueryFilterParameter;
 import org.ubiquia.common.model.ubiquia.dao.QueryOperatorType;
 
+import java.util.Objects;
 @Service
 public class NestedPredicateBuilder {
 
@@ -64,7 +65,7 @@ public class NestedPredicateBuilder {
         QueryOperatorType operator,
         Object value) {
 
-        if (value == null) {
+        if (Objects.isNull(value)) {
             subQuery.where(cb.isNull(path));
         } else if ("!null".equalsIgnoreCase(String.valueOf(value))) {
             subQuery.where(cb.isNotNull(path));
@@ -96,7 +97,7 @@ public class NestedPredicateBuilder {
     }
 
     private Object parseValue(String value, Class<?> type) {
-        if (value == null) {
+        if (Objects.isNull(value)) {
             return null;
         }
         if (type.equals(OffsetDateTime.class)) {

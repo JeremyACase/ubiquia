@@ -77,7 +77,7 @@ public class CatEntity extends AnimalEntity {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (Objects.isNull(o) || getClass() != o.getClass()) {
             return false;
         }
         CatEntity catEntity = (CatEntity) o;
@@ -105,7 +105,7 @@ public class CatEntity extends AnimalEntity {
      * (except the first line).
      */
     private String toIndentedString(Object o) {
-        if (o == null) {
+        if (Objects.isNull(o)) {
             return "null";
         }
         return o.toString().replace("\n", "\n    ");

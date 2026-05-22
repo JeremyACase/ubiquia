@@ -12,6 +12,7 @@ import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
 
+import java.util.Objects;
 /**
  * Verifies that the flow service has persisted entities that are candidates for cluster
  * synchronization. This confirms the data layer underpinning {@code ModelSynchronizationService}
@@ -58,7 +59,7 @@ public class FlowClusterSyncTestModule extends AbstractHelmTestModule {
             var response = this.restTemplate.exchange(url, HttpMethod.GET, null, typeRef);
             var page = response.getBody();
 
-            if (page == null || page.getTotalElements() == 0) {
+            if (Objects.isNull(page) || page.getTotalElements() == 0) {
                 this.testState.addFailure(
                     "No domain ontology records found in the flow service. "
                         + "At least one must exist as a sync candidate for cluster "

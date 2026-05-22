@@ -114,7 +114,7 @@ public class JsonSchemaToOpenApiEntityYamlMapper {
      */
     private void annotateElementCollectionsOnFields(
         final ObjectNode definitionsNode, final Map<String, ModelType> kindByName) {
-        if (definitionsNode == null) {
+        if (Objects.isNull(definitionsNode)) {
             return;
         }
 
@@ -234,7 +234,7 @@ public class JsonSchemaToOpenApiEntityYamlMapper {
     }
 
     private String asText(JsonNode n) {
-        return (n != null && n.isTextual()) ? n.asText() : null;
+        return (Objects.nonNull(n) && n.isTextual()) ? n.asText() : null;
     }
 
     /**

@@ -17,13 +17,15 @@ import org.ubiquia.common.library.api.repository.AgentRepository;
 import org.ubiquia.core.flow.component.FlowEgressRelay;
 import org.ubiquia.core.flow.service.cluster.synchronization.entity.AbstractSynchronizationService;
 import org.ubiquia.core.flow.service.cluster.synchronization.entity.AgentSynchronizationService;
-import org.ubiquia.core.flow.service.cluster.synchronization.kubernetes.IntraKubernetesReplicaClusterService;
-import org.ubiquia.core.flow.service.cluster.synchronization.kubernetes.IntraKubernetesSynchronizationService;
+import org.ubiquia.core.flow.service.cluster.synchronization.kubernetes.extra.ExtraKubernetesSynchronizationService;
+import org.ubiquia.core.flow.service.cluster.synchronization.kubernetes.intra.IntraKubernetesReplicaClusterService;
+import org.ubiquia.core.flow.service.cluster.synchronization.kubernetes.intra.IntraKubernetesSynchronizationService;
 import org.ubiquia.core.flow.service.cluster.synchronization.microweight.MicroweightSynchronizationService;
 
 /**
  * Top-level sync orchestrator. Combines peer URLs from {@link MicroweightSynchronizationService}
- * (JGroups/static) and {@link IntraKubernetesSynchronizationService} (DB-discovered), then drives
+ * (JGroups/static), {@link IntraKubernetesSynchronizationService} (DB-discovered intra-cluster),
+ * and {@link ExtraKubernetesSynchronizationService} (config-driven inter-cluster), then drives
  * all registered {@link AbstractSynchronizationService} implementations against the full peer set.
  *
  * <p>Enabled only when {@code ubiquia.cluster.flow-service.sync.enabled=true}.
@@ -49,10 +51,13 @@ public class ClusterSynchronizationService {
     private Optional<IntraKubernetesReplicaClusterService> replicaClusterService;
 
     @Autowired
-    private MicroweightSynchronizationService microweightSynchronizationService;
+    private Optional<MicroweightSynchronizationService> microweightSynchronizationService;
 
     @Autowired
     private IntraKubernetesSynchronizationService intraKubernetesSynchronizationService;
+
+    @Autowired
+    private ExtraKubernetesSynchronizationService extraKubernetesSynchronizationService;
 
     @Autowired
     private AgentSynchronizationService agentSynchronizationService;
@@ -64,6 +69,7 @@ public class ClusterSynchronizationService {
     private List<AbstractSynchronizationService<?, ?>> synchronizationServices;
 
     @Scheduled(
+        initialDelayString = "${ubiquia.cluster.flow-service.sync.frequency-milliseconds:30000}",
         fixedDelayString = "${ubiquia.cluster.flow-service.sync.frequency-milliseconds:30000}")
     public void tryBuildEgressRelays() {
         if (!this.isLeader()) {
@@ -74,6 +80,7 @@ public class ClusterSynchronizationService {
     }
 
     @Scheduled(
+        initialDelayString = "${ubiquia.cluster.flow-service.sync.frequency-milliseconds:30000}",
         fixedDelayString = "${ubiquia.cluster.flow-service.sync.frequency-milliseconds:30000}")
     @Transactional
     public void synchronize() {
@@ -106,8 +113,10 @@ public class ClusterSynchronizationService {
 
     private List<String> resolvePeerUrls() {
         var urls = new LinkedHashSet<String>();
-        urls.addAll(this.microweightSynchronizationService.resolvePeerUrls());
+        this.microweightSynchronizationService
+            .ifPresent(svc -> urls.addAll(svc.resolvePeerUrls()));
         urls.addAll(this.intraKubernetesSynchronizationService.resolvePeerUrls());
+        urls.addAll(this.extraKubernetesSynchronizationService.resolvePeerUrls());
         return List.copyOf(urls);
     }
 

@@ -263,7 +263,7 @@ public abstract class AbstractEgressDtoMapper<
         var embeddedDto = embeddedDtoType.getDeclaredConstructor().newInstance();
         dtoField.set(to, embeddedDto);
 
-        while (embeddedEntityClass != null && embeddedEntityClass != Object.class) {
+        while (Objects.nonNull(embeddedEntityClass) && embeddedEntityClass != Object.class) {
             for (var embeddedField : embeddedEntityClass.getDeclaredFields()) {
                 embeddedField.setAccessible(true);
 

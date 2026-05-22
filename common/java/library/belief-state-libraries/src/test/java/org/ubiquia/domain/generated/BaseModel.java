@@ -17,6 +17,7 @@ package org.ubiquia.domain.generated;
 import com.fasterxml.jackson.annotation.*;
 import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
 
+import java.util.Objects;
 /**
  * A base model.
  */
@@ -45,7 +46,7 @@ public class BaseModel extends AbstractDomainModel {
      * (except the first line).
      */
     private String toIndentedString(Object o) {
-        if (o == null) {
+        if (Objects.isNull(o)) {
             return "null";
         }
         return o.toString().replace("\n", "\n    ");

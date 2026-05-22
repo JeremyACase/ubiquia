@@ -168,6 +168,8 @@ spec:
               value: "aaaaaaaa-3333-0000-0000-000000000001"
             - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
               value: "http://localhost:8080"
+            - name: UBIQUIA_CLUSTER_SYNC_MICROWEIGHT_ENABLED
+              value: "true"
             - name: UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS
               value: "http://localhost:8081"
           ports:
@@ -190,6 +192,8 @@ spec:
               value: "bbbbbbbb-3333-0000-0000-000000000002"
             - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
               value: "http://localhost:8081"
+            - name: UBIQUIA_CLUSTER_SYNC_MICROWEIGHT_ENABLED
+              value: "true"
             - name: UBIQUIA_CLUSTER_SYNC_PEER_BASE_URLS
               value: "http://localhost:8082"
           ports:

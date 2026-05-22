@@ -1,7 +1,8 @@
-package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes;
+package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes.intra;
 
 import jakarta.transaction.Transactional;
 import java.time.Duration;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -66,7 +67,7 @@ public class IntraKubernetesHeartbeatService {
             return;
         }
         var myAgent = this.agentRepository.findById(this.agentConfig.getId()).orElse(null);
-        if (myAgent == null || myAgent.getNetwork() == null) {
+        if (Objects.isNull(myAgent) || Objects.isNull(myAgent.getNetwork())) {
             logger.debug("Heartbeat skipped: local agent has no network assigned.");
             return;
         }

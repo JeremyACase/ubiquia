@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes;
+package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes.intra;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -118,7 +118,7 @@ public class IntraKubernetesHeartbeatServiceTest {
         peer.setId(peerId);
         peer.setDeployedGraphs(new ArrayList<>());
         peer.setBaseUrl("http://peer:8080");
-        peer.setReachable(false);  // already tombstoned
+        peer.setReachable(false);
         peer.setNetwork(network);
         this.agentRepository.save(peer);
 

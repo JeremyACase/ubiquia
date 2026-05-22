@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.31.0] - 2026-05-21
+### Added
+- Kubernetes DB sync feature: `ExtraKubernetesSynchronizationService` resolves peer URLs from `ubiquia.cluster.kubernetes.extra.peer-base-urls` for HTTP-based inter-cluster ontology sync without JGroups
+- `ExtraKubernetesHeartbeatService`: periodic health probing of extra-cluster peers; tombstones unreachable peers and lifts tombstones on recovery; conditional on `ubiquia.kubernetes.enabled=true`
+- `ubiquia_test_kubernetes_db_synch.yaml`: Helm test validating that an ontology bootstrapped into one K8s flow-service agent is propagated to a second agent via `ExtraKubernetesSynchronizationService`
+
+### Fixed
+- `ClusterSynchronizationService`: added `initialDelay` equal to the sync frequency on both `@Scheduled` methods to prevent a race condition where the scheduler fired before `ApplicationReadyEvent` created the agent database record
+- `ubiquia_test_kubernetes_db_synch.yaml`: replaced `busybox` `nslookup` init container (which treats short names as absolute, bypassing Kubernetes search domains) with a `curlimages/curl` init container that polls `/actuator/health` directly
+- `ubiquia_test_simulation_dual_edge_kind_egress.yaml`: added `UBIQUIA_CLUSTER_SYNC_MICROWEIGHT_ENABLED=true` to edge-agent-1 and edge-agent-2 containers; `MicroweightSynchronizationService` was configured with peer URLs but never activated, so ontology sync never ran
+- `ubiquia_test_simulation_egress_relay.yaml`: same fix — added `UBIQUIA_CLUSTER_SYNC_MICROWEIGHT_ENABLED=true` to agent-a and agent-b containers
+
 ## [0.30.1] - 2026-05-19
 ### Added
 - `ObjectMetadataEntity`: belief-state-owned JPA entity extending `AbstractDomainModelEntity`; replaces dependency on core `org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity`

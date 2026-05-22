@@ -1,4 +1,4 @@
-package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes;
+package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes.intra;
 
 import java.util.ArrayList;
 import java.util.UUID;

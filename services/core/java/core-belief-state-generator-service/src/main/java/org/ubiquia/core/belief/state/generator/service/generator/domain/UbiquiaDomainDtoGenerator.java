@@ -86,6 +86,6 @@ public class UbiquiaDomainDtoGenerator extends JavaClientCodegen {
     /* ----------------------- helpers ----------------------- */
 
     private boolean isEmbeddable(CodegenModel m) {
-        return m != null && Boolean.TRUE.equals(m.vendorExtensions.get("x-embeddable"));
+        return Objects.nonNull(m) && Boolean.TRUE.equals(m.vendorExtensions.get("x-embeddable"));
     }
 }
