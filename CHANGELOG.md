@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.32.0] - 2026-05-22
+### Added
+- `FlowEventSynchronizationService`, `FlowMessageSynchronizationService`, `NetworkSynchronizationService`, `ObjectMetadataSynchronizationService`: typed entity sync services extending `AbstractSynchronizationService` for cluster-wide propagation of `FlowEvent`, `FlowMessage`, `Network`, and `ObjectMetadata` records
+- `FlowEventRegistrar`: idempotent registration of `FlowEvent` DTOs received from peer agents; resolves parent `Flow` and `Node` references and preserves the source UUID
+- `NetworkRegistrar`: idempotent registration of `Network` DTOs received from peer agents
+- `ObjectMetadataRegistrar`: idempotent registration of `ObjectMetadata` DTOs received from peer agents; resolves the parent `Agent` reference
+- `FlowEventController.register()`: `POST /ubiquia/core/flow-service/flow-event/register/post` sync endpoint delegating to `FlowEventRegistrar`
+- `NetworkController`: new `GenericUbiquiaDaoController` for `NetworkEntity` with a `POST /ubiquia/core/flow-service/network/register/post` sync endpoint
+- `ObjectMetadataController`: new `GenericUbiquiaDaoController` for `ObjectMetadataEntity` with a `POST /ubiquia/core/flow-service/object-metadata/register/post` sync endpoint
+- `FlowMessageController.register()`: `POST /ubiquia/core/flow-service/flow-message/register/post` sync endpoint delegating to `FlowMessageRegistrar.tryRegisterSync()`
+- `NetworkDtoMapper`: mapper from `NetworkEntity` to `Network` DTO in `common/java/library/implementation`
+
+### Changed
+- `NetworkRepository`: now extends `AbstractEntityRepository<NetworkEntity>` instead of `JpaRepository`/`CrudRepository`, enabling sync-query support
+- `AbstractSynchronizationService.sync()`: annotated `@Transactional` to ensure entity reads and remote POSTs share the same transaction context
+
+### Fixed
+- `FlowEventDtoMapper`: node ID was not being set on the mapped `Node` stub, causing sync-registered `FlowEvent` DTOs to arrive with a null node reference
+
 ## [0.31.0] - 2026-05-21
 ### Added
 - Kubernetes DB sync feature: `ExtraKubernetesSynchronizationService` resolves peer URLs from `ubiquia.cluster.kubernetes.extra.peer-base-urls` for HTTP-based inter-cluster ontology sync without JGroups

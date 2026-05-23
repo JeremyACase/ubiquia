@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.32.0] - 2026-05-22
+### Added
+- `FlowEventSynchronizationService`: sync service for `FlowEventEntity`; posts to `/ubiquia/core/flow-service/flow-event/register/post` on each peer
+- `FlowMessageSynchronizationService`: sync service for `FlowMessageEntity`; posts to `/ubiquia/core/flow-service/flow-message/register/post` on each peer
+- `NetworkSynchronizationService`: sync service for `NetworkEntity`; posts to `/ubiquia/core/flow-service/network/register/post` on each peer
+- `ObjectMetadataSynchronizationService`: sync service for `ObjectMetadataEntity`; posts to `/ubiquia/core/flow-service/object-metadata/register/post` on each peer
+- `FlowEventRegistrar`: idempotent registration of `FlowEvent` DTOs from peers; resolves `Flow` and `Node` parents and preserves source UUID
+- `NetworkRegistrar`: idempotent registration of `Network` DTOs from peers
+- `ObjectMetadataRegistrar`: idempotent registration of `ObjectMetadata` DTOs from peers; resolves parent `Agent`
+- `FlowEventController.register()`: `POST /ubiquia/core/flow-service/flow-event/register/post` delegating to `FlowEventRegistrar`
+- `NetworkController`: `GenericUbiquiaDaoController` for `NetworkEntity` with `POST .../network/register/post` sync endpoint
+- `ObjectMetadataController`: `GenericUbiquiaDaoController` for `ObjectMetadataEntity` with `POST .../object-metadata/register/post` sync endpoint
+- `FlowMessageController.register()`: `POST /ubiquia/core/flow-service/flow-message/register/post` delegating to `FlowMessageRegistrar.tryRegisterSync()`
+- `FlowMessageRegistrar.tryRegisterSync()`: idempotent sync-register path that resolves `FlowEvent` and `Node` parents without requiring a full flow chain on the receiving agent
+
+### Changed
+- `NetworkRepository`: changed base type from `JpaRepository`/`CrudRepository` to `AbstractEntityRepository<NetworkEntity>` so the sync query (`findEntitiesNeedingSync`) is available
+- `AbstractSynchronizationService.sync()`: annotated `@Transactional`
+
+### Fixed
+- `FlowEventDtoMapper`: node ID was missing from the mapped `Node` stub, causing peers to receive `FlowEvent` DTOs with a null node reference
+
 ## [0.31.0] - 2026-05-21
 ### Added
 - `ExtraKubernetesSynchronizationService`: resolves HTTP peer URLs from `ubiquia.cluster.kubernetes.extra.peer-base-urls` (comma-separated); when `ExtraKubernetesHeartbeatService` is active only reachable peers are returned, otherwise all configured URLs are returned

@@ -1,6 +1,7 @@
 package org.ubiquia.core.flow.service.cluster.synchronization.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ public abstract class AbstractSynchronizationService<
 
     protected abstract String getEndpointPath();
 
+    @Transactional
     public void sync(final List<String> peerUrls, final AgentEntity sourceAgent) {
 
         var endpointPath = this.getEndpointPath();

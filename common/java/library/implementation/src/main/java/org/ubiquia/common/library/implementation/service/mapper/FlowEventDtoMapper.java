@@ -93,6 +93,7 @@ public class FlowEventDtoMapper extends GenericDtoMapper<FlowEventEntity, FlowEv
                 to.getOutputPayloadStamps().add(kvp);
             }
             var anode = new Node();
+            anode.setId(from.getNode().getId());
             anode.setName(from.getNode().getName());
             anode.setNodeType(from.getNode().getNodeType());
 
