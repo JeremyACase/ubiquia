@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.33.0] - 2026-05-25
+### Added
+- `SyncController`: `GET /ubiquia/core/flow-service/sync/query/params` endpoint for paginated, filterable queries over `SyncEntity` records; supports dot-notation nested field filters (e.g. `sourceAgent.id=<uuid>`)
+- `ubiquia_test_simulation_agent_synch.yaml`: Helm test verifying two-agent entity synchronization — bootstraps the `pets` ontology to `synch-flow-service-a`, confirms `synch-flow-service-b` receives it via JGroups sync, then confirms `SyncEntity` records exist on agent-a filtered by `sourceAgent.id`
+
+### Changed
+- `GenericDtoMapper.setAbstractEntityFields()`: no longer hydrates the `syncs` lazy collection on egress; callers querying sync status should use `GET /sync/query/params?sourceAgent.id=<uuid>` instead
+
+### Fixed
+- `ExtraKubernetesHeartbeatServiceTest.assertCheckPeerHealth_belowFailureThreshold_doesNotTombstone`: added `@MockBean TaskScheduler taskScheduler` to prevent the background `@Scheduled` probe (which uses a 3-second connection timeout per peer) from racing with `@BeforeEach` field resets and accumulating extra failure counts before the test's own `checkPeerHealth()` call
+- `SyncMappingTest.assertSyncsAreMapped_isValid`: updated assertions to match the new mapper contract — verifies `dto.getSyncs()` is null (no lazy hydration) and asserts the `SyncEntity` record was persisted correctly via `SyncRepository`
+
 ## [0.32.0] - 2026-05-22
 ### Added
 - `FlowEventSynchronizationService`, `FlowMessageSynchronizationService`, `NetworkSynchronizationService`, `ObjectMetadataSynchronizationService`: typed entity sync services extending `AbstractSynchronizationService` for cluster-wide propagation of `FlowEvent`, `FlowMessage`, `Network`, and `ObjectMetadata` records

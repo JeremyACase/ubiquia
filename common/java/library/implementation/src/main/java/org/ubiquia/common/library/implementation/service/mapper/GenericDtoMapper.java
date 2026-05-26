@@ -25,9 +25,6 @@ public abstract class GenericDtoMapper<
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @Autowired
-    protected SyncDtoMapper syncDtoMapper;
-
     /**
      * Map from a list of entities to a list of DTOs.
      *
@@ -83,7 +80,6 @@ public abstract class GenericDtoMapper<
                 to.setTags(new ArrayList<>());
             }
 
-            to.setSyncs(this.syncDtoMapper.map(from.getSyncs()));
         }
     }
 }

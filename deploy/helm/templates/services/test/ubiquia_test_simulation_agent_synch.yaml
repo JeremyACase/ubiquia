@@ -1,0 +1,359 @@
+---
+# Shared application config for the two simulation sync test agents.
+# JGroups sync is enabled so that entities bootstrapped into agent-a are
+# propagated to agent-b, and SyncEntity records are created on agent-a to
+# track what was successfully pushed to peers.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-agent-synch-config
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  application.yaml: |
+    logging:
+      level:
+        net.jimblackler: OFF
+        org.ubiquia: {{ .Values.logging.ubiquia }}
+
+    server:
+      port: 8080
+
+    spring:
+      application:
+        name: ubiquia-core-flow-service
+      datasource:
+        driverClassName: org.h2.Driver
+        url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
+        username: sa
+        password: sa
+        hikari:
+          transaction-isolation: TRANSACTION_READ_COMMITTED
+      h2:
+        console:
+          enabled: false
+      jackson:
+        date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+        deserialization:
+          fail-on-unknown-properties: true
+      jpa:
+        hibernate:
+          ddl-auto: create
+        properties:
+          hibernate:
+            generate_statistics: false
+            format_sql: true
+
+    ubiquia:
+      mode: TEST
+      cluster:
+        flow-service:
+          sync:
+            enabled: true
+            frequency-milliseconds: 10000
+        sync:
+          microweight:
+            enabled: true
+          peer-base-urls: http://synch-flow-service-a:8080,http://synch-flow-service-b:8080
+        name: ubiquia-agent-synch-cluster
+        port: 7800
+        seed-hosts: synch-flow-service-a[7800],synch-flow-service-b[7800]
+      kubernetes:
+        enabled: false
+        namespace: {{ .Release.Namespace }}
+      outbox:
+        enabled: true
+        frequency-milliseconds: 1000
+        mode: DEFAULT
+      page:
+        max-size: 100
+      agent:
+        flow-service:
+          bootstrap:
+            belief-state:
+              enabled: false
+            domain-ontology:
+              enabled: false
+              directory: /app/etc/domain-ontologies/
+            graph:
+              deployments:
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-agent-synch-ontologies
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  pets.yaml: |
+{{ .Files.Get "bootstrap/ontologies/pets.yaml" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-test-agent-synch-scenario
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  simulation-agent-synch.yaml: |
+    name: simulation-agent-synch
+    agents:
+      - name: synch-flow-service-a
+        mode: test
+        base_url: http://synch-flow-service-a:8080
+      - name: synch-flow-service-b
+        mode: test
+        base_url: http://synch-flow-service-b:8080
+    bootstrap:
+      domain_ontologies:
+        - file: /app/etc/ontologies/pets.yaml
+          targets:
+            - synch-flow-service-a
+    events: []
+    networks: []
+    speed: 1.0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: synch-flow-service-a
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  selector:
+    app: synch-flow-service-a
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: jgroups
+      port: 7800
+      targetPort: 7800
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: synch-flow-service-b
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  selector:
+    app: synch-flow-service-b
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: jgroups
+      port: 7800
+      targetPort: 7800
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: synch-flow-service-a
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: synch-flow-service-a
+  template:
+    metadata:
+      labels:
+        app: synch-flow-service-a
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+      containers:
+        - name: flow-service
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: UBIQUIA_AGENT_ID
+              value: "aaaaaaaa-2222-0000-0000-000000000001"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://synch-flow-service-a:8080"
+          ports:
+            - containerPort: 8080
+            - containerPort: 7800
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: ubiquia-test-agent-synch-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: synch-flow-service-b
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: synch-flow-service-b
+  template:
+    metadata:
+      labels:
+        app: synch-flow-service-b
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+      containers:
+        - name: flow-service
+          image: {{ include "ubiquia.core.flowService.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: UBIQUIA_AGENT_ID
+              value: "bbbbbbbb-2222-0000-0000-000000000002"
+            - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
+              value: "http://synch-flow-service-b:8080"
+          ports:
+            - containerPort: 8080
+            - containerPort: 7800
+          volumeMounts:
+            - name: config
+              mountPath: /app/etc/application.yaml
+              subPath: application.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: ubiquia-test-agent-synch-config
+---
+# Runs the simulation scenario: bootstraps the pets ontology to agent-a,
+# which then syncs it to agent-b via JGroups, creating SyncEntity records on agent-a.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubiquia-test-simulation-agent-synch
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    sidecar.istio.io/inject: "false"
+spec:
+  serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+  restartPolicy: Never
+  containers:
+    - name: simulation-runner
+      image: {{ include "ubiquia.util.simulationService.image" . }}
+      imagePullPolicy: IfNotPresent
+      command: ["util-simulation-service"]
+      args: ["simulation", "run", "--input-file", "/app/etc/scenario/simulation-agent-synch.yaml"]
+      volumeMounts:
+        - name: scenario
+          mountPath: /app/etc/scenario/simulation-agent-synch.yaml
+          subPath: simulation-agent-synch.yaml
+        - name: ontologies
+          mountPath: /app/etc/ontologies/
+  volumes:
+    - name: scenario
+      configMap:
+        name: ubiquia-test-agent-synch-scenario
+    - name: ontologies
+      configMap:
+        name: ubiquia-test-agent-synch-ontologies
+---
+# Verifies two things:
+#   1. Agent-b received the entities that agent-a synced to it.
+#   2. Agent-a has SyncEntity records associated with itself, confirming the
+#      sync outbox was flushed and persisted after successful peer delivery.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubiquia-test-simulation-agent-synch-verify
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    sidecar.istio.io/inject: "false"
+spec:
+  serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+  restartPolicy: Never
+  containers:
+    - name: curl
+      image: curlimages/curl:8.6.0
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          set -e
+
+          AGENT_A_ID="aaaaaaaa-2222-0000-0000-000000000001"
+          AGENT_A_URL="http://synch-flow-service-a:8080"
+          AGENT_B_URL="http://synch-flow-service-b:8080"
+          MAX_ATTEMPTS=24
+
+          # --- Step 1: verify agent-b received the entities from agent-a ---
+
+          echo "Waiting for agent-b to receive the synced entities from agent-a..."
+          ATTEMPT=0
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            RESPONSE=$(curl -s "$AGENT_B_URL/ubiquia/core/flow-service/domain-ontology/query/params?page=0&size=100")
+            if echo "$RESPONSE" | grep -qE "\"name\"[[:space:]]*:[[:space:]]*\"pets\""; then
+              echo "✅ agent-b confirmed: 'pets' domain ontology received from agent-a"
+              break
+            fi
+            ATTEMPT=$((ATTEMPT + 1))
+            echo "  Attempt $ATTEMPT/$MAX_ATTEMPTS — not yet present on agent-b, retrying in 5s..."
+            sleep 5
+          done
+
+          if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+            echo "❌ agent-b did not receive entities from agent-a after $((MAX_ATTEMPTS * 5))s"
+            exit 1
+          fi
+
+          # --- Step 2: verify agent-a has SyncEntity records for itself ---
+          # SyncEntity.sourceAgent is the agent that performed the sync (agent-a).
+          # A non-zero count confirms the outbox flushed and recorded successful delivery.
+
+          echo "Verifying agent-a has SyncEntity records with sourceAgent.id=${AGENT_A_ID}..."
+          ATTEMPT=0
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            SYNC_RESPONSE=$(curl -s "$AGENT_A_URL/ubiquia/core/flow-service/sync/query/params?page=0&size=100&sourceAgent.id=${AGENT_A_ID}")
+            TOTAL=$(echo "$SYNC_RESPONSE" | grep -oE '"totalElements"[[:space:]]*:[[:space:]]*[0-9]+' | grep -oE '[0-9]+')
+            if [ -n "$TOTAL" ] && [ "$TOTAL" -gt 0 ]; then
+              echo "✅ agent-a confirmed: $TOTAL SyncEntity record(s) found for sourceAgent ${AGENT_A_ID}"
+              break
+            fi
+            ATTEMPT=$((ATTEMPT + 1))
+            echo "  Attempt $ATTEMPT/$MAX_ATTEMPTS — no sync records yet on agent-a, retrying in 5s..."
+            sleep 5
+          done
+
+          if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+            echo "❌ agent-a has no SyncEntity records after $((MAX_ATTEMPTS * 5))s"
+            exit 1
+          fi
+
+          echo "🎉 Agent synch verification passed — entities synced and SyncEntity records confirmed on agent-a!"

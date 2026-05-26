@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.33.0] - 2026-05-25
+### Changed
+- `GenericDtoMapper.setAbstractEntityFields()`: removed `SyncDtoMapper` injection and `setSyncs()` call; the `syncs` field on `AbstractModel` is no longer populated during entity egress to avoid triggering an unbounded lazy-load; query `GET /sync/query/params?sourceAgent.id=<uuid>` instead
+
 ## [0.32.0] - 2026-05-22
 ### Added
 - `NetworkDtoMapper`: maps `NetworkEntity` to `Network` DTO

@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.33.0] - 2026-05-25
+### Added
+- `SyncController`: `GET /ubiquia/core/flow-service/sync/query/params` — paginated query over `SyncEntity` records; supports arbitrary field filters including nested dot-notation (e.g. `sourceAgent.id=<uuid>`)
+
+### Fixed
+- `ExtraKubernetesHeartbeatServiceTest.assertCheckPeerHealth_belowFailureThreshold_doesNotTombstone`: added `@MockBean TaskScheduler taskScheduler` to prevent the background scheduler's initial probe (3-second connection timeout per peer) from writing into the freshly-reset `consecutiveFailures` map before the test's own `checkPeerHealth()` call, causing a spurious threshold breach
+- `SyncMappingTest.assertSyncsAreMapped_isValid`: updated to assert the new mapper contract — `dto.getSyncs()` is null (lazy collection no longer hydrated on egress); persistence is verified directly via `SyncRepository.count()`
+
 ## [0.32.0] - 2026-05-22
 ### Added
 - `FlowEventSynchronizationService`: sync service for `FlowEventEntity`; posts to `/ubiquia/core/flow-service/flow-event/register/post` on each peer
