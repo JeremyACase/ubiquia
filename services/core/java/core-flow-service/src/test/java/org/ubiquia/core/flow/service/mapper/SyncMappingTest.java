@@ -87,7 +87,11 @@ public class SyncMappingTest {
 
         var dto = this.domainOntologyDtoMapper.map(entity);
 
-        Assertions.assertNotNull(dto.getSyncs(), "Expected syncs list to be non-null");
-        Assertions.assertEquals(1, dto.getSyncs().size(), "Expected exactly one sync to be mapped");
+        // Syncs are no longer hydrated by the mapper to avoid unbounded lazy-loading.
+        // Callers should query /sync/query/params?sourceAgent.id=<id> instead.
+        Assertions.assertNull(dto.getSyncs(), "Expected syncs to be null — mapper must not hydrate the lazy collection");
+
+        // Confirm the SyncEntity was actually persisted correctly.
+        Assertions.assertEquals(1, this.syncRepository.count(), "Expected exactly one SyncEntity in the database");
     }
 }
