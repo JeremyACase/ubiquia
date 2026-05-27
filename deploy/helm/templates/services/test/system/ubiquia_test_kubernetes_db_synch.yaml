@@ -74,7 +74,7 @@ data:
               deployments:
                 enabled: false
 ---
-# Ontology files to mount into k8s-flow-service-a for bootstrapping.
+# Ontology files to mount into kubernetes-db-synch-flow-service-a for bootstrapping.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -91,7 +91,7 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: k8s-flow-service-a
+  name: kubernetes-db-synch-flow-service-a
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
@@ -99,7 +99,7 @@ metadata:
     "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   selector:
-    app: k8s-flow-service-a
+    app: kubernetes-db-synch-flow-service-a
   ports:
     - name: http
       port: 8080
@@ -108,7 +108,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: k8s-flow-service-b
+  name: kubernetes-db-synch-flow-service-b
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
@@ -116,7 +116,7 @@ metadata:
     "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   selector:
-    app: k8s-flow-service-b
+    app: kubernetes-db-synch-flow-service-b
   ports:
     - name: http
       port: 8080
@@ -126,7 +126,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: k8s-flow-service-a
+  name: kubernetes-db-synch-flow-service-a
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
@@ -136,11 +136,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: k8s-flow-service-a
+      app: kubernetes-db-synch-flow-service-a
   template:
     metadata:
       labels:
-        app: k8s-flow-service-a
+        app: kubernetes-db-synch-flow-service-a
         sidecar.istio.io/inject: "false"
     spec:
       serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
@@ -152,9 +152,9 @@ spec:
             - name: UBIQUIA_AGENT_ID
               value: "aaaaaaaa-1111-0000-0000-000000000001"
             - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
-              value: "http://k8s-flow-service-a:8080"
+              value: "http://kubernetes-db-synch-flow-service-a:8080"
             - name: UBIQUIA_CLUSTER_KUBERNETES_EXTRA_PEER_BASE_URLS
-              value: "http://k8s-flow-service-b:8080"
+              value: "http://kubernetes-db-synch-flow-service-b:8080"
             - name: UBIQUIA_AGENT_FLOW_SERVICE_BOOTSTRAP_DOMAIN_ONTOLOGY_ENABLED
               value: "true"
           ports:
@@ -177,7 +177,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: k8s-flow-service-b
+  name: kubernetes-db-synch-flow-service-b
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
@@ -187,11 +187,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: k8s-flow-service-b
+      app: kubernetes-db-synch-flow-service-b
   template:
     metadata:
       labels:
-        app: k8s-flow-service-b
+        app: kubernetes-db-synch-flow-service-b
         sidecar.istio.io/inject: "false"
     spec:
       serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
@@ -203,9 +203,9 @@ spec:
             - name: UBIQUIA_AGENT_ID
               value: "bbbbbbbb-2222-0000-0000-000000000002"
             - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
-              value: "http://k8s-flow-service-b:8080"
+              value: "http://kubernetes-db-synch-flow-service-b:8080"
             - name: UBIQUIA_CLUSTER_KUBERNETES_EXTRA_PEER_BASE_URLS
-              value: "http://k8s-flow-service-a:8080"
+              value: "http://kubernetes-db-synch-flow-service-a:8080"
           ports:
             - containerPort: 8080
           volumeMounts:
@@ -237,7 +237,7 @@ spec:
       command: ["/bin/sh", "-c"]
       args:
         - |
-          for svc in k8s-flow-service-a k8s-flow-service-b; do
+          for svc in kubernetes-db-synch-flow-service-a kubernetes-db-synch-flow-service-b; do
             echo "Waiting for $svc to be healthy..."
             until [ "$(curl -s -o /dev/null -w '%{http_code}' http://$svc:8080/actuator/health)" = "200" ]; do
               echo "  $svc not healthy yet, retrying in 5s..."
@@ -300,9 +300,9 @@ spec:
             exit 1
           }
 
-          wait_for_health "k8s-flow-service-a" "http://k8s-flow-service-a:8080"
-          wait_for_health "k8s-flow-service-b" "http://k8s-flow-service-b:8080"
-          wait_for_ontology "k8s-flow-service-a" "http://k8s-flow-service-a:8080" "pets"
-          wait_for_ontology "k8s-flow-service-b" "http://k8s-flow-service-b:8080" "pets"
+          wait_for_health "kubernetes-db-synch-flow-service-a" "http://kubernetes-db-synch-flow-service-a:8080"
+          wait_for_health "kubernetes-db-synch-flow-service-b" "http://kubernetes-db-synch-flow-service-b:8080"
+          wait_for_ontology "kubernetes-db-synch-flow-service-a" "http://kubernetes-db-synch-flow-service-a:8080" "pets"
+          wait_for_ontology "kubernetes-db-synch-flow-service-b" "http://kubernetes-db-synch-flow-service-b:8080" "pets"
 
-          echo "K8s DB sync verification passed — pets ontology synchronized from k8s-flow-service-a to k8s-flow-service-b!"
+          echo "K8s DB sync verification passed — pets ontology synchronized from kubernetes-db-synch-flow-service-a to kubernetes-db-synch-flow-service-b!"

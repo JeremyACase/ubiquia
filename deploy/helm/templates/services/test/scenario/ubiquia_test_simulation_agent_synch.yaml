@@ -57,10 +57,10 @@ data:
         sync:
           microweight:
             enabled: true
-          peer-base-urls: http://synch-flow-service-a:8080,http://synch-flow-service-b:8080
+          peer-base-urls: http://agent-synch-flow-service-a:8080,http://agent-synch-flow-service-b:8080
         name: ubiquia-agent-synch-cluster
         port: 7800
-        seed-hosts: synch-flow-service-a[7800],synch-flow-service-b[7800]
+        seed-hosts: agent-synch-flow-service-a[7800],agent-synch-flow-service-b[7800]
       kubernetes:
         enabled: false
         namespace: {{ .Release.Namespace }}
@@ -107,17 +107,17 @@ data:
   simulation-agent-synch.yaml: |
     name: simulation-agent-synch
     agents:
-      - name: synch-flow-service-a
+      - name: agent-synch-flow-service-a
         mode: test
-        base_url: http://synch-flow-service-a:8080
-      - name: synch-flow-service-b
+        base_url: http://agent-synch-flow-service-a:8080
+      - name: agent-synch-flow-service-b
         mode: test
-        base_url: http://synch-flow-service-b:8080
+        base_url: http://agent-synch-flow-service-b:8080
     bootstrap:
       domain_ontologies:
         - file: /app/etc/ontologies/pets.yaml
           targets:
-            - synch-flow-service-a
+            - agent-synch-flow-service-a
     events: []
     networks: []
     speed: 1.0
@@ -125,7 +125,7 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: synch-flow-service-a
+  name: agent-synch-flow-service-a
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
@@ -133,7 +133,7 @@ metadata:
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   selector:
-    app: synch-flow-service-a
+    app: agent-synch-flow-service-a
   ports:
     - name: http
       port: 8080
@@ -145,7 +145,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: synch-flow-service-b
+  name: agent-synch-flow-service-b
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
@@ -153,7 +153,7 @@ metadata:
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   selector:
-    app: synch-flow-service-b
+    app: agent-synch-flow-service-b
   ports:
     - name: http
       port: 8080
@@ -165,7 +165,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: synch-flow-service-a
+  name: agent-synch-flow-service-a
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
@@ -175,11 +175,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: synch-flow-service-a
+      app: agent-synch-flow-service-a
   template:
     metadata:
       labels:
-        app: synch-flow-service-a
+        app: agent-synch-flow-service-a
         sidecar.istio.io/inject: "false"
     spec:
       serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
@@ -191,7 +191,7 @@ spec:
             - name: UBIQUIA_AGENT_ID
               value: "aaaaaaaa-2222-0000-0000-000000000001"
             - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
-              value: "http://synch-flow-service-a:8080"
+              value: "http://agent-synch-flow-service-a:8080"
           ports:
             - containerPort: 8080
             - containerPort: 7800
@@ -207,7 +207,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: synch-flow-service-b
+  name: agent-synch-flow-service-b
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
@@ -217,11 +217,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: synch-flow-service-b
+      app: agent-synch-flow-service-b
   template:
     metadata:
       labels:
-        app: synch-flow-service-b
+        app: agent-synch-flow-service-b
         sidecar.istio.io/inject: "false"
     spec:
       serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
@@ -233,7 +233,7 @@ spec:
             - name: UBIQUIA_AGENT_ID
               value: "bbbbbbbb-2222-0000-0000-000000000002"
             - name: UBIQUIA_CLUSTER_SYNC_LOCAL_BASE_URL
-              value: "http://synch-flow-service-b:8080"
+              value: "http://agent-synch-flow-service-b:8080"
           ports:
             - containerPort: 8080
             - containerPort: 7800
@@ -309,8 +309,8 @@ spec:
           set -e
 
           AGENT_A_ID="aaaaaaaa-2222-0000-0000-000000000001"
-          AGENT_A_URL="http://synch-flow-service-a:8080"
-          AGENT_B_URL="http://synch-flow-service-b:8080"
+          AGENT_A_URL="http://agent-synch-flow-service-a:8080"
+          AGENT_B_URL="http://agent-synch-flow-service-b:8080"
           MAX_ATTEMPTS=24
 
           # --- Step 1: verify agent-b received the entities from agent-a ---
