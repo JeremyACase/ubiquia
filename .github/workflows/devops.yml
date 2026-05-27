@@ -305,8 +305,8 @@ jobs:
 
       - name: Pre-pull and load PostgreSQL image into KinD
         run: |
-          docker pull docker.io/bitnami/postgresql:17
-          kind load docker-image --name ubiquia-agent-0 docker.io/bitnami/postgresql:17
+          docker pull docker.io/bitnami/postgresql:latest
+          kind load docker-image --name ubiquia-agent-0 docker.io/bitnami/postgresql:latest
 
       - name: Deploy Helm chart with PostgreSQL (images tagged as latest)
         run: |
