@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.34.0] - 2026-05-26
+### Added
+- PostgreSQL Helm dependency (bitnami/postgresql 16.4.4), conditionally enabled via `postgresql.enabled`; `ubiquia.agent.database.type` value (`H2` or `Postgres`) selects the datasource in the core-flow-service configmap at render time
+- `middleweight` deployment configurations: `prod/middleweight.yaml`, `dev/middleweight-dev.yaml`, `test/build-pipeline-middleweight.yaml`; use Postgres instead of the default in-memory H2 database
+- Busybox init container on the core-flow-service Deployment that blocks startup until PostgreSQL port 5432 is reachable; only rendered when `ubiquia.agent.database.type` is `Postgres`
+- `integration/postgres/ubiquia_test_middleweight_postgres.yaml`: Helm test that verifies the core-flow-service health endpoint reports a PostgreSQL datasource when deployed with the middleweight config; gated by `testing.postgres.enabled`
+- `integration-test-postgres` CI job in `devops.yml`: deploys with `build-pipeline-middleweight.yaml` and runs the PostgreSQL integration test in isolation
+- `scenario-tests` CI job in `devops.yml`: runs scenario Helm tests against the base H2 deployment
+
+### Changed
+- Helm test templates reorganized into `systems/`, `integration/postgres/`, and `scenario/` subdirectories; simulation tests moved from `systems/` to `scenario/`
+- CI job `helm-test` renamed to `systems-tests`; `push-images` now depends on `systems-tests`, `integration-test-postgres`, and `scenario-tests`
+
+### Fixed
+- `BeliefStateOperator.tryDeployBeliefState()`: existence check was keyed on `getName().toLowerCase() + getVersion()` (e.g. `"pets1.2.3"`) instead of the canonical Kubernetes resource name from `BeliefStateNameBuilder`; injected `BeliefStateNameBuilder` and replaced the check with `getKubernetesBeliefStateNameFrom(domainOntology)`, eliminating intermittent `AlreadyExists` 400 errors on repeated deployments
+
 ## [0.33.0] - 2026-05-25
 ### Added
 - `SyncController`: `GET /ubiquia/core/flow-service/sync/query/params` endpoint for paginated, filterable queries over `SyncEntity` records; supports dot-notation nested field filters (e.g. `sourceAgent.id=<uuid>`)

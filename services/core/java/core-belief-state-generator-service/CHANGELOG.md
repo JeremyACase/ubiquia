@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.34.0] - 2026-05-26
+### Fixed
+- `BeliefStateOperator.tryDeployBeliefState()`: deployment existence check used `getName().toLowerCase() + getVersion()` (e.g. `"pets1.2.3"`) as the lookup key instead of the canonical Kubernetes name produced by `BeliefStateNameBuilder.getKubernetesBeliefStateNameFrom()` (e.g. `"pets-belief-state-1-2-3"`); injected `BeliefStateNameBuilder` and corrected the check, eliminating intermittent `AlreadyExists` 400 errors when the same domain ontology was deployed more than once
+
 ## [0.30.1] - 2026-05-19
 ### Changed
 - `ObjectController.java.template`: updated to extend `AbstractDomainModelController<ObjectMetadataEntity, ObjectMetadataDto>` with belief-state-owned entity and DTO types; removed dependency on core `GenericUbiquiaDaoController`, `ObjectMetadata`, and `ObjectMetadataEntity`

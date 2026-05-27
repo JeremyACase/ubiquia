@@ -41,16 +41,25 @@ data:
       application:
         name: flow-service
       datasource:
+        {{- if eq .Values.ubiquia.agent.database.type "Postgres" }}
+        driverClassName: org.postgresql.Driver
+        url: jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.auth.database }}
+        username: {{ .Values.postgresql.auth.username }}
+        password: {{ .Values.postgresql.auth.password }}
+        {{- else }}
         driverClassName: org.h2.Driver
         url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1
         username: sa
         password: sa
+        {{- end }}
         hikari:
           transaction-isolation: {{ .Values.ubiquia.agent.database.transactionIsolation }}
+      {{- if ne .Values.ubiquia.agent.database.type "Postgres" }}
       h2:
         console:
           enabled: true
           path: /h2-console
+      {{- end }}
       jackson:
         date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
         deserialization:

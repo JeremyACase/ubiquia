@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.ubiquia.common.library.implementation.service.builder.BeliefStateNameBuilder;
 import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.core.belief.state.generator.service.builder.BeliefStateDeploymentBuilder;
@@ -33,6 +34,9 @@ class BeliefStateOperatorTest {
 
     @Mock
     private BeliefStateDeploymentBuilder beliefStateDeploymentBuilder;
+
+    @Mock
+    private BeliefStateNameBuilder beliefStateNameBuilder;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -75,6 +79,7 @@ class BeliefStateOperatorTest {
         operator = new BeliefStateOperator();
 
         ReflectionTestUtils.setField(operator, "beliefStateDeploymentBuilder", beliefStateDeploymentBuilder);
+        ReflectionTestUtils.setField(operator, "beliefStateNameBuilder", beliefStateNameBuilder);
         ReflectionTestUtils.setField(operator, "objectMapper", objectMapper);
         ReflectionTestUtils.setField(operator, "deploymentClient", deploymentClient);
         ReflectionTestUtils.setField(operator, "serviceClient", serviceClient);
@@ -88,10 +93,12 @@ class BeliefStateOperatorTest {
 
         when(domainOntology.getName()).thenReturn("MyDomain");
         when(domainOntology.getVersion()).thenReturn(semanticVersion(1, 0, 0));
+        when(beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(domainOntology))
+            .thenReturn("mydomain-belief-state-1-0-0");
 
         var getResponse = mock(KubernetesApiResponse.class);
         when(getResponse.getObject()).thenReturn(null);
-        when(deploymentClient.get("test-ns", "mydomain1.0.0")).thenReturn(getResponse);
+        when(deploymentClient.get("test-ns", "mydomain-belief-state-1-0-0")).thenReturn(getResponse);
 
         var deployment = new V1Deployment();
         var service = new V1Service();
@@ -119,10 +126,12 @@ class BeliefStateOperatorTest {
     void tryDeployBeliefState_whenDeploymentExists_doesNothing() throws Exception {
         when(domainOntology.getName()).thenReturn("MyDomain");
         when(domainOntology.getVersion()).thenReturn(semanticVersion(1, 2, 3));
+        when(beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(domainOntology))
+            .thenReturn("mydomain-belief-state-1-2-3");
 
         var getResponse = mock(KubernetesApiResponse.class);
         when(getResponse.getObject()).thenReturn(new V1Deployment());
-        when(deploymentClient.get("test-ns", "mydomain1.2.3")).thenReturn(getResponse);
+        when(deploymentClient.get("test-ns", "mydomain-belief-state-1-2-3")).thenReturn(getResponse);
 
         operator.tryDeployBeliefState(domainOntology);
 
@@ -138,10 +147,12 @@ class BeliefStateOperatorTest {
 
         when(domainOntology.getName()).thenReturn("MyDomain");
         when(domainOntology.getVersion()).thenReturn(semanticVersion(2, 0, 0));
+        when(beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(domainOntology))
+            .thenReturn("mydomain-belief-state-2-0-0");
 
         var getResponse = mock(KubernetesApiResponse.class);
         when(getResponse.getObject()).thenReturn(null);
-        when(deploymentClient.get("test-ns", "mydomain2.0.0")).thenReturn(getResponse);
+        when(deploymentClient.get("test-ns", "mydomain-belief-state-2-0-0")).thenReturn(getResponse);
 
         var deployment = new V1Deployment();
         when(beliefStateDeploymentBuilder.buildDeploymentFrom(domainOntology)).thenReturn(deployment);

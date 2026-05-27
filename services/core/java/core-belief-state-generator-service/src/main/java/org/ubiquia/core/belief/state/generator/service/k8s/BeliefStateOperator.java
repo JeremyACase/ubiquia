@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.ubiquia.common.library.implementation.service.builder.BeliefStateNameBuilder;
 import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.core.belief.state.generator.service.builder.BeliefStateDeploymentBuilder;
 
@@ -40,6 +41,8 @@ public class BeliefStateOperator {
     private ApiClient apiClient;
     @Autowired
     private BeliefStateDeploymentBuilder beliefStateDeploymentBuilder;
+    @Autowired
+    private BeliefStateNameBuilder beliefStateNameBuilder;
     private GenericKubernetesApi<V1Deployment, V1DeploymentList> deploymentClient;
     private Integer deploymentRetries = 0;
     @Value("${ubiquia.kubernetes.namespace}")
@@ -133,9 +136,10 @@ public class BeliefStateOperator {
             domainOntology.getName(),
             domainOntology.getVersion());
 
+        var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(domainOntology);
         var currentDeployment = this.deploymentClient.get(
             this.namespace,
-            domainOntology.getName().toLowerCase() + domainOntology.getVersion());
+            beliefStateName);
 
         if (Objects.isNull(currentDeployment.getObject())) {
             logger.info("...no current deployment exists, attempting to deploy...");

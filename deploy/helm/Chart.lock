@@ -1,4 +1,7 @@
 dependencies:
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 16.4.4
 - name: minio
   repository: https://charts.bitnami.com/bitnami
   version: 17.0.21
@@ -8,5 +11,5 @@ dependencies:
 - name: grafana
   repository: https://grafana.github.io/helm-charts
   version: 8.10.4
-digest: sha256:3138c116db2291d073bf961e8253c50d87237d76f98359dfb0cc4e0b03416547
-generated: "2026-05-18T16:07:44.3383568-08:00"
+digest: sha256:7c3fe01daf4a28c441efaa965a908cb430ffbf3b88dea14801f79d59270dc378
+generated: "2026-05-26T13:27:27.9111003-08:00"

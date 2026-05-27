@@ -1,0 +1,70 @@
+logging:
+  ubiquia: DEBUG
+
+ubiquia:
+  mode: TEST
+  cluster:
+    flowService:
+      sync:
+        enabled: false
+    name: ubiquia-cluster
+    port: 7800
+    seedHosts:
+  agent:
+    database:
+      type: Postgres
+    flowService:
+      bootstrap:
+        enabled: false
+      graph:
+        deployments:
+    storage:
+      minio:
+        enabled: false
+  components:
+    core:
+      beliefStateGeneratorService:
+        image:
+          registry: docker.io/ubiquia
+          repository: core-belief-state-generator-service
+          tag: latest
+      communicationService:
+        image:
+          registry: docker.io/ubiquia
+          repository: core-communication-service
+          tag: latest
+      flowService:
+        image:
+          registry: docker.io/ubiquia
+          repository: core-flow-service
+          tag: latest
+    test:
+      beliefStateGeneratorService:
+        image:
+          registry: docker.io/ubiquia
+          repository: test-belief-state-generator-service
+          tag: latest
+    util:
+      simulationService:
+        image:
+          registry: docker.io/ubiquia
+          repository: util-simulation-service
+          tag: latest
+
+telemetry:
+  prometheus:
+    enabled: false
+    install: false
+  grafana:
+    install: false
+
+postgresql:
+  enabled: true
+  auth:
+    database: ubiquia
+    username: ubiquia
+    password: ubiquia
+
+testing:
+  postgres:
+    enabled: true
