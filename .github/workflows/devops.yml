@@ -309,7 +309,7 @@ jobs:
 
       - name: Wait for PostgreSQL to be ready
         run: |
-          kubectl rollout status statefulset/ubiquia-postgresql -n ubiquia --timeout=300s
+          kubectl rollout status statefulset/ubiquia-postgresql -n ubiquia --timeout=600s
 
       - name: Wait for core-flow-service to be available
         run: |

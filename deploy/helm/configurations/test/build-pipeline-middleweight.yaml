@@ -64,6 +64,10 @@ postgresql:
     database: ubiquia
     username: ubiquia
     password: ubiquia
+  primary:
+    persistence:
+      enabled: false
+    resources: {}
 
 testing:
   postgres:
