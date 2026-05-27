@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.34.0] - 2026-05-26
+### Added
+- Conditional datasource configuration in the Helm configmap: `ubiquia.agent.database.type: Postgres` renders the PostgreSQL JDBC driver and connection URL (`jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/...`); `H2` (default) renders the existing in-memory H2 config
+- Busybox init container on the Deployment that polls `nc -z {{ .Release.Name }}-postgresql 5432` before allowing Spring Boot to start; only rendered when `ubiquia.agent.database.type` is `Postgres`
+
 ## [0.33.0] - 2026-05-25
 ### Added
 - `SyncController`: `GET /ubiquia/core/flow-service/sync/query/params` — paginated query over `SyncEntity` records; supports arbitrary field filters including nested dot-notation (e.g. `sourceAgent.id=<uuid>`)

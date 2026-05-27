@@ -13,4 +13,7 @@ helm repo add yugabyte https://charts.yugabyte.com
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo add grafana https://grafana.github.io/helm-charts
 
+echo ...updating repos...
+helm repo update
+
 echo ...done.

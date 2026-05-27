@@ -1,0 +1,65 @@
+{{- if ((.Values.testing).postgres).enabled }}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubiquia-test-middleweight-postgres
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    sidecar.istio.io/inject: "false"
+spec:
+  serviceAccountName: {{ include "ubiquia.serviceAccountName" . }}
+  restartPolicy: Never
+  activeDeadlineSeconds: 420
+  containers:
+    - name: verify
+      image: curlimages/curl:8.6.0
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          FLOW_URL="http://ubiquia-core-flow-service:8080"
+          MAX_ATTEMPTS=60
+
+          echo "=== Middleweight Postgres Test ==="
+
+          echo "Waiting for core-flow-service to become healthy..."
+          ATTEMPT=0
+          while [ "$ATTEMPT" -lt "$MAX_ATTEMPTS" ]; do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "$FLOW_URL/actuator/health" 2>/dev/null)
+            echo "  [$ATTEMPT/$MAX_ATTEMPTS] HTTP $HTTP_CODE"
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "  core-flow-service is healthy."
+              break
+            fi
+            ATTEMPT=$((ATTEMPT + 1))
+            sleep 5
+          done
+
+          if [ "$ATTEMPT" -eq "$MAX_ATTEMPTS" ]; then
+            echo "ERROR: core-flow-service did not become healthy after $((MAX_ATTEMPTS * 5))s"
+            exit 1
+          fi
+
+          echo "Fetching health response..."
+          HEALTH=$(curl -s --max-time 5 "$FLOW_URL/actuator/health" 2>/dev/null)
+          echo "Health response: $HEALTH"
+
+          if echo "$HEALTH" | grep -q "PostgreSQL"; then
+            echo "Confirmed: datasource is PostgreSQL."
+          else
+            echo "ERROR: PostgreSQL not found in health response."
+            exit 1
+          fi
+
+          if echo "$HEALTH" | grep -q '"status":"UP"'; then
+            echo "DB health component is UP."
+          else
+            echo "ERROR: DB health component not UP."
+            exit 1
+          fi
+
+          echo "=== Middleweight Postgres test passed ==="
+{{- end }}

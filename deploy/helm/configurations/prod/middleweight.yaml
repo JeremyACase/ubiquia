@@ -1,0 +1,16 @@
+logging:
+  ubiquia: INFO
+
+ubiquia:
+  mode: PROD
+  cluster:
+  agent:
+    database:
+      type: Postgres
+
+postgresql:
+  enabled: true
+  auth:
+    database: ubiquia
+    username: ubiquia
+    password: ubiquia
