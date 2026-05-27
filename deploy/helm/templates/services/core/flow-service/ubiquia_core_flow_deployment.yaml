@@ -69,18 +69,25 @@ spec:
               mountPath: /app/etc/graphs
             - name: config
               mountPath: /app/etc
-          readinessProbe:
+          startupProbe:
             httpGet:
               path: /actuator/health
               port: {{ .Values.convenience.variables.spring.port }}
             initialDelaySeconds: 30
             periodSeconds: 10
-            failureThreshold: 30
+            failureThreshold: 36
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.convenience.variables.spring.port }}
+            periodSeconds: 10
+            failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /actuator/health
               port: {{ .Values.convenience.variables.spring.port }}
-            initialDelaySeconds: 180
+            periodSeconds: 10
+            failureThreshold: 3
           image: {{ include "ubiquia.core.flowService.image" . }}
           imagePullPolicy: {{ .Values.infrastructure.image.pullPolicy }}
           ports:
