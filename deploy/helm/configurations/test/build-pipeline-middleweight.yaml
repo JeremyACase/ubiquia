@@ -60,6 +60,8 @@ telemetry:
 
 postgresql:
   enabled: true
+  image:
+    tag: "17"
   auth:
     database: ubiquia
     username: ubiquia
