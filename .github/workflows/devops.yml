@@ -303,6 +303,18 @@ jobs:
         run: |
           helm dependency build deploy/helm/
 
+      - name: Pre-pull and load PostgreSQL image into KinD
+        run: |
+          FULL_IMAGE=$(tar -xzf deploy/helm/charts/postgresql-16.4.4.tgz -O postgresql/values.yaml | python3 -c "
+          import sys, yaml
+          v = yaml.safe_load(sys.stdin)
+          img = v['image']
+          print(img['registry'] + '/' + img['repository'] + ':' + str(img['tag']))
+          ")
+          echo "Pre-pulling PostgreSQL image: $FULL_IMAGE"
+          docker pull "$FULL_IMAGE"
+          kind load docker-image --name ubiquia-agent-0 "$FULL_IMAGE"
+
       - name: Deploy Helm chart with PostgreSQL (images tagged as latest)
         run: |
           helm install ubiquia deploy/helm/ --values deploy/helm/configurations/test/build-pipeline-middleweight.yaml -n ubiquia
