@@ -8,10 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.34.0] - 2026-05-26
 ### Added
 - PostgreSQL Helm dependency (bitnami/postgresql 16.4.4), conditionally enabled via `postgresql.enabled`; `ubiquia.agent.database.type` value (`H2` or `Postgres`) selects the datasource in the core-flow-service configmap at render time
-- `middleweight` deployment configurations: `prod/middleweight.yaml`, `dev/middleweight-dev.yaml`, `test/build-pipeline-middleweight.yaml`; use Postgres instead of the default in-memory H2 database
+- `middleweight` deployment configurations: `prod/middleweight.yaml`, `dev/middleweight-dev.yaml`, `test/integration-test-postgres.yaml`; use Postgres instead of the default in-memory H2 database
 - Busybox init container on the core-flow-service Deployment that blocks startup until PostgreSQL port 5432 is reachable; only rendered when `ubiquia.agent.database.type` is `Postgres`
 - `integration/postgres/ubiquia_test_middleweight_postgres.yaml`: Helm test that verifies the core-flow-service health endpoint reports a PostgreSQL datasource when deployed with the middleweight config; gated by `testing.postgres.enabled`
-- `integration-test-postgres` CI job in `devops.yml`: deploys with `build-pipeline-middleweight.yaml` and runs the PostgreSQL integration test in isolation
+- `integration-test-postgres` CI job in `devops.yml`: deploys with `integration-test-postgres.yaml` and runs the PostgreSQL integration test in isolation
 - `scenario-tests` CI job in `devops.yml`: runs scenario Helm tests against the base H2 deployment
 
 ### Changed

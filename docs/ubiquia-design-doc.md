@@ -290,7 +290,7 @@ helm/
 │   │   ├── featherweight-dev.yaml
 │   │   └── lightweight-dev.yaml
 │   ├── test/
-│   │   └── build-pipeline.yaml          
+│   │   └── system-tests.yaml          
 │   └── prod/          
 │       ├── featherweight.yaml
 │       ├── lightweight.yaml
