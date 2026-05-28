@@ -1,0 +1,17 @@
+logging:
+  ubiquia: INFO
+
+ubiquia:
+  mode: PROD
+  cluster:
+  agent:
+    database:
+      type: YugabyteDB
+      yugabyte:
+        enabled: true
+
+yugabytedb:
+  auth:
+    database: yugabyte
+    username: yugabyte
+    password: yugabyte

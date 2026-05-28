@@ -13,6 +13,8 @@ ubiquia:
   agent:
     database:
       type: Postgres
+      postgres:
+        enabled: true
     flowService:
       bootstrap:
         enabled: true
@@ -60,7 +62,6 @@ telemetry:
     install: false
 
 postgresql:
-  enabled: true
   auth:
     database: ubiquia
     username: ubiquia

@@ -12,8 +12,8 @@ ubiquia:
     seedHosts:
   agent:
     database:
-      type: Postgres
-      postgres:
+      type: YugabyteDB
+      yugabyte:
         enabled: true
     flowService:
       bootstrap:
@@ -62,34 +62,25 @@ telemetry:
   grafana:
     install: false
 
-postgresql:
-  image:
-    tag: latest
+yugabytedb:
   auth:
-    database: ubiquia
-    username: ubiquia
-    password: ubiquia
-  primary:
-    persistence:
-      enabled: false
-    resources: {}
-    startupProbe:
-      enabled: true
-      initialDelaySeconds: 15
-      periodSeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 30
-    readinessProbe:
-      initialDelaySeconds: 10
-      periodSeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 30
-    livenessProbe:
-      initialDelaySeconds: 60
-      periodSeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 10
+    database: yugabyte
+    username: yugabyte
+    password: yugabyte
+  replicas:
+    master: 1
+    tserver: 1
+  storage:
+    master:
+      storageClass: "standard"
+      size: 1Gi
+    tserver:
+      storageClass: "standard"
+      size: 1Gi
+  gflags:
+    master:
+      replication_factor: "1"
 
 testing:
-  postgres:
+  yugabyte:
     enabled: true

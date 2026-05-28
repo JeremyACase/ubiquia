@@ -58,6 +58,19 @@ spec:
                 sleep 2
               done
               echo "  PostgreSQL is ready."
+      {{- else if eq .Values.ubiquia.agent.database.type "YugabyteDB" }}
+      initContainers:
+        - name: wait-for-yugabyte
+          image: busybox:1.36
+          command: ['sh', '-c']
+          args:
+            - |
+              echo "Waiting for YugabyteDB to accept connections..."
+              until nc -z {{ .Release.Name }}-yb-tservers 5433; do
+                echo "  YugabyteDB not ready, retrying in 2s..."
+                sleep 2
+              done
+              echo "  YugabyteDB is ready."
       {{- end }}
 
       containers:

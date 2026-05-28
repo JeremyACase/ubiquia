@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.35.0] - 2026-05-27
+### Added
+- `integration/yugabyte/ubiquia_test_heavyweight_yugabyte.yaml`: Helm test for the YugabyteDB heavyweight deployment tier; waits for core-flow-service to become healthy, then asserts the `/actuator/health` response contains `"PostgreSQL"` (YugabyteDB YSQL) and `"status":"UP"`; gated by `testing.yugabyte.enabled`
+
+### Changed
+- Helm test agent and service names updated across all integration tests to include the test name as a prefix, making spawned resources identifiable by which test created them
+
 ## [0.31.0] - 2026-05-21
 ### Added
 - `ubiquia_test_kubernetes_db_synch.yaml`: new Helm test; two independent K8s flow-service Deployments (`k8s-flow-service-a`, `k8s-flow-service-b`) with a shared H2 database; asserts that the `pets` ontology bootstrapped into service-a is propagated to service-b via `ExtraKubernetesSynchronizationService` within the sync window

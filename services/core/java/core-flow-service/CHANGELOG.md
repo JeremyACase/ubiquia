@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.35.0] - 2026-05-27
+### Added
+- YugabyteDB datasource branch in the Helm configmap: `ubiquia.agent.database.type: YugabyteDB` renders the PostgreSQL JDBC driver with `jdbc:postgresql://{{ .Release.Name }}-yb-tservers:5433/...`
+- Busybox init container on the Deployment that polls `nc -z {{ .Release.Name }}-yb-tservers 5433` before allowing Spring Boot to start; only rendered when `ubiquia.agent.database.type` is `YugabyteDB`
+
+### Changed
+- Database dependency flag paths moved from top-level `postgresql.enabled` / `yugabytedb.enabled` to `ubiquia.agent.database.postgres.enabled` / `ubiquia.agent.database.yugabyte.enabled`
+
 ## [0.34.0] - 2026-05-26
 ### Added
 - Conditional datasource configuration in the Helm configmap: `ubiquia.agent.database.type: Postgres` renders the PostgreSQL JDBC driver and connection URL (`jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/...`); `H2` (default) renders the existing in-memory H2 config
