@@ -24,11 +24,13 @@ ubiquia:
   components:
     core:
       beliefStateGeneratorService:
+        replicas: 0
         image:
           registry: docker.io/ubiquia
           repository: core-belief-state-generator-service
           tag: latest
       communicationService:
+        replicas: 0
         image:
           registry: docker.io/ubiquia
           repository: core-communication-service
