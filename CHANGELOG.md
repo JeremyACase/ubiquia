@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.35.0] - 2026-05-27
+### Added
+- YugabyteDB `heavyweight` deployment tier: `prod/heavyweight.yaml`, `test/integration-test-yugabyte.yaml`; uses YugabyteDB YSQL (PostgreSQL-compatible JDBC on port 5433) instead of H2 or PostgreSQL
+- YugabyteDB Helm dependency (`yugabyte 2025.2.3` from `https://charts.yugabyte.com`), conditioned on `ubiquia.agent.database.yugabyte.enabled`
+- Busybox init container on core-flow-service Deployment that blocks startup until YugabyteDB tserver port 5433 is reachable; only rendered when `ubiquia.agent.database.type` is `YugabyteDB`
+- `integration/yugabyte/ubiquia_test_heavyweight_yugabyte.yaml`: Helm test that verifies the core-flow-service health endpoint reports a PostgreSQL-compatible datasource (YugabyteDB YSQL) and `"status":"UP"` when deployed with the heavyweight config; gated by `testing.yugabyte.enabled`
+- `integration-test-yugabyte` CI job in `devops.yml` (currently disabled via `if: false`): deploys with `integration-test-yugabyte.yaml` and runs the YugabyteDB heavyweight integration test in isolation
+
+### Changed
+- `postgresql.enabled` and `yugabytedb.enabled` moved from top-level Helm values into `ubiquia.agent.database.postgres.enabled` and `ubiquia.agent.database.yugabyte.enabled`; `Chart.yaml` dependency conditions updated accordingly
+- All deployment configuration overlays (`prod/middleweight.yaml`, `prod/heavyweight.yaml`, `dev/middleweight-dev.yaml`, `test/integration-test-postgres.yaml`, `test/integration-test-yugabyte.yaml`) updated to set the enabled flag under `ubiquia.agent.database`
+- YugabyteDB datasource branch added to the core-flow-service configmap: `ubiquia.agent.database.type: YugabyteDB` renders the PostgreSQL JDBC driver with `jdbc:postgresql://{{ .Release.Name }}-yb-tservers:5433/...`
+
 ## [0.34.0] - 2026-05-26
 ### Added
 - PostgreSQL Helm dependency (bitnami/postgresql 16.4.4), conditionally enabled via `postgresql.enabled`; `ubiquia.agent.database.type` value (`H2` or `Postgres`) selects the datasource in the core-flow-service configmap at render time

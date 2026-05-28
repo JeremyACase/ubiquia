@@ -28,8 +28,12 @@ ubiquia:
     # This is a default UUID for development purposes
     id: 0328ca73-4d50-409f-85a8-7168ce80bd96
     database:
-      # Allowable values are: H2, Postgres
+      # Allowable values are: H2, Postgres, YugabyteDB
       type: H2
+      postgres:
+        enabled: false
+      yugabyte:
+        enabled: false
       ddlAutoSetting: create
       # ANSI Database Level Isolation (https://en.wikipedia.org/wiki/Isolation_(database_systems))
       # values are: TRANSACTION_READ_UNCOMMITTED (0), TRANSACTION_READ_COMMITTED (1), TRANSACTION_REPEATABLE_READ (2), TRANSACTION_SERIALIZABLE (3)
@@ -111,11 +115,16 @@ grafana:
 
 # Dependency Overrides
 postgresql:
-  enabled: false
   auth:
     database: ubiquia
     username: ubiquia
     password: ubiquia
+
+yugabytedb:
+  auth:
+    database: yugabyte
+    username: yugabyte
+    password: yugabyte
 
 minio:
   image:

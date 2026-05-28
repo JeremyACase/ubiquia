@@ -356,6 +356,124 @@ jobs:
             echo ""
           done
 
+  integration-test-yugabyte:
+    if: false
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Kubernetes with KinD
+        uses: helm/kind-action@v1.5.0
+
+      - name: Ensure KinD cluster exists
+        run: |
+          kind get clusters | grep -q "^ubiquia-agent-0$" || kind create cluster --name ubiquia-agent-0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4.3.1
+        with:
+          version: v3.19.0
+
+      - name: Create shared belief state mount inside KinD node
+        run: |
+          docker exec ubiquia-agent-0-control-plane mkdir -p /mnt/data/belief-state-jars
+
+      - name: Create namespace
+        run: |
+          kubectl create namespace ubiquia || echo "Namespace 'ubiquia' already exists"
+
+      - name: Apply supporting manifests (RBAC and PV)
+        run: |
+          kubectl apply -f deploy/config/test/ubiquia_test_service_account.yaml -n ubiquia
+          kubectl apply -f deploy/config/test/ubiquia_test_kind_pv.yaml -n ubiquia
+
+      - name: Download Docker image artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+          path: docker-images
+
+      - name: Load Docker images into Docker and KinD (tagged as latest)
+        shell: bash
+        run: |
+          set -euo pipefail
+          IFS=$'\n'
+          for dir in $SUBPROJECTS; do
+            project_name="$(basename "$dir")"
+            IMAGE_NAME="${DOCKER_REPO}/${project_name}"
+            echo "Loading docker image from docker-images/${project_name}.tar"
+            docker load -i "docker-images/${project_name}.tar"
+            kind load docker-image --name ubiquia-agent-0 "$IMAGE_NAME:latest"
+          done
+
+      - name: List Docker images loaded into KinD node
+        run: |
+          echo "=== Docker images in KinD node ==="
+          docker exec "$(docker ps -q -f name=ubiquia-agent-0-control-plane)" crictl images
+
+      - name: Add Helm repositories
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add yugabytedb https://charts.yugabyte.com
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo update
+
+      - name: Build Helm chart dependencies
+        run: |
+          helm dependency build deploy/helm/
+
+      - name: Deploy Helm chart with YugabyteDB (images tagged as latest)
+        run: |
+          helm install ubiquia deploy/helm/ --values deploy/helm/configurations/test/integration-test-yugabyte.yaml -n ubiquia
+
+      - name: Wait for YugabyteDB to be ready
+        run: |
+          kubectl rollout status statefulset/ubiquia-yb-master -n ubiquia --timeout=600s
+          kubectl rollout status statefulset/ubiquia-yb-tserver -n ubiquia --timeout=600s
+
+      - name: Wait for core-flow-service to be available
+        run: |
+          kubectl wait deployment ubiquia-core-flow-service -n ubiquia --for=condition=Available --timeout=600s
+
+      - name: Inspect resources before Helm test
+        run: |
+          echo "=== Pods ==="
+          kubectl get pods -n ubiquia -o wide
+          echo "=== Services ==="
+          kubectl get svc -n ubiquia
+          echo "=== ConfigMaps ==="
+          kubectl get configmaps -n ubiquia
+
+      - name: Run yugabyte integration test
+        run: |
+          helm test ubiquia -n ubiquia --filter name=ubiquia-test-heavyweight-yugabyte --timeout 15m
+
+      - name: Inspect resources after Helm test
+        if: always()
+        run: |
+          echo "=== Pods ==="
+          kubectl get pods -n ubiquia -o wide
+          echo "=== Services ==="
+          kubectl get svc -n ubiquia
+          echo "=== ConfigMaps ==="
+          kubectl get configmaps -n ubiquia
+
+      - name: Dump logs from all pods in ubiquia namespace
+        if: always()
+        run: |
+          echo "Getting logs from all pods in namespace 'ubiquia'..."
+          for pod in $(kubectl get pods -n ubiquia --no-headers -o custom-columns=":metadata.name"); do
+            echo "=============================="
+            echo "Logs for pod: $pod"
+            echo "=============================="
+            kubectl logs -n ubiquia "$pod" || echo "Failed to get logs for $pod"
+            echo ""
+          done
+
   scenario-tests:
     needs: build
     runs-on: ubuntu-latest
