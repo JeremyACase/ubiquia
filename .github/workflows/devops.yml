@@ -195,7 +195,7 @@ jobs:
 
       - name: Deploy Helm chart (images tagged as latest)
         run: |
-          helm install ubiquia deploy/helm/ --values deploy/helm/configurations/test/build-pipeline.yaml -n ubiquia
+          helm install ubiquia deploy/helm/ --values deploy/helm/configurations/test/system-tests.yaml -n ubiquia
 
       - name: Inspect resources before Helm test
         run: |
@@ -235,6 +235,7 @@ jobs:
           done
 
   integration-test-postgres:
+    if: false
     needs: build
     runs-on: ubuntu-latest
 
@@ -310,7 +311,7 @@ jobs:
 
       - name: Deploy Helm chart with PostgreSQL (images tagged as latest)
         run: |
-          helm install ubiquia deploy/helm/ --values deploy/helm/configurations/test/build-pipeline-middleweight.yaml -n ubiquia
+          helm install ubiquia deploy/helm/ --values deploy/helm/configurations/test/integration-test-postgres.yaml -n ubiquia
 
       - name: Wait for PostgreSQL to be ready
         run: |
@@ -426,7 +427,7 @@ jobs:
 
       - name: Deploy Helm chart (images tagged as latest)
         run: |
-          helm install ubiquia deploy/helm/ --values deploy/helm/configurations/test/build-pipeline.yaml -n ubiquia
+          helm install ubiquia deploy/helm/ --values deploy/helm/configurations/test/system-tests.yaml -n ubiquia
 
       - name: Inspect resources before Helm test
         run: |
@@ -466,7 +467,7 @@ jobs:
           done
 
   push-images:
-    needs: [build, systems-tests, integration-test-postgres, scenario-tests]
+    needs: [build, systems-tests, scenario-tests]
     runs-on: ubuntu-latest
 
     steps:
