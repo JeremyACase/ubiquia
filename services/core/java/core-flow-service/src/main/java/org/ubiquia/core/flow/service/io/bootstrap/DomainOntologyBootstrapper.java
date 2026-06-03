@@ -57,6 +57,6 @@ public class DomainOntologyBootstrapper implements InterfaceBootstrapper {
                     e.getMessage());
             }
         }
-        logger.info("...completed bootstrapping agent communication languages.");
+        logger.info("...completed bootstrapping domain ontologies.");
     }
 }

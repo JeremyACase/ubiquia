@@ -3,7 +3,7 @@ import { BookOpen, GitBranch, Network, Activity, Database, Cpu } from 'lucide-re
 
 const NAV = [
   { to: '/ontologies', label: 'Domain Ontologies', icon: BookOpen },
-  { to: '/dags', label: 'DAG Graphs', icon: GitBranch },
+  { to: '/dags', label: 'DAGs', icon: GitBranch },
   { to: '/agents', label: 'Agent Network', icon: Network },
   { to: '/flows', label: 'Flow Tracing', icon: Activity },
   { to: '/belief-states', label: 'Belief States', icon: Database },

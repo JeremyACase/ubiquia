@@ -1,9 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Layout } from '@/components/Layout'
-import { Placeholder } from '@/components/Placeholder'
 import { OntologiesPanel } from '@/panels/OntologiesPanel'
 import { DagsPanel } from '@/panels/DagsPanel'
+import { AgentNetworkPanel } from '@/panels/AgentNetworkPanel'
+import { ComponentsPanel } from '@/panels/ComponentsPanel'
+import { BeliefStatesPanel } from '@/panels/BeliefStatesPanel'
+import { FlowTracingPanel } from '@/panels/FlowTracingPanel'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,42 +26,10 @@ export default function App() {
             <Route index element={<Navigate to="/ontologies" replace />} />
             <Route path="ontologies" element={<OntologiesPanel />} />
             <Route path="dags" element={<DagsPanel />} />
-            <Route
-              path="agents"
-              element={
-                <Placeholder
-                  title="Agent Network"
-                  description="Online Ubiquia agents, sync status, cluster membership, and pending outbox records."
-                />
-              }
-            />
-            <Route
-              path="flows"
-              element={
-                <Placeholder
-                  title="Flow Tracing"
-                  description="Track active FlowIds through DAG pipelines — completion rates, durations, and failure details."
-                />
-              }
-            />
-            <Route
-              path="belief-states"
-              element={
-                <Placeholder
-                  title="Belief States"
-                  description="Deployed belief state services, record counts, schema versions, and inline query."
-                />
-              }
-            />
-            <Route
-              path="components"
-              element={
-                <Placeholder
-                  title="Components"
-                  description="Deployed component pods, container images, health status, and backpressure indicators."
-                />
-              }
-            />
+            <Route path="agents" element={<AgentNetworkPanel />} />
+            <Route path="flows" element={<FlowTracingPanel />} />
+            <Route path="belief-states" element={<BeliefStatesPanel />} />
+            <Route path="components" element={<ComponentsPanel />} />
           </Route>
         </Routes>
       </BrowserRouter>

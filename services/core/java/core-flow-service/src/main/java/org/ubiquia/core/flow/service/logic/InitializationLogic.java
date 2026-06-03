@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.service.io.bootstrap.BeliefStateBootstrapper;
 import org.ubiquia.core.flow.service.io.bootstrap.DomainOntologyBootstrapper;
+import org.ubiquia.core.flow.service.io.bootstrap.GraphBootstrapper;
 import org.ubiquia.core.flow.service.k8s.ComponentOperator;
 import org.ubiquia.core.flow.service.logic.agent.AgentInitializationLogic;
 
@@ -23,6 +24,9 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
 
     @Autowired(required = false)
     private DomainOntologyBootstrapper domainOntologyBootstrapper;
+
+    @Autowired(required = false)
+    private GraphBootstrapper graphBootstrapper;
 
     @Autowired(required = false)
     private BeliefStateBootstrapper beliefStateBootstrapper;
@@ -52,6 +56,15 @@ public class InitializationLogic implements ApplicationListener<ApplicationReady
                 this.domainOntologyBootstrapper.bootstrap();
             } catch (Exception e) {
                 logger.error("ERROR bootstrapping domain ontolgoy - could not initialize: {}",
+                    e.getMessage());
+            }
+        }
+
+        if (Objects.nonNull(this.graphBootstrapper)) {
+            try {
+                this.graphBootstrapper.bootstrap();
+            } catch (Exception e) {
+                logger.error("ERROR bootstrapping graphs - could not initialize: {}",
                     e.getMessage());
             }
         }

@@ -1,8 +1,16 @@
 const FLOW_SERVICE = '/ubiquia/core/communication-service/flow-service'
 
+const BELIEF_STATE_SERVICE = '/ubiquia/core/communication-service/belief-state-generator-service'
+
 export const API = {
   ontologies: `${FLOW_SERVICE}/domain-ontology`,
   graphs: `${FLOW_SERVICE}/graph`,
+  components: `${FLOW_SERVICE}/component`,
+  agent: `${FLOW_SERVICE}/agent`,
+  flows: `${FLOW_SERVICE}/flow`,
+  events: `${FLOW_SERVICE}/event`,
+  beliefState: `${BELIEF_STATE_SERVICE}/belief-state`,
+  proxiedUrls: '/ubiquia/core-communication-service/component/get-proxied-urls',
 } as const
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {

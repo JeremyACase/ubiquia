@@ -42,11 +42,41 @@ export interface Node extends BaseModel {
   downstreamNodes?: Node[]
 }
 
+export interface Image {
+  registry: string
+  repository: string
+  tag: string
+}
+
+export interface Config {
+  configMap: string
+  configMountPath: string
+}
+
+export interface CommunicationServiceSettings {
+  exposeViaCommService: boolean
+  proxiedEndpoint: string
+}
+
 export interface Component extends BaseModel {
   modelType: 'Component'
   name: string
-  componentType: string
-  port?: number
+  componentType: 'NONE' | 'TEMPLATE' | 'POD' | string
+  port: number
+  image: Image
+  description?: string
+  exposeService?: boolean
+  config?: Config
+  communicationServiceSettings?: CommunicationServiceSettings
+  node?: Node
+  graph?: Graph
+  postStartExecCommands?: string[]
+  environmentVariables?: { name: string; value: string }[]
+}
+
+export interface BeliefStateGeneration {
+  domainName: string
+  version: SemanticVersion
 }
 
 export interface Graph extends BaseModel {
@@ -86,4 +116,57 @@ export interface IngressResponse {
   id: string
   modelType: 'IngressResponse'
   payloadModelType: string
+}
+
+export interface FlowEventTimes {
+  pollStartedTime?: string
+  payloadSentToComponentTime?: string
+  componentResponseTime?: string
+  eventStartTime?: string
+  eventCompleteTime?: string
+  sentToOutboxTime?: string
+  egressResponseReceivedTime?: string
+  payloadEgressedTime?: string
+}
+
+export interface FlowEvent extends BaseModel {
+  modelType: 'FlowEvent'
+  flow?: { id: string; graph?: { id: string; name: string } }
+  node?: Node
+  inputPayload?: unknown
+  outputPayload?: unknown
+  httpResponseCode?: number
+  flowEventTimes?: FlowEventTimes
+  inputPayloadStamps?: KeyValuePair[]
+  outputPayloadStamps?: KeyValuePair[]
+}
+
+export interface Flow extends BaseModel {
+  modelType: 'Flow'
+  graph?: Graph
+  flowEvents?: FlowEvent[]
+}
+
+export interface Update extends BaseModel {
+  modelType: 'Update'
+  updateReason?: string
+  model?: unknown
+}
+
+export interface Sync extends BaseModel {
+  modelType: 'Sync'
+  model?: unknown
+}
+
+export interface Agent extends BaseModel {
+  modelType: 'Agent'
+  baseUrl?: string
+  reachable: boolean
+  deployedGraphs?: Graph[]
+  updates?: Update[]
+  syncs?: Sync[]
+  network?: {
+    id: string
+    agents?: Agent[]
+  }
 }

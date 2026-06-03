@@ -328,7 +328,7 @@ export function DagsPanel() {
       <div className="w-64 shrink-0 flex flex-col border-r border-slate-700 bg-slate-900">
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700 shrink-0">
           <div>
-            <h2 className="text-sm font-semibold text-slate-100">DAG Graphs</h2>
+            <h2 className="text-sm font-semibold text-slate-100">DAGs</h2>
             {data && (
               <p className="text-xs text-slate-500 mt-0.5">{data.totalElements} registered</p>
             )}
