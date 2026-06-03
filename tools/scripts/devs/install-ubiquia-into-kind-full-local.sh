@@ -59,8 +59,7 @@ for dockerfile in "${DOCKERFILES[@]}"; do
                  -t "${image_name}:latest" "$dir"
 
   else
-    # Python and everything else (e.g., ollama-whisperer)
-    # The Python image’s Dockerfile installs uv + app inside the container; no host uv needed.
+    # Python services, React/NGINX frontends, and anything else that needs no extra build args.
     docker build -t "${image_name}:latest" "$dir"
   fi
 
@@ -86,11 +85,11 @@ kubectl apply -f deploy/config/dev/ubiquia_dev_kind_pv.yaml -n ubiquia
 if helm status ubiquia -n ubiquia >/dev/null 2>&1; then
   echo "Helm release 'ubiquia' exists — upgrading..."
   helm upgrade ubiquia deploy/helm/ \
-    --values deploy/helm/configurations/dev/featherweight-dev.yaml \
+    --values deploy/helm/configurations/dev/lightweight-dev.yaml \
     -n ubiquia
 else
   echo "Installing Helm release 'ubiquia'..."
   helm install ubiquia deploy/helm/ \
-    --values deploy/helm/configurations/dev/featherweight-dev.yaml \
+    --values deploy/helm/configurations/dev/lightweight-dev.yaml \
     -n ubiquia
 fi

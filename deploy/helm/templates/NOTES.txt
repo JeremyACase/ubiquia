@@ -55,6 +55,21 @@ Attempting to register Directed Acyclic Graphs (DAGs) with Flow Service:
 {{- end }}
 **************************************************
 {{- end }}
+{{- if .Values.ubiquia.components.util.ubiquiaDashboard.enabled }}
+**************************************************
+Ubiquia Dashboard:
+
+The dashboard is proxied through the Communication Service (NodePort 30080).
+
+Access via NodePort:
+  http://<node-ip>:30080/ubiquia/core/communication-service/dashboard/
+
+  To find <node-ip>: kubectl get nodes -o wide -n {{ .Release.Namespace }}
+
+Or port-forward the Communication Service:
+  $ kubectl port-forward svc/ubiquia-core-communication-service -n {{ .Release.Namespace }} {{ .Values.convenience.variables.spring.port }}:{{ .Values.convenience.variables.spring.port }}
+  Then open: http://localhost:{{ .Values.convenience.variables.spring.port }}/ubiquia/core/communication-service/dashboard/
+{{- end }}
 {{ if and .Values.telemetry.prometheus.install .Values.telemetry.grafana.install }}
 **************************************************
 Grafana:

@@ -59,3 +59,9 @@ data:
           pollFrequencyMilliseconds: 5000
           port: {{ .Values.convenience.variables.spring.port }}
           url: http://ubiquia-core-flow-service
+      {{- if .Values.ubiquia.components.util.ubiquiaDashboard.enabled }}
+      dashboard:
+        service:
+          port: 80
+          url: http://ubiquia-util-dashboard
+      {{- end }}

@@ -1,0 +1,48 @@
+{{- if .Values.ubiquia.components.util.ubiquiaDashboard.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubiquia-util-dashboard
+  labels:
+    {{- include "ubiquia.labels" . | nindent 4 }}
+    component: ubiquia-util-dashboard
+spec:
+  {{- if not .Values.k8s.autoscaling.enabled }}
+  replicas: {{ .Values.ubiquia.components.util.ubiquiaDashboard.replicas | default 1 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ubiquia.selectorLabels" . | nindent 6 }}
+      component: ubiquia-util-dashboard
+  template:
+    metadata:
+      labels:
+        {{- include "ubiquia.selectorLabels" . | nindent 8 }}
+        {{- include "ubiquia.podLabels" . | nindent 8 }}
+        component: ubiquia-util-dashboard
+    spec:
+      {{- with .Values.infrastructure.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: ubiquia-util-dashboard-nginx-config
+      containers:
+        - name: ubiquia-util-dashboard
+          image: {{ include "ubiquia.util.ubiquiaDashboard.image" . }}
+          imagePullPolicy: {{ .Values.infrastructure.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+{{- end }}

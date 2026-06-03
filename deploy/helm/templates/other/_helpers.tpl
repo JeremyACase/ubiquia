@@ -93,3 +93,27 @@ Create the name of the service account to use
 {{- define "ubiquia.util.simulationService.image" -}}
 {{ .Values.ubiquia.components.util.simulationService.image.registry }}/{{ .Values.ubiquia.components.util.simulationService.image.repository }}:{{ .Values.ubiquia.components.util.simulationService.image.tag }}
 {{- end }}
+
+{{- define "ubiquia.util.ubiquiaDashboard.image" -}}
+{{ .Values.ubiquia.components.util.ubiquiaDashboard.image.registry }}/{{ .Values.ubiquia.components.util.ubiquiaDashboard.image.repository }}:{{ .Values.ubiquia.components.util.ubiquiaDashboard.image.tag }}
+{{- end }}
+
+{{/*
+Ubiquia Dashboard — access via the Communication Service
+---------------------------------------------------------
+The dashboard has no NodePort of its own. It is proxied exclusively through
+the Communication Service, which is exposed at NodePort 30080.
+
+When ubiquia.components.util.ubiquiaDashboard.enabled is true, open:
+
+  http://<node-ip>:30080/ubiquia/core/communication-service/dashboard/
+
+To find <node-ip> in a local KinD cluster:
+  kubectl get nodes -o wide
+  # use the INTERNAL-IP of any node, or 'localhost' if using kind with port-forwarding
+
+To check whether the dashboard is enabled in the current release:
+  helm get values <release-name> -n <namespace> | grep -A2 ubiquiaDashboard
+
+Disabled by default for featherweight profiles (no UI overhead on edge nodes).
+*/}}

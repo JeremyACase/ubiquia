@@ -28,6 +28,9 @@ ubiquia:
         enabled: false
         
   components:
+    util:
+      ubiquiaDashboard:
+        enabled: false
     core:
       beliefStateGeneratorService:
         image:

@@ -1,0 +1,19 @@
+{{- if .Values.ubiquia.components.util.ubiquiaDashboard.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ubiquia-util-dashboard-nginx-config
+  labels:
+    {{- include "ubiquia.labels" . | nindent 4 }}
+    component: ubiquia-util-dashboard
+data:
+  default.conf: |
+    server {
+        listen 80;
+
+        location / {
+            root /usr/share/nginx/html;
+            try_files $uri $uri/ /index.html;
+        }
+    }
+{{- end }}

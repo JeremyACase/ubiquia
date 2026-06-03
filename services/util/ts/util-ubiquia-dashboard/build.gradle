@@ -1,0 +1,39 @@
+plugins {
+    id 'base'
+    id 'com.github.node-gradle.node' version '7.1.0'
+}
+
+node {
+    version = '22.12.0'
+    download = true
+    npmInstallCommand = 'ci'
+}
+
+clean.doLast {
+    def distDir = file("$projectDir/dist")
+    if (distDir.exists()) {
+        println "Deleting $distDir"
+        distDir.deleteDir()
+    }
+}
+
+tasks.register('npmCi', com.github.gradle.node.npm.task.NpmTask) {
+    args = ['ci']
+    inputs.file('package.json')
+    inputs.file('package-lock.json')
+    outputs.dir('node_modules')
+}
+
+tasks.register('viteBuild', com.github.gradle.node.npm.task.NpmTask) {
+    dependsOn 'npmCi'
+    args = ['run', 'build']
+    inputs.dir('src')
+    inputs.file('index.html')
+    inputs.file('vite.config.ts')
+    inputs.file('tsconfig.json')
+    inputs.file('package.json')
+    outputs.dir('dist')
+}
+
+tasks.named('assemble').configure { dependsOn 'viteBuild' }
+tasks.named('build').configure    { dependsOn 'viteBuild' }

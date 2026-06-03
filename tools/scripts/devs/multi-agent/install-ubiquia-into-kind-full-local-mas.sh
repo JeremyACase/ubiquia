@@ -59,8 +59,7 @@ for dockerfile in "${DOCKERFILES[@]}"; do
                  -t "${image_name}:latest" "$dir"
 
   else
-    # Python and everything else (e.g., ollama-whisperer)
-    # The Python image’s Dockerfile installs uv + app inside the container; no host uv needed.
+    # Python services, React/NGINX frontends, and anything else that needs no extra build args.
     docker build -t "${image_name}:latest" "$dir"
   fi
 

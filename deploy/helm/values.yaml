@@ -84,6 +84,12 @@ ubiquia:
           registry: ubiquia
           repository: util-simulation-service
           tag: latest
+      ubiquiaDashboard:
+        enabled: true
+        image:
+          registry: ubiquia
+          repository: util-ubiquia-dashboard
+          tag: latest
 
 k8s:
   serviceAccount:
