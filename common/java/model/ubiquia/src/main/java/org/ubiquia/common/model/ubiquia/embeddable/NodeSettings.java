@@ -10,8 +10,6 @@ public class NodeSettings {
 
     private Boolean stimulateInputPayload = false;
 
-    private Boolean simulateOutputPayload = false;
-
     private Boolean validateInputPayload = false;
 
     private Boolean validateOutputPayload = false;
@@ -108,13 +106,5 @@ public class NodeSettings {
 
     public void setStimulateFrequencyMilliseconds(Long stimulateFrequencyMilliseconds) {
         this.stimulateFrequencyMilliseconds = stimulateFrequencyMilliseconds;
-    }
-
-    public Boolean getSimulateOutputPayload() {
-        return simulateOutputPayload;
-    }
-
-    public void setSimulateOutputPayload(Boolean simulateOutputPayload) {
-        this.simulateOutputPayload = simulateOutputPayload;
     }
 }

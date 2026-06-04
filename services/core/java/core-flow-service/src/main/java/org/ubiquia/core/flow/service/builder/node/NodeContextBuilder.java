@@ -6,18 +6,30 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.implementation.service.builder.NodeEndpointRecordBuilder;
+import org.ubiquia.common.library.implementation.service.mapper.ComponentDtoMapper;
 import org.ubiquia.common.library.implementation.service.mapper.GraphDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.core.flow.model.node.NodeContext;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
+import org.ubiquia.core.flow.repository.ComponentRepository;
 import org.ubiquia.core.flow.service.logic.node.NodeTypeLogic;
 
 @Service
 public class NodeContextBuilder {
+
+    private static final Logger logger = LoggerFactory.getLogger(NodeContextBuilder.class);
+
+    @Autowired
+    private ComponentDtoMapper componentDtoMapper;
+
+    @Autowired
+    private ComponentRepository componentRepository;
 
     @Autowired
     private NodeEndpointRecordBuilder nodeEndpointRecordBuilder;
@@ -40,7 +52,7 @@ public class NodeContextBuilder {
         context.setNodeName(node.getName());
         context.setNodeId(node.getId());
         context.setNodeType(node.getNodeType());
-        context.setAdapterSettings(node.getNodeSettings());
+        context.setNodeSettings(node.getNodeSettings());
         context.setBackpressurePollRatePerMinute(
             this.getBackPressurePollRatePerMinute(node));
         context.setBrokerSettings(node.getBrokerSettings());
@@ -49,6 +61,16 @@ public class NodeContextBuilder {
         context.setGraphSettings(graphDeployment.getGraphSettings());
         context.setPollSettings(node.getPollSettings());
         context.setComponent(node.getComponent());
+
+        if (Objects.isNull(context.getComponent())) {
+            var componentRecord = this.componentRepository
+                .findByNameAndGraphId(node.getName(), graphEntity.getId());
+            if (componentRecord.isPresent()) {
+                logger.debug("Component not linked on node {}; resolved by name+graph lookup.",
+                    node.getName());
+                context.setComponent(this.componentDtoMapper.map(componentRecord.get()));
+            }
+        }
 
         this.trySetNodeContextEndpoint(context, node);
 

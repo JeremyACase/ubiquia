@@ -50,10 +50,6 @@ public class NodeContext {
         this.nodeName = nodeName;
     }
 
-    public void setAdapterSettings(NodeSettings nodeSettings) {
-        this.nodeSettings = nodeSettings;
-    }
-
     public Long getBackpressurePollRatePerMinute() {
         return backpressurePollRatePerMinute;
     }

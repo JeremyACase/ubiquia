@@ -77,11 +77,12 @@ const TYPE_STYLE: Record<string, { fill: string; stroke: string; label: string }
 const DFLT = { fill: '#1e293b', stroke: '#475569', label: '#94a3b8' }
 const typeStyle = (t?: string) => t ? (TYPE_STYLE[t.toUpperCase()] ?? DFLT) : DFLT
 
-// ── Flow colors ───────────────────────────────────────────────────────────────
-const PALETTE = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#06b6d4', '#f97316', '#84cc16', '#ec4899']
-function flowColor(id: string): string {
-  const h = id.split('').reduce((a, c) => (Math.imul(31, a) + c.charCodeAt(0)) | 0, 0)
-  return PALETTE[Math.abs(h) % PALETTE.length]
+// ── Flow status colors ────────────────────────────────────────────────────────
+const FLOW_STATUS_COLORS = { error: '#ef4444', inProgress: '#f59e0b', success: '#10b981' }
+function flowStatusColor(hasError: boolean, isComplete: boolean): string {
+  if (hasError) return FLOW_STATUS_COLORS.error
+  if (!isComplete) return FLOW_STATUS_COLORS.inProgress
+  return FLOW_STATUS_COLORS.success
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -112,27 +113,31 @@ interface FlowSummary {
   nodeNames: string[]   // visit order
   latestTime: string
   hasError: boolean
+  isComplete: boolean
   color: string
 }
 
 function deriveFlows(events: FlowEvent[]): FlowSummary[] {
-  const map = new Map<string, { nodeNames: string[]; latestTime: string; hasError: boolean }>()
+  const map = new Map<string, { nodeNames: string[]; latestTime: string; hasError: boolean; isComplete: boolean }>()
   const sorted = [...events].sort(
     (a, b) => new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime(),
   )
   for (const evt of sorted) {
     if (!evt.flow?.id) continue
     const fid = evt.flow.id
-    if (!map.has(fid)) map.set(fid, { nodeNames: [], latestTime: '', hasError: false })
+    if (!map.has(fid)) map.set(fid, { nodeNames: [], latestTime: '', hasError: false, isComplete: false })
     const entry = map.get(fid)!
     const name = evt.node?.name
     if (name && !entry.nodeNames.includes(name)) entry.nodeNames.push(name)
     if ((evt.httpResponseCode ?? 0) >= 400) entry.hasError = true
-    if ((evt.createdAt ?? '') > entry.latestTime) entry.latestTime = evt.createdAt ?? ''
+    if ((evt.createdAt ?? '') > entry.latestTime) {
+      entry.latestTime = evt.createdAt ?? ''
+      entry.isComplete = !!evt.flowEventTimes?.eventCompleteTime
+    }
   }
   return Array.from(map.entries())
     .sort(([, a], [, b]) => b.latestTime.localeCompare(a.latestTime))
-    .map(([id, d]) => ({ id, ...d, color: flowColor(id) }))
+    .map(([id, d]) => ({ id, ...d, color: flowStatusColor(d.hasError, d.isComplete) }))
 }
 
 // ── Canvas ────────────────────────────────────────────────────────────────────
@@ -499,6 +504,7 @@ export function FlowTracingPanel() {
     queryKey: ['trace-flow-events', selectedFlowId],
     queryFn: () => fetchEventsForFlow(selectedFlowId!),
     enabled: !!selectedFlowId,
+    refetchInterval: autoRefresh ? 3000 : false,
   })
   const selectedFlowEvents = useMemo(
     () => (flowEventsData?.content ?? []).filter(e => graphNodeNames.has(e.node?.name ?? '')),

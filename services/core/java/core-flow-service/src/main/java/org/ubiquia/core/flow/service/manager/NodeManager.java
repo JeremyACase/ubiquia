@@ -90,9 +90,9 @@ public class NodeManager {
             }
         }
 
-        logger.info("...completed deploying nodes for graph named {}. Local node IDs now: {}",
+        logger.info("...completed deploying nodes for graph named {}. Local nodes now: {}",
             graphEntity.getName(),
-            this.getLocalNodeIds());
+            this.getLocalNodeNames());
     }
 
     /**
@@ -161,6 +161,14 @@ public class NodeManager {
         return this.nodeMap.values()
             .stream()
             .flatMap(graphNodes -> graphNodes.keySet().stream())
+            .collect(Collectors.toSet());
+    }
+
+    public Set<String> getLocalNodeNames() {
+        return this.nodeMap.values()
+            .stream()
+            .flatMap(graphNodes -> graphNodes.values().stream())
+            .map(node -> node.getNodeContext().getNodeName())
             .collect(Collectors.toSet());
     }
 
