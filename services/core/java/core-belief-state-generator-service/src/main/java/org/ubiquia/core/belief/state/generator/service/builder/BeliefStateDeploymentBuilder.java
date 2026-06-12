@@ -1,7 +1,21 @@
 package org.ubiquia.core.belief.state.generator.service.builder;
 
-
-import io.kubernetes.client.openapi.models.*;
+import io.kubernetes.client.openapi.models.V1Container;
+import io.kubernetes.client.openapi.models.V1ContainerPort;
+import io.kubernetes.client.openapi.models.V1Deployment;
+import io.kubernetes.client.openapi.models.V1DeploymentSpec;
+import io.kubernetes.client.openapi.models.V1EnvVar;
+import io.kubernetes.client.openapi.models.V1EnvVarSource;
+import io.kubernetes.client.openapi.models.V1ObjectMeta;
+import io.kubernetes.client.openapi.models.V1PersistentVolumeClaimVolumeSource;
+import io.kubernetes.client.openapi.models.V1PodSpec;
+import io.kubernetes.client.openapi.models.V1PodTemplateSpec;
+import io.kubernetes.client.openapi.models.V1SecretKeySelector;
+import io.kubernetes.client.openapi.models.V1Service;
+import io.kubernetes.client.openapi.models.V1ServicePort;
+import io.kubernetes.client.openapi.models.V1ServiceSpec;
+import io.kubernetes.client.openapi.models.V1Volume;
+import io.kubernetes.client.openapi.models.V1VolumeMount;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +28,10 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.implementation.service.builder.BeliefStateNameBuilder;
 import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 
+/**
+ * Builds Kubernetes {@link V1Service} and {@link V1Deployment} manifests for a
+ * belief-state microservice derived from a {@link DomainOntology}.
+ */
 @ConditionalOnProperty(
     value = "ubiquia.kubernetes.enabled",
     havingValue = "true",
@@ -22,55 +40,72 @@ import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 @Service
 public class BeliefStateDeploymentBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(BeliefStateDeploymentBuilder.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(BeliefStateDeploymentBuilder.class);
+
     @Value("${ubiquia.jdkVersion}")
     private String jdkVersion;
+
     @Value("${ubiquia.beliefStateGeneratorService.uber.jars.path}")
     private String uberJarsPath;
+
     @Value("${ubiquia.agent.storage.minio.enabled}")
     private Boolean minioEnabled;
+
     @Autowired
     private BeliefStateNameBuilder beliefStateNameBuilder;
+
     private V1Deployment ubiquiaDeployment;
 
+    /**
+     * Returns the Ubiquia deployment used as a template for label and spec inheritance.
+     *
+     * @return the base deployment
+     */
     public V1Deployment getUbiquiaDeployment() {
         return this.ubiquiaDeployment;
     }
 
+    /**
+     * Sets the Ubiquia deployment template.
+     *
+     * @param ubiquiaDeployment the base deployment to inherit labels and spec from
+     */
     public void setUbiquiaDeployment(final V1Deployment ubiquiaDeployment) {
         this.ubiquiaDeployment = ubiquiaDeployment;
     }
 
+    /**
+     * Builds a Kubernetes {@link V1Service} for the belief state derived from
+     * {@code domainOntology}.
+     *
+     * @param domainOntology the domain ontology defining the belief state
+     * @return the constructed service manifest
+     */
     public V1Service buildServiceFrom(final DomainOntology domainOntology) {
+
+        var beliefStateName =
+            this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(domainOntology);
+        var domainName = domainOntology.getName().toLowerCase();
+
         var service = new V1Service();
         service.setApiVersion("v1");
         service.setKind("Service");
 
         service.setMetadata(new V1ObjectMeta());
-        var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(domainOntology);
         service.getMetadata().setName(beliefStateName);
-
-        service.getMetadata().setLabels(new HashMap<>());
-        service.getMetadata().getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
-        service.getMetadata().getLabels().remove("component");
-        service.getMetadata().getLabels().remove("app.kubernetes.io/managed-by");
-        service.getMetadata().getLabels().put(
-            "domain",
-            domainOntology.getName().toLowerCase());
-        service.getMetadata().getLabels().put(
-            "belief-state",
-            beliefStateName);
-        service.getMetadata().getLabels().put("app.kubernetes.io/managed-by", "ubiquia");
+        service.getMetadata().setLabels(
+            K8sLabelBuilder.from(this.ubiquiaDeployment.getMetadata().getLabels())
+                .remove("component", "app.kubernetes.io/managed-by")
+                .put("domain", domainName)
+                .withBeliefState(beliefStateName)
+                .build());
 
         var serviceSpec = new V1ServiceSpec();
         serviceSpec.setType("ClusterIP");
         serviceSpec.setSelector(new HashMap<>());
-        serviceSpec.getSelector().put(
-            "domain",
-            domainOntology.getName().toLowerCase());
-        serviceSpec.getSelector().put(
-            "belief-state",
-            beliefStateName);
+        serviceSpec.getSelector().put("domain", domainName);
+        serviceSpec.getSelector().put("belief-state", beliefStateName);
         service.setSpec(serviceSpec);
 
         serviceSpec.setPorts(new ArrayList<>());
@@ -83,36 +118,40 @@ public class BeliefStateDeploymentBuilder {
         return service;
     }
 
+    /**
+     * Builds a Kubernetes {@link V1Deployment} for the belief state derived from
+     * {@code domainOntology}.
+     *
+     * @param domainOntology the domain ontology defining the belief state
+     * @return the constructed deployment manifest
+     */
     public V1Deployment buildDeploymentFrom(final DomainOntology domainOntology) {
+
+        var beliefStateName =
+            this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(domainOntology);
+        var domainName = domainOntology.getName().toLowerCase();
 
         var deployment = new V1Deployment();
         deployment.setApiVersion("apps/v1");
         deployment.setKind("Deployment");
-
-        var metadata = this.getMetadataFrom(domainOntology);
-        deployment.setMetadata(metadata);
-
-        var spec = this.getDeploymentSpecFrom(domainOntology);
-        deployment.setSpec(spec);
+        deployment.setMetadata(this.buildDeploymentMetadata(beliefStateName, domainName));
+        deployment.setSpec(this.buildDeploymentSpec(beliefStateName, domainName, domainOntology));
 
         return deployment;
     }
 
-    private V1ObjectMeta getMetadataFrom(final DomainOntology domainOntology) {
+    private V1ObjectMeta buildDeploymentMetadata(
+        final String beliefStateName,
+        final String domainName) {
+
         var metadata = new V1ObjectMeta();
-
-        var beliefStateName = this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(domainOntology);
         metadata.setName(beliefStateName);
-
-        metadata.setLabels(new HashMap<>());
-        metadata.getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
-        metadata.getLabels().remove("component");
-        metadata.getLabels().remove("app.kubernetes.io/managed-by");
-        metadata.getLabels().put("component", domainOntology.getName().toLowerCase());
-        metadata.getLabels().put("app.kubernetes.io/managed-by", "ubiquia");
-        metadata.getLabels().put(
-            "belief-state",
-            beliefStateName);
+        metadata.setLabels(
+            K8sLabelBuilder.from(this.ubiquiaDeployment.getMetadata().getLabels())
+                .remove("component", "app.kubernetes.io/managed-by")
+                .put("component", domainName)
+                .withBeliefState(beliefStateName)
+                .build());
 
         metadata.setAnnotations(new HashMap<>());
         metadata.getAnnotations().putAll(this.ubiquiaDeployment.getMetadata().getAnnotations());
@@ -120,60 +159,49 @@ public class BeliefStateDeploymentBuilder {
         return metadata;
     }
 
-    private V1DeploymentSpec getDeploymentSpecFrom(final DomainOntology domainOntology) {
-
-        var beliefStateName = this
-            .beliefStateNameBuilder
-            .getKubernetesBeliefStateNameFrom(domainOntology);
+    private V1DeploymentSpec buildDeploymentSpec(
+        final String beliefStateName,
+        final String domainName,
+        final DomainOntology domainOntology) {
 
         var spec = new V1DeploymentSpec();
         spec.setReplicas(1);
         spec.setSelector(this.ubiquiaDeployment.getSpec().getSelector());
-        spec.getSelector().getMatchLabels().put(
-            "domain",
-            domainOntology.getName().toLowerCase());
-        spec.getSelector().getMatchLabels().put(
-            "belief-state",
-            beliefStateName);
-
-        var template = this.getPodTemplateSpec(domainOntology);
-        spec.setTemplate(template);
+        spec.getSelector().getMatchLabels().put("domain", domainName);
+        spec.getSelector().getMatchLabels().put("belief-state", beliefStateName);
+        spec.setTemplate(this.buildPodTemplateSpec(beliefStateName, domainName, domainOntology));
 
         return spec;
     }
 
-    private V1PodTemplateSpec getPodTemplateSpec(final DomainOntology domainOntology) {
-
-        var beliefStateName = this
-            .beliefStateNameBuilder
-            .getKubernetesBeliefStateNameFrom(domainOntology);
+    private V1PodTemplateSpec buildPodTemplateSpec(
+        final String beliefStateName,
+        final String domainName,
+        final DomainOntology domainOntology) {
 
         var template = new V1PodTemplateSpec();
         template.setMetadata(new V1ObjectMeta());
-        template.getMetadata().setLabels(new HashMap<>());
-        template.getMetadata().getLabels().putAll(this.ubiquiaDeployment.getMetadata().getLabels());
-        template.getMetadata().getLabels().put("domain", domainOntology.getName().toLowerCase());
-        template.getMetadata().getLabels().put("belief-state", beliefStateName);
-        template.getMetadata().getLabels().remove("app.kubernetes.io/managed-by");
-        template.getMetadata().getLabels().put("app.kubernetes.io/managed-by", "ubiquia");
+        template.getMetadata().setLabels(
+            K8sLabelBuilder.from(this.ubiquiaDeployment.getMetadata().getLabels())
+                .remove("app.kubernetes.io/managed-by")
+                .put("domain", domainName)
+                .withBeliefState(beliefStateName)
+                .build());
 
         var podSpec = new V1PodSpec();
         podSpec.setContainers(new ArrayList<>());
-        podSpec.setImagePullSecrets(this
-            .ubiquiaDeployment
+        podSpec.setImagePullSecrets(this.ubiquiaDeployment
             .getSpec()
             .getTemplate()
             .getSpec()
             .getImagePullSecrets());
 
-        // Create container with updated volume mount
-        var container = this.getContainer(domainOntology);
-        podSpec.getContainers().add(container);
+        podSpec.getContainers().add(this.buildContainer(beliefStateName, domainOntology));
 
-        // PVC volume
         var jarVolume = new V1Volume()
             .name("belief-state-jar-volume")
             .persistentVolumeClaim(new V1PersistentVolumeClaimVolumeSource()
+                // CHECKSTYLE.SUPPRESS: LineLength
                 .claimName("ubiquia-core-belief-state-generator-service-belief-state-jars-pvc"));
         podSpec.setVolumes(List.of(jarVolume));
 
@@ -181,7 +209,9 @@ public class BeliefStateDeploymentBuilder {
         return template;
     }
 
-    private V1Container getContainer(final DomainOntology domainOntology) {
+    private V1Container buildContainer(
+        final String beliefStateName,
+        final DomainOntology domainOntology) {
 
         var container = new V1Container();
         container.setName(domainOntology.getName().toLowerCase());
@@ -208,27 +238,20 @@ public class BeliefStateDeploymentBuilder {
             ));
         }
 
-        // Port setup
         var port = new V1ContainerPort()
             .containerPort(8080)
             .name("http")
             .protocol("TCP");
         container.setPorts(List.of(port));
 
-        var beliefStateJarName = this
-            .beliefStateNameBuilder
-            .getJarBeliefStateNameFrom(domainOntology);
-        var mountPath = this.uberJarsPath + beliefStateJarName;
+        var jarName = this.beliefStateNameBuilder.getJarBeliefStateNameFrom(domainOntology);
+        var mountPath = this.uberJarsPath + jarName;
 
-        // Volume mount with subPath
-        container
-            .setVolumeMounts(List
-                .of(new V1VolumeMount()
-                    .name("belief-state-jar-volume")
-                    .mountPath(mountPath)
-                    .subPath(beliefStateJarName)));
+        container.setVolumeMounts(List.of(new V1VolumeMount()
+            .name("belief-state-jar-volume")
+            .mountPath(mountPath)
+            .subPath(jarName)));
 
-        // Startup command
         container.setCommand(List.of("java"));
         container.setArgs(List.of("-jar", mountPath));
 

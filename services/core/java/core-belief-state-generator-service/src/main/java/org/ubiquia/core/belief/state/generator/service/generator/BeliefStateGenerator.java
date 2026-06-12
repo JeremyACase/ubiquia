@@ -84,12 +84,12 @@ public class BeliefStateGenerator {
             .jsonSchemaToOpenApiEntityYamlMapper
             .translateJsonSchemaToOpenApiYaml(jsonSchema);
 
-        this.openApiEntityGenerator.generateOpenApiEntitiesFrom(openApiEntityYaml);
+        this.openApiEntityGenerator.generate(openApiEntityYaml);
 
         var openApiDtoYaml = this
             .jsonSchemaToOpenApiDtoYamlMapper
             .translateJsonSchemaToOpenApiYaml(jsonSchema);
-        this.openApiDtoGenerator.generateOpenApiDtosFrom(openApiDtoYaml);
+        this.openApiDtoGenerator.generate(openApiDtoYaml);
 
         this.beliefStateGenerationPostProcessor.postProcess(domainOntology);
 

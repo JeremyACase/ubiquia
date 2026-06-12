@@ -22,6 +22,12 @@ public class InheritancePreprocessor implements SchemaTransformer {
 
     private static final String REF_VALUE = "#/definitions/AbstractDomainModel";
 
+    // These Ubiquia infrastructure models must not be given an allOf self-reference
+    // (AbstractDomainModel) or a circular inheritance chain (KeyValuePair is embeddable,
+    // not an entity, and AbstractDomainModel already references it via its tags field).
+    private static final String BASE_MODEL_NAME = "AbstractDomainModel";
+    private static final String KEY_VALUE_PAIR_NAME = "KeyValuePair";
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -75,7 +81,9 @@ public class InheritancePreprocessor implements SchemaTransformer {
 
             var schema = (ObjectNode) entry.getValue();
 
-            if (schema.has("enum") || schema.has("allOf")) {
+            if (schema.has("enum") || schema.has("allOf")
+                || BASE_MODEL_NAME.equals(entry.getKey())
+                || KEY_VALUE_PAIR_NAME.equals(entry.getKey())) {
                 continue;
             }
 

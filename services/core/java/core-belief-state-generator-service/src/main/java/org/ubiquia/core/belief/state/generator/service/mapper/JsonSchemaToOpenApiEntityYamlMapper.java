@@ -1,300 +1,195 @@
 package org.ubiquia.core.belief.state.generator.service.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Map;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.belief.state.generator.model.json.schema.ModelType;
-import org.ubiquia.core.belief.state.generator.service.visitor.entity.JsonSchemaModelTypeClassifier;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
 
+/**
+ * Produces an OpenAPI 3.0 YAML document targeting JPA entity generation.
+ *
+ * <p>Non-enum definitions are suffixed with {@code Entity}. Before iteration, {@code $ref}
+ * targets are rewritten to include the suffix, and fields whose referenced type is EMBEDDABLE
+ * receive {@code x-element-collection: true}.
+ */
 @Service
-public class JsonSchemaToOpenApiEntityYamlMapper {
+public class JsonSchemaToOpenApiEntityYamlMapper extends AbstractJsonSchemaToOpenApiYamlMapper {
 
-    private static final Logger logger =
-        LoggerFactory.getLogger(JsonSchemaToOpenApiEntityYamlMapper.class);
+    private static final String SCHEMA_PREFIX = "#/components/schemas/";
 
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private JsonSchemaModelTypeClassifier classifier;
+    @Override
+    protected void preprocessDefinitions(
+        final ObjectNode mainSchema,
+        final Map<String, ModelType> kindByName) {
 
-    public String translateJsonSchemaToOpenApiYaml(final String jsonSchema)
-        throws JsonProcessingException {
-        logger.debug("Translating schema to OpenAPI yaml: {}...", jsonSchema);
-
-        // Normalize legacy refs to OpenAPI-style before we analyze/transform
-        final var rewrittenSchema =
-            jsonSchema.replaceAll("#/definitions/", "#/components/schemas/");
-
-        // Classify using the (normalized) schema
-        final var kindByName = classifier.classify(rewrittenSchema);
-
-        final var rootNode = objectMapper.readTree(rewrittenSchema);
-        final var mainSchema = (ObjectNode) rootNode;
-
-        // ---------- OpenAPI Skeleton ----------
-        final var openApiNode = objectMapper.createObjectNode();
-        openApiNode.put("openapi", "3.0.0");
-
-        final var infoNode = objectMapper.createObjectNode();
-        infoNode.put("title", "Generated OpenAPI");
-        infoNode.put("version", "1.0.0");
-        openApiNode.set("info", infoNode);
-        openApiNode.set("paths", objectMapper.createObjectNode());
-
-        final var componentsNode = objectMapper.createObjectNode();
-        final var schemasNode = objectMapper.createObjectNode();
+        this.rewriteRefsByKind(mainSchema, kindByName);
 
         if (mainSchema.has("definitions")) {
-            final var definitionsNode = (ObjectNode) mainSchema.get("definitions");
-
-            // 1) Rewrite $refs with proper *Entity suffixing, etc.
-            rewriteRefsByKind(mainSchema, kindByName);
-
-            // 2) Annotate properties that reference embeddables
-            annotateElementCollectionsOnFields(definitionsNode, kindByName);
-
-            // 3) Emit schemas
-            definitionsNode
-                .fieldNames()
-                .forEachRemaining(
-                    defName -> {
-                        final var defNode = definitionsNode.get(defName);
-                        final var kind =
-                            kindByName.getOrDefault(defName, ModelType.ISOLATED);
-
-                        final var outNode = deepClone(defNode);
-
-                        switch (kind) {
-                            case ENUM:
-                                schemasNode.set(defName, outNode);
-                                break;
-                            case EMBEDDABLE:
-                                ensureObjectNode(outNode).put("x-embeddable", true);
-                                schemasNode.set(defName + "Entity", outNode);
-                                break;
-                            default:
-                                schemasNode.set(defName + "Entity", outNode);
-                                break;
-                        }
-                    });
+            this.annotateElementCollectionsOnFields(
+                (ObjectNode) mainSchema.get("definitions"), kindByName);
         }
+    }
 
-        componentsNode.set("schemas", schemasNode);
-        openApiNode.set("components", componentsNode);
+    @Override
+    protected void visitDefinition(
+        final String defName,
+        final JsonNode defNode,
+        final ModelType kind,
+        final ObjectNode schemasNode) {
 
-        // ---------- Convert to YAML ----------
-        final var options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        options.setPrettyFlow(true);
-        final var yaml = new Yaml(options);
-
-        @SuppressWarnings("unchecked") final var map = objectMapper.convertValue(openApiNode, Map.class);
-        final var yamlString = yaml.dump(map);
-
-        logger.debug("...generated OpenAPI YAML: \n{}", yamlString);
-        return yamlString;
+        switch (kind) {
+            case ENUM:
+                schemasNode.set(defName, defNode);
+                break;
+            case EMBEDDABLE:
+                this.ensureObjectNode(defNode).put("x-embeddable", true);
+                schemasNode.set(defName + "Entity", defNode);
+                break;
+            default:
+                schemasNode.set(defName + "Entity", defNode);
+                break;
+        }
     }
 
     /**
-     * Marks fields that reference EMBEDDABLE types with "x-element-collection": true.
-     * Works for:
-     * - direct $ref
-     * - array items.$ref
-     * - allOf single $ref (optional edge case)
+     * Walks the entire schema tree and rewrites {@code $ref} targets to include the
+     * {@code Entity} suffix for ENTITY, ISOLATED, and EMBEDDABLE definitions.
+     *
+     * @param node       the root node to walk (mutated in-place)
+     * @param kindByName definition name to classified {@link ModelType}
+     */
+    private void rewriteRefsByKind(
+        final JsonNode node,
+        final Map<String, ModelType> kindByName) {
+
+        if (Objects.isNull(node)) {
+            return;
+        }
+
+        if (node.isObject()) {
+            var obj = (ObjectNode) node;
+
+            if (obj.has("$ref") && obj.get("$ref").isTextual()) {
+                var refText = obj.get("$ref").asText();
+                if (refText.startsWith(SCHEMA_PREFIX)) {
+                    var name = refText.substring(SCHEMA_PREFIX.length());
+                    var type = kindByName.getOrDefault(name, ModelType.ISOLATED);
+                    var newTarget = (type == ModelType.ENTITY
+                        || type == ModelType.ISOLATED
+                        || type == ModelType.EMBEDDABLE)
+                        ? name + "Entity"
+                        : name;
+                    obj.put("$ref", SCHEMA_PREFIX + newTarget);
+                }
+            }
+
+            obj.fields().forEachRemaining(e -> {
+                if (!"$ref".equals(e.getKey())) {
+                    this.rewriteRefsByKind(e.getValue(), kindByName);
+                }
+            });
+
+        } else if (node.isArray()) {
+            node.forEach(child -> this.rewriteRefsByKind(child, kindByName));
+        }
+    }
+
+    /**
+     * Marks fields that reference EMBEDDABLE types with {@code x-element-collection: true}.
+     * Handles direct {@code $ref}, array {@code items.$ref}, and {@code allOf} single-ref cases.
+     *
+     * @param definitionsNode the definitions container node
+     * @param kindByName      definition name to classified {@link ModelType}
      */
     private void annotateElementCollectionsOnFields(
-        final ObjectNode definitionsNode, final Map<String, ModelType> kindByName) {
+        final ObjectNode definitionsNode,
+        final Map<String, ModelType> kindByName) {
+
         if (Objects.isNull(definitionsNode)) {
             return;
         }
 
-        definitionsNode
-            .fieldNames()
-            .forEachRemaining(
-                defName -> {
-                    final JsonNode defNode = definitionsNode.get(defName);
-                    if (!(defNode instanceof ObjectNode)) {
+        definitionsNode.fieldNames().forEachRemaining(defName -> {
+            var defNode = definitionsNode.get(defName);
+            if (!(defNode instanceof ObjectNode defObj)) {
+                return;
+            }
+
+            var propsNode = defObj.get("properties");
+            if (!(propsNode instanceof ObjectNode propsObj)) {
+                return;
+            }
+
+            propsObj.fieldNames().forEachRemaining(propName -> {
+                var propSchema = propsObj.get(propName);
+                if (!(propSchema instanceof ObjectNode propObj)) {
+                    return;
+                }
+
+                // Case A: direct $ref
+                if (propObj.has("$ref") && propObj.get("$ref").isTextual()) {
+                    if (this.refTargetsEmbeddable(propObj.get("$ref").asText(), kindByName)) {
+                        propObj.put("x-element-collection", true);
                         return;
                     }
+                }
 
-                    final ObjectNode defObj = (ObjectNode) defNode;
-                    final JsonNode propsNode = defObj.get("properties");
-                    if (!(propsNode instanceof ObjectNode)) {
-                        return;
-                    }
-
-                    final ObjectNode propsObj = (ObjectNode) propsNode;
-                    propsObj
-                        .fieldNames()
-                        .forEachRemaining(
-                            propName -> {
-                                final JsonNode propSchema =
-                                    propsObj.get(propName);
-                                if (!(propSchema instanceof ObjectNode)) {
+                // Case B: array items.$ref or items.allOf[$ref]
+                if ("array".equals(asText(propObj.get("type")))) {
+                    var items = propObj.get("items");
+                    if (items instanceof ObjectNode itemsObj) {
+                        if (itemsObj.has("$ref") && itemsObj.get("$ref").isTextual()) {
+                            if (this.refTargetsEmbeddable(
+                                itemsObj.get("$ref").asText(), kindByName)) {
+                                propObj.put("x-element-collection", true);
+                                return;
+                            }
+                        }
+                        if (itemsObj.has("allOf") && itemsObj.get("allOf").isArray()) {
+                            var arr = (ArrayNode) itemsObj.get("allOf");
+                            if (arr.size() == 1 && arr.get(0).has("$ref")) {
+                                if (this.refTargetsEmbeddable(
+                                    arr.get(0).get("$ref").asText(), kindByName)) {
+                                    propObj.put("x-element-collection", true);
                                     return;
                                 }
-                                final ObjectNode propObj =
-                                    (ObjectNode) propSchema;
+                            }
+                        }
+                    }
+                }
 
-                                // Case A: direct $ref
-                                if (propObj.has("$ref")
-                                    && propObj.get("$ref").isTextual()) {
-                                    if (refTargetsEmbeddable(
-                                        propObj.get("$ref").asText(),
-                                        kindByName)) {
-                                        propObj.put("x-element-collection", true);
-                                        return;
-                                    }
-                                }
-
-                                // Case B: array items.$ref
-                                if ("array"
-                                    .equals(asText(propObj.get("type")))) {
-                                    final JsonNode items = propObj.get("items");
-                                    if (items instanceof ObjectNode) {
-                                        final ObjectNode itemsObj =
-                                            (ObjectNode) items;
-                                        if (itemsObj.has("$ref")
-                                            && itemsObj.get("$ref")
-                                            .isTextual()) {
-                                            if (refTargetsEmbeddable(
-                                                itemsObj.get("$ref").asText(),
-                                                kindByName)) {
-                                                propObj.put(
-                                                    "x-element-collection",
-                                                    true);
-                                                return;
-                                            }
-                                        }
-                                        // Case B2: array items allOf single $ref
-                                        if (itemsObj.has("allOf")
-                                            && itemsObj
-                                            .get("allOf")
-                                            .isArray()) {
-                                            final var arr =
-                                                (ArrayNode)
-                                                    itemsObj.get("allOf");
-                                            if (arr.size() == 1
-                                                && arr.get(0).has("$ref")) {
-                                                if (refTargetsEmbeddable(
-                                                    arr.get(0)
-                                                        .get("$ref")
-                                                        .asText(),
-                                                    kindByName)) {
-                                                    propObj.put(
-                                                        "x-element-collection",
-                                                        true);
-                                                    return;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // Case C: allOf with single $ref
-                                if (propObj.has("allOf")
-                                    && propObj.get("allOf").isArray()) {
-                                    final var arr =
-                                        (ArrayNode) propObj.get("allOf");
-                                    if (arr.size() == 1 && arr.get(0).has("$ref")) {
-                                        if (refTargetsEmbeddable(
-                                            arr.get(0).get("$ref").asText(),
-                                            kindByName)) {
-                                            propObj.put(
-                                                "x-element-collection", true);
-                                        }
-                                    }
-                                }
-                            });
-                });
+                // Case C: allOf with single $ref
+                if (propObj.has("allOf") && propObj.get("allOf").isArray()) {
+                    var arr = (ArrayNode) propObj.get("allOf");
+                    if (arr.size() == 1 && arr.get(0).has("$ref")) {
+                        if (this.refTargetsEmbeddable(
+                            arr.get(0).get("$ref").asText(), kindByName)) {
+                            propObj.put("x-element-collection", true);
+                        }
+                    }
+                }
+            });
+        });
     }
 
     private boolean refTargetsEmbeddable(
-        final String refText, final Map<String, ModelType> kindByName) {
-        final String prefix = "#/components/schemas/";
-        if (!refText.startsWith(prefix)) {
+        final String refText,
+        final Map<String, ModelType> kindByName) {
+
+        if (!refText.startsWith(SCHEMA_PREFIX)) {
             return false;
         }
-        String name = refText.substring(prefix.length());
-        // Strip "Entity" suffix (we append that during rewrite)
+        var name = refText.substring(SCHEMA_PREFIX.length());
         if (name.endsWith("Entity")) {
             name = name.substring(0, name.length() - "Entity".length());
         }
         return kindByName.getOrDefault(name, ModelType.ISOLATED) == ModelType.EMBEDDABLE;
     }
 
-    private String asText(JsonNode n) {
+    private String asText(final JsonNode n) {
         return (Objects.nonNull(n) && n.isTextual()) ? n.asText() : null;
-    }
-
-    /**
-     * Walks the entire schema tree and rewrites $ref targets according to classifier results.
-     */
-    private void rewriteRefsByKind(final JsonNode node, final Map<String, ModelType> kindByName) {
-        if (Objects.isNull(node)) {
-            return;
-        }
-
-        if (node.isObject()) {
-            final var obj = (ObjectNode) node;
-
-            if (obj.has("$ref") && obj.get("$ref").isTextual()) {
-                final var refText = obj.get("$ref").asText();
-                final var prefix = "#/components/schemas/";
-                if (refText.startsWith(prefix)) {
-                    final var name = refText.substring(prefix.length());
-                    final var type = kindByName.getOrDefault(name, ModelType.ISOLATED);
-
-                    final var newTarget =
-                        (type == ModelType.ENTITY
-                            || type == ModelType.ISOLATED
-                            || type == ModelType.EMBEDDABLE)
-                            ? (name + "Entity")
-                            : name;
-
-                    obj.put("$ref", prefix + newTarget);
-                }
-            }
-
-            obj.fields()
-                .forEachRemaining(
-                    e -> {
-                        final var k = e.getKey();
-                        if (!"$ref".equals(k)) {
-                            rewriteRefsByKind(e.getValue(), kindByName);
-                        }
-                    });
-        } else if (node.isArray()) {
-            node.forEach(child -> rewriteRefsByKind(child, kindByName));
-        }
-    }
-
-    private ObjectNode ensureObjectNode(final JsonNode node) {
-        if (node instanceof ObjectNode) {
-            return (ObjectNode) node;
-        }
-        final var wrapper = objectMapper.createObjectNode();
-        final var arr = objectMapper.createArrayNode();
-        arr.add(node);
-        wrapper.set("allOf", arr);
-        return wrapper;
-    }
-
-    private JsonNode deepClone(final JsonNode node) {
-        try {
-            return objectMapper.readTree(node.toString());
-        } catch (Exception e) {
-            return node;
-        }
     }
 }

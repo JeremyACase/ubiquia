@@ -1,63 +1,33 @@
 package org.ubiquia.core.belief.state.generator.service.generator.openapi;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
-import org.openapitools.codegen.DefaultGenerator;
-import org.openapitools.codegen.config.CodegenConfigurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+/**
+ * Generates JPA entity source files from an OpenAPI YAML spec using the
+ * {@code ubiquia-domain-entity-generator} codegen plugin.
+ */
 @Service
-public class OpenApiEntityGenerator {
-
-    private static final Logger logger = LoggerFactory.getLogger(OpenApiEntityGenerator.class);
+public class OpenApiEntityGenerator extends AbstractOpenApiGenerator {
 
     @Value("${ubiquia.beliefStateGeneratorService.template.filepath.entity}")
-    private String templateFilepathEntity;
+    private String templateFilepath;
 
-    public void generateOpenApiEntitiesFrom(final String openApiYaml) throws IOException {
+    @Override
+    protected String getGeneratorName() {
+        return "ubiquia-domain-entity-generator";
+    }
 
-        logger.debug("Generating new entities from: {}", openApiYaml);
+    @Override
+    protected String getTemplatePath() {
+        return this.templateFilepath;
+    }
 
-        Path tempPath;
-        tempPath = Files.createTempFile("openapi-spec-entity", ".yaml");
-        Files.writeString(tempPath, openApiYaml, StandardCharsets.UTF_8);
-
-        var specFilePath = tempPath.toAbsolutePath().toString();
-        var templatePath = Paths.get(this.templateFilepathEntity)
-            .toAbsolutePath()
-            .toString();
-
-        var configurator = new CodegenConfigurator()
-            .setInputSpec(specFilePath)
-            .setGeneratorName("ubiquia-domain-entity-generator")
-            .setOutputDir("generated")
-            .setTemplateDir(templatePath)
-            .addAdditionalProperty("gson", false)
-            .addAdditionalProperty("jackson", false)
-            .addAdditionalProperty("library", "native")
-            .addAdditionalProperty("modelPropertyNaming", "original")
-            .addAdditionalProperty("modelPackage", "org.ubiquia.domain.generated")
-            .addAdditionalProperty("useBeanValidation", true);
-
-        configurator.setGlobalProperties(Map.of(
-            "models", "",
-            "modelDocs", "false",
-            "modelTests", "false",
-            "apis", "false",
-            "apiDocs", "false",
-            "apiTests", "false",
-            "supportingFiles", "false"
-        ));
-
-        var generator = new DefaultGenerator();
-        generator.opts(configurator.toClientOptInput()).generate();
+    @Override
+    protected Map<String, String> buildGlobalProperties() {
+        var props = super.buildGlobalProperties();
+        props.put("supportingFiles", "false");
+        return props;
     }
 }

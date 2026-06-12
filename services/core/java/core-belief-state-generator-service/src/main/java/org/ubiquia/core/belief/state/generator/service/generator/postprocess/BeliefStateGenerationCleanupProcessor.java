@@ -13,6 +13,12 @@ public class BeliefStateGenerationCleanupProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateGenerationCleanupProcessor.class);
 
+    // AbstractDomainModel* files are deleted because the shared library (domain-*.jar) already
+    // provides AbstractDomainModel and AbstractDomainModelEntity; generated classes extend those
+    // via the wildcard imports in the model templates. KeyValuePair and KeyValuePairEntity are
+    // NOT blacklisted — generated models import them from org.ubiquia.domain.generated and they
+    // must remain on the classpath. The generators' postProcessFile handles deletion of the
+    // embeddable support files (Controller, Repository, RelationshipBuilder, DtoMappers).
     private final List<String> BLACKLISTED_FILENAMES = List.of(
         "AbstractDomainModel.java",
         "AbstractDomainModelEntity.java",
@@ -20,14 +26,7 @@ public class BeliefStateGenerationCleanupProcessor {
         "AbstractDomainModelEntityRepository.java",
         "AbstractDomainModelController.java",
         "AbstractDomainModelIngressDtoMapper.java",
-        "AbstractDomainModelEgressDtoMapper.java",
-        "KeyValuePair.java",
-        "KeyValuePairEntity.java",
-        "KeyValuePairController.java",
-        "KeyValuePairEntityRepository.java",
-        "KeyValuePairEntityRelationshipBuilder.java",
-        "KeyValuePairIngressDtoMapper.java",
-        "KeyValuePairEgressDtoMapper.java"
+        "AbstractDomainModelEgressDtoMapper.java"
     );
 
     public void removeBlacklistedFiles(final Path generatedDir) throws IOException {

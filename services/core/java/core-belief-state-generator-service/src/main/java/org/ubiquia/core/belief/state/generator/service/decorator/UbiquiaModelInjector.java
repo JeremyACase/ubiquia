@@ -66,7 +66,6 @@ public class UbiquiaModelInjector implements SchemaTransformer {
         domainProperties.set("createdAt", timestamp("Creation timestamp", true));
         domainProperties.set("updatedAt", timestamp("Last update timestamp", true));
         domainProperties.set("tags", tagsArray());
-        domainProperties.set("modelType", stringOrNull("Transient helper for type introspection"));
         domainSchema.set("properties", domainProperties);
         domainSchema.set("required", this.objectMapper.createArrayNode());
 
