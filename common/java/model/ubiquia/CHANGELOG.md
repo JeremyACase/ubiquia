@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.36.0] - 2026-06-10
+### Removed
+- `simulateOutputPayload` field and its getter/setter from `NodeSettings`; simulated-output behavior is now driven by `NodeType.HIDDEN` and `ComponentType.TEMPLATE` in the flow service
+
 ## [0.31.0] - 2026-05-21
 ### Added
 - `AgentEntity.baseUrl`: nullable column storing the HTTP base URL of the agent; populated during initialization from `AgentConfig` and used by heartbeat and sync services for peer discovery

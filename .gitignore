@@ -31,5 +31,9 @@ deploy/helm/charts
 # Python
 **/__pycache__
 
+# Node / TypeScript
+node_modules
+dist
+
 # Simulation dumps
 *-event-dump.json

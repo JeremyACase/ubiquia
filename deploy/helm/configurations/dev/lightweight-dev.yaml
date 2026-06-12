@@ -18,11 +18,38 @@ ubiquia:
           deployments:
         graph:
           deployments:
-            - name: ubiquia-workbench
+            - name: state-dag
+              domainOntologyName: abstract-world
               version:
                 major: 1
                 minor: 0
                 patch: 0
+              graphSettings:
+                flag: demo
+            - name: location-calculator-dag
+              domainOntologyName: abstract-world
+              version:
+                major: 1
+                minor: 0
+                patch: 0
+              graphSettings:
+                flag: demo
+            - name: entity-movement-dag
+              domainOntologyName: abstract-world
+              version:
+                major: 1
+                minor: 0
+                patch: 0
+              graphSettings:
+                flag: demo
+            - name: action-processing-dag
+              domainOntologyName: abstract-world
+              version:
+                major: 1
+                minor: 0
+                patch: 0
+              graphSettings:
+                flag: demo
     storage:
       minio:
         enabled: false

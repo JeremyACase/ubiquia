@@ -14,6 +14,7 @@ env:
     services/core/java/core-communication-service
     services/core/java/core-flow-service
     services/util/python/util-simulation-service
+    services/util/ts/util-ubiquia-dashboard
     services/dag/workbench/python/dag-workbench-whisperer
     services/dag/workbench/python/dag-workbench-scaffold
     services/dag/workbench/ts/dag-workbench-ui
@@ -95,13 +96,19 @@ jobs:
             echo "----"
             echo "Building $dir  ->  ${IMAGE_NAME}:latest"
 
-            # Special-case the UI subproject: build with APP_BASE_PATH (Angular/NGINX image)
+            # Angular workbench UI: pass APP_BASE_PATH for base-href baking
             if [[ "$dir" == *"/dag-workbench-ui" ]]; then
               docker build \
                 --build-arg APP_BASE_PATH="/" \
                 -t "${IMAGE_NAME}:latest" "$dir"
+
+            # React/NGINX frontend: no extra build args (base href injected at runtime by comm service)
+            elif [[ "$dir" == *"/util-ubiquia-dashboard" ]]; then
+              docker build \
+                -t "${IMAGE_NAME}:latest" "$dir"
+
             else
-              # Default: Java services use OPENJDK_VERSION build arg
+              # Java services: pass OPENJDK_VERSION
               docker build \
                 --build-arg OPENJDK_VERSION="${OPENJDK_VERSION}" \
                 -t "${IMAGE_NAME}:latest" "$dir"

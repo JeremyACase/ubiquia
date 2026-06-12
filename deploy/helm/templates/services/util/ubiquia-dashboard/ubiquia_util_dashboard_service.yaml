@@ -1,0 +1,17 @@
+{{- if .Values.ubiquia.components.util.ubiquiaDashboard.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubiquia-util-dashboard
+  labels:
+    component: ubiquia-util-dashboard
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+  selector:
+    component: ubiquia-util-dashboard
+{{- end }}

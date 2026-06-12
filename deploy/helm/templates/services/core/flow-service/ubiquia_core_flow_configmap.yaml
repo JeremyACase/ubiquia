@@ -112,10 +112,12 @@ data:
               enabled: true
               directory:  /app/etc/domain-ontologies/
             graph:
+              enabled: {{ if .Values.ubiquia.agent.flowService.bootstrap.graph.deployments }}true{{ else }}false{{ end }}
               deployments:
                 {{- range $v := .Values.ubiquia.agent.flowService.bootstrap.graph.deployments }}
-                - name: {{ $v.name }}
-                  version: 
+                - graphName: {{ $v.name }}
+                  domainOntologyName: {{ index $v "domainOntologyName" }}
+                  domainVersion:
                     major: {{ $v.version.major }}
                     minor: {{ $v.version.minor }}
                     patch: {{ $v.version.patch }}

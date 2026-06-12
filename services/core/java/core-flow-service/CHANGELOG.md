@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.36.0] - 2026-06-10
+### Added
+- `GraphBootstrapConfig` and `GraphBootstrapper` for config-driven graph deployment on startup (conditional on `ubiquia.agent.flow-service.bootstrap.graph.enabled`)
+- `ComponentRepository.findByNodeId` and `findByNameAndGraphId` query methods
+- `NodeManager.getLocalNodeNames()` helper
+- `NodeSimulatedOutputLogicTest` integration tests
+
+### Changed
+- `NodeContextBuilder` now auto-resolves unlinked components via name+graph lookup when the node DTO does not carry an explicit component reference
+- `NodeInboxPollingLogic` now null-checks egress settings before evaluating concurrency limits
+- `NodePassthroughLogic` now skips passthrough for `HIDDEN` node type
+- `NodeSimulatedOutputLogic` now derives simulated-output status from `ComponentType.TEMPLATE` or a `HIDDEN` node with no component, replacing the removed `NodeSettings.simulateOutputPayload` flag
+- `GraphRegistrar` now performs a final auto-link pass that matches unlinked components to unlinked nodes by name
+- `NodeManager` logs node names instead of node IDs in deployment completion messages
+
 ## [0.35.0] - 2026-05-27
 ### Added
 - YugabyteDB datasource branch in the Helm configmap: `ubiquia.agent.database.type: YugabyteDB` renders the PostgreSQL JDBC driver with `jdbc:postgresql://{{ .Release.Name }}-yb-tservers:5433/...`

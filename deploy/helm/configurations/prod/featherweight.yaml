@@ -4,3 +4,7 @@ logging:
 ubiquia:
   mode: PROD
   cluster:
+  components:
+    util:
+      ubiquiaDashboard:
+        enabled: false

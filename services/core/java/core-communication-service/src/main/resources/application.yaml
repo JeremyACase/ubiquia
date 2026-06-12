@@ -53,3 +53,7 @@ ubiquia:
       port: 8080
       url: http://ubiquia-core-flow-service
       pollFrequencyMilliseconds: 5000
+  dashboard:
+    service:
+      port: 80
+      url: http://ubiquia-util-dashboard

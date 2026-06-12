@@ -1,5 +1,6 @@
 package org.ubiquia.core.flow.service.logic.node;
 
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,8 @@ public class NodeInboxPollingLogic {
             valid = true;
         } else {
             var type = context.getNodeType();
-            if (this.nodeTypeLogic.nodeTypeRequiresEgressSettings(type)) {
+            if (this.nodeTypeLogic.nodeTypeRequiresEgressSettings(type)
+                && Objects.nonNull(context.getEgressSettings())) {
                 valid = this.hasFewerOpenMessagesThanEgressConcurrency(node);
             } else {
                 valid = true;

@@ -18,16 +18,14 @@ ubiquia:
           deployments:
         graph:
           deployments:
-            - name: ubiquia-workbench
-              version:
-                major: 2
-                minor: 0
-                patch: 0
     storage:  
       minio:
         enabled: false
         
   components:
+    util:
+      ubiquiaDashboard:
+        enabled: false
     core:
       beliefStateGeneratorService:
         image:

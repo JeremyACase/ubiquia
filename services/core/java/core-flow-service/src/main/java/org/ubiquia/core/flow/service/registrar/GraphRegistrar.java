@@ -210,6 +210,27 @@ public class GraphRegistrar {
             }
         }
 
+        // Final pass: match unlinked components to unlinked nodes by name
+        for (var componentEntity : componentEntities) {
+            if (Objects.isNull(componentEntity.getNode())) {
+                var nodeRecord = nodeEntities
+                    .stream()
+                    .filter(x -> Objects.isNull(x.getComponent())
+                        && x.getName().equals(componentEntity.getName()))
+                    .findFirst();
+                if (nodeRecord.isPresent()) {
+                    var nodeEntity = nodeRecord.get();
+                    logger.info("...auto-linking component {} to node {} by name match...",
+                        componentEntity.getName(), nodeEntity.getName());
+                    nodeEntity.setComponent(componentEntity);
+                    nodeEntity = this.nodeRepository.save(nodeEntity);
+                    componentEntity.setNode(nodeEntity);
+                    this.componentRepository.save(componentEntity);
+                    logger.info("...completed auto-linking.");
+                }
+            }
+        }
+
         logger.info("...completed adapting nodes to components.");
     }
 
