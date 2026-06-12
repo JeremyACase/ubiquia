@@ -7,52 +7,54 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+/**
+ * Adds {@code allOf} inheritance references to every definition that does not already
+ * declare one, pointing to {@code #/definitions/AbstractDomainModel}.
+ */
+@Order(3)
 @Service
-public class InheritancePreprocessor {
+public class InheritancePreprocessor implements SchemaTransformer {
 
-    private static final Logger logger = LoggerFactory.getLogger(UbiquiaModelInjector.class);
+    private static final Logger logger = LoggerFactory.getLogger(InheritancePreprocessor.class);
 
     private static final String REF_VALUE = "#/definitions/AbstractDomainModel";
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    /**
-     * Accepts a JSON schema as a string, modifies it, and returns the result as a string.
-     *
-     * @param jsonSchema The input JSON schema as a string
-     * @return The transformed JSON schema as a string
-     * @throws IOException If JSON parsing or writing fails
-     */
-    public String appendInheritance(final String jsonSchema) throws IOException {
+    /** {@inheritDoc} */
+    @Override
+    public String transform(final String schema) throws IOException {
 
-        logger.debug("Appending inheritance to: {}...", jsonSchema);
-        var root = this.objectMapper.readTree(jsonSchema);
-        var transformed = this.transform(root);
+        logger.debug("Appending inheritance to: {}...", schema);
+        var root = this.objectMapper.readTree(schema);
+        var transformed = this.applyTransformations(root);
         var modified = this
             .objectMapper
             .writerWithDefaultPrettyPrinter()
             .writeValueAsString(transformed);
         logger.debug("...modified to: {}", modified);
-        return jsonSchema;
+        return modified;
     }
 
     /**
      * Transforms the supplied JSON Schema root node in-place where applicable.
+     *
+     * @param root the root JSON node to transform
+     * @return the transformed node
      */
-    private JsonNode transform(JsonNode root) {
+    private JsonNode applyTransformations(final JsonNode root) {
         if (!root.isObject()) return root;
 
         var rootObj = ((ObjectNode) root).deepCopy();
 
-        // Handle Draft-04 style "definitions"
         if (rootObj.has("definitions")) {
             this.processContainer((ObjectNode) rootObj.get("definitions"));
         }
 
-        // Handle OpenAPI-style "components.schemas"
         if (rootObj.has("components") && rootObj.get("components").has("schemas")) {
             this.processContainer((ObjectNode) rootObj.get("components").get("schemas"));
         }
@@ -61,9 +63,11 @@ public class InheritancePreprocessor {
     }
 
     /**
-     * Iterate over each definition/schema in the container and add the allOf reference when needed.
+     * Iterates over each definition in the container and adds an allOf reference when needed.
+     *
+     * @param container the definitions or schemas container node
      */
-    private void processContainer(ObjectNode container) {
+    private void processContainer(final ObjectNode container) {
         var fields = container.fields();
         while (fields.hasNext()) {
             var entry = fields.next();
@@ -71,7 +75,6 @@ public class InheritancePreprocessor {
 
             var schema = (ObjectNode) entry.getValue();
 
-            // Skip enums and existing allOfs
             if (schema.has("enum") || schema.has("allOf")) {
                 continue;
             }
@@ -85,4 +88,3 @@ public class InheritancePreprocessor {
         }
     }
 }
-

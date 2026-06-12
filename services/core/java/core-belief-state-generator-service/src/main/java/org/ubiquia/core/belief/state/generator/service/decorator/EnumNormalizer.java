@@ -8,18 +8,29 @@ import java.io.IOException;
 import java.util.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+/**
+ * Normalizes inline enum definitions into named {@code $ref} definitions.
+ *
+ * <p>Inline enum arrays found in object properties are hoisted into the top-level
+ * {@code definitions} block and replaced with a {@code $ref}, deduplicating identical
+ * enum value sets by content hash.
+ */
+@Order(1)
 @Service
-public class EnumNormalizer {
+public class EnumNormalizer implements SchemaTransformer {
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    public String normalizeEnums(final String rawSchemaJson) throws IOException {
-        var normalizedResult = rawSchemaJson;
+    /** {@inheritDoc} */
+    @Override
+    public String transform(final String schema) throws IOException {
+        var normalizedResult = schema;
 
-        var root = this.objectMapper.readTree(rawSchemaJson);
+        var root = this.objectMapper.readTree(schema);
         var jsonSchemaNode = root.has("jsonSchema") ? root.get("jsonSchema") : root;
 
         if (jsonSchemaNode instanceof ObjectNode jsonSchemaObject) {
@@ -45,16 +56,12 @@ public class EnumNormalizer {
                     var propsNode = def.get("properties");
 
                     if (propsNode instanceof ObjectNode props) {
-                        this.normalizeEnumsInProperties(
-                            props,
-                            definitions,
-                            enumToDefName);
+                        this.normalizeEnumsInProperties(props, definitions, enumToDefName);
                     }
                 }
             }
 
-            normalizedResult = this
-                .objectMapper
+            normalizedResult = this.objectMapper
                 .writerWithDefaultPrettyPrinter()
                 .writeValueAsString(root);
         }
@@ -63,9 +70,9 @@ public class EnumNormalizer {
     }
 
     private void normalizeEnumsInProperties(
-        ObjectNode props,
-        ObjectNode definitions,
-        Map<String, String> enumToDefName
+        final ObjectNode props,
+        final ObjectNode definitions,
+        final Map<String, String> enumToDefName
     ) {
         var propNames = Lists.newArrayList(props.fieldNames());
 
@@ -73,8 +80,8 @@ public class EnumNormalizer {
             var propNode = props.get(propName);
 
             var isObjectNode = propNode instanceof ObjectNode;
-            var hasEnum = isObjectNode && (propNode).has("enum");
-            var hasRef = isObjectNode && (propNode).has("$ref");
+            var hasEnum = isObjectNode && propNode.has("enum");
+            var hasRef = isObjectNode && propNode.has("$ref");
 
             if (isObjectNode && hasEnum && !hasRef) {
                 var prop = (ObjectNode) propNode;
@@ -86,11 +93,11 @@ public class EnumNormalizer {
 
                 var enumKey = String.join("|", enumValues);
 
-                String defEnumName = null;
+                String defEnumName;
                 if (enumToDefName.containsKey(enumKey)) {
                     defEnumName = enumToDefName.get(enumKey);
                 } else {
-                    String hash = DigestUtils.sha256Hex(enumKey).substring(0, 8);
+                    var hash = DigestUtils.sha256Hex(enumKey).substring(0, 8);
                     defEnumName = "Enum_" + hash;
 
                     var newEnum = this.objectMapper.createObjectNode();

@@ -1,27 +1,35 @@
 package org.ubiquia.core.belief.state.generator.service.decorator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
+/**
+ * Injects Ubiquia domain model definitions ({@code AbstractDomainModel}, {@code KeyValuePair})
+ * into the top-level {@code definitions} block of the JSON schema.
+ */
+@Order(2)
 @Service
-public class UbiquiaModelInjector {
+public class UbiquiaModelInjector implements SchemaTransformer {
 
     private static final Logger logger = LoggerFactory.getLogger(UbiquiaModelInjector.class);
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    public String appendDomainModels(final String jsonSchema) throws JsonProcessingException {
+    /** {@inheritDoc} */
+    @Override
+    public String transform(final String schema) throws IOException {
 
-        logger.debug("Appending Ubiquia models to: {}...", jsonSchema);
+        logger.debug("Appending Ubiquia models to: {}...", schema);
 
-        var node = objectMapper.readTree(jsonSchema);
+        var node = objectMapper.readTree(schema);
 
         if (!node.isObject()) {
             throw new IllegalArgumentException(
@@ -44,31 +52,33 @@ public class UbiquiaModelInjector {
             .put("additionalProperties", false);
 
         var kvProps = this.objectMapper.createObjectNode();
-        kvProps.set("key",   stringOrNull("Tag key"));
+        kvProps.set("key", stringOrNull("Tag key"));
         kvProps.set("value", stringOrNull("Tag value"));
         kvPair.set("properties", kvProps);
-        kvPair.set("required", this.objectMapper.createArrayNode()); // add "key","value" if required
+        kvPair.set("required", this.objectMapper.createArrayNode());
 
         var domainSchema = this.objectMapper.createObjectNode()
             .put("type", "object")
             .put("additionalProperties", false);
 
         var domainProperties = this.objectMapper.createObjectNode();
-        domainProperties.set("id",        uuid("Database-generated UUID"));
+        domainProperties.set("id", uuid("Database-generated UUID"));
         domainProperties.set("createdAt", timestamp("Creation timestamp", true));
         domainProperties.set("updatedAt", timestamp("Last update timestamp", true));
         domainProperties.set("tags", tagsArray());
         domainProperties.set("modelType", stringOrNull("Transient helper for type introspection"));
         domainSchema.set("properties", domainProperties);
-        domainSchema.set("required", this.objectMapper.createArrayNode()); // e.g. ["id"] if you need it
+        domainSchema.set("required", this.objectMapper.createArrayNode());
 
         defs.putIfAbsent("KeyValuePair", kvPair);
         defs.putIfAbsent("AbstractDomainModel", domainSchema);
 
-        var preprocssed = this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
-        logger.debug("...appended Ubiquia models: {}.", preprocssed);
+        var preprocessed = this.objectMapper
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(root);
+        logger.debug("...appended Ubiquia models: {}.", preprocessed);
 
-        return preprocssed;
+        return preprocessed;
     }
 
     private ObjectNode stringOrNull(final String desc) {

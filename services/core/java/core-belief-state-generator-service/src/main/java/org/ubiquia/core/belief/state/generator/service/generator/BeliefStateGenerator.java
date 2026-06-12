@@ -16,9 +16,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateCompiler;
 import org.ubiquia.core.belief.state.generator.service.compile.BeliefStateUberizer;
-import org.ubiquia.core.belief.state.generator.service.decorator.EnumNormalizer;
-import org.ubiquia.core.belief.state.generator.service.decorator.InheritancePreprocessor;
-import org.ubiquia.core.belief.state.generator.service.decorator.UbiquiaModelInjector;
+import org.ubiquia.core.belief.state.generator.service.decorator.SchemaTransformationPipeline;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiDtoGenerator;
 import org.ubiquia.core.belief.state.generator.service.generator.openapi.OpenApiEntityGenerator;
 import org.ubiquia.core.belief.state.generator.service.generator.postprocess.BeliefStateGenerationPostProcessor;
@@ -47,10 +45,7 @@ public class BeliefStateGenerator {
     private BeliefStateGenerationPostProcessor beliefStateGenerationPostProcessor;
 
     @Autowired
-    private EnumNormalizer enumNormalizer;
-
-    @Autowired
-    private InheritancePreprocessor inheritancePreprocessor;
+    private SchemaTransformationPipeline schemaTransformationPipeline;
 
     @Autowired
     private JsonSchemaToOpenApiDtoYamlMapper jsonSchemaToOpenApiDtoYamlMapper;
@@ -66,9 +61,6 @@ public class BeliefStateGenerator {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private UbiquiaModelInjector ubiquiaModelInjector;
 
     @Autowired
     private BeliefStateUberizer beliefStateUberizer;
@@ -143,9 +135,7 @@ public class BeliefStateGenerator {
             : this.objectMapper.valueToTree(schema); // convert POJO/Map/etc
 
         var jsonSchema = this.objectMapper.writeValueAsString(schemaNode);
-        jsonSchema = this.enumNormalizer.normalizeEnums(jsonSchema);
-        jsonSchema = this.ubiquiaModelInjector.appendDomainModels(jsonSchema);
-        jsonSchema = this.inheritancePreprocessor.appendInheritance(jsonSchema);
+        jsonSchema = this.schemaTransformationPipeline.apply(jsonSchema);
 
         logger.debug("Preprocessed JSON Schema to: {}", jsonSchema);
 
