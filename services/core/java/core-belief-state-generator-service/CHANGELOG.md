@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.37.1] - 2026-06-15
+### Fixed
+- `KeyValuePairEntity.key`: field mapped to SQL reserved word `key` as a bare column name; `UbiquiaDomainEntityGenerator.attachColumnAnnotationsToEmbeddables()` now detects reserved-word field names on embeddable models and emits `@Column(name = "pair_<field>")`, resolving H2 syntax errors at runtime
+- `BeliefStateGenerationSupportProcessor.SupportTemplate.APPLICATION`: destination path typo (`org/ubiquiadomainl/generated/`) placed `Application.java` in a directory that did not match its package declaration, causing every generated belief state compilation to fail; corrected to `org/ubiquia/domain/generated/`
+- Stale `Application.java` left at the typo'd path from a prior run was compiled alongside the correctly placed file, causing a duplicate-class error; artifact removed
+
+### Changed
+- `BeliefStateCompiler`: collects `DiagnosticCollector` output and logs each error at `ERROR` level before throwing, surfacing compiler errors in logs without requiring `--stacktrace`
+- Resolved all Google Java Style checkstyle warnings across the service: missing Javadoc on types and methods, `NeedBraces`, `LineLength`, `OperatorWrap`, `VariableDeclarationUsageDistance`, `CustomImportOrder`, `EmptyLineSeparator`, `SummaryJavadoc`, and `AbbreviationAsWordInName`; `BLACKLISTED_FILENAMES` renamed to `blacklistedFilenames`
+
 ## [0.37.0] - 2026-06-12
 ### Added
 - `SchemaTransformer` interface: single-method contract (`transform(String) throws IOException`) implemented by all schema preprocessing steps

@@ -1,13 +1,14 @@
 package org.ubiquia.core.belief.state.generator.service.visitor.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-
+/** Utility methods for inspecting JSON Schema nodes. */
 @Service
 public class JsonSchemaNodeUtils {
 
+    /** Returns true if {@code node} represents a string enum definition. */
     public boolean isEnumDefinition(final JsonNode node) {
         var result = false;
 
@@ -22,6 +23,7 @@ public class JsonSchemaNodeUtils {
         return result;
     }
 
+    /** Extracts the local definition name from a {@code $ref} value, or returns null. */
     public String extractLocalRefName(final String ref) {
         var result = (String) null;
 

@@ -7,6 +7,7 @@ import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.languages.JavaClientCodegen;
 import org.openapitools.codegen.model.ModelsMap;
 
+/** OpenAPI generator that produces DTO mappers and controller stubs for domain models. */
 public class UbiquiaDomainDtoGenerator extends JavaClientCodegen {
 
     private final Map<String, CodegenModel> modelIndex = new HashMap<>();

@@ -50,9 +50,9 @@ public abstract class AbstractJsonSchemaToOpenApiYamlMapper {
 
         var rewrittenSchema =
             jsonSchema.replaceAll("#/definitions/", "#/components/schemas/");
-        var kindByName = this.classifier.classify(rewrittenSchema);
+        final var kindByName = this.classifier.classify(rewrittenSchema);
 
-        var mainSchema = (ObjectNode) this.objectMapper.readTree(rewrittenSchema);
+        final var mainSchema = (ObjectNode) this.objectMapper.readTree(rewrittenSchema);
 
         var openApiNode = this.objectMapper.createObjectNode();
         openApiNode.put("openapi", "3.0.0");

@@ -37,7 +37,7 @@ public class BeliefStateGenerationSupportProcessor {
 
         APPLICATION(
             "template/java/support/Application.java.template",
-            "generated/src/main/java/org/ubiquiadomainl/generated/Application.java",
+            "generated/src/main/java/org/ubiquia/domain/generated/Application.java",
             false),
 
         EXCEPTION_HANDLER(

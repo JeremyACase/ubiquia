@@ -57,7 +57,7 @@ public class UbiquiaModelInjector implements SchemaTransformer {
         kvPair.set("properties", kvProps);
         kvPair.set("required", this.objectMapper.createArrayNode());
 
-        var domainSchema = this.objectMapper.createObjectNode()
+        final var domainSchema = this.objectMapper.createObjectNode()
             .put("type", "object")
             .put("additionalProperties", false);
 

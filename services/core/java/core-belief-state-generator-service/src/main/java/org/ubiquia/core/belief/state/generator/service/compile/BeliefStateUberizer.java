@@ -15,6 +15,7 @@ import org.springframework.boot.loader.tools.LibraryScope;
 import org.springframework.boot.loader.tools.Repackager;
 import org.springframework.stereotype.Service;
 
+/** Packages compiled classes and resources into a Spring Boot executable Uber JAR. */
 @Service
 public class BeliefStateUberizer {
 
@@ -49,14 +50,16 @@ public class BeliefStateUberizer {
         // Create temporary base JAR
         Path baseJarPath = Files.createTempFile("base", ".jar");
 
-        try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(baseJarPath.toFile()))) {
+        try (JarOutputStream jos = new JarOutputStream(
+            new FileOutputStream(baseJarPath.toFile()))) {
 
             // Add compiled classes
             Files.walk(classesPath)
                 .filter(Files::isRegularFile)
                 .forEach(path -> {
                     try {
-                        String entryName = classesPath.relativize(path).toString().replace("\\", "/");
+                        String entryName = classesPath.relativize(path)
+                            .toString().replace("\\", "/");
                         jos.putNextEntry(new ZipEntry(entryName));
                         Files.copy(path, jos);
                         jos.closeEntry();
@@ -72,7 +75,8 @@ public class BeliefStateUberizer {
                     .filter(Files::isRegularFile)
                     .forEach(path -> {
                         try {
-                            String entryName = resourcesPath.relativize(path).toString().replace("\\", "/");
+                            String entryName = resourcesPath.relativize(path)
+                                .toString().replace("\\", "/");
                             jos.putNextEntry(new ZipEntry(entryName));
                             Files.copy(path, jos);
                             jos.closeEntry();

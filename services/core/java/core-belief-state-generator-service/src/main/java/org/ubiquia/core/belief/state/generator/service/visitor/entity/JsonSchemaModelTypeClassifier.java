@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.belief.state.generator.model.json.schema.ModelType;
 
+/** Classifies each JSON Schema definition as ENTITY, EMBEDDABLE, ENUM, or ISOLATED. */
 @Service
 public class JsonSchemaModelTypeClassifier {
 
@@ -23,6 +24,7 @@ public class JsonSchemaModelTypeClassifier {
     @Autowired
     private JsonSchemaNodeUtils utils;
 
+    /** Classifies all definitions in {@code jsonSchemaString} by their JPA mapping role. */
     public Map<String, ModelType> classify(final String jsonSchemaString) {
         Map<String, ModelType> result = Map.of();
 
@@ -46,12 +48,13 @@ public class JsonSchemaModelTypeClassifier {
                     final var out = g.outRefs.getOrDefault(name, Set.of()).size();
                     final var in  = g.inRefs.getOrDefault(name, Set.of()).size();
 
-                    if (cycleNodes.contains(name) || cycleDetector.hasDirectMutualRef(name, g.outRefs)) {
-                        computed.put(name, ModelType.ENTITY);       // bidirectional path/cycle
+                    if (cycleNodes.contains(name)
+                        || cycleDetector.hasDirectMutualRef(name, g.outRefs)) {
+                        computed.put(name, ModelType.ENTITY);
                     } else if (out > 0) {
-                        computed.put(name, ModelType.ENTITY);       // unidirectional: has outgoing refs
+                        computed.put(name, ModelType.ENTITY);
                     } else if (in > 0) {
-                        computed.put(name, ModelType.EMBEDDABLE);   // referenced by others, references none
+                        computed.put(name, ModelType.EMBEDDABLE);
                     } else {
                         computed.put(name, ModelType.ISOLATED);     // neither in nor out
                     }

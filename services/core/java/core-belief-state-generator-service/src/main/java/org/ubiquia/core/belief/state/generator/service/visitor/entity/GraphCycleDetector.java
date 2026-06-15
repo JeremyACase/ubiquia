@@ -3,6 +3,7 @@ package org.ubiquia.core.belief.state.generator.service.visitor.entity;
 import java.util.*;
 import org.springframework.stereotype.Service;
 
+/** Detects directed cycles and mutual back-references in a JSON Schema reference graph. */
 @Service
 public class GraphCycleDetector {
 
@@ -63,7 +64,7 @@ public class GraphCycleDetector {
     }
 
     /**
-     * Direct mutual back-reference check (A->B && B->A)
+     * Direct mutual back-reference check (A-&gt;B and B-&gt;A).
      */
     public boolean hasDirectMutualRef(
         final String name,

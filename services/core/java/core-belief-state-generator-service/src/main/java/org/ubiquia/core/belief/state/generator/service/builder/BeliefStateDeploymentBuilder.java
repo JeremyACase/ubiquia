@@ -84,9 +84,9 @@ public class BeliefStateDeploymentBuilder {
      */
     public V1Service buildServiceFrom(final DomainOntology domainOntology) {
 
-        var beliefStateName =
+        final var beliefStateName =
             this.beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(domainOntology);
-        var domainName = domainOntology.getName().toLowerCase();
+        final var domainName = domainOntology.getName().toLowerCase();
 
         var service = new V1Service();
         service.setApiVersion("v1");

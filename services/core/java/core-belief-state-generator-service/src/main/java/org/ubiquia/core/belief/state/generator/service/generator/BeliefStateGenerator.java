@@ -24,6 +24,7 @@ import org.ubiquia.core.belief.state.generator.service.k8s.BeliefStateOperator;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiDtoYamlMapper;
 import org.ubiquia.core.belief.state.generator.service.mapper.JsonSchemaToOpenApiEntityYamlMapper;
 
+/** Orchestrates the full belief-state generation pipeline from a domain ontology. */
 @Service
 public class BeliefStateGenerator {
 

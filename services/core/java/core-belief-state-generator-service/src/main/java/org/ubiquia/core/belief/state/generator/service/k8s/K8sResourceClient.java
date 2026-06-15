@@ -32,7 +32,8 @@ public final class K8sResourceClient<T extends KubernetesObject, L extends Kuber
      *
      * @param api          the underlying Kubernetes API handle
      * @param namespace    the namespace all operations will target
-     * @param resourceKind human-readable kind label used in log messages (e.g. {@code "deployment"})
+     * @param resourceKind human-readable kind label used in log messages
+     *                     (e.g. {@code "deployment"})
      */
     public K8sResourceClient(
         final GenericKubernetesApi<T, L> api,

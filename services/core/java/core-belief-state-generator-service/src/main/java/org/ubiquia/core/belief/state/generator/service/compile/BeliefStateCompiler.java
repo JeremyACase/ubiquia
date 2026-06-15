@@ -15,11 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+/** Compiles generated Java sources using the system Java compiler. */
 @Service
 public class BeliefStateCompiler {
 
     private static final Logger logger = LoggerFactory.getLogger(BeliefStateCompiler.class);
 
+    /** Compiles all Java source files under {@code sourceDirPath} to {@code outputDirPath}. */
     public void compileGeneratedSources(
         final String sourceDirPath,
         final String outputDirPath,
@@ -35,10 +37,10 @@ public class BeliefStateCompiler {
             throw new IllegalStateException("JDK required. System compiler not found.");
         }
 
-        var fileManager = compiler.getStandardFileManager(null, null, null);
+        final var fileManager = compiler.getStandardFileManager(null, null, null);
 
         // Collect all .java files under sourceDir
-        var sourceFiles = Files.walk(Paths.get(sourceDirPath))
+        final var sourceFiles = Files.walk(Paths.get(sourceDirPath))
             .filter(path -> path.toString().endsWith(".java"))
             .map(Path::toFile)
             .collect(Collectors.toList());
@@ -69,17 +71,26 @@ public class BeliefStateCompiler {
         options.addAll(Arrays.asList("-classpath", classpath));
         options.addAll(Arrays.asList("-d", outputDirPath));
 
-        // Compile
+        // Collect diagnostics so failures are visible in logs
+        var diagnostics = new javax.tools.DiagnosticCollector<javax.tools.JavaFileObject>();
         var compilationUnits = fileManager.getJavaFileObjectsFromFiles(sourceFiles);
         JavaCompiler.CompilationTask task = compiler.getTask(
-            null, fileManager, null, options, null, compilationUnits
+            null, fileManager, diagnostics, options, null, compilationUnits
         );
 
         var success = task.call();
         fileManager.close();
 
         if (!success) {
-            throw new RuntimeException("Compilation failed.");
+            for (var d : diagnostics.getDiagnostics()) {
+                if (d.getKind() == javax.tools.Diagnostic.Kind.ERROR) {
+                    logger.error("Compile error [{}:{}] {}",
+                        d.getSource() != null ? d.getSource().getName() : "<unknown>",
+                        d.getLineNumber(),
+                        d.getMessage(java.util.Locale.ENGLISH));
+                }
+            }
+            throw new RuntimeException("Compilation failed — see ERROR lines above.");
         }
 
         logger.info("...compilation successful.");

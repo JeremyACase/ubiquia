@@ -53,7 +53,9 @@ public class InheritancePreprocessor implements SchemaTransformer {
      * @return the transformed node
      */
     private JsonNode applyTransformations(final JsonNode root) {
-        if (!root.isObject()) return root;
+        if (!root.isObject()) {
+            return root;
+        }
 
         var rootObj = ((ObjectNode) root).deepCopy();
 
@@ -77,7 +79,9 @@ public class InheritancePreprocessor implements SchemaTransformer {
         var fields = container.fields();
         while (fields.hasNext()) {
             var entry = fields.next();
-            if (!entry.getValue().isObject()) continue;
+            if (!entry.getValue().isObject()) {
+                continue;
+            }
 
             var schema = (ObjectNode) entry.getValue();
 
