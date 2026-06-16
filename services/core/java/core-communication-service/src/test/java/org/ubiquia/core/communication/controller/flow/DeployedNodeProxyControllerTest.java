@@ -1,131 +1,148 @@
 package org.ubiquia.core.communication.controller.flow;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.env.Environment;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.ubiquia.common.library.api.config.FlowServiceConfig;
+import org.ubiquia.core.communication.service.io.flow.DeployedGraphPoller;
 import org.ubiquia.core.communication.service.manager.flow.NodeProxyManager;
 
-@SpringBootTest(properties = {
-    "spring.task.scheduling.enabled=false",
-    "ubiquia.flow.service.url=http://flow-host",
-    "ubiquia.flow.service.port=8080",
-    "ubiquia.flow.service.poll-frequency-milliseconds=60000"
-})
-@AutoConfigureMockMvc
+@WebMvcTest(controllers = DeployedNodeProxyController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@TestPropertySource(properties = "spring.task.scheduling.enabled=false")
 class DeployedNodeProxyControllerTest {
 
-    @Autowired private MockMvc mockMvc;
-    @Autowired private Environment env;
+    private static final String GRAPH = "my-graph";
+    private static final String BASE = "/ubiquia/core-communication-service";
 
-    @MockitoBean private NodeProxyManager nodeProxyManager;
+    @Autowired
+    private MockMvc mockMvc;
 
-    private String flowUrl() {
-        return env.getRequiredProperty("ubiquia.flow.service.url");
+    private MockWebServer server;
+
+    @MockitoBean
+    private NodeProxyManager nodeProxyManager;
+
+    @MockitoBean
+    private FlowServiceConfig flowServiceConfig;
+
+    @MockitoBean
+    private DeployedGraphPoller deployedGraphPoller;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        this.server = new MockWebServer();
+        this.server.start();
+        given(this.flowServiceConfig.getBaseUrl())
+            .willReturn("http://" + this.server.getHostName() + ":" + this.server.getPort());
     }
 
-    private int flowPort() {
-        return Integer.parseInt(env.getRequiredProperty("ubiquia.flow.service.port"));
+    @AfterEach
+    void tearDown() throws IOException {
+        this.server.shutdown();
     }
 
     @Test
+    @DisplayName("GET /node/get-proxied-urls returns registered endpoints")
     void getProxiedUrls_returnsRegisteredEndpoints() throws Exception {
-        when(nodeProxyManager.getRegisteredEndpoints()).thenReturn(List.of("a/b", "c/d"));
+        given(this.nodeProxyManager.getRegisteredEndpoints()).willReturn(List.of("a/b", "c/d"));
 
-        mockMvc.perform(get("/ubiquia/core-communication-service/node/get-proxied-urls"))
+        this.mockMvc.perform(get(BASE + "/node/get-proxied-urls"))
             .andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$[*]").value(containsInAnyOrder("a/b", "c/d")));
-
-        verify(nodeProxyManager).getRegisteredEndpoints();
+            .andExpect(content().json("[\"a/b\",\"c/d\"]"));
     }
 
     @Test
-    void proxyToNode_get_forwardsStatusHeadersAndBody() throws Exception {
-        var graphName = "my-graph";
-        var nodeName = "nodeA";
-        when(nodeProxyManager.getRegisteredEndpointForNodeName(nodeName)).thenReturn("registered");
+    @DisplayName("Unknown node → 400 BAD_REQUEST")
+    void unknownNode_returns400() throws Exception {
+        given(this.nodeProxyManager.getRegisteredEndpointForNodeName("missing")).willReturn(null);
 
-        var connection = mock(HttpURLConnection.class);
-        when(connection.getResponseCode()).thenReturn(200);
-        when(connection.getHeaderFields()).thenReturn(Map.of(
-            "X-Downstream", List.of("yes"),
-            "Content-Type", List.of("text/plain")
-        ));
-        when(connection.getInputStream()).thenReturn(new ByteArrayInputStream("OK".getBytes()));
-
-        var capturedTargetUrl = new StringBuilder();
-
-        try (var mockedUrl =
-                 mockConstruction(URL.class, (mock, context) -> {
-                     capturedTargetUrl.append(context.arguments().get(0));
-                     when(mock.openConnection()).thenReturn(connection);
-                 })) {
-
-            mockMvc.perform(get("/ubiquia/core-communication-service/" + graphName + "/node/" + nodeName + "/foo/bar")
-                    .header("X-Inbound", "123"))
-                .andExpect(status().isOk())
-                .andExpect(header().string("X-Downstream", "yes"))
-                .andExpect(content().string("OK"));
-
-            verify(connection).setRequestMethod("GET");
-            verify(connection).addRequestProperty("X-Inbound", "123");
-
-            var expected = flowUrl() + ":" + flowPort()
-                + "/ubiquia/core-flow-service/" + graphName + "/node/" + nodeName.toLowerCase() + "/foo/bar";
-            org.junit.jupiter.api.Assertions.assertTrue(
-                capturedTargetUrl.toString().contains(expected),
-                "Expected URL to contain: " + expected + " but was: " + capturedTargetUrl
-            );
-        }
+        this.mockMvc.perform(get(BASE + "/" + GRAPH + "/node/missing/foo"))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
-    void proxyToNode_post_streamsRequestBodyToDownstream() throws Exception {
-        var graphName = "my-graph";
-        var nodeName = "nodeB";
-        when(nodeProxyManager.getRegisteredEndpointForNodeName(nodeName)).thenReturn("registered");
+    @DisplayName("GET forwards status, headers, and body to downstream")
+    void get_forwardsResponseToClient() throws Exception {
+        given(this.nodeProxyManager.getRegisteredEndpointForNodeName("nodeA"))
+            .willReturn("registered");
 
-        var downstreamBody = new ByteArrayOutputStream();
+        this.server.enqueue(new MockResponse()
+            .setResponseCode(200)
+            .setHeader("Content-Type", "text/plain")
+            .setHeader("X-Downstream", "yes")
+            .setBody("OK"));
 
-        var connection = mock(HttpURLConnection.class);
-        when(connection.getResponseCode()).thenReturn(201);
-        when(connection.getHeaderFields()).thenReturn(Map.of());
-        when(connection.getOutputStream()).thenReturn(downstreamBody);
-        when(connection.getInputStream()).thenReturn(new ByteArrayInputStream("CREATED".getBytes()));
+        this.mockMvc.perform(get(BASE + "/" + GRAPH + "/node/nodeA/foo/bar")
+                .header("X-Inbound", "123"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("X-Downstream", "yes"))
+            .andExpect(content().string("OK"));
 
-        try (var mockedUrl =
-                 mockConstruction(URL.class, (mock, context) -> {
-                     when(mock.openConnection()).thenReturn(connection);
-                 })) {
+        var recorded = this.server.takeRequest();
+        assertThat(recorded.getMethod()).isEqualTo("GET");
+        assertThat(recorded.getHeader("X-Inbound")).isEqualTo("123");
+        assertThat(recorded.getPath())
+            .isEqualTo("/ubiquia/core-flow-service/" + GRAPH + "/node/nodea/foo/bar");
+    }
 
-            mockMvc.perform(post("/ubiquia/core-communication-service/" + graphName + "/node/" + nodeName + "/some/path")
-                    .contentType(MediaType.TEXT_PLAIN)
-                    .content("hello downstream"))
-                .andExpect(status().isCreated())
-                .andExpect(content().string("CREATED"));
+    @Test
+    @DisplayName("POST streams request body to downstream")
+    void post_streamsBodyToDownstream() throws Exception {
+        given(this.nodeProxyManager.getRegisteredEndpointForNodeName("nodeB"))
+            .willReturn("registered");
 
-            verify(connection).setRequestMethod("POST");
-            verify(connection).setDoOutput(true);
+        this.server.enqueue(new MockResponse()
+            .setResponseCode(201)
+            .setBody("CREATED"));
 
-            org.junit.jupiter.api.Assertions.assertEquals("hello downstream", downstreamBody.toString());
-        }
+        this.mockMvc.perform(post(BASE + "/" + GRAPH + "/node/nodeB/some/path")
+                .contentType(MediaType.TEXT_PLAIN)
+                .content("hello downstream"))
+            .andExpect(status().isCreated())
+            .andExpect(content().string("CREATED"));
+
+        var recorded = this.server.takeRequest();
+        assertThat(recorded.getMethod()).isEqualTo("POST");
+        assertThat(recorded.getBody().readUtf8()).isEqualTo("hello downstream");
+    }
+
+    @Test
+    @DisplayName("HTML response is passed through without rewriting (rewritesHtmlAndCss=false)")
+    void htmlResponse_notRewritten() throws Exception {
+        given(this.nodeProxyManager.getRegisteredEndpointForNodeName("nodeC"))
+            .willReturn("registered");
+
+        var html = "<html><body><a href=\"/some/link\">link</a></body></html>";
+        this.server.enqueue(new MockResponse()
+            .setResponseCode(200)
+            .setHeader("Content-Type", "text/html")
+            .setBody(html));
+
+        var result = this.mockMvc.perform(get(BASE + "/" + GRAPH + "/node/nodeC/page"))
+            .andExpect(status().isOk())
+            .andReturn().getResponse();
+
+        assertThat(result.getContentAsString()).doesNotContain("<base href");
+        assertThat(result.getContentAsString()).contains("/some/link");
     }
 }

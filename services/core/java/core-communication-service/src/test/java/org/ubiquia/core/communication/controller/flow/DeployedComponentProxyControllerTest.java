@@ -32,7 +32,8 @@ import org.ubiquia.core.communication.service.manager.flow.ComponentProxyManager
 class DeployedComponentProxyControllerTest {
 
     private static final String GRAPH = "test-graph";
-    private static final String BASE = "/ubiquia/core-communication-service/" + GRAPH + "/component";
+    private static final String BASE =
+        "/ubiquia/core-communication-service/" + GRAPH + "/component";
 
     @Autowired
     private MockMvc mockMvc;
@@ -54,9 +55,8 @@ class DeployedComponentProxyControllerTest {
     void setUp() throws IOException {
         this.server = new MockWebServer();
         this.server.start();
-        this.baseUrl = "http://" + this.server.getHostName();
-        given(this.flowServiceConfig.getUrl()).willReturn(this.baseUrl);
-        given(this.flowServiceConfig.getPort()).willReturn(this.server.getPort());
+        this.baseUrl = "http://" + this.server.getHostName() + ":" + this.server.getPort();
+        given(this.flowServiceConfig.getBaseUrl()).willReturn(this.baseUrl);
     }
 
     @AfterEach
