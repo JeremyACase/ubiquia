@@ -7,12 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.belief.state.generator.model.json.schema.JsonSchemaGraph;
 
+/** Builds a directed reference graph from a JSON Schema definitions node. */
 @Service
 public class JsonSchemaReferenceGraphBuilder {
 
     @Autowired
     private JsonSchemaNodeUtils utils;
 
+    /** Builds a {@link JsonSchemaGraph} from the given definitions root node. */
     public JsonSchemaGraph build(final ObjectNode defsRoot) {
         var result = new JsonSchemaGraph(Map.of(), Map.of(), Set.of());
 

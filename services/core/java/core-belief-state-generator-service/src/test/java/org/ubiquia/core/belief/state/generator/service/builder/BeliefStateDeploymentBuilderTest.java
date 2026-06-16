@@ -11,13 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.ubiquia.common.library.implementation.service.builder.BeliefStateNameBuilder;
 import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
 class BeliefStateDeploymentBuilderTest {
 
     private BeliefStateDeploymentBuilder builder;
@@ -202,8 +200,41 @@ class BeliefStateDeploymentBuilderTest {
         assertThat(mount.getSubPath()).isEqualTo("bs-sales.jar");
     }
 
+    @Test
+    void buildServiceFrom_labelMap_isIndependentFromDeploymentAndUbiquiaLabels() {
+        when(domainOntology.getName()).thenReturn("Finance");
+        when(beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(domainOntology))
+            .thenReturn("bs-finance");
+
+        var service = builder.buildServiceFrom(domainOntology);
+        var ubiquiaLabels = builder.getUbiquiaDeployment().getMetadata().getLabels();
+
+        service.getMetadata().getLabels().put("injected-by-test", "true");
+
+        // mutating the service label map must not bleed into the template deployment
+        assertThat(ubiquiaLabels).doesNotContainKey("injected-by-test");
+    }
+
+    @Test
+    void buildDeploymentFrom_labelMap_isIndependentForEachCall() {
+        when(domainOntology.getName()).thenReturn("Retail");
+        when(beliefStateNameBuilder.getKubernetesBeliefStateNameFrom(domainOntology))
+            .thenReturn("bs-retail");
+        when(beliefStateNameBuilder.getJarBeliefStateNameFrom(domainOntology))
+            .thenReturn("bs-retail.jar");
+
+        var dep1 = builder.buildDeploymentFrom(domainOntology);
+        var dep2 = builder.buildDeploymentFrom(domainOntology);
+
+        dep1.getMetadata().getLabels().put("extra", "val");
+
+        assertThat(dep2.getMetadata().getLabels()).doesNotContainKey("extra");
+        assertThat(builder.getUbiquiaDeployment().getMetadata().getLabels())
+            .doesNotContainKey("extra");
+    }
+
     // ---------------------------------------------------------------------
-    // Test helper
+    // Minio env vars
     // ---------------------------------------------------------------------
 
     @Test

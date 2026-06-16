@@ -22,11 +22,13 @@ import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
 import org.ubiquia.core.belief.state.generator.service.generator.BeliefStateGenerator;
 import org.ubiquia.core.belief.state.generator.service.k8s.BeliefStateOperator;
 
+/** REST controller that exposes belief-state generation and teardown endpoints. */
 @RestController
 @RequestMapping("ubiquia/core/belief-state-generator-service")
 public class BeliefStateGeneratorController {
 
-    private static final Logger logger = LoggerFactory.getLogger(BeliefStateGeneratorController.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(BeliefStateGeneratorController.class);
 
     @Autowired
     private BeliefStateGenerator beliefStateGenerator;
@@ -46,6 +48,7 @@ public class BeliefStateGeneratorController {
     @Autowired
     private RestTemplate restTemplate;
 
+    /** Generates a belief state for the domain ontology identified in the request body. */
     @PostMapping("/belief-state/generate")
     public BeliefStateGeneration generateBeliefState(
         @RequestBody @Valid final BeliefStateGeneration beliefStateGeneration)
@@ -78,8 +81,8 @@ public class BeliefStateGeneratorController {
             .restTemplate
             .exchange(uri, HttpMethod.GET, null, responseType);
 
-        if (!response.getStatusCode().is2xxSuccessful() ||
-            Objects.requireNonNull(response.getBody()).getNumberOfElements() <= 0) {
+        if (!response.getStatusCode().is2xxSuccessful()
+            || Objects.requireNonNull(response.getBody()).getNumberOfElements() <= 0) {
 
             throw new IllegalArgumentException("Could not find a registered Domain Ontology "
                 + "for: "
@@ -96,6 +99,7 @@ public class BeliefStateGeneratorController {
         return beliefStateGeneration;
     }
 
+    /** Tears down the Kubernetes resources associated with the specified belief state. */
     @PostMapping("/belief-state/teardown")
     public BeliefStateGeneration teardownBeliefState(
         @RequestBody @Valid final BeliefStateGeneration beliefStateGeneration)

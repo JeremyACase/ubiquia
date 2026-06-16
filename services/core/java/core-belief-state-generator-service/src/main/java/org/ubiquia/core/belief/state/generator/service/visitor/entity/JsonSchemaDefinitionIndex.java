@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
 
+/** Locates and returns the definitions or schemas container node from a JSON Schema root. */
 @Service
 public class JsonSchemaDefinitionIndex {
 
-
+    /** Extracts the definitions root node from a JSON Schema or OpenAPI root node. */
     public ObjectNode extractDefinitionsRoot(final JsonNode root) {
 
         ObjectNode result = null;

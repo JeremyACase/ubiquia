@@ -4,12 +4,13 @@ import static org.ubiquia.core.belief.state.generator.service.generator.domain.U
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.languages.JavaClientCodegen;
 import org.openapitools.codegen.model.ModelsMap;
 
-import java.util.Objects;
 /**
  * Post-processor that figures out JPA relationship metadata and
  * stores it in vendor-extensions every template can use.
@@ -33,6 +34,13 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
         modelTemplateFiles.put("modelRelationshipBuilder.mustache", "RelationshipBuilder.java");
     }
 
+    // H2 reserved words that are unsafe as bare column names
+    private static final Set<String> SQL_RESERVED_WORDS = Set.of(
+        "key", "value", "index", "order", "group", "select", "from",
+        "where", "table", "column", "type", "name", "level", "position",
+        "row", "rows", "set", "system", "user", "current", "check"
+    );
+
     @Override
     public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
         indexModels(objs);
@@ -42,8 +50,8 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
         chooseOwners(pairs);
         pairs.values().forEach(RelationPair::stampExtensions);
 
-        // NEW: add per-property vendor extensions (owner name, join column, collection table, element-collection flag)
-        attachPerPropertyExtensions();  // <-- important
+        attachPerPropertyExtensions();
+        attachColumnAnnotationsToEmbeddables();
 
         return super.postProcessAllModels(objs);
     }
@@ -131,13 +139,19 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
         var pairs = new HashMap<String, RelationPair>();
 
         for (var source : modelIndex.values()) {
-            if (isSkippable(source)) continue;
+            if (isSkippable(source)) {
+                continue;
+            }
 
             for (var prop : source.vars) {
-                if (!isModelRef(prop)) continue;
+                if (!isModelRef(prop)) {
+                    continue;
+                }
 
                 var target = getTargetModel(prop);
-                if (isSkippable(target)) continue;
+                if (isSkippable(target)) {
+                    continue;
+                }
 
                 var key = pairKey(source.classname, target.classname);
                 var pair = pairs.computeIfAbsent(key, k -> new RelationPair());
@@ -149,7 +163,9 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
 
     private void chooseOwners(Map<String, RelationPair> pairs) {
         for (var p : pairs.values()) {
-            if (!p.isBidirectional()) continue;
+            if (!p.isBidirectional()) {
+                continue;
+            }
             switch (p.jointType()) {
                 case ONE_TO_ONE, MANY_TO_MANY -> p.chooseOwnerLexicographically();
                 default -> { /* 1-N / N-1 handled implicitly */ }
@@ -158,11 +174,31 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
     }
 
     private boolean isSupportFile(String filename) {
-        return filename.endsWith("Repository.java") || filename.endsWith("RelationshipBuilder.java");
+        return filename.endsWith("Repository.java")
+            || filename.endsWith("RelationshipBuilder.java");
     }
 
     private String stripSupportSuffix(String filename) {
         return filename.replace("Repository.java", "").replace("RelationshipBuilder.java", "");
+    }
+
+    /* ============================================================ */
+    /* Column annotations for embeddable fields                    */
+    /* ============================================================ */
+
+    private void attachColumnAnnotationsToEmbeddables() {
+        for (var model : modelIndex.values()) {
+            if (!isEmbeddable(model)) {
+                continue;
+            }
+            for (var p : model.vars) {
+                if (SQL_RESERVED_WORDS.contains(p.name.toLowerCase())) {
+                    p.vendorExtensions.put(
+                        "x-field-extra-annotation",
+                        "@Column(name = \"pair_" + p.name + "\")");
+                }
+            }
+        }
     }
 
     /* ============================================================ */
@@ -171,7 +207,9 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
 
     private void attachPerPropertyExtensions() {
         for (var model : modelIndex.values()) {
-            if (isSkippable(model)) continue;
+            if (isSkippable(model)) {
+                continue;
+            }
 
             boolean hasElementCollections = false; // class-level flag for conditional imports
 
@@ -203,8 +241,10 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
     }
 
     private String toOwnerLower(String classname) {
-        if (Objects.isNull(classname) || classname.isEmpty()) return "";
-        // lowerCamel “Entity” stays part of the name here (matches your current codegen names)
+        if (Objects.isNull(classname) || classname.isEmpty()) {
+            return "";
+        }
+        // lowerCamel "Entity" stays part of the name here (matches your current codegen names)
         return classname.substring(0, 1).toLowerCase() + classname.substring(1);
     }
 
@@ -212,14 +252,17 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
 
     private enum RelationType { ONE_TO_ONE, ONE_TO_MANY, MANY_TO_ONE, MANY_TO_MANY }
 
-    /** Holds the two “sides” of a relationship */
+    /** Holds the two "sides" of a relationship. */
     public final class RelationPair {
         Side left;
         Side right;
 
         void addSide(CodegenModel mdl, CodegenProperty prop) {
-            if (Objects.isNull(left)) left = new Side(mdl, prop);
-            else if (Objects.isNull(right)) right = new Side(mdl, prop);
+            if (Objects.isNull(left)) {
+                left = new Side(mdl, prop);
+            } else if (Objects.isNull(right)) {
+                right = new Side(mdl, prop);
+            }
         }
 
         boolean isBidirectional() {
@@ -231,27 +274,44 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
         }
 
         RelationType jointType() {
-            if (Objects.isNull(left) || Objects.isNull(right)) return RelationType.ONE_TO_ONE;
+            if (Objects.isNull(left) || Objects.isNull(right)) {
+                return RelationType.ONE_TO_ONE;
+            }
             var l = cardOf(left);
             var r = cardOf(right);
-            if (l == ONE && r == ONE) return RelationType.ONE_TO_ONE;
-            if (l == ONE && r == Cardinality.MANY) return RelationType.ONE_TO_MANY;
-            if (l == Cardinality.MANY && r == ONE) return RelationType.MANY_TO_ONE;
+            if (l == ONE && r == ONE) {
+                return RelationType.ONE_TO_ONE;
+            }
+            if (l == ONE && r == Cardinality.MANY) {
+                return RelationType.ONE_TO_MANY;
+            }
+            if (l == Cardinality.MANY && r == ONE) {
+                return RelationType.MANY_TO_ONE;
+            }
             return RelationType.MANY_TO_MANY;
         }
 
         void chooseOwnerLexicographically() {
-            if (left.model.classname.compareTo(right.model.classname) < 0) left.owningSide = true;
-            else right.owningSide = true;
+            if (left.model.classname.compareTo(right.model.classname) < 0) {
+                left.owningSide = true;
+            } else {
+                right.owningSide = true;
+            }
         }
 
         void stampExtensions() {
-            if (Objects.nonNull(left)) stamp(left, right);
-            if (Objects.nonNull(right)) stamp(right, left);
+            if (Objects.nonNull(left)) {
+                stamp(left, right);
+            }
+            if (Objects.nonNull(right)) {
+                stamp(right, left);
+            }
         }
 
         private void stamp(Side me, Side other) {
-            if (isEmbeddable(me.model)) return;
+            if (isEmbeddable(me.model)) {
+                return;
+            }
 
             var v = me.prop.vendorExtensions;
             v.put("x-is-owning-side", me.owningSide || Objects.isNull(other));
@@ -273,7 +333,11 @@ public class UbiquiaDomainEntityGenerator extends JavaClientCodegen {
             v.put("x-is-many-to-many", m2m);
             v.put("x-is-one-to-many", o2m);
             v.put("x-is-many-to-one", m2o);
-            v.put("x-relation-type", o2o ? "ONE_TO_ONE" : o2m ? "ONE_TO_MANY" : m2o ? "MANY_TO_ONE" : "MANY_TO_MANY");
+            String relationType = o2o ? "ONE_TO_ONE"
+                : o2m ? "ONE_TO_MANY"
+                : m2o ? "MANY_TO_ONE"
+                : "MANY_TO_MANY";
+            v.put("x-relation-type", relationType);
         }
 
         enum Cardinality { ONE, MANY }

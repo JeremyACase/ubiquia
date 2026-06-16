@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.37.1] - 2026-06-15
+### Fixed
+- `core-belief-state-generator-service`: `KeyValuePairEntity.key` field mapped to the SQL reserved word `key` as a bare column name, causing H2 syntax errors at runtime; `UbiquiaDomainEntityGenerator` now detects reserved-word field names on embeddable models and emits `@Column(name = "pair_<field>")` via `attachColumnAnnotationsToEmbeddables()`
+- `core-belief-state-generator-service`: `BeliefStateGenerationSupportProcessor.SupportTemplate.APPLICATION` destination path contained a typo (`org/ubiquiadomainl/generated/`) that placed `Application.java` in a directory mismatching its `package org.ubiquia.domain.generated` declaration, causing every generated belief state to fail Java compilation; corrected to `org/ubiquia/domain/generated/`
+- `core-belief-state-generator-service`: stale `Application.java` artifact at the typo'd path was not cleaned up between runs and was picked up by the compiler alongside the correctly placed file, producing a duplicate-class compile error; stale file removed
+
+### Changed
+- `core-belief-state-generator-service`: `BeliefStateCompiler` now collects `DiagnosticCollector` output and logs each compiler error at `ERROR` level before throwing, making compilation failures visible in logs without requiring `--stacktrace`
+- `core-belief-state-generator-service`: resolved all Google Java Style checkstyle warnings (missing Javadoc, `NeedBraces`, `LineLength`, `OperatorWrap`, `VariableDeclarationUsageDistance`, `CustomImportOrder`, `AbbreviationAsWordInName`); `BLACKLISTED_FILENAMES` field renamed to `blacklistedFilenames`
+
+## [0.37.0] - 2026-06-12
+### Changed
+- `core-belief-state-generator-service`: introduced `SchemaTransformationPipeline` (Chain of Responsibility) and `SchemaTransformer` interface; schema preprocessing is now a sequenced, Spring-ordered list of transformers (`EnumNormalizer`, `UbiquiaModelInjector`, `InheritancePreprocessor`) rather than inline ad-hoc mutations
+- `core-belief-state-generator-service`: extracted `AbstractOpenApiGenerator` (Template Method) as a shared base for `OpenApiDtoGenerator` and `OpenApiEntityGenerator`; generator name, template path, additional properties, and global properties are now supplied via hooks, eliminating duplicated `CodegenConfigurator` setup
+- `core-belief-state-generator-service`: introduced `K8sLabelBuilder` fluent builder for Kubernetes label map construction; replaces ad-hoc `Map.of()` / `HashMap` usage in `BeliefStateDeploymentBuilder` and `BeliefStateOperator`
+- `core-belief-state-generator-service`: introduced `K8sResourceClient<T, L>` generic wrapper around `GenericKubernetesApi` that binds a namespace at construction time; `BeliefStateOperator` now holds typed clients instead of raw APIs, removing repeated namespace arguments at every call site
+- `core-belief-state-generator-service`: `BeliefStateGenerationSupportProcessor` support-file registry converted to a package-private `SupportTemplate` enum with `resourcePath`, `destinationPath`, and `requiresReplacement` fields
+
+### Fixed
+- `InheritancePreprocessor.transform()`: was returning the original schema string instead of the modified one; now correctly returns the post-transformation result
+- `InheritancePreprocessor.processContainer()`: `AbstractDomainModel` and `KeyValuePair` are now excluded from `allOf` injection; previously `AbstractDomainModel` received a self-referencing `allOf` (causing a duplicate `getModelType()` method in every generated class) and `KeyValuePair` received a circular `allOf` reference (breaking its EMBEDDABLE classification)
+- `AbstractOpenApiGenerator.generate()`: added `openApiNullable=false` to prevent `JavaClientCodegen` from wrapping nullable fields in `JsonNullable<>` when `jackson-databind-nullable` is absent from the generated project's classpath
+- `UbiquiaModelInjector`: removed `modelType` from the injected `AbstractDomainModel` schema; the DTO and entity Mustache templates already generate `@Override getModelType()`, so the schema property was producing a duplicate method compile error in all generated classes
+- `BeliefStateGenerationCleanupProcessor`: removed `KeyValuePair.java` and `KeyValuePairEntity.java` from the blacklist; generated domain models import these types from `org.ubiquia.domain.generated` and require them on the compilation classpath; support files (`Controller`, `Repository`, `RelationshipBuilder`, `DtoMapper`) are already deleted by the generators' own `postProcessFile` logic for embeddable models
+
 ## [0.35.0] - 2026-05-27
 ### Added
 - YugabyteDB `heavyweight` deployment tier: `prod/heavyweight.yaml`, `test/integration-test-yugabyte.yaml`; uses YugabyteDB YSQL (PostgreSQL-compatible JDBC on port 5433) instead of H2 or PostgreSQL

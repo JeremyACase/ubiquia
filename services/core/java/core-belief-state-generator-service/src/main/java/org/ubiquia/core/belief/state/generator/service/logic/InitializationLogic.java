@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 import org.ubiquia.core.belief.state.generator.service.k8s.BeliefStateOperator;
 
+/** Handles application startup by initializing the Kubernetes belief-state operator. */
 @Service
 public class InitializationLogic implements ApplicationListener<ApplicationReadyEvent> {
 
