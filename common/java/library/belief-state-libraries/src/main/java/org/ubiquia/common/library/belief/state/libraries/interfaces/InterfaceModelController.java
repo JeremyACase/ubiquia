@@ -171,9 +171,12 @@ public interface InterfaceModelController<
     Page<Object[]> queryWithMultiselectParams(
         @RequestParam("page") final Integer page,
         @RequestParam("size") final Integer size,
-        @RequestParam(value = "sort-descending", required = false, defaultValue = "true") final Boolean sortDescending,
-        @RequestParam(value = "sort-by-fields", required = false, defaultValue = "") final List<String> sortByFields,
-        @RequestParam(value = "multiselect-fields", defaultValue = "") final List<String> multiselectFields,
+        @RequestParam(value = "sort-descending", required = false, defaultValue = "true")
+            final Boolean sortDescending,
+        @RequestParam(value = "sort-by-fields", required = false, defaultValue = "")
+            final List<String> sortByFields,
+        @RequestParam(value = "multiselect-fields", defaultValue = "")
+            final List<String> multiselectFields,
         final HttpServletRequest httpServletRequest)
         throws NoSuchFieldException;
 
@@ -191,8 +194,10 @@ public interface InterfaceModelController<
     GenericPageImplementation<D> queryWithParams(
         @RequestParam("page") final Integer page,
         @RequestParam("size") final Integer size,
-        @RequestParam(value = "sort-descending", required = false, defaultValue = "true") final Boolean sortDescending,
-        @RequestParam(value = "sort-by-fields", required = false, defaultValue = "") final List<String> sortByFields,
+        @RequestParam(value = "sort-descending", required = false, defaultValue = "true")
+            final Boolean sortDescending,
+        @RequestParam(value = "sort-by-fields", required = false, defaultValue = "")
+            final List<String> sortByFields,
         final HttpServletRequest httpServletRequest)
         throws Exception;
 }

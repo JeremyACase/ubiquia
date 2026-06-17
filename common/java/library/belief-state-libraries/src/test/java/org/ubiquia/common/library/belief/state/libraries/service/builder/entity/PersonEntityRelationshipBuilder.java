@@ -5,10 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.ubiquia.domain.generated.PersonEntity;
 
+/** Relationship builder for person entities. */
 @Service
 public class PersonEntityRelationshipBuilder extends EntityRelationshipBuilder<PersonEntity> {
 
-    protected static final Logger logger = LoggerFactory.getLogger(PersonEntityRelationshipBuilder.class);
+    protected static final Logger logger =
+        LoggerFactory.getLogger(PersonEntityRelationshipBuilder.class);
 
     @Override
     public Logger getLogger() {

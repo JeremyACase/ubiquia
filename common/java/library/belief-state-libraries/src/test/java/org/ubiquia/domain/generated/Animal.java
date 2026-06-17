@@ -29,8 +29,12 @@ import java.util.Objects;
     Animal.JSON_PROPERTY_HEIGHT,
     Animal.JSON_PROPERTY_WEIGHT
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
+@jakarta.annotation.Generated(
+    value = "org.openapitools.codegen.languages.JavaClientCodegen",
+    date = "2025-06-18T01:59:17.081296200Z[UTC]",
+    comments = "Generator version: 7.13.0")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY,
+    property = "modelType", visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = Cat.class, name = "Cat"),
     @JsonSubTypes.Type(value = Dachschund.class, name = "Dachschund"),
@@ -57,7 +61,7 @@ public class Animal extends BaseModel {
     protected Float weight;
 
     /**
-     * Get color
+     * Get color.
      *
      * @return color
      */
@@ -78,6 +82,7 @@ public class Animal extends BaseModel {
         this.color = color;
     }
 
+    /** Sets the owner and returns this instance. */
     public Animal owner(@jakarta.annotation.Nullable Person owner) {
 
         this.owner = owner;
@@ -85,7 +90,7 @@ public class Animal extends BaseModel {
     }
 
     /**
-     * Get owner
+     * Get owner.
      *
      * @return owner
      */
@@ -106,6 +111,7 @@ public class Animal extends BaseModel {
         this.owner = owner;
     }
 
+    /** Sets the name and returns this instance. */
     public Animal name(@jakarta.annotation.Nullable Name name) {
 
         this.name = name;
@@ -113,7 +119,7 @@ public class Animal extends BaseModel {
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return name
      */
@@ -134,6 +140,7 @@ public class Animal extends BaseModel {
         this.name = name;
     }
 
+    /** Sets the height and returns this instance. */
     public Animal height(@jakarta.annotation.Nullable Float height) {
 
         this.height = height;
@@ -141,7 +148,7 @@ public class Animal extends BaseModel {
     }
 
     /**
-     * Get height
+     * Get height.
      * minimum: 0
      *
      * @return height
@@ -162,6 +169,7 @@ public class Animal extends BaseModel {
         this.height = height;
     }
 
+    /** Sets the weight and returns this instance. */
     public Animal weight(@jakarta.annotation.Nullable Float weight) {
 
         this.weight = weight;
@@ -169,7 +177,7 @@ public class Animal extends BaseModel {
     }
 
     /**
-     * Get weight
+     * Get weight.
      * minimum: 0
      *
      * @return weight
@@ -199,12 +207,12 @@ public class Animal extends BaseModel {
             return false;
         }
         Animal animal = (Animal) o;
-        return Objects.equals(this.color, animal.color) &&
-            Objects.equals(this.owner, animal.owner) &&
-            Objects.equals(this.name, animal.name) &&
-            Objects.equals(this.height, animal.height) &&
-            Objects.equals(this.weight, animal.weight) &&
-            super.equals(o);
+        return Objects.equals(this.color, animal.color)
+            && Objects.equals(this.owner, animal.owner)
+            && Objects.equals(this.name, animal.name)
+            && Objects.equals(this.height, animal.height)
+            && Objects.equals(this.weight, animal.weight)
+            && super.equals(o);
     }
 
     @Override
@@ -214,14 +222,14 @@ public class Animal extends BaseModel {
 
     @Override
     public String toString() {
-        String sb = "class AnimalDto {\n" +
-            "    " + toIndentedString(super.toString()) + "\n" +
-            "    color: " + toIndentedString(color) + "\n" +
-            "    owner: " + toIndentedString(owner) + "\n" +
-            "    name: " + toIndentedString(name) + "\n" +
-            "    height: " + toIndentedString(height) + "\n" +
-            "    weight: " + toIndentedString(weight) + "\n" +
-            "}";
+        String sb = "class AnimalDto {\n"
+            + "    " + toIndentedString(super.toString()) + "\n"
+            + "    color: " + toIndentedString(color) + "\n"
+            + "    owner: " + toIndentedString(owner) + "\n"
+            + "    name: " + toIndentedString(name) + "\n"
+            + "    height: " + toIndentedString(height) + "\n"
+            + "    weight: " + toIndentedString(weight) + "\n"
+            + "}";
         return sb;
     }
 

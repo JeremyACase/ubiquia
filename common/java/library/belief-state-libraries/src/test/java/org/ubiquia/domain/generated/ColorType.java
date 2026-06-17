@@ -16,10 +16,10 @@ package org.ubiquia.domain.generated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-
 import java.util.Objects;
+
 /**
- * Gets or Sets ColorType
+ * Gets or Sets ColorType.
  */
 public enum ColorType {
 
@@ -41,6 +41,7 @@ public enum ColorType {
         this.value = value;
     }
 
+    /** Returns the ColorType from the given string value. */
     @JsonCreator
     public static ColorType fromValue(String value) {
         for (ColorType b : ColorType.values()) {

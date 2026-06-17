@@ -24,18 +24,24 @@ import java.util.Objects;
 @JsonPropertyOrder({
     Cat.JSON_PROPERTY_MEOW_DECIBELS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
+@jakarta.annotation.Generated(
+    value = "org.openapitools.codegen.languages.JavaClientCodegen",
+    date = "2025-06-18T01:59:17.081296200Z[UTC]",
+    comments = "Generator version: 7.13.0")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY,
+    property = "modelType", visible = true)
 
 public class Cat extends Animal {
     public static final String JSON_PROPERTY_MEOW_DECIBELS = "meowDecibels";
     @jakarta.annotation.Nullable
     private Float meowDecibels;
 
+    /** Constructs a Cat instance. */
     public Cat() {
 
     }
 
+    /** Sets meowDecibels and returns this instance. */
     public Cat meowDecibels(@jakarta.annotation.Nullable Float meowDecibels) {
 
         this.meowDecibels = meowDecibels;
@@ -43,7 +49,7 @@ public class Cat extends Animal {
     }
 
     /**
-     * Get meowDecibels
+     * Get meowDecibels.
      * minimum: 0
      *
      * @return meowDecibels
@@ -73,8 +79,8 @@ public class Cat extends Animal {
             return false;
         }
         Cat catDto = (Cat) o;
-        return Objects.equals(this.meowDecibels, catDto.meowDecibels) &&
-            super.equals(o);
+        return Objects.equals(this.meowDecibels, catDto.meowDecibels)
+            && super.equals(o);
     }
 
     @Override

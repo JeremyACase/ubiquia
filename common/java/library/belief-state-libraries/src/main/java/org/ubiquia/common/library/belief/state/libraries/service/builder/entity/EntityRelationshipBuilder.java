@@ -15,11 +15,11 @@ import org.ubiquia.common.library.belief.state.libraries.service.finder.EntityRe
 import org.ubiquia.common.model.domain.entity.AbstractDomainModelEntity;
 
 /**
- * <p>An abstract class that enables generated belief states to persist model relationships
+ * An abstract class that enables generated belief states to persist model relationships
  * "a posteriori" to model definition (i.e., Agent Communication Language definition.)
  * In one sense, this code is largely concerned with ensuring updates to relational data propagate
  * through by crawling the entity's relationships.
- * </p>
+ *
  * <p>Consider this problem: what if a model is sent to Ubiquia for an update, but then Ubiquia
  * "saves" this model by persisting it in the database before "hydrating" any of the
  * relationships? If existing relationships aren't properly accounted for, this code could well
@@ -52,7 +52,8 @@ public abstract class EntityRelationshipBuilder<T extends AbstractDomainModelEnt
     @SuppressWarnings("unchecked")
     public EntityRelationshipBuilder() {
         this.getLogger().info("Caching reflection data...");
-        this.cachedEntityClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        this.cachedEntityClass = (Class<T>) ((ParameterizedType) this.getClass()
+            .getGenericSuperclass()).getActualTypeArguments()[0];
         var fields = FieldUtils.getAllFields(this.cachedEntityClass);
 
         for (var field : fields) {
@@ -417,7 +418,9 @@ public abstract class EntityRelationshipBuilder<T extends AbstractDomainModelEnt
             var elementClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
 
             var subFields = Arrays.asList(FieldUtils.getAllFields(elementClass));
-            var backRef = subFields.stream().filter(f -> f.getType().isAssignableFrom(cachedEntityClass)).findFirst();
+            var backRef = subFields.stream()
+                .filter(f -> f.getType().isAssignableFrom(cachedEntityClass))
+                .findFirst();
             if (backRef.isPresent()) {
                 field.setAccessible(true);
                 backRef.get().setAccessible(true);
@@ -425,7 +428,8 @@ public abstract class EntityRelationshipBuilder<T extends AbstractDomainModelEnt
                 cached = true;
             }
 
-            var sameCollectionFields = subFields.stream().filter(f -> collectionClass.isAssignableFrom(f.getType()));
+            var sameCollectionFields = subFields.stream()
+                .filter(f -> collectionClass.isAssignableFrom(f.getType()));
             for (var f : sameCollectionFields.toList()) {
                 var childElementType = (ParameterizedType) f.getGenericType();
                 var childClass = (Class<?>) childElementType.getActualTypeArguments()[0];

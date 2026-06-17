@@ -27,7 +27,10 @@ import java.util.Objects;
     Name.JSON_PROPERTY_FIRST_NAME,
     Name.JSON_PROPERTY_LAST_NAME
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
+@jakarta.annotation.Generated(
+    value = "org.openapitools.codegen.languages.JavaClientCodegen",
+    date = "2025-06-18T01:59:17.081296200Z[UTC]",
+    comments = "Generator version: 7.13.0")
 public class Name {
     public static final String JSON_PROPERTY_FIRST_NAME = "firstName";
     public static final String JSON_PROPERTY_LAST_NAME = "lastName";
@@ -36,6 +39,7 @@ public class Name {
     @jakarta.annotation.Nullable
     private String lastName;
 
+    /** Sets firstName and returns this instance. */
     public Name firstName(@jakarta.annotation.Nonnull String firstName) {
 
         this.firstName = firstName;
@@ -43,7 +47,7 @@ public class Name {
     }
 
     /**
-     * Get firstName
+     * Get firstName.
      *
      * @return firstName
      */
@@ -64,6 +68,7 @@ public class Name {
         this.firstName = firstName;
     }
 
+    /** Sets lastName and returns this instance. */
     public Name lastName(@jakarta.annotation.Nullable String lastName) {
 
         this.lastName = lastName;
@@ -71,7 +76,7 @@ public class Name {
     }
 
     /**
-     * Get lastName
+     * Get lastName.
      *
      * @return lastName
      */
@@ -100,8 +105,8 @@ public class Name {
             return false;
         }
         Name name = (Name) o;
-        return Objects.equals(this.firstName, name.firstName) &&
-            Objects.equals(this.lastName, name.lastName);
+        return Objects.equals(this.firstName, name.firstName)
+            && Objects.equals(this.lastName, name.lastName);
     }
 
     @Override

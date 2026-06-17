@@ -19,15 +19,17 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.ubiquia.common.library.api.config.MinioConfig;
 
+/** Tests for the Minio service. */
 @SpringBootTest
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 public class MinioServiceTest {
 
     @Container
-    public static MinIOContainer minioContainer = new MinIOContainer("minio/minio:RELEASE.2023-09-04T19-57-37Z")
-        .withUserName("testUsername")
-        .withPassword("testPassword");
+    public static MinIOContainer minioContainer =
+        new MinIOContainer("minio/minio:RELEASE.2023-09-04T19-57-37Z")
+            .withUserName("testUsername")
+            .withPassword("testPassword");
     @Autowired
     private MinioService minioService;
     @Autowired

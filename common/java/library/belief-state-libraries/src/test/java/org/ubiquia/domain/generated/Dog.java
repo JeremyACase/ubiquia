@@ -24,8 +24,12 @@ import java.util.Objects;
 @JsonPropertyOrder({
     Dog.JSON_PROPERTY_BARK_DECIBELS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
+@jakarta.annotation.Generated(
+    value = "org.openapitools.codegen.languages.JavaClientCodegen",
+    date = "2025-06-18T01:59:17.081296200Z[UTC]",
+    comments = "Generator version: 7.13.0")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY,
+    property = "modelType", visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = Dachschund.class, name = "Dachschund"),
     @JsonSubTypes.Type(value = Poodle.class, name = "Poodle"),
@@ -37,7 +41,7 @@ public class Dog extends Animal {
     protected Float barkDecibels;
 
     /**
-     * Get barkDecibels
+     * Get barkDecibels.
      * minimum: 0
      *
      * @return barkDecibels
@@ -67,8 +71,8 @@ public class Dog extends Animal {
             return false;
         }
         Dog dogDto = (Dog) o;
-        return Objects.equals(this.barkDecibels, dogDto.barkDecibels) &&
-            super.equals(o);
+        return Objects.equals(this.barkDecibels, dogDto.barkDecibels)
+            && super.equals(o);
     }
 
     @Override

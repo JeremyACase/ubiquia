@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.ubiquia.domain.generated.Cat;
 import org.ubiquia.domain.generated.CatEntity;
 
+/** Egress mapper for cat entities. */
 @Component
 public class CatEgressDtoMapper extends AbstractEgressDtoMapper<CatEntity, Cat> {
 

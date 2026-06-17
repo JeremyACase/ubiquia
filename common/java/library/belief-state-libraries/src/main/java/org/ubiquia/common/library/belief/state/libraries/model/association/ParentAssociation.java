@@ -2,7 +2,6 @@ package org.ubiquia.common.library.belief.state.libraries.model.association;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-
 import org.springframework.validation.annotation.Validated;
 
 /**

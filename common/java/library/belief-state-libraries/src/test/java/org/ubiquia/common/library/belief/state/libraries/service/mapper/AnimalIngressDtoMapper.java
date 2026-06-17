@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.domain.generated.Animal;
 import org.ubiquia.domain.generated.AnimalEntity;
 
+/** Ingress mapper for animal domain models. */
 @Service
 public class AnimalIngressDtoMapper extends AbstractIngressDtoMapper<Animal, AnimalEntity> {
 

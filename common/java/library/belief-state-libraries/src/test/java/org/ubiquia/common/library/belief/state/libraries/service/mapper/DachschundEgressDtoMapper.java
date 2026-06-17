@@ -6,8 +6,10 @@ import org.springframework.stereotype.Component;
 import org.ubiquia.domain.generated.Dachschund;
 import org.ubiquia.domain.generated.DachschundEntity;
 
+/** Egress mapper for dachschund entities. */
 @Component
-public class DachschundEgressDtoMapper extends AbstractEgressDtoMapper<DachschundEntity, Dachschund> {
+public class DachschundEgressDtoMapper
+    extends AbstractEgressDtoMapper<DachschundEntity, Dachschund> {
 
     protected static final Logger logger = LoggerFactory.getLogger(DachschundEgressDtoMapper.class);
 

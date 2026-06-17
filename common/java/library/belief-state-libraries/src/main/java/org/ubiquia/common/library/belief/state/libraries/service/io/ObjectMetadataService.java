@@ -13,6 +13,7 @@ import org.ubiquia.common.library.belief.state.libraries.repository.ObjectMetada
 import org.ubiquia.common.library.belief.state.libraries.service.mapper.ObjectMetadataEgressDtoMapper;
 import org.ubiquia.common.model.domain.dto.ObjectMetadataDto;
 
+/** Persists object storage metadata for belief-state services when Minio is enabled. */
 @ConditionalOnProperty(value = "ubiquia.agent.storage.minio.enabled", havingValue = "true")
 @Service
 public class ObjectMetadataService {
@@ -25,6 +26,7 @@ public class ObjectMetadataService {
     @Autowired
     private ObjectMetadataEgressDtoMapper objectMetadataEgressDtoMapper;
 
+    /** Persists file metadata to the database and returns the mapped DTO. */
     @Transactional
     public ObjectMetadataDto persistObjectMetadata(
         final String bucketName,

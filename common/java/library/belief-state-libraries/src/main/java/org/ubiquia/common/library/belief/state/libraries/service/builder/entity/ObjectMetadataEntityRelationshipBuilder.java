@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.belief.state.libraries.entity.ObjectMetadataEntity;
 
+/** Relationship builder for {@link ObjectMetadataEntity}; no domain relationships to wire. */
 @Service
 public class ObjectMetadataEntityRelationshipBuilder
     extends EntityRelationshipBuilder<ObjectMetadataEntity> {

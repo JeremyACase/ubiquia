@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/** Test configuration for the belief state library. */
 @Configuration
 @EnableWebMvc
 public class Config implements WebMvcConfigurer {
@@ -31,6 +32,7 @@ public class Config implements WebMvcConfigurer {
         return new RestTemplate();
     }
 
+    /** Initialize the timezone. */
     @PostConstruct
     public void init() {
         // Setting Spring Boot SetTimeZone

@@ -5,13 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.ubiquia.domain.generated.Cat;
-import org.ubiquia.domain.generated.CatEntity;
 import org.ubiquia.common.library.belief.state.libraries.repository.CatEntityRepository;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.CatEntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractIngressDtoMapper;
+import org.ubiquia.domain.generated.Cat;
+import org.ubiquia.domain.generated.CatEntity;
 
+/** REST controller for Cat domain model. */
 @RestController
 @RequestMapping("/ubiquia/belief-state-service/cat")
 public class CatController extends AbstractDomainModelController<CatEntity, Cat> {

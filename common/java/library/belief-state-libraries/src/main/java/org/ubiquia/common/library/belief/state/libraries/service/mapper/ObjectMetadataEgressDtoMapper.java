@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.belief.state.libraries.entity.ObjectMetadataEntity;
 import org.ubiquia.common.model.domain.dto.ObjectMetadataDto;
 
+/** Egress mapper from {@link ObjectMetadataEntity} to {@link ObjectMetadataDto}. */
 @Service
 public class ObjectMetadataEgressDtoMapper
     extends AbstractEgressDtoMapper<ObjectMetadataEntity, ObjectMetadataDto> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ObjectMetadataEgressDtoMapper.class);
+    private static final Logger logger = LoggerFactory.getLogger(
+        ObjectMetadataEgressDtoMapper.class);
 
     @Override
     public Logger getLogger() {

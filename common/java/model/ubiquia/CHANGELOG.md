@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.38.1] - 2026-06-17
+### Fixed
+- Resolved all Google Java Style checkstyle violations across main sources: missing Javadoc on types and methods, `CustomImportOrder`, `AbbreviationAsWordInName`, `LineLength`, `OperatorWrap`, `SummaryJavadoc`, `EmptyLineSeparator`
+
 ## [0.36.0] - 2026-06-10
 ### Removed
 - `simulateOutputPayload` field and its getter/setter from `NodeSettings`; simulated-output behavior is now driven by `NodeType.HIDDEN` and `ComponentType.TEMPLATE` in the flow service

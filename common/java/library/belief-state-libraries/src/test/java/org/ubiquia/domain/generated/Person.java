@@ -30,7 +30,10 @@ import java.util.Objects;
     Person.JSON_PROPERTY_NAME,
     Person.JSON_PROPERTY_PETS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
+@jakarta.annotation.Generated(
+    value = "org.openapitools.codegen.languages.JavaClientCodegen",
+    date = "2025-06-18T01:59:17.081296200Z[UTC]",
+    comments = "Generator version: 7.13.0")
 
 public class Person extends BaseModel {
     public static final String JSON_PROPERTY_HAIR_COLOR = "hairColor";
@@ -43,6 +46,7 @@ public class Person extends BaseModel {
     @jakarta.annotation.Nullable
     private List<@Valid Animal> pets = new ArrayList<>();
 
+    /** Sets hairColor and returns this instance. */
     public Person hairColor(@jakarta.annotation.Nullable ColorType hairColor) {
 
         this.hairColor = hairColor;
@@ -50,7 +54,7 @@ public class Person extends BaseModel {
     }
 
     /**
-     * Get hairColor
+     * Get hairColor.
      *
      * @return hairColor
      */
@@ -71,6 +75,7 @@ public class Person extends BaseModel {
         this.hairColor = hairColor;
     }
 
+    /** Sets name and returns this instance. */
     public Person name(@jakarta.annotation.Nullable Name name) {
 
         this.name = name;
@@ -78,7 +83,7 @@ public class Person extends BaseModel {
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return name
      */
@@ -99,12 +104,14 @@ public class Person extends BaseModel {
         this.name = name;
     }
 
+    /** Sets pets and returns this instance. */
     public Person pets(@jakarta.annotation.Nullable List<@Valid Animal> pets) {
 
         this.pets = pets;
         return this;
     }
 
+    /** Adds a pet to the list and returns this instance. */
     public Person addPetsItem(Animal petsItem) {
         if (Objects.isNull(this.pets)) {
             this.pets = new ArrayList<>();
@@ -114,7 +121,7 @@ public class Person extends BaseModel {
     }
 
     /**
-     * Get pets
+     * Get pets.
      *
      * @return pets
      */
@@ -144,10 +151,10 @@ public class Person extends BaseModel {
             return false;
         }
         Person personDto = (Person) o;
-        return Objects.equals(this.hairColor, personDto.hairColor) &&
-            Objects.equals(this.name, personDto.name) &&
-            Objects.equals(this.pets, personDto.pets) &&
-            super.equals(o);
+        return Objects.equals(this.hairColor, personDto.hairColor)
+            && Objects.equals(this.name, personDto.name)
+            && Objects.equals(this.pets, personDto.pets)
+            && super.equals(o);
     }
 
     @Override

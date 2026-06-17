@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.ubiquia.domain.generated.Shark;
 import org.ubiquia.domain.generated.SharkEntity;
 
+/** Egress mapper for shark entities. */
 @Component
 public class SharkEgressDtoMapper extends AbstractEgressDtoMapper<SharkEntity, Shark> {
 

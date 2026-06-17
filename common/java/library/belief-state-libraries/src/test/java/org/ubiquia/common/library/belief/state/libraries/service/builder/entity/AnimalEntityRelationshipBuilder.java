@@ -5,10 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.ubiquia.domain.generated.AnimalEntity;
 
+/** Relationship builder for animal entities. */
 @Service
 public class AnimalEntityRelationshipBuilder extends EntityRelationshipBuilder<AnimalEntity> {
 
-    protected static final Logger logger = LoggerFactory.getLogger(AnimalEntityRelationshipBuilder.class);
+    protected static final Logger logger =
+        LoggerFactory.getLogger(AnimalEntityRelationshipBuilder.class);
 
     @Override
     public Logger getLogger() {

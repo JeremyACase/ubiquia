@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import org.ubiquia.common.model.domain.entity.AbstractDomainModelEntity;
 
+/** JPA entity for belief-state object storage metadata. */
 @Entity(name = "BeliefStateObjectMetadataEntity")
 @Table(name = "belief_state_object_metadata")
 public class ObjectMetadataEntity extends AbstractDomainModelEntity {

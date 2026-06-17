@@ -5,13 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.ubiquia.domain.generated.Animal;
-import org.ubiquia.domain.generated.AnimalEntity;
 import org.ubiquia.common.library.belief.state.libraries.repository.AnimalEntityRepository;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.AnimalEntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.builder.entity.EntityRelationshipBuilder;
 import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractIngressDtoMapper;
+import org.ubiquia.domain.generated.Animal;
+import org.ubiquia.domain.generated.AnimalEntity;
 
+/** REST controller for Animal domain model. */
 @RestController
 @RequestMapping("/ubiquia/belief-state-service/animal")
 public class AnimalController extends AbstractDomainModelController<AnimalEntity, Animal> {
