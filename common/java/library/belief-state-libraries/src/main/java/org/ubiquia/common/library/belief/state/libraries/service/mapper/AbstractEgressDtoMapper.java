@@ -35,7 +35,7 @@ public abstract class AbstractEgressDtoMapper<
     InterfaceLogger {
 
     private final Class<F> cachedEntityClass;
-    private final Class<T> cachedDTOClass;
+    private final Class<T> cachedDtoClass;
     private final List<Field> cachedEntityFields = new ArrayList<>();
     private final HashMap<Field, Field> cachedDtoFieldMap = new HashMap<>();
     @Autowired
@@ -50,10 +50,10 @@ public abstract class AbstractEgressDtoMapper<
             this.getClass().getSimpleName());
 
         this.cachedEntityClass = this.resolveGenericClass(0);
-        this.cachedDTOClass = this.resolveGenericClass(1);
+        this.cachedDtoClass = this.resolveGenericClass(1);
 
         var entityFields = FieldUtils.getAllFields(this.cachedEntityClass);
-        var dtoFields = FieldUtils.getAllFields(this.cachedDTOClass);
+        var dtoFields = FieldUtils.getAllFields(this.cachedDtoClass);
 
         this.matchFields(entityFields, dtoFields);
 
@@ -229,14 +229,13 @@ public abstract class AbstractEgressDtoMapper<
 
                 var value = field.get(unproxied);
                 if (Objects.nonNull(field.get(unproxied))) {
-                    if (field.isAnnotationPresent(Embedded.class) ||
-                        field.getType().isAnnotationPresent(Embeddable.class)) {
+                    if (field.isAnnotationPresent(Embedded.class)
+                        || field.getType().isAnnotationPresent(Embeddable.class)) {
 
                         this.tryHydrateEmbeddable(to, value, dtoField);
                     } else if (field.isAnnotationPresent(ElementCollection.class)) {
                         this.tryHydrateEmbeddables(to, value, dtoField);
-                    }
-                    else {
+                    } else {
                         this.hydrateObject(to, value, dtoField);
                     }
                 } else {
@@ -248,6 +247,7 @@ public abstract class AbstractEgressDtoMapper<
 
     /**
      * Attempt to hydrate embedded objects without bidirectional relationships.
+     *
      * @param to The parent object we're hydrating.
      * @param value The embedded object.
      * @param dtoField The DTO field representing the embedded object.
@@ -279,7 +279,8 @@ public abstract class AbstractEgressDtoMapper<
 
                         // find same-named field on DTO
                         try {
-                            var dtoSideField = embeddedDto.getClass().getDeclaredField(embeddedField.getName());
+                            var dtoSideField = embeddedDto.getClass()
+                                .getDeclaredField(embeddedField.getName());
                             dtoSideField.setAccessible(true);
 
                             var dtoMods = dtoSideField.getModifiers();

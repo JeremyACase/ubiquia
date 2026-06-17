@@ -5,10 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.ubiquia.domain.generated.SharkEntity;
 
+/** Relationship builder for shark entities. */
 @Service
 public class SharkEntityRelationshipBuilder extends EntityRelationshipBuilder<SharkEntity> {
 
-    protected static final Logger logger = LoggerFactory.getLogger(SharkEntityRelationshipBuilder.class);
+    protected static final Logger logger =
+        LoggerFactory.getLogger(SharkEntityRelationshipBuilder.class);
 
     @Override
     public Logger getLogger() {

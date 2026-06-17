@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+/** Test Spring Boot application entry point. */
 @SpringBootApplication
 @ComponentScan(basePackages = {"org.ubiquia"})
 @EntityScan(basePackages = {"org.ubiquia"})

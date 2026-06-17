@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.ubiquia.domain.generated.Animal;
 import org.ubiquia.domain.generated.AnimalEntity;
 
+/** Egress mapper for animal entities. */
 @Component
 public class AnimalEgressDtoMapper extends AbstractEgressDtoMapper<AnimalEntity, Animal> {
 

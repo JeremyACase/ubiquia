@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.belief.state.libraries.entity.ObjectMetadataEntity;
 import org.ubiquia.common.model.domain.dto.ObjectMetadataDto;
 
+/** Ingress mapper from {@link ObjectMetadataDto} to {@link ObjectMetadataEntity}. */
 @Service
 public class ObjectMetadataIngressDtoMapper
     extends AbstractIngressDtoMapper<ObjectMetadataDto, ObjectMetadataEntity> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ObjectMetadataIngressDtoMapper.class);
+    private static final Logger logger = LoggerFactory.getLogger(
+        ObjectMetadataIngressDtoMapper.class);
 
     @Autowired
     private ObjectMapper objectMapper;

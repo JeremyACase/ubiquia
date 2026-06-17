@@ -17,8 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.client.RestTemplate;
-import org.ubiquia.domain.generated.Animal;
-import org.ubiquia.domain.generated.Person;
 import org.ubiquia.common.library.belief.state.libraries.model.association.Association;
 import org.ubiquia.common.library.belief.state.libraries.model.association.ChildAssociation;
 import org.ubiquia.common.library.belief.state.libraries.model.association.ParentAssociation;
@@ -26,7 +24,10 @@ import org.ubiquia.common.library.belief.state.libraries.service.factory.MockFac
 import org.ubiquia.common.model.domain.embeddable.KeyValuePair;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
+import org.ubiquia.domain.generated.Animal;
+import org.ubiquia.domain.generated.Person;
 
+/** Tests for the person entity controller. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -51,7 +52,7 @@ public class PersonEntityControllerTest {
     private RestTemplate restTemplate;
 
     @Test
-    public void assertPOSTsModel_isValid() throws Exception {
+    public void assertPostsModel_isValid() throws Exception {
 
         var model = this.mockFactory.generatePerson();
         var url = "http://localhost:8080/ubiquia/belief-state-service/person/add";
@@ -66,7 +67,7 @@ public class PersonEntityControllerTest {
     }
 
     @Test
-    public void assertPOSTsModels_isValid() throws Exception {
+    public void assertPostsModels_isValid() throws Exception {
 
         var models = new ArrayList<Person>();
         models.add(this.mockFactory.generatePerson());
@@ -85,9 +86,9 @@ public class PersonEntityControllerTest {
     }
 
     @Test
-    public void assertPOSTsModelWithEmbedded_isValid() throws Exception {
+    public void assertPostsModelWithEmbedded_isValid() throws Exception {
 
-        var model = this.mockFactory.generatePerson();
+        final var model = this.mockFactory.generatePerson();
         var weenOne = this.mockFactory.generateWienerDog();
         var weenTwo = this.mockFactory.generateWienerDog();
         var weenThree = this.mockFactory.generateWienerDog();
@@ -108,10 +109,10 @@ public class PersonEntityControllerTest {
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
             .andReturn();
 
-        var queryURL = "http://localhost:8080/ubiquia/belief-state-service/animal/query/params";
+        var queryUrl = "http://localhost:8080/ubiquia/belief-state-service/animal/query/params";
 
         var json = this.mockMvc.perform(MockMvcRequestBuilders
-                .get(queryURL)
+                .get(queryUrl)
                 .queryParam("page", "0")
                 .queryParam("size", "1")
                 .accept(MediaType.APPLICATION_JSON)
@@ -154,10 +155,10 @@ public class PersonEntityControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 
-        var queryURL = "http://localhost:8080/ubiquia/belief-state-service/animal/query/params";
+        var queryUrl = "http://localhost:8080/ubiquia/belief-state-service/animal/query/params";
 
         var json = this.mockMvc.perform(MockMvcRequestBuilders
-                .get(queryURL)
+                .get(queryUrl)
                 .queryParam("page", "0")
                 .queryParam("size", "1")
                 .queryParam("owner.ubiquiaId", personResponse.getId())
@@ -197,9 +198,9 @@ public class PersonEntityControllerTest {
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
             .andReturn();
 
-        var getURL = "http://localhost:8080/ubiquia/belief-state-service/person/tags/get/keys";
+        var getUrl = "http://localhost:8080/ubiquia/belief-state-service/person/tags/get/keys";
         var result = this.mockMvc.perform(MockMvcRequestBuilders
-                .get(getURL)
+                .get(getUrl)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
@@ -233,9 +234,9 @@ public class PersonEntityControllerTest {
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
             .andReturn();
 
-        var getURL = "http://localhost:8080/ubiquia/belief-state-service/person/tags/get/values-by-key/uniqueKey";
+        var getUrl = "http://localhost:8080/ubiquia/belief-state-service/person/tags/get/values-by-key/uniqueKey";
         var result = this.mockMvc.perform(MockMvcRequestBuilders
-                .get(getURL)
+                .get(getUrl)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
@@ -269,9 +270,9 @@ public class PersonEntityControllerTest {
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
             .andReturn();
 
-        var getURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/params";
+        var getUrl = "http://localhost:8080/ubiquia/belief-state-service/person/query/params";
         var json = this.mockMvc.perform(MockMvcRequestBuilders
-                .get(getURL)
+                .get(getUrl)
                 .accept(MediaType.APPLICATION_JSON)
                 .queryParam("page", "0")
                 .queryParam("size", "1")
@@ -330,9 +331,9 @@ public class PersonEntityControllerTest {
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
             .andReturn();
 
-        var getURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/params";
+        var getUrl = "http://localhost:8080/ubiquia/belief-state-service/person/query/params";
         var json = this.mockMvc.perform(MockMvcRequestBuilders
-                .get(getURL)
+                .get(getUrl)
                 .accept(MediaType.APPLICATION_JSON)
                 .queryParam("page", "0")
                 .queryParam("size", "1")
@@ -392,9 +393,9 @@ public class PersonEntityControllerTest {
         ween.setOwner(personRecord.getBody());
         var weenResponse = this.animalController.add(ween);
 
-        var getURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/params";
+        var getUrl = "http://localhost:8080/ubiquia/belief-state-service/person/query/params";
         var json = this.mockMvc.perform(MockMvcRequestBuilders
-                .get(getURL)
+                .get(getUrl)
                 .accept(MediaType.APPLICATION_JSON)
                 .queryParam("page", "0")
                 .queryParam("size", "1")
@@ -419,10 +420,10 @@ public class PersonEntityControllerTest {
         var model = this.mockFactory.generatePerson();
         var ingressResponse = this.personController.add(model);
 
-        var queryURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/count/params";
+        var queryUrl = "http://localhost:8080/ubiquia/belief-state-service/person/query/count/params";
 
         var result = this.mockMvc.perform(MockMvcRequestBuilders
-                .get(queryURL)
+                .get(queryUrl)
                 .queryParam("ubiquiaId", ingressResponse.getId())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -442,9 +443,9 @@ public class PersonEntityControllerTest {
         var model = this.mockFactory.generatePerson();
         var ingressResponse = this.personController.add(model);
 
-        var queryURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/multiselect/params";
+        var queryUrl = "http://localhost:8080/ubiquia/belief-state-service/person/query/multiselect/params";
         this.mockMvc.perform(MockMvcRequestBuilders
-                .get(queryURL)
+                .get(queryUrl)
                 .queryParam("ubiquiaId", ingressResponse.getId())
                 .queryParam("page", "0")
                 .queryParam("size", "1")
@@ -471,11 +472,11 @@ public class PersonEntityControllerTest {
             result.getResponse().getContentAsString(),
             IngressResponse.class);
 
-        var deleteURL = "http://localhost:8080/ubiquia/belief-state-service/person/delete/"
+        var deleteUrl = "http://localhost:8080/ubiquia/belief-state-service/person/delete/"
             + ingressResponse.getId();
 
         this.mockMvc.perform(MockMvcRequestBuilders
-                .delete(deleteURL)
+                .delete(deleteUrl)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 

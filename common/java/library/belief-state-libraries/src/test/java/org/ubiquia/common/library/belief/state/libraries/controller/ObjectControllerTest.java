@@ -23,6 +23,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.ubiquia.common.model.domain.dto.ObjectMetadataDto;
 
+/** Tests for the object storage controller. */
 @SpringBootTest
 @Testcontainers
 @AutoConfigureMockMvc
@@ -30,9 +31,10 @@ import org.ubiquia.common.model.domain.dto.ObjectMetadataDto;
 public class ObjectControllerTest {
 
     @Container
-    public static MinIOContainer minioContainer = new MinIOContainer("minio/minio:RELEASE.2023-09-04T19-57-37Z")
-        .withUserName("testUsername")
-        .withPassword("testPassword");
+    public static MinIOContainer minioContainer =
+        new MinIOContainer("minio/minio:RELEASE.2023-09-04T19-57-37Z")
+            .withUserName("testUsername")
+            .withPassword("testPassword");
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -50,7 +52,8 @@ public class ObjectControllerTest {
     @Test
     public void testUploadFile() throws Exception {
         var content = "Hello, world!".getBytes(StandardCharsets.UTF_8);
-        MockMultipartFile file = new MockMultipartFile("file", "testfile.txt", "text/plain", content);
+        MockMultipartFile file =
+            new MockMultipartFile("file", "testfile.txt", "text/plain", content);
 
         this.mockMvc.perform(multipart("/ubiquia/belief-state-service/object/upload")
                 .file(file))
@@ -60,7 +63,8 @@ public class ObjectControllerTest {
     @Test
     public void testDownloadFileSuccess() throws Exception {
         var content = "Hello, world!".getBytes(StandardCharsets.UTF_8);
-        MockMultipartFile file = new MockMultipartFile("file", "testfile.txt", "text/plain", content);
+        MockMultipartFile file =
+            new MockMultipartFile("file", "testfile.txt", "text/plain", content);
 
         var response = this.mockMvc.perform(multipart("/ubiquia/belief-state-service/object/upload")
                 .file(file))

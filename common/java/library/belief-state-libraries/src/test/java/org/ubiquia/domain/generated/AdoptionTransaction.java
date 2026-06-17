@@ -24,8 +24,12 @@ import java.util.Objects;
     AdoptionTransaction.JSON_PROPERTY_OWNER,
     AdoptionTransaction.JSON_PROPERTY_PET
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
+@jakarta.annotation.Generated(
+    value = "org.openapitools.codegen.languages.JavaClientCodegen",
+    date = "2025-06-18T01:59:17.081296200Z[UTC]",
+    comments = "Generator version: 7.13.0")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY,
+    property = "modelType", visible = true)
 
 public class AdoptionTransaction extends BaseModel {
     public static final String JSON_PROPERTY_OWNER = "owner";
@@ -35,10 +39,12 @@ public class AdoptionTransaction extends BaseModel {
     @jakarta.annotation.Nullable
     private Animal pet;
 
+    /** Constructs an AdoptionTransaction instance. */
     public AdoptionTransaction() {
 
     }
 
+    /** Sets the owner and returns this instance. */
     public AdoptionTransaction owner(@jakarta.annotation.Nullable Person owner) {
 
         this.owner = owner;
@@ -46,7 +52,7 @@ public class AdoptionTransaction extends BaseModel {
     }
 
     /**
-     * Get owner
+     * Get owner.
      *
      * @return owner
      */
@@ -67,6 +73,7 @@ public class AdoptionTransaction extends BaseModel {
         this.owner = owner;
     }
 
+    /** Sets the pet and returns this instance. */
     public AdoptionTransaction pet(@jakarta.annotation.Nullable Animal pet) {
 
         this.pet = pet;
@@ -74,7 +81,7 @@ public class AdoptionTransaction extends BaseModel {
     }
 
     /**
-     * Get pet
+     * Get pet.
      *
      * @return pet
      */
@@ -104,9 +111,9 @@ public class AdoptionTransaction extends BaseModel {
             return false;
         }
         AdoptionTransaction adoptionTransaction = (AdoptionTransaction) o;
-        return Objects.equals(this.owner, adoptionTransaction.owner) &&
-            Objects.equals(this.pet, adoptionTransaction.pet) &&
-            super.equals(o);
+        return Objects.equals(this.owner, adoptionTransaction.owner)
+            && Objects.equals(this.pet, adoptionTransaction.pet)
+            && super.equals(o);
     }
 
     @Override

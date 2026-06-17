@@ -15,13 +15,16 @@ package org.ubiquia.domain.generated;
 
 
 import com.fasterxml.jackson.annotation.*;
+import java.util.Objects;
 import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
 
-import java.util.Objects;
 /**
  * A base model.
  */
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
+@jakarta.annotation.Generated(
+    value = "org.openapitools.codegen.languages.JavaClientCodegen",
+    date = "2025-06-18T01:59:17.081296200Z[UTC]",
+    comments = "Generator version: 7.13.0")
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,

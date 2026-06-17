@@ -24,18 +24,24 @@ import java.util.Objects;
 @JsonPropertyOrder({
     Dachschund.JSON_PROPERTY_APEX_PREDATOR
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-06-18T01:59:17.081296200Z[UTC]", comments = "Generator version: 7.13.0")
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "modelType", visible = true)
+@jakarta.annotation.Generated(
+    value = "org.openapitools.codegen.languages.JavaClientCodegen",
+    date = "2025-06-18T01:59:17.081296200Z[UTC]",
+    comments = "Generator version: 7.13.0")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY,
+    property = "modelType", visible = true)
 
 public class Dachschund extends Dog {
     public static final String JSON_PROPERTY_APEX_PREDATOR = "apexPredator";
     @jakarta.annotation.Nonnull
     private Boolean apexPredator = true;
 
+    /** Constructs a Dachschund instance. */
     public Dachschund() {
 
     }
 
+    /** Sets apexPredator and returns this instance. */
     public Dachschund apexPredator(@jakarta.annotation.Nonnull Boolean apexPredator) {
 
         this.apexPredator = apexPredator;
@@ -43,7 +49,7 @@ public class Dachschund extends Dog {
     }
 
     /**
-     * Get apexPredator
+     * Get apexPredator.
      *
      * @return apexPredator
      */
@@ -73,8 +79,8 @@ public class Dachschund extends Dog {
             return false;
         }
         Dachschund dachschundDto = (Dachschund) o;
-        return Objects.equals(this.apexPredator, dachschundDto.apexPredator) &&
-            super.equals(o);
+        return Objects.equals(this.apexPredator, dachschundDto.apexPredator)
+            && super.equals(o);
     }
 
     @Override

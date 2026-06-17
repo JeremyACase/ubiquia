@@ -28,7 +28,10 @@ import java.util.Objects;
     NameEntity.JSON_PROPERTY_FIRST_NAME,
     NameEntity.JSON_PROPERTY_LAST_NAME
 })
-@jakarta.annotation.Generated(value = "org.ubiquia.core.belief.state.generator.service.generator.acl.UbiquiaAclEntityCodegen", date = "2025-06-18T01:59:36.137342500Z[UTC]", comments = "Generator version: 7.13.0")
+@jakarta.annotation.Generated(
+    value = "org.ubiquia.core.belief.state.generator.service.generator.acl.UbiquiaAclEntityCodegen",
+    date = "2025-06-18T01:59:36.137342500Z[UTC]",
+    comments = "Generator version: 7.13.0")
 @Embeddable
 public class NameEntity {
     public static final String JSON_PROPERTY_FIRST_NAME = "firstName";
@@ -42,9 +45,11 @@ public class NameEntity {
 
     private String lastName;
 
+    /** Constructs a NameEntity instance. */
     public NameEntity() {
     }
 
+    /** Sets firstName and returns this instance. */
     public NameEntity firstName(@jakarta.annotation.Nonnull String firstName) {
 
         this.firstName = firstName;
@@ -52,7 +57,7 @@ public class NameEntity {
     }
 
     /**
-     * Get firstName
+     * Get firstName.
      *
      * @return firstName
      */
@@ -73,6 +78,7 @@ public class NameEntity {
         this.firstName = firstName;
     }
 
+    /** Sets lastName and returns this instance. */
     public NameEntity lastName(@jakarta.annotation.Nullable String lastName) {
 
         this.lastName = lastName;
@@ -80,7 +86,7 @@ public class NameEntity {
     }
 
     /**
-     * Get lastName
+     * Get lastName.
      *
      * @return lastName
      */
@@ -109,8 +115,8 @@ public class NameEntity {
             return false;
         }
         NameEntity nameEntity = (NameEntity) o;
-        return Objects.equals(this.firstName, nameEntity.firstName) &&
-            Objects.equals(this.lastName, nameEntity.lastName);
+        return Objects.equals(this.firstName, nameEntity.firstName)
+            && Objects.equals(this.lastName, nameEntity.lastName);
     }
 
     @Override

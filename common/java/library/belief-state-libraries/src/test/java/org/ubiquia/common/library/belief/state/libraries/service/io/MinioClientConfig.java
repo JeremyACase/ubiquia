@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.ubiquia.common.library.api.config.MinioConfig;
 
+/** Configuration for the Minio client bean. */
 @Configuration
 @EnableConfigurationProperties(MinioConfig.class)
 @ConditionalOnProperty(
@@ -21,6 +22,7 @@ public class MinioClientConfig {
     @Autowired
     private MinioConfig minioConfig;
 
+    /** Build and return a configured MinioClient bean. */
     @Bean
     public MinioClient minioClient() throws MinioException {
         return MinioClient.builder()

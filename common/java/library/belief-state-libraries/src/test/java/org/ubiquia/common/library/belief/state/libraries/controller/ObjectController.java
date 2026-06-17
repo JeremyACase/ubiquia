@@ -22,10 +22,12 @@ import org.ubiquia.common.library.belief.state.libraries.service.io.ObjectMetada
 import org.ubiquia.common.library.belief.state.libraries.service.mapper.AbstractIngressDtoMapper;
 import org.ubiquia.common.model.domain.dto.ObjectMetadataDto;
 
+/** REST controller for object storage metadata. */
 @RestController
 @RequestMapping("/ubiquia/belief-state-service/object")
 @Transactional
-public class ObjectController extends AbstractDomainModelController<ObjectMetadataEntity, ObjectMetadataDto> {
+public class ObjectController
+    extends AbstractDomainModelController<ObjectMetadataEntity, ObjectMetadataDto> {
 
     private static final Logger logger = LoggerFactory.getLogger(ObjectController.class);
 
@@ -67,6 +69,7 @@ public class ObjectController extends AbstractDomainModelController<ObjectMetada
         return this.objectMetadataEntityRepository;
     }
 
+    /** Upload a file to object storage. */
     @PostMapping("/upload")
     public ObjectMetadataDto uploadFile(
         @RequestParam("file") MultipartFile file)
@@ -89,6 +92,7 @@ public class ObjectController extends AbstractDomainModelController<ObjectMetada
         return metadata;
     }
 
+    /** Download a file from object storage. */
     @GetMapping("/download/{filename}")
     public ResponseEntity<byte[]> downloadFile(
         @PathVariable("filename") String filename)

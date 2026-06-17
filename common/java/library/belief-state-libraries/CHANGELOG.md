@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.38.1] - 2026-06-17
+### Fixed
+- Resolved all Google Java Style checkstyle violations in main sources: missing Javadoc on types and methods, `CustomImportOrder`, `AbbreviationAsWordInName`, `LineLength`, `OperatorWrap`, `SummaryJavadoc`
+- Resolved all Google Java Style checkstyle violations in test sources: missing Javadoc, `CustomImportOrder`, `AbbreviationAsWordInName` (`queryURL` → `queryUrl`, `getURL` → `getUrl`, `deleteURL` → `deleteUrl`, `assertPOSTsModel` → `assertPostsModel`), `VariableDeclarationUsageDistance`, `LineLength`, `OperatorWrap`, `SummaryJavadoc`, `EmptyLineSeparator`
+
 ## [0.19.0] 2026-05-19
 ### Added
 - `ObjectMetadataEntity`: new JPA entity in `entity` package extending `AbstractDomainModelEntity`; annotated with `@Entity(name = "BeliefStateObjectMetadataEntity")` and `@Table(name = "belief_state_object_metadata")` to avoid collision with the identically-named core entity

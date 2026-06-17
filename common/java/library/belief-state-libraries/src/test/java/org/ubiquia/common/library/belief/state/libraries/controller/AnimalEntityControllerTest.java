@@ -15,11 +15,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.client.RestTemplate;
-import org.ubiquia.domain.generated.Animal;
-import org.ubiquia.domain.generated.Person;
 import org.ubiquia.common.library.belief.state.libraries.service.factory.MockFactory;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
+import org.ubiquia.domain.generated.Animal;
+import org.ubiquia.domain.generated.Person;
 
+/** Tests for the animal entity controller. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -43,7 +44,7 @@ public class AnimalEntityControllerTest {
     @Test
     public void assertsDoesNotNullifyOneRelationsInJson_isValid() throws Exception {
 
-        var owner = this.mockFactory.generatePerson();
+        final var owner = this.mockFactory.generatePerson();
         var weenOne = this.mockFactory.generateWienerDog();
         var weenTwo = this.mockFactory.generateWienerDog();
         var weenThree = this.mockFactory.generateWienerDog();
@@ -64,10 +65,10 @@ public class AnimalEntityControllerTest {
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
             .andReturn();
 
-        var queryURL = "http://localhost:8080/ubiquia/belief-state-service/animal/query/params";
+        var queryUrl = "http://localhost:8080/ubiquia/belief-state-service/animal/query/params";
 
         var json = this.mockMvc.perform(MockMvcRequestBuilders
-                .get(queryURL)
+                .get(queryUrl)
                 .queryParam("page", "0")
                 .queryParam("size", "3")
                 .accept(MediaType.APPLICATION_JSON)
@@ -96,7 +97,7 @@ public class AnimalEntityControllerTest {
     @Test
     public void assertsNullifiesManyRelationsInJson_isValid() throws Exception {
 
-        var owner = this.mockFactory.generatePerson();
+        final var owner = this.mockFactory.generatePerson();
         var weenOne = this.mockFactory.generateWienerDog();
         var weenTwo = this.mockFactory.generateWienerDog();
         var weenThree = this.mockFactory.generateWienerDog();
@@ -117,10 +118,10 @@ public class AnimalEntityControllerTest {
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
             .andReturn();
 
-        var queryURL = "http://localhost:8080/ubiquia/belief-state-service/person/query/params";
+        var queryUrl = "http://localhost:8080/ubiquia/belief-state-service/person/query/params";
 
         var json = this.mockMvc.perform(MockMvcRequestBuilders
-                .get(queryURL)
+                .get(queryUrl)
                 .queryParam("page", "0")
                 .queryParam("size", "1")
                 .accept(MediaType.APPLICATION_JSON)

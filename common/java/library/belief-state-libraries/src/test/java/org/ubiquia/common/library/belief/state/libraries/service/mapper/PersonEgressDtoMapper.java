@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.ubiquia.domain.generated.Person;
 import org.ubiquia.domain.generated.PersonEntity;
 
+/** Egress mapper for person entities. */
 @Component
 public class PersonEgressDtoMapper extends AbstractEgressDtoMapper<PersonEntity, Person> {
 

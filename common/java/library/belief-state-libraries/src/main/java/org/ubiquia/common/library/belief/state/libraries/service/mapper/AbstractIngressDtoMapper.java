@@ -19,6 +19,7 @@ import org.ubiquia.common.library.belief.state.libraries.service.finder.EntityRe
 import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
 import org.ubiquia.common.model.domain.entity.AbstractDomainModelEntity;
 
+/** Abstract ingress mapper that translates DTOs into JPA entities and hydrates FK relationships. */
 @Service
 public abstract class AbstractIngressDtoMapper<
     F extends AbstractDomainModel,

@@ -18,7 +18,7 @@ public class EgressMapperFinder {
     /**
      * Provided a Ubiquia ACL entity, "Find" the appropriate mapper from the context.
      *
-     * @param entity
+     * @param entity The entity to resolve a mapper for.
      * @return The appropriate mapper.
      */
     @SuppressWarnings("rawtypes")

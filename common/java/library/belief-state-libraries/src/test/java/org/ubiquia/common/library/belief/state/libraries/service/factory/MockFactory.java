@@ -5,9 +5,10 @@ import static org.instancio.Select.field;
 import java.util.ArrayList;
 import org.instancio.Instancio;
 import org.springframework.stereotype.Service;
-import org.ubiquia.domain.generated.*;
 import org.ubiquia.common.model.domain.dto.AbstractDomainModel;
+import org.ubiquia.domain.generated.*;
 
+/** Factory for generating mock domain models for testing. */
 @Service
 public class MockFactory {
 
