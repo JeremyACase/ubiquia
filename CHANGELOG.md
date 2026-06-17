@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.38.0] - 2026-06-16
+### Changed
+- `core-communication-service`: refactored proxy layer to use Template Method (`AbstractReverseProxyController`), Builder (`HttpProxyConnectionBuilder`), and Single Responsibility (`ProxyResponseRewriter`) design patterns; introduced `getBaseUrl()` on `FlowServiceConfig` and `DashboardServiceConfig`; removed unused fields from `ComponentProxyManager`, `NodeProxyManager`, and `GraphControllerProxy`; resolved all Google Java Style checkstyle violations across modified files; controller tests converted from `@SpringBootTest` to `@WebMvcTest` + `MockWebServer` and service tests to `@ExtendWith(MockitoExtension.class)`
+
 ## [0.37.1] - 2026-06-15
 ### Fixed
 - `core-belief-state-generator-service`: `KeyValuePairEntity.key` field mapped to the SQL reserved word `key` as a bare column name, causing H2 syntax errors at runtime; `UbiquiaDomainEntityGenerator` now detects reserved-word field names on embeddable models and emits `@Column(name = "pair_<field>")` via `attachColumnAnnotationsToEmbeddables()`

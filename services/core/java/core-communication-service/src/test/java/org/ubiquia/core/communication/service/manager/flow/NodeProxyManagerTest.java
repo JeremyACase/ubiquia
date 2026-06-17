@@ -1,98 +1,93 @@
 package org.ubiquia.core.communication.service.manager.flow;
 
-import java.util.HashMap;
-import org.junit.jupiter.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.ArrayList;
+import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.ubiquia.common.library.implementation.service.builder.NodeEndpointRecordBuilder;
+import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.common.model.ubiquia.embeddable.CommunicationServiceSettings;
-import org.ubiquia.core.communication.dummy.DummyFactory;
-import org.ubiquia.core.communication.service.io.flow.DeployedGraphPoller;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class NodeProxyManagerTest {
 
-    @Autowired
-    private DummyFactory dummyFactory;
+    @Mock
+    private NodeEndpointRecordBuilder nodeEndpointRecordBuilder;
 
-    @MockitoBean
-    private DeployedGraphPoller deployedGraphPoller;
-
-    @Autowired
+    @InjectMocks
     private NodeProxyManager nodeProxyManager;
 
-    @Test
-    public void assertDeploysNode_isValid() {
+    private Graph graph;
+    private Node node;
 
-        var graph = this.dummyFactory.generateGraph();
+    @BeforeEach
+    void setUp() {
+        graph = new Graph();
+        graph.setName("test-graph");
+        graph.setNodes(new ArrayList<>());
 
-        var node = this.dummyFactory.generateNode();
-        node.setCommunicationServiceSettings(new CommunicationServiceSettings());
-        node.getCommunicationServiceSettings().setExposeViaCommService(true);
+        node = new Node();
+        node.setId(UUID.randomUUID().toString());
+        node.setName("test-node");
+        node.setEndpoint("/test/endpoint");
+        var settings = new CommunicationServiceSettings();
+        settings.setExposeViaCommService(true);
+        node.setCommunicationServiceSettings(settings);
         graph.getNodes().add(node);
-
-        this.nodeProxyManager.tryProcessNewlyDeployedGraph(graph);
-
-        @SuppressWarnings("unchecked")
-        var map = (HashMap<String, Node>) ReflectionTestUtils
-            .getField(this.nodeProxyManager, "proxiedNodesById");
-
-        Assertions.assertTrue(map.containsKey(node.getId()));
     }
 
     @Test
-    public void assertContainsEndpoint_isValid() {
-
-        var graph = this.dummyFactory.generateGraph();
-
-        var node = this.dummyFactory.generateNode();
-        node.setCommunicationServiceSettings(new CommunicationServiceSettings());
-        node.getCommunicationServiceSettings().setExposeViaCommService(true);
-        graph.getNodes().add(node);
-
+    @DisplayName("Deploy: node is reachable by name after registration")
+    void deploy_registersNodeByName() {
         this.nodeProxyManager.tryProcessNewlyDeployedGraph(graph);
 
-        var endpoints = this.nodeProxyManager.getRegisteredEndpoints();
-        Assertions.assertTrue(endpoints.contains(node.getEndpoint()));
+        assertThat(this.nodeProxyManager.getRegisteredEndpointForNodeName(node.getName()))
+            .isEqualTo(node.getEndpoint());
     }
 
     @Test
-    public void assertTearsDownNode_isValid() {
+    @DisplayName("Deploy: endpoint appears in getRegisteredEndpoints")
+    void deploy_endpointAppearsInList() {
+        this.nodeProxyManager.tryProcessNewlyDeployedGraph(graph);
 
-        var graph = this.dummyFactory.generateGraph();
+        assertThat(this.nodeProxyManager.getRegisteredEndpoints())
+            .contains(node.getEndpoint());
+    }
 
-        var node = this.dummyFactory.generateNode();
-        node.setCommunicationServiceSettings(new CommunicationServiceSettings());
-        node.getCommunicationServiceSettings().setExposeViaCommService(true);
-        graph.getNodes().add(node);
+    @Test
+    @DisplayName("Deploy: node with exposeViaCommService=false is not registered")
+    void deploy_skipsNodeNotFlaggedForExposure() {
+        node.getCommunicationServiceSettings().setExposeViaCommService(false);
+        this.nodeProxyManager.tryProcessNewlyDeployedGraph(graph);
 
+        assertThat(this.nodeProxyManager.getRegisteredEndpointForNodeName(node.getName())).isNull();
+        assertThat(this.nodeProxyManager.getRegisteredEndpoints()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Teardown: node is no longer reachable by name")
+    void teardown_deregistersNodeByName() {
         this.nodeProxyManager.tryProcessNewlyDeployedGraph(graph);
         this.nodeProxyManager.tryProcessNewlyTornDownGraph(graph);
 
-        @SuppressWarnings("unchecked")
-        var map = (HashMap<String, Node>) ReflectionTestUtils
-            .getField(this.nodeProxyManager, "proxiedNodesById");
-
-        Assertions.assertFalse(map.containsKey(node.getId()));
+        assertThat(this.nodeProxyManager.getRegisteredEndpointForNodeName(node.getName())).isNull();
     }
 
     @Test
-    public void assertContainsDoesNotContainEndpoint_isValid() {
-
-        var graph = this.dummyFactory.generateGraph();
-
-        var node = this.dummyFactory.generateNode();
-        node.setCommunicationServiceSettings(new CommunicationServiceSettings());
-        node.getCommunicationServiceSettings().setExposeViaCommService(true);
-        graph.getNodes().add(node);
-
+    @DisplayName("Teardown: endpoint removed from getRegisteredEndpoints")
+    void teardown_endpointRemovedFromList() {
         this.nodeProxyManager.tryProcessNewlyDeployedGraph(graph);
         this.nodeProxyManager.tryProcessNewlyTornDownGraph(graph);
 
-        var endpoints = this.nodeProxyManager.getRegisteredEndpoints();
-        Assertions.assertFalse(endpoints.contains(node.getEndpoint()));
+        assertThat(this.nodeProxyManager.getRegisteredEndpoints())
+            .doesNotContain(node.getEndpoint());
     }
 }

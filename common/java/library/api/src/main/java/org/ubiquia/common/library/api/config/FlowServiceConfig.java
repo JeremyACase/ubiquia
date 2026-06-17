@@ -40,4 +40,8 @@ public class FlowServiceConfig {
     public void setPollFrequencyMilliseconds(Long pollFrequencyMilliseconds) {
         this.pollFrequencyMilliseconds = pollFrequencyMilliseconds;
     }
+
+    public String getBaseUrl() {
+        return this.url + ":" + this.port;
+    }
 }

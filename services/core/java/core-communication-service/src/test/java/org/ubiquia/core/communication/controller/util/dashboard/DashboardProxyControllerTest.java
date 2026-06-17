@@ -46,10 +46,8 @@ class DashboardProxyControllerTest {
     void setUp() throws IOException {
         this.server = new MockWebServer();
         this.server.start();
-        given(this.dashboardServiceConfig.getUrl())
-            .willReturn("http://" + this.server.getHostName());
-        given(this.dashboardServiceConfig.getPort())
-            .willReturn(this.server.getPort());
+        given(this.dashboardServiceConfig.getBaseUrl())
+            .willReturn("http://" + this.server.getHostName() + ":" + this.server.getPort());
     }
 
     @AfterEach
@@ -219,7 +217,7 @@ class DashboardProxyControllerTest {
 
     @Test
     @DisplayName("X-Ubiquia-Target header set on response")
-    void xUbiquiaTargetHeaderPresent() throws Exception {
+    void ubiquiaTargetHeaderIsPresent() throws Exception {
         this.server.enqueue(new MockResponse()
             .setResponseCode(200)
             .setHeader("Content-Type", "text/plain")

@@ -9,59 +9,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.ubiquia.common.library.implementation.service.builder.ComponentEndpointRecordBuilder;
 import org.ubiquia.common.model.ubiquia.dto.Graph;
 
 /**
- * Manages reverse-proxy registrations for component endpoints derived from deployed {@link Graph}s.
+ * Maintains an in-memory registry of component name → upstream URI for reverse-proxy routing.
  *
- * <p>
- * This service maintains an in-memory registry mapping component names to their upstream
- * {@link URI} base endpoints. It is typically invoked by a deployment poller or other lifecycle
- * orchestrator to register/unregister proxy routes for components that opt into exposure via the
- * communication service (i.e., {@code communicationServiceSettings.exposeViaCommService == true}).
- * </p>
- *
- * <h3>Behavior</h3>
- * <ul>
- *   <li>On new graph deployments, registers the upstream endpoint for each eligible component.</li>
- *   <li>On graph teardown, removes previously registered component endpoints.</li>
- *   <li>Provides read APIs to list all registered paths or fetch one by component name.</li>
- * </ul>
- *
- * <p><strong>Thread-safety:</strong> Uses a plain {@link HashMap}; if accessed from multiple threads,
- * add synchronization or replace with a concurrent map.</p>
- *
- * <p><strong>Name casing:</strong> Keys are stored using {@code component.getName().toLowerCase()} on registration.
- * Callers to {@link #getRegisteredEndpointFor(String)} should normalize casing accordingly to avoid misses.</p>
+ * <p>Driven by graph deployment/teardown lifecycle events from {@link
+ * org.ubiquia.core.communication.service.io.flow.DeployedGraphPoller}. Only components
+ * with {@code communicationServiceSettings.exposeViaCommService == true} are registered.</p>
  */
 @Service
 public class ComponentProxyManager {
+
     private static final Logger logger = LoggerFactory.getLogger(ComponentProxyManager.class);
 
-    /** Registry of component name (lower-cased) → upstream component base {@link URI}. */
     private final HashMap<String, URI> proxiedComponentEndpoints = new HashMap<>();
 
     @Autowired
     private ComponentEndpointRecordBuilder componentEndpointRecordBuilder;
 
-    /** Reserved for future health checks or metadata calls. */
-    @Autowired
-    private WebClient webClient;
-
     /**
-     * Processes a newly deployed {@link Graph} by registering proxies for any components
-     * that should be exposed via the communication service.
+     * Registers proxy endpoints for components in a newly deployed graph that opt in to
+     * exposure via the communication service.
      *
-     * <p>
-     * For each component with {@code exposeViaCommService == true}, computes the upstream
-     * base {@link URI} using {@link ComponentEndpointRecordBuilder#getComponentUriFrom(String, org.ubiquia.common.model.ubiquia.dto.Component)}
-     * and stores it in the registry if not already present.
-     * </p>
-     *
-     * @param graph the deployed graph whose components may need proxy registration
-     * @throws URISyntaxException if building the component endpoint {@link URI} fails
+     * @param graph the deployed graph
+     * @throws URISyntaxException if building a component endpoint URI fails
      */
     public void tryProcessNewlyDeployedGraph(final Graph graph) throws URISyntaxException {
         var componentsToProxy = graph
@@ -73,11 +46,9 @@ public class ComponentProxyManager {
             .toList();
 
         for (var component : componentsToProxy) {
-
             if (!this.proxiedComponentEndpoints.containsKey(component.getName())) {
                 logger.info("Registering proxy for component: {}", component.getName());
-                var endpoint = this
-                    .componentEndpointRecordBuilder
+                var endpoint = this.componentEndpointRecordBuilder
                     .getComponentUriFrom(graph.getName(), component);
                 logger.info("...proxying base url: {}", endpoint);
                 this.proxiedComponentEndpoints.put(component.getName(), endpoint);
@@ -86,42 +57,24 @@ public class ComponentProxyManager {
     }
 
     /**
-     * Unregisters any previously proxied component endpoints associated with a torn-down graph.
+     * Unregisters proxy endpoints for all components in a torn-down graph.
      *
-     * <p>
-     * For each component with {@code exposeViaCommService == true}, removes its entry from the
-     * registry if present.
-     * </p>
-     *
-     * @param graph the torn-down graph whose components should be unproxied
+     * @param graph the torn-down graph
      */
     public void tryProcessNewlyTornDownGraph(final Graph graph) {
-
         logger.info("...processing torn down graph: {}", graph.getName());
 
-        var componentsToUnproxy = graph
-            .getComponents()
-            .stream()
-            .toList();
-
-        for (var component : componentsToUnproxy) {
-
+        for (var component : graph.getComponents()) {
             logger.info("...checking if component {} needs to be torn down...",
                 component.getName());
-
             if (this.proxiedComponentEndpoints.containsKey(component.getName())) {
-                logger.info("...unproxying endpoints for component {}...",
-                    component.getName());
+                logger.info("...unproxying endpoints for component {}...", component.getName());
                 this.proxiedComponentEndpoints.remove(component.getName());
             }
         }
     }
 
-    /**
-     * Returns the list of currently registered upstream paths (raw path portion of each {@link URI}).
-     *
-     * @return immutable snapshot list of registered endpoint paths (e.g., {@code /graph-x/component-y})
-     */
+    /** Returns the raw paths of all currently registered upstream component endpoints. */
     public List<String> getRegisteredEndpoints() {
         var endpoints = new ArrayList<String>();
         for (var uri : this.proxiedComponentEndpoints.values()) {
@@ -131,19 +84,12 @@ public class ComponentProxyManager {
     }
 
     /**
-     * Looks up the upstream base {@link URI} for a given component name.
-     *
-     * <p><strong>Casing:</strong> Keys are stored lower-cased; normalize the input name
-     * (e.g., {@code toLowerCase(Locale.ROOT)}) to avoid misses.</p>
+     * Returns the upstream base URI for the given component name,
+     * or {@code null} if not registered.
      *
      * @param componentName the component's logical name
-     * @return the registered upstream base {@link URI}, or {@code null} if not registered
      */
     public URI getRegisteredEndpointFor(final String componentName) {
-        URI endpoint = null;
-        if (this.proxiedComponentEndpoints.containsKey(componentName)) {
-            endpoint = this.proxiedComponentEndpoints.get(componentName);
-        }
-        return endpoint;
+        return this.proxiedComponentEndpoints.get(componentName);
     }
 }
