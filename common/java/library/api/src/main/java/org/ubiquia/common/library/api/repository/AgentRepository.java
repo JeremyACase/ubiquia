@@ -47,7 +47,10 @@ public interface AgentRepository
     @Query("SELECT DISTINCT g.id FROM AgentEntity a JOIN a.deployedGraphs g WHERE a.id = :id")
     Page<String> findDeployedGraphIdsById(@Param("id") String id, Pageable pageable);
 
-    /** All agents in a network that have a baseUrl, regardless of reachability. Used by the heartbeat. */
+    /**
+     * All agents in a network that have a baseUrl, regardless of reachability.
+     * Used by the heartbeat.
+     */
     List<AgentEntity> findByNetworkAndBaseUrlIsNotNull(NetworkEntity network);
 
     /** Reachable agents in a network that have a baseUrl. Used by sync peer resolution. */

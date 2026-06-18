@@ -14,7 +14,7 @@ plugins {
 
 allprojects {
     group = 'org.ubiquia'
-    version = '0.38.1'
+    version = '0.38.2'
 
     repositories {
         mavenCentral()
@@ -28,7 +28,10 @@ allprojects {
     checkstyle {
         toolVersion = '10.23.1'
         config = resources.text.fromFile("$rootDir/common/java/checkstyle/checkstyle.xml")
-        configProperties = ['basedir': rootDir]
+        configProperties = [
+            'basedir': rootDir,
+            'org.checkstyle.google.suppressionfilter.config': "${rootDir}/common/java/checkstyle/checkstyle-suppressions.xml"
+        ]
     }
 
     tasks.withType(Checkstyle).configureEach {
