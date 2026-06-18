@@ -1,8 +1,8 @@
 package org.ubiquia.common.library.api.config;
 
+import java.util.Objects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-import java.util.Objects;
 
 /**
  * A bean to be used for service configuration. Makes for consistent Helm injection.

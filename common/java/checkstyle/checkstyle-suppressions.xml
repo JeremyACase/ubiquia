@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.0//EN"
+    "https://checkstyle.org/dtds/suppressions_1_0.dtd">
+<suppressions>
+    <!-- Spring Data derived query name exceeds limit but cannot be shortened without @Query -->
+    <suppress checks="LineLength"
+              files="AgentRepository\.java"
+              lines="32"/>
+</suppressions>
