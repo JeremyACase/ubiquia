@@ -29,6 +29,7 @@ public class AgentInitializationLogic {
     @Autowired
     private NetworkRepository networkRepository;
 
+    /** Ensures this agent has a record in the database, creating one if absent. */
     @Transactional
     public void tryInitializeAgentInDatabase() {
         logger.info("...attempting to initialize Ubiquia agent id: {}...",

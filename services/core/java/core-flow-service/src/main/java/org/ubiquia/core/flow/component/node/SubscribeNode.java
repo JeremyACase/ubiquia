@@ -13,6 +13,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.kafka.listener.MessageListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * A node that subscribes to a broker topic and forwards received messages into the flow pipeline.
+ */
 @Component
 @Scope("prototype")
 public class SubscribeNode

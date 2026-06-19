@@ -29,6 +29,7 @@ import org.ubiquia.core.flow.service.manager.ComponentManager;
 import org.ubiquia.core.flow.service.manager.NodeManager;
 import org.ubiquia.core.flow.service.registrar.GraphRegistrar;
 
+/** REST controller for deploying and tearing down graphs on this agent. */
 @RestController
 @RequestMapping("/ubiquia/core/flow-service/graph")
 public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Graph> {
@@ -153,6 +154,7 @@ public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Gr
         return deployment;
     }
 
+    /** Tears down a deployed graph and removes it from this agent's deployment record. */
     @PostMapping("/teardown")
     @Transactional
     public void tryTeardownGraph(@RequestBody @Valid GraphDeployment deployment) {
@@ -168,8 +170,8 @@ public class GraphController extends GenericUbiquiaDaoController<GraphEntity, Gr
         this.nodeManager.tearDownNodesFor(deployment);
 
         if (Objects.nonNull(this.componentOperator)) {
-            this.getLogger().info("...running in kubernetes; attempting to tear down any of the graph's "
-                + " resources deployed in Kubernetes...");
+            this.getLogger().info("...running in kubernetes; attempting to tear down"
+                + " any of the graph's resources deployed in Kubernetes...");
             this.componentOperator.deleteGraphResources(deployment.getGraphName());
         }
 

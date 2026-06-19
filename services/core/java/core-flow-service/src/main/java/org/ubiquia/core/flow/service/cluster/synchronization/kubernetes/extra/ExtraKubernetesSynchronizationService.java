@@ -13,7 +13,8 @@ import org.springframework.stereotype.Service;
  * Resolves HTTP peer URLs for agents running in external Kubernetes clusters.
  *
  * <p>Peers are supplied via {@code ubiquia.cluster.kubernetes.extra.peer-base-urls}
- * (comma-separated). Only peers currently deemed reachable by {@link ExtraKubernetesHeartbeatService}
+ * (comma-separated). Only peers currently deemed reachable by
+ * {@link ExtraKubernetesHeartbeatService}
  * are returned. When the heartbeat service is not active (i.e., {@code ubiquia.kubernetes.enabled}
  * is not set), all configured URLs are returned unfiltered so that the relay can still attempt
  * delivery.

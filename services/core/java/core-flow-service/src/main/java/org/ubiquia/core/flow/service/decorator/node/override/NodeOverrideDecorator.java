@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.core.flow.service.decorator.override.GenericOverrideDecorator;
 
+/** Decorator that applies override settings to Node DTO instances. */
 @Service
 public class NodeOverrideDecorator extends GenericOverrideDecorator<Node> {
 

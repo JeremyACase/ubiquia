@@ -7,12 +7,14 @@ import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.component.node.AbstractNode;
 
+/** Determines whether a node acts as a passthrough (no component processing). */
 @Service
 public class NodePassthroughLogic {
 
     @Autowired
     private NodeTypeLogic nodeTypeLogic;
 
+    /** Returns true if the given node instance is a passthrough node. */
     public Boolean isPassthrough(final AbstractNode node) {
         var isPassthrough = false;
 
@@ -31,6 +33,7 @@ public class NodePassthroughLogic {
         return isPassthrough;
     }
 
+    /** Returns true if the given node DTO is a passthrough node. */
     public Boolean isPassthrough(final Node node) {
         var isPassthrough = false;
 

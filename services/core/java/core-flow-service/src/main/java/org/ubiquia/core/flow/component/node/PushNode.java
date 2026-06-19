@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/** A node that accepts pushed payloads and forwards them into the flow pipeline. */
 @Component
 @Scope("prototype")
 public class PushNode extends AbstractNode {

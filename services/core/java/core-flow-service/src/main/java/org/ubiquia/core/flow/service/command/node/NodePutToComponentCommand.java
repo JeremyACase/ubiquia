@@ -50,6 +50,7 @@ public class NodePutToComponentCommand implements InterfaceLogger {
         return logger;
     }
 
+    /** Sends a synchronous PUT to the component and processes the response. */
     @Transactional
     public ResponseEntity<Object> tryPutPayloadToComponentSynchronously(
         FlowEventEntity flowEventEntity,
@@ -85,10 +86,12 @@ public class NodePutToComponentCommand implements InterfaceLogger {
         }
         flowEventTimes.setComponentResponseTime(OffsetDateTime.now());
         flowEventEntity.setHttpResponseCode(response.getStatusCode().value());
-        this.nodeComponentResponseCommand.processComponentResponse(flowEventEntity, adapter, response);
+        this.nodeComponentResponseCommand.processComponentResponse(
+            flowEventEntity, adapter, response);
         return response;
     }
 
+    /** Sends an asynchronous PUT to the component and processes the response reactively. */
     @Transactional
     public void tryPutInputToComponentAsynchronously(
         FlowEventEntity flowEventEntity,

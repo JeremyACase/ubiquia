@@ -55,10 +55,10 @@ public class MicroweightSynchronizationService {
                 .filter(url -> !url.isBlank() && !url.equals(this.localBaseUrl))
                 .toList();
         }
-        return this.resolveFromJGroupsView();
+        return this.resolveFromJgroupsView();
     }
 
-    private List<String> resolveFromJGroupsView() {
+    private List<String> resolveFromJgroupsView() {
         var channel = this.microweightClusterService.getChannel();
         if (Objects.isNull(channel) || Objects.isNull(channel.getView())) {
             logger.debug("JGroups channel or view not available; no microweight peers resolved.");

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.ubiquia.common.model.ubiquia.node.QueueNodeEgress;
 import org.ubiquia.core.flow.service.command.node.QueueAdapterCommand;
 
+/** A node that acts as a queue, supporting peek and pop operations on buffered messages. */
 @Component
 @Scope("prototype")
 public class QueueNode extends AbstractNode {
@@ -37,10 +38,12 @@ public class QueueNode extends AbstractNode {
             this.getNodeContext().getNodeType());
     }
 
+    /** Returns the next queued message without removing it. */
     public ResponseEntity<QueueNodeEgress> peek() throws Exception {
         return this.queueAdapterCommand.peekFor(this);
     }
 
+    /** Removes and returns the next queued message. */
     public ResponseEntity<QueueNodeEgress> pop() throws Exception {
         return this.queueAdapterCommand.popFor(this);
     }

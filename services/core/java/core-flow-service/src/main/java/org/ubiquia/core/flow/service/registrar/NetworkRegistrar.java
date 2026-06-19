@@ -10,6 +10,7 @@ import org.ubiquia.common.model.ubiquia.dto.Network;
 import org.ubiquia.common.model.ubiquia.entity.NetworkEntity;
 import org.ubiquia.core.flow.repository.NetworkRepository;
 
+/** Registers and persists network entities during cluster synchronization. */
 @Service
 public class NetworkRegistrar {
 
@@ -18,6 +19,7 @@ public class NetworkRegistrar {
     @Autowired
     private NetworkRepository networkRepository;
 
+    /** Registers a network entity from the given DTO if it does not already exist. */
     @Transactional
     public void tryRegister(final Network dto) {
         if (Objects.nonNull(dto.getId()) && this.networkRepository.existsById(dto.getId())) {

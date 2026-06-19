@@ -16,6 +16,7 @@ import org.ubiquia.common.model.ubiquia.dto.Network;
 import org.ubiquia.common.model.ubiquia.entity.NetworkEntity;
 import org.ubiquia.core.flow.service.registrar.NetworkRegistrar;
 
+/** REST controller for registering and querying network entities. */
 @RestController
 @RequestMapping("/ubiquia/core/flow-service/network")
 public class NetworkController extends GenericUbiquiaDaoController<NetworkEntity, Network> {
@@ -46,6 +47,7 @@ public class NetworkController extends GenericUbiquiaDaoController<NetworkEntity
         return this.dtoMapper;
     }
 
+    /** Registers a network from a JSON request body. */
     @PostMapping("/register/post")
     @Transactional
     public void register(@RequestBody final Network network) {

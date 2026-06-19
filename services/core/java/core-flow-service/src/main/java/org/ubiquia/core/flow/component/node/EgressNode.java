@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.service.command.node.EgressNodeCommand;
 
+/** A node that forwards messages to an egress component. */
 @Component
 @Scope("prototype")
 public class EgressNode extends AbstractNode {

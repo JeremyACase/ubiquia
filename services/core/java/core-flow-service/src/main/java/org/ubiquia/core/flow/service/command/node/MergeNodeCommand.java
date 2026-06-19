@@ -12,14 +12,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
+import org.ubiquia.common.library.implementation.service.telemetry.MicroMeterHelper;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.common.model.ubiquia.entity.FlowMessageEntity;
 import org.ubiquia.core.flow.component.node.MergeNode;
-import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
+import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.orchestrator.NodePayloadOrchestrator;
-import org.ubiquia.common.library.implementation.service.telemetry.MicroMeterHelper;
 
 /**
  * A service that exposes adapter type logic.
@@ -52,6 +52,7 @@ public class MergeNodeCommand implements InterfaceLogger {
         return logger;
     }
 
+    /** Processes a merge node inbox message, merging all upstream payloads when complete. */
     @Transactional
     public void tryProcessMessageFor(final FlowMessage message, final MergeNode node) {
 

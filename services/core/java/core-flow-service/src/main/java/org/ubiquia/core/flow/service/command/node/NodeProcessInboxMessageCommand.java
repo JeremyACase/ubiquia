@@ -19,7 +19,8 @@ import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
 @Transactional
 public class NodeProcessInboxMessageCommand {
 
-    private static final Logger logger = LoggerFactory.getLogger(NodeProcessInboxMessageCommand.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(NodeProcessInboxMessageCommand.class);
 
     @Autowired
     private NodePayloadOrchestrator nodePayloadOrchestrator;
@@ -38,6 +39,7 @@ public class NodeProcessInboxMessageCommand {
         return logger;
     }
 
+    /** Processes a message from the node's inbox, validates it, and forwards it. */
     public void tryProcessInboxMessageFor(
         final FlowMessage message,
         final AbstractNode node) {

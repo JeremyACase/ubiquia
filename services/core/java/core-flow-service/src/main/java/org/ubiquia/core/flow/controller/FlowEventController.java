@@ -17,6 +17,7 @@ import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 import org.ubiquia.core.flow.service.registrar.FlowEventRegistrar;
 
+/** REST controller exposing DAO operations and registration for flow event entities. */
 @RestController
 @RequestMapping("/ubiquia/core/flow-service/flow-event")
 public class FlowEventController extends GenericUbiquiaDaoController<FlowEventEntity, FlowEvent> {
@@ -47,6 +48,7 @@ public class FlowEventController extends GenericUbiquiaDaoController<FlowEventEn
         return this.dtoMapper;
     }
 
+    /** Registers a flow event from a JSON request body. */
     @PostMapping("/register/post")
     @Transactional
     public void register(@RequestBody @Valid final FlowEvent flowEvent) throws Exception {

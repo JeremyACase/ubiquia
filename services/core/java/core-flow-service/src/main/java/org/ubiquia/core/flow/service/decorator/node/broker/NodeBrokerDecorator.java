@@ -13,6 +13,7 @@ import org.ubiquia.core.flow.component.node.SubscribeNode;
 public class NodeBrokerDecorator {
 
     private static final Logger logger = LoggerFactory.getLogger(NodeBrokerDecorator.class);
+
     @Autowired(required = false)
     private KafkaSubscriptionNodeDecorator kafkaSubscriptionNodeDecorator;
 
@@ -26,15 +27,17 @@ public class NodeBrokerDecorator {
         var type = subscribeAdapter.getNodeContext().getBrokerSettings().getType();
         switch (type) {
 
-            case KAFKA: {
-                this.kafkaSubscriptionNodeDecorator.initializeKafkaSubscriptionFor(
-                    subscribeAdapter);
-            }
-            break;
+            case KAFKA:
+                {
+                    this.kafkaSubscriptionNodeDecorator.initializeKafkaSubscriptionFor(
+                        subscribeAdapter);
+                }
+                break;
 
-            default: {
-                throw new RuntimeException("ERROR: Unrecognized broker type: " + type);
-            }
+            default:
+                {
+                    throw new RuntimeException("ERROR: Unrecognized broker type: " + type);
+                }
         }
     }
 }

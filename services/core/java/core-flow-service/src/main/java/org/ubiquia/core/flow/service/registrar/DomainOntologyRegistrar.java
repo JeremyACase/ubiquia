@@ -1,10 +1,9 @@
 package org.ubiquia.core.flow.service.registrar;
 
-
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.HashSet;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +47,7 @@ public class DomainOntologyRegistrar {
     @Autowired
     private GraphRegistrar graphRegistrar;
 
+    /** Registers a domain ontology and its graphs if it does not already exist. */
     @Transactional
     public DomainOntology tryRegister(final DomainOntology domainOntology)
         throws Exception {

@@ -55,6 +55,7 @@ public class MicroweightClusterService implements Receiver {
 
     private JChannel channel;
 
+    /** Joins the JGroups TCP cluster on startup. */
     @PostConstruct
     public void start() throws Exception {
         logger.info("Starting JGroups cluster '{}' on port {} with seed hosts: {}",
@@ -72,6 +73,7 @@ public class MicroweightClusterService implements Receiver {
             clusterName, this.channel.getAddress());
     }
 
+    /** Closes the JGroups channel on application shutdown. */
     @PreDestroy
     public void stop() {
         if (Objects.nonNull(this.channel)) {

@@ -11,6 +11,7 @@ import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
 import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;
 import org.ubiquia.core.flow.repository.ObjectMetadataRepository;
 
+/** Registers and persists object metadata entities during cluster synchronization. */
 @Service
 public class ObjectMetadataRegistrar {
 
@@ -22,6 +23,7 @@ public class ObjectMetadataRegistrar {
     @Autowired
     private AgentRepository agentRepository;
 
+    /** Registers an object metadata record from the given DTO if it does not already exist. */
     @Transactional
     public void tryRegister(final ObjectMetadata dto) {
         if (Objects.nonNull(dto.getId()) && this.objectMetadataRepository.existsById(dto.getId())) {
@@ -29,7 +31,8 @@ public class ObjectMetadataRegistrar {
             return;
         }
 
-        if (Objects.isNull(dto.getUbiquiaAgent()) || Objects.isNull(dto.getUbiquiaAgent().getId())) {
+        if (Objects.isNull(dto.getUbiquiaAgent())
+            || Objects.isNull(dto.getUbiquiaAgent().getId())) {
             throw new IllegalArgumentException(
                 "Cannot register ObjectMetadata: missing agent reference.");
         }

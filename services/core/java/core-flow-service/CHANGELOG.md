@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.38.3] - 2026-06-18
+### Changed
+- Resolved all Google Java Style checkstyle warnings across `core-flow-service`: added missing Javadocs on ~100 classes/methods, fixed import ordering, corrected `EmptyLineSeparator` between members, applied `LeftCurlyNl` formatting to `default:` switch blocks with correct indentation, renamed methods violating `AbbreviationAsWordInName` (`ASingle` → `Single`, `URI` → `Uri`, `JGroups` → `Jgroups`), wrapped long lines, and updated `checkstyle-suppressions.xml` for unavoidable Spring Data derived query names.
+
 ## [0.36.0] - 2026-06-10
 ### Added
 - `GraphBootstrapConfig` and `GraphBootstrapper` for config-driven graph deployment on startup (conditional on `ubiquia.agent.flow-service.bootstrap.graph.enabled`)

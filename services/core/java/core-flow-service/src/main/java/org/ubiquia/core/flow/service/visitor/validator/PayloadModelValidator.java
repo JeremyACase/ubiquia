@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.visitor.validator;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -116,7 +115,8 @@ public class PayloadModelValidator {
                     .getSubSchemas()
                     .keySet()
                     .stream()
-                    .filter(x -> x.toString().contains(nodeEntity.getOutputSubSchema().getModelName()))
+                    .filter(x -> x.toString()
+                        .contains(nodeEntity.getOutputSubSchema().getModelName()))
                     .findFirst();
 
                 if (match.isEmpty()) {
@@ -168,7 +168,7 @@ public class PayloadModelValidator {
             var schemaStore = new SchemaStore(true);
             var schema = schemaStore.loadSchemaJson(jsonSchema);
 
-            URI jsonSubSchemaURI = null;
+            URI jsonSubSchemaUri = null;
 
             for (var inputSchema : nodeEntity.getInputSubSchemas()) {
 
@@ -180,12 +180,12 @@ public class PayloadModelValidator {
                     .findFirst();
 
                 if (match.isPresent()) {
-                    jsonSubSchemaURI = match.get();
+                    jsonSubSchemaUri = match.get();
                     break;
                 }
             }
 
-            if (Objects.isNull(jsonSubSchemaURI)) {
+            if (Objects.isNull(jsonSubSchemaUri)) {
 
                 var schemas = this.objectMapper.writeValueAsString(nodeEntity.getInputSubSchemas());
 
@@ -196,7 +196,7 @@ public class PayloadModelValidator {
                     + "'!");
             }
 
-            var jsonSubSchema = schema.getSubSchemas().get(jsonSubSchemaURI);
+            var jsonSubSchema = schema.getSubSchemas().get(jsonSubSchemaUri);
             this.inputSchemaCache.put(nodeId, jsonSubSchema);
             logger.info("...initialized.");
         }

@@ -6,9 +6,11 @@ import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.component.node.AbstractNode;
 
+/** Determines whether a node should produce a simulated (non-component) output payload. */
 @Service
 public class NodeSimulatedOutputLogic {
 
+    /** Returns true if the node's output payload should be simulated rather than computed. */
     public Boolean isSimulatedResponsePayload(final AbstractNode node) {
         var component = node.getNodeContext().getComponent();
         var isHiddenWithNoComponent = Objects.isNull(component)

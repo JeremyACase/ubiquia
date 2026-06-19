@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
+import org.ubiquia.common.library.implementation.service.telemetry.MicroMeterHelper;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 import org.ubiquia.core.flow.component.node.EgressNode;
@@ -20,7 +21,6 @@ import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.orchestrator.NodePayloadOrchestrator;
-import org.ubiquia.common.library.implementation.service.telemetry.MicroMeterHelper;
 import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
 
 /**
@@ -56,6 +56,7 @@ public class EgressNodeCommand implements InterfaceLogger {
         return logger;
     }
 
+    /** Processes an inbox message for the given egress node, forwarding the payload. */
     @Transactional
     public void tryProcessInboxMessageFor(
         final FlowMessage flowMessage,
@@ -120,10 +121,11 @@ public class EgressNodeCommand implements InterfaceLogger {
             }
             break;
 
-            default: {
-                throw new NotImplementedException("ERROR: Unrecognized HTTP output type: "
-                    + node.getNodeContext().getEgressSettings().getHttpOutputType());
-            }
+            default:
+                {
+                    throw new NotImplementedException("ERROR: Unrecognized HTTP output type: "
+                        + node.getNodeContext().getEgressSettings().getHttpOutputType());
+                }
         }
     }
 }

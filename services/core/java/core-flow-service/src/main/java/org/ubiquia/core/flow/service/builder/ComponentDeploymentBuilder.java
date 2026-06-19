@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.builder;
 
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kubernetes.client.custom.IntOrString;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.Component;
 import org.ubiquia.common.model.ubiquia.embeddable.Volume;
 
+/** Builds Kubernetes resources (Deployments, Services, ConfigMaps) for agent components. */
 @ConditionalOnProperty(
     value = "ubiquia.kubernetes.enabled",
     havingValue = "true",
@@ -26,7 +26,9 @@ import org.ubiquia.common.model.ubiquia.embeddable.Volume;
 public class ComponentDeploymentBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentDeploymentBuilder.class);
+
     private V1Deployment ubiquiaDeployment;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -372,7 +374,8 @@ public class ComponentDeploymentBuilder {
         var volumeResource = new V1Volume();
         volumeResource.setName(volume.getName());
         volumeResource.setPersistentVolumeClaim(new V1PersistentVolumeClaimVolumeSource());
-        volumeResource.getPersistentVolumeClaim().setClaimName(volume.getPersistentVolumeClaimName());
+        volumeResource.getPersistentVolumeClaim()
+            .setClaimName(volume.getPersistentVolumeClaimName());
         return volumeResource;
     }
 

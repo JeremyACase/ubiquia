@@ -15,7 +15,8 @@ import org.ubiquia.common.library.api.repository.AgentRepository;
  * this agent's network that have a {@code baseUrl} and are currently reachable.
  *
  * <p>These records are populated when microweight agents push their registration to a Kubernetes
- * peer via {@link org.ubiquia.core.flow.service.cluster.synchronization.entity.AgentSynchronizationService}.
+ * peer via {@link
+ * org.ubiquia.core.flow.service.cluster.synchronization.entity.AgentSynchronizationService}.
  * The {@link IntraKubernetesHeartbeatService} is responsible for marking agents unreachable when
  * probes fail, which causes them to be excluded here until they recover.
  */

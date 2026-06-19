@@ -9,10 +9,12 @@ import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.model.ubiquia.entity.DomainOntologyEntity;
 import org.ubiquia.core.flow.repository.*;
 
+/** Deletes a domain ontology and all its associated graphs, components, and nodes. */
 @Service
 public class DomainOntologyDestroyCommand implements InterfaceLogger {
 
-    private static final Logger logger = LoggerFactory.getLogger(DomainOntologyDestroyCommand.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(DomainOntologyDestroyCommand.class);
 
     @Autowired
     private DomainOntologyRepository domainOntologyRepository;
@@ -33,6 +35,7 @@ public class DomainOntologyDestroyCommand implements InterfaceLogger {
         return logger;
     }
 
+    /** Deletes the given domain ontology entity and all its dependent graph records. */
     @Transactional
     public void delete(DomainOntologyEntity domainOntology) {
 

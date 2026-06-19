@@ -6,11 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
-import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 import org.ubiquia.common.library.api.config.AgentConfig;
 import org.ubiquia.common.library.api.repository.AgentRepository;
+import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
+import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 
+/** Finds agent entities from the repository based on deployment criteria. */
 @Service
 @Transactional
 public class AgentFinder {
@@ -23,6 +24,7 @@ public class AgentFinder {
     @Autowired
     private AgentConfig agentConfig;
 
+    /** Finds the agent entity currently deploying the given graph. */
     public Optional<AgentEntity> findAgentFor(final GraphDeployment graphDeployment) {
         var ubiquiaAgentRecord = this
             .agentRepository
@@ -35,6 +37,3 @@ public class AgentFinder {
         return ubiquiaAgentRecord;
     }
 }
-
-
-

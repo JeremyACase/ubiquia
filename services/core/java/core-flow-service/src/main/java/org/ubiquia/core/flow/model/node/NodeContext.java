@@ -42,6 +42,7 @@ public class NodeContext {
     private List<ScheduledFuture> tasks = new ArrayList<>();
     private URI endpointUri;
     private Integer openMessages = 0;
+
     public String getNodeName() {
         return nodeName;
     }

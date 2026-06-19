@@ -43,6 +43,7 @@ public class NodeManager {
     @Autowired
     private GraphRepository graphRepository;
 
+    /** Initializes the NodeManager with an empty node map. */
     public NodeManager() {
         this.nodeMap = new HashMap<>();
     }
@@ -111,6 +112,7 @@ public class NodeManager {
         logger.info("...all adapters torn down.");
     }
 
+    /** Tears down all deployed nodes associated with the given graph deployment. */
     @Transactional
     public void tearDownNodesFor(final GraphDeployment deployment) {
 

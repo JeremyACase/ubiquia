@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.service.command.node.MergeNodeCommand;
 
+/** A node that merges messages from multiple upstream nodes into a single stream. */
 @Component
 @Scope("prototype")
 public class MergeNode extends AbstractNode {

@@ -9,6 +9,7 @@ import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 import org.ubiquia.core.flow.repository.FlowEventRepository;
 
+/** Synchronizes flow event entities to peer agents in the cluster. */
 @Service
 public class FlowEventSynchronizationService
     extends AbstractSynchronizationService<FlowEventEntity, FlowEvent> {

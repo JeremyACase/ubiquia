@@ -9,6 +9,7 @@ import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
 import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;
 import org.ubiquia.core.flow.repository.ObjectMetadataRepository;
 
+/** Synchronizes object metadata entities to peer agents in the cluster. */
 @Service
 public class ObjectMetadataSynchronizationService
     extends AbstractSynchronizationService<ObjectMetadataEntity, ObjectMetadata> {

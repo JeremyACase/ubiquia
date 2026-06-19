@@ -7,4 +7,16 @@
     <suppress checks="LineLength"
               files="AgentRepository\.java"
               lines="32"/>
+    <suppress checks="LineLength"
+              files="GraphRepository\.java"
+              lines="12,20"/>
+    <suppress checks="LineLength"
+              files="AgentFinder\.java"
+              lines="31"/>
+    <suppress checks="LineLength"
+              files="GraphFinder\.java"
+              lines="38,63"/>
+    <suppress checks="LineLength"
+              files="NodeManager\.java"
+              lines="126"/>
 </suppressions>

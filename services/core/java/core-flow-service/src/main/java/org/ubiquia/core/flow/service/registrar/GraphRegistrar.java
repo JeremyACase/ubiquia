@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.registrar;
 
-
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -53,6 +52,7 @@ public class GraphRegistrar {
     @Autowired
     private GraphValidator graphValidator;
 
+    /** Registers and persists all graphs defined in the given domain ontology. */
     public List<GraphEntity> tryRegisterGraphs(
         DomainOntologyEntity domainOntologyEntity,
         final DomainOntology domainOntology)
@@ -199,7 +199,7 @@ public class GraphRegistrar {
                 }
                 var componentEntity = componentRecord.get();
 
-                logger.info("...node {} adapted to component {} (via node→component link); connecting...",
+                logger.info("...node {} adapted to component {} (via node→component link)...",
                     nodeEntity.getName(), componentEntity.getName());
 
                 nodeEntity.setComponent(componentEntity);

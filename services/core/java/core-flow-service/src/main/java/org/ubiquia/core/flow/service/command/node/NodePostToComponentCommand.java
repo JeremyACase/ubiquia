@@ -48,6 +48,7 @@ public class NodePostToComponentCommand implements InterfaceLogger {
         return logger;
     }
 
+    /** Posts a synchronous payload to the component and processes the response. */
     @Transactional
     public void tryPostPayloadToComponentSynchronously(
         FlowEventEntity flowEventEntity,
@@ -93,6 +94,7 @@ public class NodePostToComponentCommand implements InterfaceLogger {
         this.nodeComponentResponseCommand.processComponentResponse(flowEventEntity, node, response);
     }
 
+    /** Posts a payload asynchronously to the component and processes the response reactively. */
     @Transactional
     public void tryPostInputToComponentAsynchronously(
         FlowEventEntity flowEventEntity,

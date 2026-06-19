@@ -1,6 +1,7 @@
 package org.ubiquia.core.flow.service.cluster.synchronization.entity;
 
 import java.util.List;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import org.ubiquia.common.library.api.repository.AgentRepository;
 import org.ubiquia.common.library.implementation.service.mapper.AgentDtoMapper;
 import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 
-import java.util.Objects;
 /**
  * Pushes this agent's own record to peer agents so they can track it for heartbeat monitoring.
  *
@@ -40,6 +40,7 @@ public class AgentSynchronizationService {
     @Autowired
     private RestTemplate restTemplate;
 
+    /** Pushes this agent's registration DTO to each peer URL that accepts it. */
     public void sync(final List<String> peerUrls) {
         if (peerUrls.isEmpty()) {
             return;

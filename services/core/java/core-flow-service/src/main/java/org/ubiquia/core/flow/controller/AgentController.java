@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 import org.ubiquia.common.library.api.config.AgentConfig;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.api.repository.AgentRepository;
@@ -44,6 +43,7 @@ public class AgentController implements InterfaceLogger {
         return logger;
     }
 
+    /** Returns the DTO representation of this agent's own instance record. */
     @GetMapping(value = "/instance/get")
     @Transactional
     public Agent getInstance() throws JsonProcessingException {
@@ -83,9 +83,11 @@ public class AgentController implements InterfaceLogger {
             .ifPresent(me -> entity.setNetwork(me.getNetwork()));
 
         this.agentRepository.save(entity);
-        logger.info("Registered remote agent {} (baseUrl={}).", entity.getId(), entity.getBaseUrl());
+        logger.info("Registered remote agent {} (baseUrl={}).",
+            entity.getId(), entity.getBaseUrl());
     }
 
+    /** Returns a page of graph IDs currently deployed by the specified agent. */
     @GetMapping("/{id}/get-deployed-graph-ids")
     public Page<String> getDeployedGraphIdsByAgent(
         @PathVariable("id") final String id,

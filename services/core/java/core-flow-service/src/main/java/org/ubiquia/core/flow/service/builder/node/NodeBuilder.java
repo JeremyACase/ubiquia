@@ -22,6 +22,7 @@ import org.ubiquia.core.flow.service.decorator.node.override.NodeOverrideDecorat
 import org.ubiquia.core.flow.service.logic.node.NodePassthroughLogic;
 import org.ubiquia.core.flow.service.logic.node.NodeTypeLogic;
 
+/** Builds and decorates {@link org.ubiquia.core.flow.component.node.AbstractNode} instances. */
 @Service
 public class NodeBuilder {
 
@@ -136,11 +137,12 @@ public class NodeBuilder {
                     break;
 
                     // ...else just set to null
-                    default: {
-                        logger.info("...assuming no endpoint for {} component...",
-                            componentType);
-                        nodeContext.setEndpointUri(null);
-                    }
+                    default:
+                        {
+                            logger.info("...assuming no endpoint for {} component...",
+                                componentType);
+                            nodeContext.setEndpointUri(null);
+                        }
 
                 }
             } else if (this.nodeTypeLogic.nodeTypeRequiresEndpoint(nodeData.getNodeType())) {

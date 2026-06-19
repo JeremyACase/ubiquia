@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.ubiquia.core.flow.component.node.PublishNode;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
+import org.ubiquia.core.flow.component.node.PublishNode;
 import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.service.io.broker.kafka.KafkaEgress;
 
@@ -19,11 +19,14 @@ import org.ubiquia.core.flow.service.io.broker.kafka.KafkaEgress;
 public class BrokerEgress {
 
     private static final Logger logger = LoggerFactory.getLogger(BrokerEgress.class);
+
     @Autowired
     private FlowEventRepository flowEventRepository;
+
     @Autowired(required = false)
     private KafkaEgress kafkaEgress;
 
+    /** Publishes the given flow message to the broker configured on the node. */
     @Transactional
     public void tryPublishFor(FlowMessage flowMessage, final PublishNode node) {
 
@@ -34,20 +37,22 @@ public class BrokerEgress {
 
         switch (nodeContext.getBrokerSettings().getType()) {
 
-            case KAFKA: {
-                if (Objects.isNull(this.kafkaEgress)) {
-                    throw new RuntimeException("ERROR: Cannot egress a payload over Kafka when "
-                        + " Kafka isn't enabled!");
+            case KAFKA:
+                {
+                    if (Objects.isNull(this.kafkaEgress)) {
+                        throw new RuntimeException(
+                            "ERROR: Cannot egress a payload over Kafka when Kafka isn't enabled!");
+                    }
+                    var egressTime = OffsetDateTime.now();
+                    this.kafkaEgress.tryPublishPayload(flowMessage.getPayload(), node);
+                    this.egressHelper(flowMessage, egressTime);
                 }
-                var egressTime = OffsetDateTime.now();
-                this.kafkaEgress.tryPublishPayload(flowMessage.getPayload(), node);
-                this.egressHelper(flowMessage, egressTime);
-            }
-            break;
+                break;
 
-            default: {
-                throw new RuntimeException("ERROR: No broker configured for node!");
-            }
+            default:
+                {
+                    throw new RuntimeException("ERROR: No broker configured for node!");
+                }
         }
     }
 

@@ -1,11 +1,9 @@
 package org.ubiquia.core.flow.service.visitor.validator;
 
-
+import net.jimblackler.jsonschemafriend.SchemaStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import net.jimblackler.jsonschemafriend.SchemaStore;
 
 /**
  * A service that can verify if incoming JSON Schemas are valid.

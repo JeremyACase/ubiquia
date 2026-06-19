@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.decorator.node;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -36,14 +35,19 @@ import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
 public class NodeDecorator {
 
     private static final Logger logger = LoggerFactory.getLogger(NodeDecorator.class);
+
     @Autowired
     private NodeBrokerDecorator nodeBrokerDecorator;
+
     @Autowired
     private NodeEndpointRecordBuilder nodeEndpointRecordBuilder;
+
     @Autowired
     private PayloadModelValidator payloadModelValidator;
+
     @Autowired
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
+
     @Autowired
     private StimulatedPayloadBuilder stimulatedPayloadBuilder;
 
@@ -70,6 +74,7 @@ public class NodeDecorator {
         logger.info("...completed back pressure polling initialization...");
     }
 
+    /** Initializes output logic for the given node, loading the output schema. */
     public void initializeOutputLogicFor(AbstractNode node)
         throws GenerationException {
 
@@ -130,6 +135,7 @@ public class NodeDecorator {
         logger.info("...completed polling initialization...");
     }
 
+    /** Initializes periodic input stimulation for the node if configured to do so. */
     public void tryInitializeInputStimulationFor(AbstractNode node)
         throws GenerationException {
 

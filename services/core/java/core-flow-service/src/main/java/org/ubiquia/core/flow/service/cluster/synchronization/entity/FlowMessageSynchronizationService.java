@@ -9,6 +9,7 @@ import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.common.model.ubiquia.entity.FlowMessageEntity;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 
+/** Synchronizes flow message entities to peer agents in the cluster. */
 @Service
 public class FlowMessageSynchronizationService
     extends AbstractSynchronizationService<FlowMessageEntity, FlowMessage> {

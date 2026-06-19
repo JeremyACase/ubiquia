@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.builder;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -23,20 +22,27 @@ import org.ubiquia.core.flow.repository.FlowRepository;
 import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.service.visitor.StamperVisitor;
 
+/** Builds and persists flow event entities for various node types. */
 @Service
 public class FlowEventBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(FlowEventBuilder.class);
+
     @Autowired
     private NodeRepository nodeRepository;
+
     @Autowired
     private FlowBuilder flowBuilder;
+
     @Autowired
     private FlowRepository flowRepository;
+
     @Autowired
     private FlowEventRepository flowEventRepository;
+
     @Autowired
     private ObjectMapper objectMapper;
+
     @Autowired
     private StamperVisitor stamperVisitor;
 
@@ -67,6 +73,7 @@ public class FlowEventBuilder {
         return flowEvent;
     }
 
+    /** Creates a new flow and event record for the given input payload and node. */
     @Transactional
     public FlowEventEntity makeFlowAndEventFrom(
         final String inputPayload,
@@ -92,6 +99,7 @@ public class FlowEventBuilder {
         return flowEvent;
     }
 
+    /** Creates a new event record for a merge node using an existing flow ID. */
     @Transactional
     public FlowEventEntity makeEventFrom(
         final String mergedPayload,
@@ -124,6 +132,7 @@ public class FlowEventBuilder {
         return flowEvent;
     }
 
+    /** Creates a new event record linked to the flow carried by the given flow message. */
     @Transactional
     public FlowEventEntity makeEventFrom(
         final FlowMessage flowMessage,

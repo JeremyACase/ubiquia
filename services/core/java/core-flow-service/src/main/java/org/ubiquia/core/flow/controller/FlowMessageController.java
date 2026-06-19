@@ -11,6 +11,7 @@ import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.service.registrar.FlowMessageRegistrar;
 
+/** REST controller for receiving and registering flow messages. */
 @RestController
 @RequestMapping("/ubiquia/core/flow-service/flow-message")
 public class FlowMessageController implements InterfaceLogger {
@@ -25,6 +26,7 @@ public class FlowMessageController implements InterfaceLogger {
         return logger;
     }
 
+    /** Accepts an incoming flow message forwarded from a peer agent. */
     @PostMapping("/receive")
     public void receive(@RequestBody final FlowMessage flowMessage) {
         logger.info("Received incoming flow message for node {}.",
@@ -32,6 +34,7 @@ public class FlowMessageController implements InterfaceLogger {
         this.flowMessageRegistrar.tryRegisterFlowMessage(flowMessage);
     }
 
+    /** Registers a flow message received during cluster synchronization. */
     @PostMapping("/register/post")
     public void register(@RequestBody final FlowMessage flowMessage) {
         logger.info("Received sync-register request for FlowMessage id {}.", flowMessage.getId());
