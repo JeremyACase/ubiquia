@@ -41,8 +41,10 @@ public class ExtraKubernetesHeartbeatService {
 
     private final RestTemplate healthTemplate;
     private final Set<String> reachablePeers = ConcurrentHashMap.newKeySet();
-    private final ConcurrentHashMap<String, Integer> consecutiveFailures = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Integer> consecutiveFailures =
+        new ConcurrentHashMap<>();
 
+    /** Builds the health-check RestTemplate with short connect and read timeouts. */
     public ExtraKubernetesHeartbeatService(final RestTemplateBuilder builder) {
         this.healthTemplate = builder
             .connectTimeout(Duration.ofSeconds(3))
@@ -50,6 +52,7 @@ public class ExtraKubernetesHeartbeatService {
             .build();
     }
 
+    /** Populates the reachable peers set from configuration on startup. */
     @PostConstruct
     public void init() {
         if (this.peerBaseUrlsConfig.isBlank()) {
@@ -63,6 +66,7 @@ public class ExtraKubernetesHeartbeatService {
             this.reachablePeers.size());
     }
 
+    /** Probes all configured external peers and updates the reachability set. */
     @Scheduled(fixedDelayString = "${ubiquia.cluster.heartbeat.frequency-milliseconds:15000}")
     public void checkPeerHealth() {
         if (this.peerBaseUrlsConfig.isBlank()) {

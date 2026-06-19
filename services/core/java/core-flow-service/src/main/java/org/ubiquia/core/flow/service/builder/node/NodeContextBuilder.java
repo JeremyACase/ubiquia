@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.builder.node;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,12 +13,13 @@ import org.ubiquia.common.library.implementation.service.builder.NodeEndpointRec
 import org.ubiquia.common.library.implementation.service.mapper.ComponentDtoMapper;
 import org.ubiquia.common.library.implementation.service.mapper.GraphDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.Node;
-import org.ubiquia.core.flow.model.node.NodeContext;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
+import org.ubiquia.core.flow.model.node.NodeContext;
 import org.ubiquia.core.flow.repository.ComponentRepository;
 import org.ubiquia.core.flow.service.logic.node.NodeTypeLogic;
 
+/** Builds {@link NodeContext} instances from node DTOs and graph entities at bootstrap time. */
 @Service
 public class NodeContextBuilder {
 
@@ -40,6 +40,7 @@ public class NodeContextBuilder {
     @Autowired
     private NodeTypeLogic nodeTypeLogic;
 
+    /** Builds a fully-initialized NodeContext from the given node, graph, and deployment. */
     public NodeContext buildNodeContext(
         final Node node,
         final GraphEntity graphEntity,
@@ -109,9 +110,10 @@ public class NodeContextBuilder {
                 break;
 
                 // ...else just set to null
-                default: {
-                    nodeContext.setEndpointUri(null);
-                }
+                default:
+                    {
+                        nodeContext.setEndpointUri(null);
+                    }
 
             }
         } else if (this.nodeTypeLogic.nodeTypeRequiresEndpoint(

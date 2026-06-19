@@ -41,9 +41,11 @@ public class UpdateController implements InterfaceLogger {
 
     @Autowired
     private UpdateDtoMapper updateDtoMapper;
+
     @Autowired
     private PageValidator pageValidator;
 
+    /** Initializes the UpdateController with a compiled regex for camelCase conversion. */
     public UpdateController() {
 
         this.getLogger().info("Initializing...");
@@ -58,12 +60,15 @@ public class UpdateController implements InterfaceLogger {
         return logger;
     }
 
+    /** Queries update records using request parameters as filters and returns paginated results. */
     @GetMapping("/query/params")
     public GenericPageImplementation<Update> queryWithParams(
         @RequestParam("page") final Integer page,
         @RequestParam("size") final Integer size,
-        @RequestParam(value = "sort-descending", required = false, defaultValue = "true") final Boolean sortDescending,
-        @RequestParam(value = "sort-by-fields", required = false, defaultValue = "") final List<String> sortByFields,
+        @RequestParam(value = "sort-descending", required = false, defaultValue = "true")
+            final Boolean sortDescending,
+        @RequestParam(value = "sort-by-fields", required = false, defaultValue = "")
+            final List<String> sortByFields,
         HttpServletRequest httpServletRequest)
         throws NoSuchFieldException,
         JsonProcessingException {

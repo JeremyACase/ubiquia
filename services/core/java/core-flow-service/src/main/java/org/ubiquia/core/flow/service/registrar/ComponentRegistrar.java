@@ -177,7 +177,8 @@ public class ComponentRegistrar {
         if (Objects.nonNull(componentRegistration.getTags())) {
             componentEntity.getTags().addAll(componentRegistration.getTags());
         }
-        componentEntity.setCommunicationServiceSettings(componentRegistration.getCommunicationServiceSettings());
+        componentEntity.setCommunicationServiceSettings(
+            componentRegistration.getCommunicationServiceSettings());
         componentEntity.setExposeService(componentRegistration.getExposeService());
         componentEntity.setInitContainer(componentRegistration.getInitContainer());
         componentEntity.setLivenessProbe(componentRegistration.getLivenessProbe());

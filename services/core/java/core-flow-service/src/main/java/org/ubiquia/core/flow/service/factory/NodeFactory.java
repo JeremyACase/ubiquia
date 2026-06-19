@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
-import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
 import org.ubiquia.common.model.ubiquia.entity.ComponentEntity;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
+import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.component.node.*;
 import org.ubiquia.core.flow.service.builder.node.NodeBuilder;
@@ -144,10 +144,11 @@ public class NodeFactory {
             }
             break;
 
-            default: {
-                throw new Exception("ERROR: Unrecognized node type: "
-                    + nodeType);
-            }
+            default:
+                {
+                    throw new Exception("ERROR: Unrecognized node type: "
+                        + nodeType);
+                }
         }
         return node;
     }

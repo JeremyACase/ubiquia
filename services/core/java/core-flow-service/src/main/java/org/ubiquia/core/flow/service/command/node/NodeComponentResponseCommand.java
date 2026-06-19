@@ -30,6 +30,7 @@ public class NodeComponentResponseCommand {
     @Autowired
     private StamperVisitor stamperVisitor;
 
+    /** Processes the HTTP response from a component, persisting the output payload. */
     public void processComponentResponse(
         final FlowEventEntity flowEventEntity,
         final AbstractNode node,

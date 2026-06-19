@@ -12,6 +12,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 
+/** A node that periodically polls an external endpoint and forwards the response as a payload. */
 @Component
 @Scope("prototype")
 public class PollNode extends AbstractNode {
@@ -34,6 +35,7 @@ public class PollNode extends AbstractNode {
             this.getNodeContext().getNodeType());
     }
 
+    /** Polls the configured endpoint and forwards the response into the flow pipeline. */
     public void tryPollEndpoint() {
 
         var nodeContext = this.getNodeContext();

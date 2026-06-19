@@ -12,6 +12,7 @@ import org.ubiquia.common.library.implementation.service.mapper.FlowDtoMapper;
 import org.ubiquia.common.model.ubiquia.dto.Flow;
 import org.ubiquia.common.model.ubiquia.entity.FlowEntity;
 
+/** REST controller exposing DAO operations for flow entities. */
 @RestController
 @RequestMapping("/ubiquia/core/flow-service/flow")
 public class FlowController extends GenericUbiquiaDaoController<FlowEntity, Flow> {

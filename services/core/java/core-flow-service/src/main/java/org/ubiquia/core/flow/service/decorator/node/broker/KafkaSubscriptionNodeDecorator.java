@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.decorator.node.broker;
 
-
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
@@ -29,7 +28,9 @@ import org.ubiquia.core.flow.component.node.SubscribeNode;
 public class KafkaSubscriptionNodeDecorator {
 
     private static final AtomicLong endpointIdIndex = new AtomicLong(1);
-    private static final Logger logger = LoggerFactory.getLogger(KafkaSubscriptionNodeDecorator.class);
+
+    private static final Logger logger =
+        LoggerFactory.getLogger(KafkaSubscriptionNodeDecorator.class);
     @Autowired
     private KafkaListenerContainerFactory kafkaListenerContainerFactory;
     @Autowired

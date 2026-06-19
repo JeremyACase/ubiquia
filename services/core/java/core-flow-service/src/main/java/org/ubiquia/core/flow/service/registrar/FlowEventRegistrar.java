@@ -15,6 +15,7 @@ import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.repository.FlowRepository;
 import org.ubiquia.core.flow.repository.NodeRepository;
 
+/** Registers and persists flow event entities during cluster synchronization. */
 @Service
 public class FlowEventRegistrar {
 
@@ -32,6 +33,7 @@ public class FlowEventRegistrar {
     @Autowired
     private ObjectMapper objectMapper;
 
+    /** Registers a flow event from the given DTO if it does not already exist. */
     @Transactional
     public void tryRegister(final FlowEvent dto) throws Exception {
         if (Objects.nonNull(dto.getId()) && this.flowEventRepository.existsById(dto.getId())) {

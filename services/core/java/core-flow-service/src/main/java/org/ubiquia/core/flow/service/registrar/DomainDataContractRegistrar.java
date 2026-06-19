@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.registrar;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -15,6 +14,7 @@ import org.ubiquia.common.model.ubiquia.entity.DomainOntologyEntity;
 import org.ubiquia.core.flow.repository.DomainDataContractRepository;
 import org.ubiquia.core.flow.service.visitor.validator.JsonSchemaValidator;
 
+/** Registers and persists domain data contracts for a given domain ontology. */
 @Service
 public class DomainDataContractRegistrar {
 
@@ -29,6 +29,7 @@ public class DomainDataContractRegistrar {
     @Autowired
     private DomainDataContractRepository domainDataContractRepository;
 
+    /** Validates and persists a domain data contract for the given ontology entity. */
     public void tryRegisterDomainDataContract(
         DomainOntologyEntity domainOntologyEntity,
         final DomainOntology domainOntology)

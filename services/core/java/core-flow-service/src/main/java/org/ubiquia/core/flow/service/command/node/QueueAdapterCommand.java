@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.implementation.service.mapper.FlowEventDtoMapper;
+import org.ubiquia.common.library.implementation.service.telemetry.MicroMeterHelper;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.common.model.ubiquia.node.QueueNodeEgress;
 import org.ubiquia.core.flow.component.node.QueueNode;
@@ -18,7 +19,6 @@ import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.io.Inbox;
-import org.ubiquia.common.library.implementation.service.telemetry.MicroMeterHelper;
 import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
 
 /**
@@ -28,18 +28,25 @@ import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
 public class QueueAdapterCommand implements InterfaceLogger {
 
     private static final Logger logger = LoggerFactory.getLogger(QueueAdapterCommand.class);
+
     @Autowired
     private FlowEventBuilder flowEventBuilder;
+
     @Autowired
     private FlowEventDtoMapper flowEventDtoMapper;
+
     @Autowired
     private FlowEventRepository flowEventRepository;
+
     @Autowired
     private FlowMessageRepository flowMessageRepository;
+
     @Autowired
     private Inbox inbox;
+
     @Autowired(required = false)
     private MicroMeterHelper microMeterHelper;
+
     @Autowired
     private PayloadModelValidator payloadModelValidator;
 
@@ -47,6 +54,7 @@ public class QueueAdapterCommand implements InterfaceLogger {
         return logger;
     }
 
+    /** Returns the first available queued message without removing it from the queue. */
     public ResponseEntity<QueueNodeEgress> peekFor(final QueueNode node)
         throws Exception {
 
@@ -79,6 +87,7 @@ public class QueueAdapterCommand implements InterfaceLogger {
         return response;
     }
 
+    /** Returns and removes the first available queued message from the queue. */
     @Transactional
     public ResponseEntity<QueueNodeEgress> popFor(final QueueNode node)
         throws Exception {

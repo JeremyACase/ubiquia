@@ -18,6 +18,7 @@ import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 import org.ubiquia.common.model.ubiquia.entity.SyncEntity;
 import org.ubiquia.core.flow.repository.SyncRepository;
 
+/** Base class for services that sync a single entity type to peer agents in the cluster. */
 public abstract class AbstractSynchronizationService<
     E extends AbstractModelEntity,
     D extends AbstractModel> {
@@ -31,12 +32,16 @@ public abstract class AbstractSynchronizationService<
     @Autowired
     private SyncRepository syncRepository;
 
+    /** Returns the repository used to fetch entities needing synchronization. */
     protected abstract AbstractEntityRepository<E> getRepository();
 
+    /** Returns the DTO mapper used to convert entities for transmission. */
     protected abstract GenericDtoMapper<E, D> getMapper();
 
+    /** Returns the REST endpoint path on each peer to POST entities to. */
     protected abstract String getEndpointPath();
 
+    /** Fetches unsynchronized entities and POSTs them to each peer URL. */
     @Transactional
     public void sync(final List<String> peerUrls, final AgentEntity sourceAgent) {
 

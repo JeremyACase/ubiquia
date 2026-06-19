@@ -9,6 +9,7 @@ import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.common.model.ubiquia.entity.DomainOntologyEntity;
 import org.ubiquia.core.flow.repository.DomainOntologyRepository;
 
+/** Synchronizes domain ontology entities to peer agents in the cluster. */
 @Service
 public class DomainOntologySynchronizationService
     extends AbstractSynchronizationService<DomainOntologyEntity, DomainOntology> {

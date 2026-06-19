@@ -9,6 +9,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.core.flow.component.node.AbstractNode;
 
+/** Manages node lifecycle teardown, cancelling tasks and unregistering request mappings. */
 @Service
 public class NodeManagerCommand implements InterfaceLogger {
 
@@ -21,12 +22,14 @@ public class NodeManagerCommand implements InterfaceLogger {
         return logger;
     }
 
+    /** Tears down all nodes in the given list. */
     public void tearDown(List<AbstractNode> nodes) {
         for (var node : nodes) {
             this.tearDown(node);
         }
     }
 
+    /** Cancels scheduled tasks and unregisters request mappings for the given node. */
     public void tearDown(AbstractNode node) {
 
         var nodeContext = node.getNodeContext();

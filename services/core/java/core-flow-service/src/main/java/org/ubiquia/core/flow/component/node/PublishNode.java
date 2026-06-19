@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.core.flow.service.io.broker.BrokerEgress;
 
+/** A node that publishes messages to a broker topic. */
 @Component
 @Scope("prototype")
 public class PublishNode extends AbstractNode {

@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.builder;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -19,10 +18,12 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.component.node.AbstractNode;
 import org.ubiquia.core.flow.repository.NodeRepository;
 
+/** Generates random JSON payloads conforming to a node's input schema for stimulation. */
 @Service
 public class StimulatedPayloadBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(StimulatedPayloadBuilder.class);
+
     @Autowired
     private NodeRepository nodeRepository;
 
@@ -44,6 +45,7 @@ public class StimulatedPayloadBuilder {
             .get();
     }
 
+    /** Generates and returns a random JSON string conforming to the node's input schema. */
     public String buildStimulatedPayloadFor(final AbstractNode node)
         throws GenerationException, JsonProcessingException, JsonGeneratorException {
 

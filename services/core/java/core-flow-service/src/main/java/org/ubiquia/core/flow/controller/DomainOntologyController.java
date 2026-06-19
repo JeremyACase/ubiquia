@@ -25,6 +25,7 @@ import org.ubiquia.core.flow.repository.DomainOntologyRepository;
 import org.ubiquia.core.flow.service.command.controller.DomainOntologyDestroyCommand;
 import org.ubiquia.core.flow.service.registrar.DomainOntologyRegistrar;
 
+/** REST controller for managing domain ontology registration and lifecycle. */
 @RestController
 @RequestMapping("/ubiquia/core/flow-service/domain-ontology")
 public class DomainOntologyController extends GenericUbiquiaDaoController<
@@ -86,6 +87,7 @@ public class DomainOntologyController extends GenericUbiquiaDaoController<
         return response;
     }
 
+    /** Registers a domain ontology from a JSON request body. */
     @PostMapping("/register/post")
     @Transactional
     public IngressResponse register(@RequestBody @Valid final DomainOntology domainOntology)
@@ -97,6 +99,7 @@ public class DomainOntologyController extends GenericUbiquiaDaoController<
         return response;
     }
 
+    /** Registers a domain ontology from an uploaded YAML file. */
     @PostMapping(value = "/register/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public IngressResponse upload(@RequestParam("file") MultipartFile file) throws Exception {
         this.getLogger().info("Received uploaded ontology; processing...");

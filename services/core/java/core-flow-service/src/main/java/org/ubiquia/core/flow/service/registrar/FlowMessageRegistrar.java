@@ -19,6 +19,7 @@ import org.ubiquia.core.flow.repository.FlowRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.repository.NodeRepository;
 
+/** Registers incoming and sync-received flow messages, creating associated flows and events. */
 @Service
 public class FlowMessageRegistrar {
 
@@ -39,6 +40,7 @@ public class FlowMessageRegistrar {
     @Autowired
     private NodeRepository nodeRepository;
 
+    /** Registers an incoming flow message and creates the associated flow and event records. */
     @Transactional
     public void tryRegisterFlowMessage(final FlowMessage dto) {
         var nodeId = dto.getTargetNode().getId();
@@ -84,6 +86,7 @@ public class FlowMessageRegistrar {
         logger.info("Registered incoming flow message for node {}.", nodeEntity.getName());
     }
 
+    /** Registers a flow message received during cluster sync if it does not already exist. */
     @Transactional
     public void tryRegisterSync(final FlowMessage dto) {
         if (Objects.nonNull(dto.getId()) && this.flowMessageRepository.existsById(dto.getId())) {

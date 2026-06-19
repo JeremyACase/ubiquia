@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/** Spring configuration class providing shared beans for the flow service. */
 @Configuration
 @EnableWebMvc
 public class Config implements WebMvcConfigurer {
@@ -42,6 +43,7 @@ public class Config implements WebMvcConfigurer {
         return WebClient.builder().build();
     }
 
+    /** Sets the JVM default timezone to UTC on startup. */
     @PostConstruct
     public void init() {
         // Setting Spring Boot SetTimeZone

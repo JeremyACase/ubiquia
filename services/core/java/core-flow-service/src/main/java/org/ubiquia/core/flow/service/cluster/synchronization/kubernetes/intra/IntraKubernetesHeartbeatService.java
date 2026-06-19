@@ -50,8 +50,10 @@ public class IntraKubernetesHeartbeatService {
     private int failureThreshold;
 
     private final RestTemplate healthTemplate;
-    private final ConcurrentHashMap<String, Integer> consecutiveFailures = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Integer> consecutiveFailures =
+        new ConcurrentHashMap<>();
 
+    /** Builds the health-check RestTemplate with short connect and read timeouts. */
     public IntraKubernetesHeartbeatService(final RestTemplateBuilder builder) {
         this.healthTemplate = builder
             .connectTimeout(Duration.ofSeconds(3))
@@ -59,6 +61,7 @@ public class IntraKubernetesHeartbeatService {
             .build();
     }
 
+    /** Probes all reachable intra-cluster peers and tombstones those that repeatedly fail. */
     @Scheduled(fixedDelayString = "${ubiquia.cluster.heartbeat.frequency-milliseconds:15000}")
     @Transactional
     public void checkPeerHealth() {
@@ -119,7 +122,8 @@ public class IntraKubernetesHeartbeatService {
         if (failures >= this.failureThreshold && peer.isReachable()) {
             peer.setReachable(false);
             this.agentRepository.save(peer);
-            logger.warn("Agent {} tombstoned after {} consecutive probe failures.", peer.getId(), failures);
+            logger.warn("Agent {} tombstoned after {} consecutive probe failures.",
+                peer.getId(), failures);
         }
     }
 }

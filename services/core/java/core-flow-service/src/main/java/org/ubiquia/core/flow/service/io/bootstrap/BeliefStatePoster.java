@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
 
+/** Posts belief state generation requests to a remote URL with retry logic. */
 @Service
 public class BeliefStatePoster {
 
@@ -22,6 +23,7 @@ public class BeliefStatePoster {
     @Autowired
     private ObjectMapper objectMapper;
 
+    /** Posts a belief state generation payload to the given URL with retry on failure. */
     @Retryable(
         maxAttempts = 10,
         backoff = @Backoff(delay = 1000, multiplier = 2)
@@ -44,6 +46,7 @@ public class BeliefStatePoster {
         return response;
     }
 
+    /** Returns null after all retries are exhausted, logging the failure. */
     @Recover
     public BeliefStateGeneration recover(
         final Exception e,

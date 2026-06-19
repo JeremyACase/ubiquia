@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.core.flow.component.node.AbstractNode;
 import org.ubiquia.core.flow.service.logic.node.NodeTypeLogic;
 
+/** Calculates inbox query page sizes based on a node's egress concurrency settings. */
 @Service
 public class NodeConcurrencyCalculator {
 
@@ -13,6 +14,7 @@ public class NodeConcurrencyCalculator {
 
     /**
      * Provided an adapter, calculate the page size to use to query the inbox.
+     *
      * @param adapter The adapter to calculate a page size for.
      * @return A page size.
      */

@@ -24,6 +24,7 @@ public class NodeTypeLogic {
             || nodeType.equals(NodeType.MERGE);
     }
 
+    /** Returns true if the node type terminates the flow (does not forward messages). */
     public Boolean isTerminalNodeType(final NodeType nodeType) {
 
         var terminalNodeType =
@@ -34,6 +35,7 @@ public class NodeTypeLogic {
         return terminalNodeType;
     }
 
+    /** Returns true if the node type is valid as a passthrough node. */
     public Boolean nodeTypeIsValidPassthrough(final NodeType nodeType) {
         return nodeType.equals(NodeType.HIDDEN)
             || nodeType.equals(NodeType.PUSH)

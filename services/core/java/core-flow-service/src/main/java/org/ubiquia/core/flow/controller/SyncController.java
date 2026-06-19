@@ -22,6 +22,7 @@ import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.Sync;
 import org.ubiquia.common.model.ubiquia.entity.SyncEntity;
 
+/** REST controller for querying sync records. */
 @RestController
 @RequestMapping("/ubiquia/core/flow-service/sync")
 public class SyncController implements InterfaceLogger {
@@ -42,6 +43,7 @@ public class SyncController implements InterfaceLogger {
     @Autowired
     private PageValidator pageValidator;
 
+    /** Initializes the SyncController with a compiled regex for camelCase conversion. */
     public SyncController() {
         this.getLogger().info("Initializing...");
         this.camelcaseRegex = Pattern.compile("-([a-z])");
@@ -53,12 +55,15 @@ public class SyncController implements InterfaceLogger {
         return logger;
     }
 
+    /** Queries sync records using request parameters as filters and returns a paginated result. */
     @GetMapping("/query/params")
     public GenericPageImplementation<Sync> queryWithParams(
         @RequestParam("page") final Integer page,
         @RequestParam("size") final Integer size,
-        @RequestParam(value = "sort-descending", required = false, defaultValue = "true") final Boolean sortDescending,
-        @RequestParam(value = "sort-by-fields", required = false, defaultValue = "") final List<String> sortByFields,
+        @RequestParam(value = "sort-descending", required = false, defaultValue = "true")
+            final Boolean sortDescending,
+        @RequestParam(value = "sort-by-fields", required = false, defaultValue = "")
+            final List<String> sortByFields,
         HttpServletRequest httpServletRequest)
         throws NoSuchFieldException, JsonProcessingException {
 

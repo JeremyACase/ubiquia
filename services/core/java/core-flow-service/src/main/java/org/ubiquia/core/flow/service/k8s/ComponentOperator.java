@@ -85,11 +85,13 @@ public class ComponentOperator {
         logger.info("...Kubernetes client connection initialized.");
     }
 
+    /** Tears down deployed graph resources in Kubernetes on service shutdown. */
     @PreDestroy
     public void teardown() throws JsonProcessingException {
         logger.info("Tearing down Ubiquia agent operator...");
 
-        var deploymentResponse = this.deploymentClient.get(this.namespace, "ubiquia-core-flow-service");
+        var deploymentResponse = this.deploymentClient.get(
+            this.namespace, "ubiquia-core-flow-service");
         if (deploymentResponse.getHttpStatusCode() == HttpStatus.NO_CONTENT.value()) {
             logger.info("...Ubiquia K8s deployment not found, tearing down "
                 + "deployed graphs...");
@@ -176,6 +178,7 @@ public class ComponentOperator {
         factory.startAllRegisteredInformers();
     }
 
+    /** Deploys the given component to Kubernetes if it is not already deployed. */
     public void tryDeployComponent(final Component component)
         throws JsonProcessingException {
 
@@ -285,10 +288,11 @@ public class ComponentOperator {
         } else {
             if (Objects.isNull(this.ubiquiaDeployment)) {
                 logger.info("...trying to fetch Ubiquia deployment data from Kubernetes...");
-                var response = this.deploymentClient.get(this.namespace, "ubiquia-core-flow-service");
+                var response = this.deploymentClient.get(
+                    this.namespace, "ubiquia-core-flow-service");
                 if (response.isSuccess()) {
                     this.ubiquiaDeployment = response.getObject();
-                    logger.info("...successfully fetched Ubiquia deployment data from Kubernetes...");
+                    logger.info("...successfully fetched Ubiquia deployment data from Kubernetes.");
                 } else {
                     logger.error("Failed to fetch deployment: " + response.getStatus());
                     this.deploymentRetries++;

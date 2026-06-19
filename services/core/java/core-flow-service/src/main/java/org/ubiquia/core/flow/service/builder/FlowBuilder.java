@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.builder;
 
-
 import jakarta.transaction.Transactional;
 import java.util.HashSet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,7 @@ import org.ubiquia.core.flow.component.node.AbstractNode;
 import org.ubiquia.core.flow.repository.FlowRepository;
 import org.ubiquia.core.flow.repository.GraphRepository;
 
+/** Builds and persists a new flow entity for a given node. */
 @Service
 public class FlowBuilder {
 
@@ -19,6 +19,7 @@ public class FlowBuilder {
     @Autowired
     private GraphRepository graphRepository;
 
+    /** Creates a new flow record linked to the graph of the given node. */
     @Transactional
     public FlowEntity makeFlowFrom(final AbstractNode node) {
 

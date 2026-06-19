@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.io;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -12,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 import org.ubiquia.common.model.ubiquia.entity.FlowMessageEntity;
-import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
+import org.ubiquia.core.flow.repository.NodeRepository;
 
 /**
  * This is a service dedicated to sending message to the database on behalf of adapters so that

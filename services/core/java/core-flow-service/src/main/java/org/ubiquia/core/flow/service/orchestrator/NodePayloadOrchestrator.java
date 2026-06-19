@@ -47,6 +47,7 @@ public class NodePayloadOrchestrator implements InterfaceLogger {
         return logger;
     }
 
+    /** Forwards the payload to the appropriate output target based on the node configuration. */
     public void forwardPayload(
         FlowEventEntity flowEventEntity,
         final AbstractNode node,
@@ -96,10 +97,11 @@ public class NodePayloadOrchestrator implements InterfaceLogger {
             }
             break;
 
-            default: {
-                throw new NotImplementedException("ERROR: Unrecognized egress type: "
-                    + egressSettings.getEgressType());
-            }
+            default:
+                {
+                    throw new NotImplementedException("ERROR: Unrecognized egress type: "
+                        + egressSettings.getEgressType());
+                }
         }
     }
 
@@ -131,10 +133,11 @@ public class NodePayloadOrchestrator implements InterfaceLogger {
             }
             break;
 
-            default: {
-                throw new NotImplementedException("ERROR: Unrecognized egress type: "
-                    + egressSettings.getEgressType());
-            }
+            default:
+                {
+                    throw new NotImplementedException("ERROR: Unrecognized egress type: "
+                        + egressSettings.getEgressType());
+                }
         }
     }
 
@@ -159,10 +162,11 @@ public class NodePayloadOrchestrator implements InterfaceLogger {
             }
             break;
 
-            default: {
-                throw new NotImplementedException("ERROR: Unrecognized HTTP output type: "
-                    + egressSettings.getHttpOutputType());
-            }
+            default:
+                {
+                    throw new NotImplementedException("ERROR: Unrecognized HTTP output type: "
+                        + egressSettings.getHttpOutputType());
+                }
         }
     }
 }

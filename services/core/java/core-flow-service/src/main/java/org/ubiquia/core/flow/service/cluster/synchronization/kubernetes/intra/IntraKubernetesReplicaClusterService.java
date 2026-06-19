@@ -2,17 +2,17 @@ package org.ubiquia.core.flow.service.cluster.synchronization.kubernetes.intra;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import java.util.Objects;
 import org.jgroups.JChannel;
-import org.jgroups.View;
-import org.jgroups.Receiver;
 import org.jgroups.Message;
+import org.jgroups.Receiver;
+import org.jgroups.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 /**
  * Manages a JGroups cluster among replicas of this K8s Deployment using KUBE_PING
  * for automatic pod discovery. Only active when {@code ubiquia.kubernetes.enabled=true}.
@@ -23,7 +23,8 @@ import java.util.Objects;
  * When the leader pod fails, JGroups automatically promotes the next member.
  *
  * <p>This channel is entirely separate from the microweight JGroups channel managed by
- * {@link org.ubiquia.core.flow.service.cluster.synchronization.microweight.MicroweightClusterService};
+ * {@link
+ * org.ubiquia.core.flow.service.cluster.synchronization.microweight.MicroweightClusterService};
  * the two never share a cluster.
  */
 @ConditionalOnProperty(value = "ubiquia.kubernetes.enabled", havingValue = "true")
@@ -43,6 +44,7 @@ public class IntraKubernetesReplicaClusterService implements Receiver {
 
     private JChannel channel;
 
+    /** Joins the JGroups KUBE_PING cluster for replica leader election. */
     @PostConstruct
     public void start() throws Exception {
         logger.info("Starting K8s replica JGroups cluster '{}' (namespace={}, port={})...",
@@ -60,6 +62,7 @@ public class IntraKubernetesReplicaClusterService implements Receiver {
             this.channel.getAddress(), this.isLeader());
     }
 
+    /** Closes the JGroups channel on application shutdown. */
     @PreDestroy
     public void stop() {
         if (Objects.nonNull(this.channel)) {

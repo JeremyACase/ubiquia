@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/** A node that is hidden from external visibility but participates in the flow graph. */
 @Component
 @Scope("prototype")
 public class HiddenNode extends AbstractNode {

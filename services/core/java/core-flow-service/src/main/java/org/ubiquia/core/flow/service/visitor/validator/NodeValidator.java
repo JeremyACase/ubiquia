@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.visitor.validator;
 
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -89,10 +88,11 @@ public class NodeValidator {
             }
             break;
 
-            default: {
-                throw new Exception("ERROR: Unrecognized node type: "
-                    + node.getNodeType());
-            }
+            default:
+                {
+                    throw new Exception("ERROR: Unrecognized node type: "
+                        + node.getNodeType());
+                }
         }
     }
 
@@ -137,7 +137,7 @@ public class NodeValidator {
         this.tryValidateNodeSettings(node);
         this.validateNodeHasNoComponent(node);
         this.validateNodeHasNoDownstreamNodes(node);
-        this.validateNodeHasASingleUpstreamNode(node);
+        this.validateNodeHasSingleUpstreamNode(node);
         this.validateNodeHasEgressSettings(node);
         this.validateNodeIsNotPassthrough(node);
         logger.info("...validated...");
@@ -164,7 +164,7 @@ public class NodeValidator {
         this.tryValidateNodeSettings(node);
         this.validateNodeHasNoUpstreamNodes(node);
         this.validateNodeHasPollSettings(node);
-        this.validateNodeHasASingleInputSubSchema(node);
+        this.validateNodeHasSingleInputSubSchema(node);
         this.validateNodeIsNotPassthroughWithoutDownstreamNodes(node);
         logger.info("...validated...");
     }
@@ -177,10 +177,10 @@ public class NodeValidator {
     public void tryValidatePublishNode(final Node node) {
         this.tryValidateNodeSettings(node);
         this.validateNodeHasNoComponent(node);
-        this.validateNodeHasASingleUpstreamNode(node);
+        this.validateNodeHasSingleUpstreamNode(node);
         this.validateNodeHasNoDownstreamNodes(node);
         this.validateNodeHasNoEgressSettings(node);
-        this.validateNodeHasASingleInputSubSchema(node);
+        this.validateNodeHasSingleInputSubSchema(node);
         this.validateNodeIsNotPassthrough(node);
         logger.info("...validated...");
     }
@@ -194,7 +194,7 @@ public class NodeValidator {
         this.tryValidateNodeSettings(node);
         this.validateNodeHasNoUpstreamNodes(node);
         this.validateNodeHasEgressSettings(node);
-        this.validateNodeHasASingleInputSubSchema(node);
+        this.validateNodeHasSingleInputSubSchema(node);
         this.validateNodeIsNotPassthroughWithoutDownstreamNodes(node);
         logger.info("...validated...");
     }
@@ -207,10 +207,10 @@ public class NodeValidator {
     public void tryValidateQueueNode(final Node node) {
         this.tryValidateNodeSettings(node);
         this.validateNodeHasNoComponent(node);
-        this.validateNodeHasASingleUpstreamNode(node);
+        this.validateNodeHasSingleUpstreamNode(node);
         this.validateNodeHasNoDownstreamNodes(node);
         this.validateNodeHasNoEgressSettings(node);
-        this.validateNodeHasASingleInputSubSchema(node);
+        this.validateNodeHasSingleInputSubSchema(node);
         this.validateNodeIsNotPassthrough(node);
         logger.info("...validated...");
     }
@@ -222,9 +222,9 @@ public class NodeValidator {
      */
     public void tryValidateHiddenNode(final Node node) {
         this.tryValidateNodeSettings(node);
-        this.validateNodeHasASingleUpstreamNode(node);
+        this.validateNodeHasSingleUpstreamNode(node);
         this.validateNodeHasEgressSettings(node);
-        this.validateNodeHasASingleInputSubSchema(node);
+        this.validateNodeHasSingleInputSubSchema(node);
         this.validateNodeIsNotPassthroughWithoutDownstreamNodes(node);
         logger.info("...validated...");
     }
@@ -238,7 +238,7 @@ public class NodeValidator {
         this.tryValidateNodeSettings(node);
         this.validateNodeHasEgressSettings(node);
         this.validateNodeHasNoUpstreamNodes(node);
-        this.validateNodeHasASingleInputSubSchema(node);
+        this.validateNodeHasSingleInputSubSchema(node);
         this.validateNodeIsNotPassthroughWithoutDownstreamNodes(node);
         logger.info("...validated...");
     }
@@ -381,7 +381,7 @@ public class NodeValidator {
      *
      * @param node The node to validate.
      */
-    private void validateNodeHasASingleUpstreamNode(final Node node) {
+    private void validateNodeHasSingleUpstreamNode(final Node node) {
 
         logger.info("...validating node named {} has only a single upstream node...",
             node.getName());
@@ -416,7 +416,7 @@ public class NodeValidator {
      *
      * @param node The node to valiate.
      */
-    private void validateNodeHasASingleInputSubSchema(final Node node) {
+    private void validateNodeHasSingleInputSubSchema(final Node node) {
         logger.info("...validating node named {} has only a single input sub schema...",
             node.getName());
 

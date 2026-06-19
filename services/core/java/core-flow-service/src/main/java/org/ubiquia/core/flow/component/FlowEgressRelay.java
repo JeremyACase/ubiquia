@@ -1,5 +1,7 @@
 package org.ubiquia.core.flow.component;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -9,8 +11,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -24,6 +24,7 @@ import org.ubiquia.common.library.implementation.service.mapper.FlowMessageDtoMa
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.service.manager.NodeManager;
 
+/** Relays orphaned flow messages to peer agents when a node's target is not local. */
 @Component
 public class FlowEgressRelay {
 
@@ -51,6 +52,7 @@ public class FlowEgressRelay {
     private final Set<String> peerBaseUrls = ConcurrentHashMap.newKeySet();
     private ScheduledFuture<?> pollTask;
 
+    /** Starts the scheduled poll-and-forward task. */
     @PostConstruct
     public void start() {
         var executor = new ScheduledThreadPoolExecutor(1);
@@ -62,12 +64,14 @@ public class FlowEgressRelay {
         logger.info("FlowEgressRelay started.");
     }
 
+    /** Updates the set of peer base URLs that orphaned messages may be forwarded to. */
     public void updatePeers(final Set<String> peerBaseUrls) {
         this.peerBaseUrls.clear();
         this.peerBaseUrls.addAll(peerBaseUrls);
         logger.debug("FlowEgressRelay peer set updated to {} peer(s).", peerBaseUrls.size());
     }
 
+    /** Cancels the scheduled poll task on shutdown. */
     @PreDestroy
     public void teardown() {
         logger.info("Tearing down FlowEgressRelay.");

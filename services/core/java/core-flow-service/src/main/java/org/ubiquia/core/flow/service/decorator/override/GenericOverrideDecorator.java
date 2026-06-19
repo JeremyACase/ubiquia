@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.decorator.override;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -16,6 +15,7 @@ import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.model.ubiquia.embeddable.GraphDeployment;
 import org.ubiquia.common.model.ubiquia.embeddable.OverrideSettingsStringified;
 
+/** Generic decorator that applies deployment override settings to model instances by reflection. */
 @Service
 public abstract class GenericOverrideDecorator<T> implements InterfaceLogger {
 

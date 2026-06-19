@@ -1,6 +1,5 @@
 package org.ubiquia.core.flow.service.builder.node;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -8,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 import org.ubiquia.core.flow.component.node.AbstractNode;
 
+/** Builds telemetry tag lists from a node's context metadata. */
 @Service
 public class NodeTagBuilder {
 

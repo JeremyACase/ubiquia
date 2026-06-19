@@ -68,6 +68,7 @@ public class ClusterSynchronizationService {
     @Autowired
     private List<AbstractSynchronizationService<?, ?>> synchronizationServices;
 
+    /** Updates the egress relay peer list if this node is the cluster leader. */
     @Scheduled(
         initialDelayString = "${ubiquia.cluster.flow-service.sync.frequency-milliseconds:30000}",
         fixedDelayString = "${ubiquia.cluster.flow-service.sync.frequency-milliseconds:30000}")
@@ -79,6 +80,7 @@ public class ClusterSynchronizationService {
         this.flowEgressRelay.updatePeers(new HashSet<>(this.resolvePeerUrls()));
     }
 
+    /** Synchronizes all entity types to resolved peer URLs if this node is the cluster leader. */
     @Scheduled(
         initialDelayString = "${ubiquia.cluster.flow-service.sync.frequency-milliseconds:30000}",
         fixedDelayString = "${ubiquia.cluster.flow-service.sync.frequency-milliseconds:30000}")
@@ -98,7 +100,8 @@ public class ClusterSynchronizationService {
 
         var agentEntity = this.agentRepository.findById(this.agentConfig.getId()).orElse(null);
         if (Objects.isNull(agentEntity)) {
-            logger.error("Cannot sync: agent record not found for id {}.", this.agentConfig.getId());
+            logger.error("Cannot sync: agent record not found for id {}.",
+                this.agentConfig.getId());
             return;
         }
 

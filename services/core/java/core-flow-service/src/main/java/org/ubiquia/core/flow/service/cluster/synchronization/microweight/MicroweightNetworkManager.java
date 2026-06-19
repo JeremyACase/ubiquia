@@ -16,6 +16,7 @@ import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 import org.ubiquia.common.model.ubiquia.entity.NetworkEntity;
 import org.ubiquia.core.flow.repository.NetworkRepository;
 
+/** Manages network entity consolidation as cluster membership changes. */
 @Service
 public class MicroweightNetworkManager {
 
@@ -101,7 +102,7 @@ public class MicroweightNetworkManager {
             }
         }
 
-        // Flush agent FK updates before deleting orphaned networks to satisfy referential integrity.
+        // Flush agent FK updates before deleting orphaned networks.
         this.entityManager.flush();
 
         for (int i = 1; i < distinctNetworks.size(); i++) {

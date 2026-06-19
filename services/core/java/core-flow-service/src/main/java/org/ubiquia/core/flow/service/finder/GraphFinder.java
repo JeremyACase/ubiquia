@@ -12,6 +12,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.core.flow.repository.GraphRepository;
 
+/** Finds graph entities from the repository by name, ontology, and version. */
 @Service
 public class GraphFinder {
     private static final Logger logger = LoggerFactory.getLogger(GraphFinder.class);
@@ -25,6 +26,7 @@ public class GraphFinder {
     @Autowired
     private AgentConfig agentConfig;
 
+    /** Finds a graph by name, ontology name, and version; throws if not found. */
     @Transactional
     public GraphEntity findGraphWith(
         final String graphName,
@@ -48,6 +50,7 @@ public class GraphFinder {
         return graphRecord.get();
     }
 
+    /** Finds a deployed graph record for a specific agent, or empty if not found. */
     @Transactional
     public Optional<GraphEntity> findDeployedGraphRecordWith(
         final String graphName,
@@ -67,6 +70,3 @@ public class GraphFinder {
         return graphRecord;
     }
 }
-
-
-

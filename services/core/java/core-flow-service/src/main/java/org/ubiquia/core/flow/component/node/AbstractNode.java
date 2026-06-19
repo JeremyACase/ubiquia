@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.library.implementation.service.mapper.FlowEventDtoMapper;
+import org.ubiquia.common.library.implementation.service.telemetry.MicroMeterHelper;
 import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
 import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.common.model.ubiquia.node.backpressure.BackPressure;
@@ -23,12 +24,11 @@ import org.ubiquia.core.flow.service.builder.FlowBuilder;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.builder.StimulatedPayloadBuilder;
 import org.ubiquia.core.flow.service.calculator.BackPressureCalculator;
-import org.ubiquia.core.flow.service.command.node.NodeProcessInboxMessageCommand;
 import org.ubiquia.core.flow.service.command.node.NodeInboxPollCommand;
+import org.ubiquia.core.flow.service.command.node.NodeProcessInboxMessageCommand;
 import org.ubiquia.core.flow.service.decorator.node.NodeDecorator;
 import org.ubiquia.core.flow.service.logic.node.NodeInboxPollingLogic;
 import org.ubiquia.core.flow.service.orchestrator.NodePayloadOrchestrator;
-import org.ubiquia.common.library.implementation.service.telemetry.MicroMeterHelper;
 import org.ubiquia.core.flow.service.visitor.StamperVisitor;
 import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
 
@@ -84,6 +84,7 @@ public abstract class AbstractNode implements InterfaceLogger {
         this.nodeContext = nodeContext;
     }
 
+    /** Initializes this node's behavior based on its context. */
     public void initializeBehavior() throws GenerationException, JsonProcessingException {
         var adapterContext = this.getNodeContext();
         this.getLogger().info("...Initializing {} node named {} for graph {}...",
@@ -92,6 +93,7 @@ public abstract class AbstractNode implements InterfaceLogger {
             adapterContext.getGraph().getName());
     }
 
+    /** Samples the current inbox depth to update back-pressure calculations. */
     public void pollToSampleBackPressure() {
 
         var nodeContext = this.getNodeContext();
@@ -117,6 +119,7 @@ public abstract class AbstractNode implements InterfaceLogger {
         }
     }
 
+    /** Receives an input payload, validates it, and forwards it through the flow pipeline. */
     @Transactional
     public ResponseEntity<FlowEvent> push(@RequestBody final String inputPayload)
         throws Exception {
@@ -145,6 +148,7 @@ public abstract class AbstractNode implements InterfaceLogger {
         return response;
     }
 
+    /** Sends a synthetic stimulation payload to the component for testing or initialization. */
     public void stimulateComponent() {
 
         Timer.Sample sample = null;
@@ -170,6 +174,7 @@ public abstract class AbstractNode implements InterfaceLogger {
         }
     }
 
+    /** Polls the inbox for pending messages and processes them if eligible. */
     @Transactional
     public void tryPollInbox() {
 
@@ -179,6 +184,7 @@ public abstract class AbstractNode implements InterfaceLogger {
         }
     }
 
+    /** Returns the current back-pressure state for this node. */
     public ResponseEntity<BackPressure> tryGetBackPressure() {
         this.getLogger().debug("Received a request to get current back pressure...");
         var backPressure = this.backPressureCalculator.calculateBackPressureFor(this);
@@ -186,6 +192,7 @@ public abstract class AbstractNode implements InterfaceLogger {
         return response;
     }
 
+    /** Processes each inbox message in order. */
     @Transactional
     protected void tryProcessInboxMessages(final List<FlowMessage> messages) {
         for (var message : messages) {

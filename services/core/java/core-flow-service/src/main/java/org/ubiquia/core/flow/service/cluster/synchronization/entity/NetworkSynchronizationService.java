@@ -9,6 +9,7 @@ import org.ubiquia.common.model.ubiquia.dto.Network;
 import org.ubiquia.common.model.ubiquia.entity.NetworkEntity;
 import org.ubiquia.core.flow.repository.NetworkRepository;
 
+/** Synchronizes network entities to peer agents in the cluster. */
 @Service
 public class NetworkSynchronizationService
     extends AbstractSynchronizationService<NetworkEntity, Network> {

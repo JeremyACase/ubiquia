@@ -16,6 +16,7 @@ import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
 import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;
 import org.ubiquia.core.flow.service.registrar.ObjectMetadataRegistrar;
 
+/** REST controller for registering and querying object metadata entities. */
 @RestController
 @RequestMapping("/ubiquia/core/flow-service/object-metadata")
 public class ObjectMetadataController
@@ -48,6 +49,7 @@ public class ObjectMetadataController
         return this.dtoMapper;
     }
 
+    /** Registers an object metadata record from a JSON request body. */
     @PostMapping("/register/post")
     @Transactional
     public void register(@RequestBody final ObjectMetadata objectMetadata) {
