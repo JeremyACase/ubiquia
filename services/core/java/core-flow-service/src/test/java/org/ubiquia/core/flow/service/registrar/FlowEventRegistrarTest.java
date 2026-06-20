@@ -20,6 +20,7 @@ import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.repository.FlowRepository;
 import org.ubiquia.core.flow.repository.NodeRepository;
 
+/** Test class for FlowEventRegistrarTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -46,6 +47,7 @@ public class FlowEventRegistrarTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
@@ -106,7 +108,7 @@ public class FlowEventRegistrarTest {
     @Test
     public void assertTryRegister_withValidParents_createsFlowEventEntity() throws Exception {
         var chain = this.buildChain();
-        var countBefore = this.flowEventRepository.count();
+        final var countBefore = this.flowEventRepository.count();
 
         var flow = new Flow();
         flow.setId(chain.flowId);
@@ -136,7 +138,7 @@ public class FlowEventRegistrarTest {
         dto.setFlowEventTimes(new FlowEventTimes());
 
         this.flowEventRegistrar.tryRegister(dto);
-        var countAfterFirst = this.flowEventRepository.count();
+        final var countAfterFirst = this.flowEventRepository.count();
 
         // Re-register with the same ID that was auto-assigned
         var savedId = this.flowEventRepository.findAll().stream()
@@ -157,7 +159,7 @@ public class FlowEventRegistrarTest {
 
     private FlowEventChain buildChain() throws Exception {
         var ontology = this.dummyFactory.generateDomainOntology();
-        var graph = ontology.getGraphs().get(0);
+        final var graph = ontology.getGraphs().get(0);
         var node = this.dummyFactory.generateNode();
         node.setNodeType(NodeType.PUSH);
         node.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Person"));

@@ -19,6 +19,7 @@ import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.service.decorator.node.override.NodeOverrideDecorator;
 
 
+/** Test class for NodeOverrideDecoratorTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -33,6 +34,7 @@ public class NodeOverrideDecoratorTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();

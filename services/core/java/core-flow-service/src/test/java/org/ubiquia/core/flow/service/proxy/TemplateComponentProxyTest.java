@@ -24,6 +24,7 @@ import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.visitor.validator.PayloadModelValidator;
 
 
+/** Test class for TemplateComponentProxyTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -50,6 +51,7 @@ public class TemplateComponentProxyTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();

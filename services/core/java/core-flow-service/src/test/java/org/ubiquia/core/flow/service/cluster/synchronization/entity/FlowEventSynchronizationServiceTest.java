@@ -29,6 +29,7 @@ import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.repository.SyncRepository;
 import org.ubiquia.core.flow.service.registrar.FlowMessageRegistrar;
 
+/** Test class for FlowEventSynchronizationServiceTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -61,6 +62,7 @@ public class FlowEventSynchronizationServiceTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
@@ -108,7 +110,7 @@ public class FlowEventSynchronizationServiceTest {
 
     private void createFlowEventChain() throws Exception {
         var ontology = this.dummyFactory.generateDomainOntology();
-        var graph = ontology.getGraphs().get(0);
+        final var graph = ontology.getGraphs().get(0);
         var node = this.dummyFactory.generateNode();
         node.setNodeType(NodeType.PUSH);
         node.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Person"));

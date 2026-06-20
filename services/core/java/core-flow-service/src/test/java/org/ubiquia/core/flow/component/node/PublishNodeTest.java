@@ -19,6 +19,7 @@ import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
 
+/** Test class for PublishNodeTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @EmbeddedKafka(
@@ -39,11 +40,13 @@ public class PublishNodeTest {
 
     private String mostRecentlyConsumedMessage;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
     }
 
+    /** Receives Kafka messages for testing. */
     @KafkaListener(topics = "topic.test")
     public void receive(ConsumerRecord<?, ?> consumerRecord) {
         this.mostRecentlyConsumedMessage = consumerRecord.value().toString();
@@ -52,7 +55,7 @@ public class PublishNodeTest {
     @Test
     public void assertPublishesData_isValid() throws Exception {
         var domainOntology = this.dummyFactory.generateDomainOntology();
-        var graph = domainOntology.getGraphs().get(0);
+        final var graph = domainOntology.getGraphs().get(0);
 
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);

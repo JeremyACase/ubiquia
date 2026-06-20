@@ -13,6 +13,7 @@ import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.repository.ObjectMetadataRepository;
 
+/** Test class for ObjectMetadataRegistrarTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -30,6 +31,7 @@ public class ObjectMetadataRegistrarTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();

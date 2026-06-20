@@ -18,6 +18,7 @@ import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.repository.FlowRepository;
 import org.ubiquia.core.flow.repository.NodeRepository;
 
+/** Test class for FlowMessageRegistrarTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -44,6 +45,7 @@ public class FlowMessageRegistrarTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
@@ -52,7 +54,7 @@ public class FlowMessageRegistrarTest {
     @Test
     public void assertTryRegisterFlowMessage_withValidNode_createsEntityChain() throws Exception {
         var domainOntology = this.dummyFactory.generateDomainOntology();
-        var graph = domainOntology.getGraphs().get(0);
+        final var graph = domainOntology.getGraphs().get(0);
         var node = this.dummyFactory.generateNode();
         node.setNodeType(NodeType.PUSH);
         node.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Person"));
@@ -111,7 +113,7 @@ public class FlowMessageRegistrarTest {
     @Test
     public void assertTryRegisterSync_withMissingNode_createsNoEntity() throws Exception {
         var ontology = this.dummyFactory.generateDomainOntology();
-        var graph = ontology.getGraphs().get(0);
+        final var graph = ontology.getGraphs().get(0);
         var node = this.dummyFactory.generateNode();
         node.setNodeType(NodeType.PUSH);
         node.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Person"));
@@ -148,7 +150,7 @@ public class FlowMessageRegistrarTest {
     @Test
     public void assertTryRegisterSync_withValidParents_createsEntity() throws Exception {
         var ontology = this.dummyFactory.generateDomainOntology();
-        var graph = ontology.getGraphs().get(0);
+        final var graph = ontology.getGraphs().get(0);
         var node = this.dummyFactory.generateNode();
         node.setNodeType(NodeType.PUSH);
         node.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Person"));
@@ -185,7 +187,7 @@ public class FlowMessageRegistrarTest {
     @Test
     public void assertTryRegisterSync_withDuplicateId_doesNotCreateDuplicate() throws Exception {
         var ontology = this.dummyFactory.generateDomainOntology();
-        var graph = ontology.getGraphs().get(0);
+        final var graph = ontology.getGraphs().get(0);
         var node = this.dummyFactory.generateNode();
         node.setNodeType(NodeType.PUSH);
         node.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Person"));

@@ -11,6 +11,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 
+/** Test class for ExtraKubernetesSynchronizationServiceTest. */
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(properties = {
@@ -31,6 +32,7 @@ public class ExtraKubernetesSynchronizationServiceTest {
     @Autowired
     private ExtraKubernetesHeartbeatService heartbeatService;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         var allPeers = ConcurrentHashMap.newKeySet();

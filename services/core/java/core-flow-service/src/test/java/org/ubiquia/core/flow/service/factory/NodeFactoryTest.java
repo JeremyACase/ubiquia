@@ -14,6 +14,7 @@ import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.component.node.AbstractNode;
 
 
+/** Test class for NodeFactoryTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 public class NodeFactoryTest {
@@ -24,6 +25,7 @@ public class NodeFactoryTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();

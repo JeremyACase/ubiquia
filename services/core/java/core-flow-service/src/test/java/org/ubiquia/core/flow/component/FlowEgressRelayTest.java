@@ -30,6 +30,7 @@ import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.service.manager.NodeManager;
 import org.ubiquia.core.flow.service.registrar.FlowMessageRegistrar;
 
+/** Test class for FlowEgressRelayTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -59,6 +60,7 @@ public class FlowEgressRelayTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.relay.teardown();
@@ -89,7 +91,7 @@ public class FlowEgressRelayTest {
     @SuppressWarnings("unchecked")
     public void assertTryPollAndForward_withOrphanedMessage_forwardsAndDeletes() throws Exception {
         var domainOntology = this.dummyFactory.generateDomainOntology();
-        var graph = domainOntology.getGraphs().get(0);
+        final var graph = domainOntology.getGraphs().get(0);
         var node = this.dummyFactory.generateNode();
         node.setNodeType(NodeType.PUSH);
         node.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Person"));
@@ -126,7 +128,7 @@ public class FlowEgressRelayTest {
     @SuppressWarnings("unchecked")
     public void assertTryPollAndForward_withFailingPost_doesNotDeleteMessage() throws Exception {
         var domainOntology = this.dummyFactory.generateDomainOntology();
-        var graph = domainOntology.getGraphs().get(0);
+        final var graph = domainOntology.getGraphs().get(0);
         var node = this.dummyFactory.generateNode();
         node.setNodeType(NodeType.PUSH);
         node.getInputSubSchemas().add(this.dummyFactory.buildSubSchema("Person"));

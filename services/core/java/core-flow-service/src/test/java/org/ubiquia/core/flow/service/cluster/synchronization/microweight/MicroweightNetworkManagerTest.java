@@ -20,6 +20,7 @@ import org.ubiquia.common.model.ubiquia.entity.NetworkEntity;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.repository.NetworkRepository;
 
+/** Test class for MicroweightNetworkManagerTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -43,6 +44,7 @@ public class MicroweightNetworkManagerTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
@@ -68,7 +70,7 @@ public class MicroweightNetworkManagerTest {
         this.entityManager.flush();
         this.entityManager.clear();
 
-        long networkCountBefore = this.networkRepository.count();
+        final long networkCountBefore = this.networkRepository.count();
 
         this.microweightNetworkManager.onSoloView();
 
@@ -86,9 +88,9 @@ public class MicroweightNetworkManagerTest {
     @Transactional
     public void assertOnSoloView_whenAgentAlreadyHasNetwork_isNoOp() {
         var agent = this.agentRepository.findById(this.agentConfig.getId()).orElseThrow();
-        var existingNetworkId = agent.getNetwork().getId();
+        final var existingNetworkId = agent.getNetwork().getId();
 
-        long networkCountBefore = this.networkRepository.count();
+        final long networkCountBefore = this.networkRepository.count();
 
         this.microweightNetworkManager.onSoloView();
 

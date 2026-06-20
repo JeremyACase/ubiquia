@@ -28,6 +28,7 @@ import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.repository.NetworkRepository;
 
+/** Test class for IntraKubernetesHeartbeatServiceTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -54,12 +55,15 @@ public class IntraKubernetesHeartbeatServiceTest {
 
     private RestTemplate mockHealthTemplate;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
         this.mockHealthTemplate = mock(RestTemplate.class);
-        ReflectionTestUtils.setField(this.heartbeatService, "healthTemplate", this.mockHealthTemplate);
-        ReflectionTestUtils.setField(this.heartbeatService, "consecutiveFailures", new ConcurrentHashMap<>());
+        ReflectionTestUtils.setField(
+            this.heartbeatService, "healthTemplate", this.mockHealthTemplate);
+        ReflectionTestUtils.setField(
+            this.heartbeatService, "consecutiveFailures", new ConcurrentHashMap<>());
     }
 
     @Test

@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.ubiquia.core.flow.service.visitor.validator.JsonSchemaValidator;
 
 
+/** Test class for JsonSubSchemaValidatorTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 public class JsonSubSchemaValidatorTest {

@@ -20,6 +20,7 @@ import org.ubiquia.core.flow.controller.GraphController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
 
+/** Test class for ComponentCardinalityVisitorTest. */
 @SpringBootTest
 public class ComponentCardinalityVisitorTest {
 
@@ -35,6 +36,7 @@ public class ComponentCardinalityVisitorTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
