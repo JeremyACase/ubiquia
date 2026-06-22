@@ -24,6 +24,7 @@ import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
 
+/** Test class for EgressNodeTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -38,16 +39,17 @@ public class EgressNodeTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
     }
 
     @Test
-    public void assertPOSTsToEndpoint_isValid() throws Exception {
+    public void assertPostsToEndpoint_isValid() throws Exception {
 
         var domainOntology = this.dummyFactory.generateDomainOntology();
-        var graph = domainOntology.getGraphs().get(0);
+        final var graph = domainOntology.getGraphs().get(0);
 
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);
@@ -87,10 +89,10 @@ public class EgressNodeTest {
     }
 
     @Test
-    public void assertPUTsToEndpoint_isValid() throws Exception {
+    public void assertPutsToEndpoint_isValid() throws Exception {
 
         var domainOntology = this.dummyFactory.generateDomainOntology();
-        var graph = domainOntology.getGraphs().get(0);
+        final var graph = domainOntology.getGraphs().get(0);
 
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);

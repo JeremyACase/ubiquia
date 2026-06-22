@@ -30,6 +30,7 @@ import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
 
+/** Test class for PushNodeTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -47,13 +48,14 @@ public class PushNodeTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
     }
 
     @Test
-    public void assertPOSTsListToEndpoint_isValid() throws Exception {
+    public void assertPostsListToEndpoint_isValid() throws Exception {
 
         var domainOntology = this.dummyFactory.generateDomainOntology();
         var graph = domainOntology.getGraphs().get(0);

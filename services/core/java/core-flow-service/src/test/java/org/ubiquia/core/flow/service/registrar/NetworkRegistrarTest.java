@@ -11,6 +11,7 @@ import org.ubiquia.common.model.ubiquia.dto.Network;
 import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.repository.NetworkRepository;
 
+/** Test class for NetworkRegistrarTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -25,6 +26,7 @@ public class NetworkRegistrarTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
@@ -47,7 +49,8 @@ public class NetworkRegistrarTest {
 
         this.networkRegistrar.tryRegister(dto);
 
-        Assertions.assertTrue(this.networkRepository.existsById("aaaaaaaa-1111-1111-1111-aaaaaaaaaaaa"));
+        Assertions.assertTrue(
+            this.networkRepository.existsById("aaaaaaaa-1111-1111-1111-aaaaaaaaaaaa"));
     }
 
     @Test

@@ -10,12 +10,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.ubiquia.common.model.ubiquia.embeddable.NodeSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
-import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
+import org.ubiquia.common.model.ubiquia.embeddable.NodeSettings;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
+import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
 
 
+/** Test class for StamperTest. */
 @SpringBootTest
 public class StamperTest {
 

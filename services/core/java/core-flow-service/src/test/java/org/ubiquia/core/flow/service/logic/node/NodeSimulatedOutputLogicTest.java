@@ -19,6 +19,7 @@ import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 import org.ubiquia.core.flow.service.builder.FlowEventBuilder;
 import org.ubiquia.core.flow.service.proxy.TemplateComponentProxy;
 
+/** Test class for NodeSimulatedOutputLogicTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -39,6 +40,7 @@ public class NodeSimulatedOutputLogicTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
@@ -50,7 +52,7 @@ public class NodeSimulatedOutputLogicTest {
         throws Exception {
 
         var domainOntology = this.dummyFactory.generateDomainOntology();
-        var graph = domainOntology.getGraphs().get(0);
+        final var graph = domainOntology.getGraphs().get(0);
 
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);
@@ -92,7 +94,7 @@ public class NodeSimulatedOutputLogicTest {
     public void assertIsSimulatedResponsePayload_whenNoComponent_returnsTrue() throws Exception {
 
         var domainOntology = this.dummyFactory.generateDomainOntology();
-        var graph = domainOntology.getGraphs().get(0);
+        final var graph = domainOntology.getGraphs().get(0);
 
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);
@@ -130,7 +132,7 @@ public class NodeSimulatedOutputLogicTest {
     public void assertOutputPayloadIsSet_whenTemplateComponent() throws Exception {
 
         var domainOntology = this.dummyFactory.generateDomainOntology();
-        var graph = domainOntology.getGraphs().get(0);
+        final var graph = domainOntology.getGraphs().get(0);
 
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);

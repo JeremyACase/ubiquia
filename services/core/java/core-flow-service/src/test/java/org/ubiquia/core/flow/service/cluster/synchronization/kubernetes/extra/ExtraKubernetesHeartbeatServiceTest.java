@@ -24,6 +24,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
+/** Test class for ExtraKubernetesHeartbeatServiceTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -45,11 +46,14 @@ public class ExtraKubernetesHeartbeatServiceTest {
 
     private RestTemplate mockHealthTemplate;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.mockHealthTemplate = mock(RestTemplate.class);
-        ReflectionTestUtils.setField(this.heartbeatService, "healthTemplate", this.mockHealthTemplate);
-        ReflectionTestUtils.setField(this.heartbeatService, "consecutiveFailures", new ConcurrentHashMap<>());
+        ReflectionTestUtils.setField(
+            this.heartbeatService, "healthTemplate", this.mockHealthTemplate);
+        ReflectionTestUtils.setField(
+            this.heartbeatService, "consecutiveFailures", new ConcurrentHashMap<>());
         var freshPeers = ConcurrentHashMap.newKeySet();
         ReflectionTestUtils.setField(this.heartbeatService, "reachablePeers", freshPeers);
         this.heartbeatService.init();
@@ -59,8 +63,10 @@ public class ExtraKubernetesHeartbeatServiceTest {
     public void assertInit_populatesReachablePeersFromConfig() {
         var reachable = this.heartbeatService.getReachablePeers();
 
-        Assertions.assertTrue(reachable.contains(PEER_A), "Expected peer-a to be reachable after init");
-        Assertions.assertTrue(reachable.contains(PEER_B), "Expected peer-b to be reachable after init");
+        Assertions.assertTrue(reachable.contains(PEER_A),
+            "Expected peer-a to be reachable after init");
+        Assertions.assertTrue(reachable.contains(PEER_B),
+            "Expected peer-b to be reachable after init");
     }
 
     @Test

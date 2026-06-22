@@ -25,6 +25,7 @@ import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.repository.ObjectMetadataRepository;
 import org.ubiquia.core.flow.repository.SyncRepository;
 
+/** Test class for ObjectMetadataSynchronizationServiceTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -51,6 +52,7 @@ public class ObjectMetadataSynchronizationServiceTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();

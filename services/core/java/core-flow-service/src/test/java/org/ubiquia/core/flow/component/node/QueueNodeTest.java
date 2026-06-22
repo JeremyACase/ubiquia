@@ -19,6 +19,7 @@ import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
 
+/** Test class for QueueNodeTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -36,6 +37,7 @@ public class QueueNodeTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
@@ -45,7 +47,7 @@ public class QueueNodeTest {
     public void assertPeek_isValid() throws Exception {
 
         var domainOntology = this.dummyFactory.generateDomainOntology();
-        var graph = domainOntology.getGraphs().get(0);
+        final var graph = domainOntology.getGraphs().get(0);
 
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);
@@ -101,7 +103,7 @@ public class QueueNodeTest {
     public void assertPop_isValid() throws Exception {
 
         var domainOntology = this.dummyFactory.generateDomainOntology();
-        var graph = domainOntology.getGraphs().get(0);
+        final var graph = domainOntology.getGraphs().get(0);
 
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);

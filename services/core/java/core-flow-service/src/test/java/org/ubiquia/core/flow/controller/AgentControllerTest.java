@@ -15,6 +15,7 @@ import org.ubiquia.common.model.ubiquia.dto.Agent;
 import org.ubiquia.common.model.ubiquia.entity.AgentEntity;
 import org.ubiquia.core.flow.TestHelper;
 
+/** Test class for AgentControllerTest. */
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AgentControllerTest {
@@ -31,6 +32,7 @@ public class AgentControllerTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
@@ -49,11 +51,13 @@ public class AgentControllerTest {
         var saved = this.agentRepository.findById(remoteId).orElseThrow(
             () -> new AssertionError("Expected remote agent to be persisted"));
         Assertions.assertEquals("http://remote:8080", saved.getBaseUrl());
-        Assertions.assertTrue(saved.isReachable(), "Expected newly registered agent to be reachable");
+        Assertions.assertTrue(saved.isReachable(),
+            "Expected newly registered agent to be reachable");
 
         var myNetwork = this.agentRepository.findById(this.agentConfig.getId())
             .orElseThrow().getNetwork();
-        Assertions.assertNotNull(saved.getNetwork(), "Expected remote agent to be assigned to a network");
+        Assertions.assertNotNull(saved.getNetwork(),
+            "Expected remote agent to be assigned to a network");
         Assertions.assertEquals(myNetwork.getId(), saved.getNetwork().getId(),
             "Expected remote agent to share the local agent's network");
     }

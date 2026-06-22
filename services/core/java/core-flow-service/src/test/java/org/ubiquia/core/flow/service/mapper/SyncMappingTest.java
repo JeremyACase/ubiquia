@@ -19,6 +19,7 @@ import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 import org.ubiquia.core.flow.repository.DomainOntologyRepository;
 import org.ubiquia.core.flow.repository.SyncRepository;
 
+/** Test class for SyncMappingTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -51,6 +52,7 @@ public class SyncMappingTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
@@ -89,9 +91,11 @@ public class SyncMappingTest {
 
         // Syncs are no longer hydrated by the mapper to avoid unbounded lazy-loading.
         // Callers should query /sync/query/params?sourceAgent.id=<id> instead.
-        Assertions.assertNull(dto.getSyncs(), "Expected syncs to be null — mapper must not hydrate the lazy collection");
+        Assertions.assertNull(dto.getSyncs(),
+            "Expected syncs to be null — mapper must not hydrate the lazy collection");
 
         // Confirm the SyncEntity was actually persisted correctly.
-        Assertions.assertEquals(1, this.syncRepository.count(), "Expected exactly one SyncEntity in the database");
+        Assertions.assertEquals(1, this.syncRepository.count(),
+            "Expected exactly one SyncEntity in the database");
     }
 }

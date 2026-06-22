@@ -14,6 +14,7 @@ import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.service.logic.agent.AgentInitializationLogic;
 import org.ubiquia.core.flow.service.manager.NodeManager;
 
+/** Test class for TestHelper. */
 @Service
 public class TestHelper {
 
@@ -32,11 +33,13 @@ public class TestHelper {
     @Autowired
     private AgentInitializationLogic agentLogic;
 
+    /** Sets up test fixtures. */
     public void setupAgentState() {
         this.nodeManager.teardownAllNodes();
         this.agentLogic.tryInitializeAgentInDatabase();
     }
 
+    /** Registers and deploys a graph for testing. */
     public void registerAndDeploy(
         final DomainOntology domainOntology,
         final Graph graph)

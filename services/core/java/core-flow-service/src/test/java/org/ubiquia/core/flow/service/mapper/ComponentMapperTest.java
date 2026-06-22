@@ -13,6 +13,7 @@ import org.ubiquia.core.flow.TestHelper;
 import org.ubiquia.core.flow.controller.DomainOntologyController;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
+/** Test class for ComponentMapperTest. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -27,6 +28,7 @@ public class ComponentMapperTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
@@ -43,7 +45,7 @@ public class ComponentMapperTest {
     public void assertEgressOrderMatchesIngress_isValid() throws Exception {
 
         var domainOntology = this.dummyFactory.generateDomainOntology();
-        var graph = domainOntology.getGraphs().get(0);
+        final var graph = domainOntology.getGraphs().get(0);
 
         var postExecCommands = new ArrayList<String>();
         postExecCommands.add("0");

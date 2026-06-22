@@ -22,6 +22,7 @@ import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.service.manager.NodeManager;
 
 
+/** Test class for NodeInboxPollingLogicTest. */
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class NodeInboxPollingLogicTest {
@@ -47,6 +48,7 @@ public class NodeInboxPollingLogicTest {
     @Autowired
     private TestHelper testHelper;
 
+    /** Sets up test fixtures. */
     @BeforeEach
     public void setup() {
         this.testHelper.setupAgentState();
@@ -128,7 +130,7 @@ public class NodeInboxPollingLogicTest {
     public void assertHiddenNodeIsNotValidToPollInbox_isValid() throws Exception {
 
         var domainOntology = this.dummyFactory.generateDomainOntology();
-        var graph = domainOntology.getGraphs().get(0);
+        final var graph = domainOntology.getGraphs().get(0);
 
         var ingressNode = this.dummyFactory.generateNode();
         ingressNode.setNodeType(NodeType.PUSH);

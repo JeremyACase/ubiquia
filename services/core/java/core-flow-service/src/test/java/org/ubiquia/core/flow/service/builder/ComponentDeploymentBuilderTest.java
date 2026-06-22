@@ -16,6 +16,7 @@ import org.ubiquia.common.model.ubiquia.dto.Config;
 import org.ubiquia.core.flow.dummy.factory.DummyFactory;
 
 
+/** Test class for ComponentDeploymentBuilderTest. */
 @SpringBootTest(
     properties = {
         "ubiquia.kubernetes.enabled=true"
