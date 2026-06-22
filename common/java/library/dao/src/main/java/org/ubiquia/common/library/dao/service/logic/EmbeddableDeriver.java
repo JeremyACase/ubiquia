@@ -5,6 +5,9 @@ import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * A service that determines whether a given class is a JPA embeddable type.
+ */
 @Service
 public class EmbeddableDeriver {
 
@@ -13,6 +16,12 @@ public class EmbeddableDeriver {
 
     private HashMap<Class, Boolean> cachedEntities = new HashMap<>();
 
+    /**
+     * Determine whether the provided class is registered as a JPA embeddable.
+     *
+     * @param clazz The class to check.
+     * @return True if the class is an embeddable, false otherwise.
+     */
     public boolean isEmbeddedClass(final Class<?> clazz) {
         var isEntity = false;
         if (this.cachedEntities.containsKey(clazz)) {
