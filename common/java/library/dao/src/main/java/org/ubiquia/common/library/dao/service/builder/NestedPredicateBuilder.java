@@ -6,14 +6,26 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Subquery;
 import java.lang.reflect.Field;
 import java.time.OffsetDateTime;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dao.QueryFilterParameter;
 import org.ubiquia.common.model.ubiquia.dao.QueryOperatorType;
 
-import java.util.Objects;
+/**
+ * A builder service for constructing JPA predicates for nested (subquery-based) queries.
+ */
 @Service
 public class NestedPredicateBuilder {
 
+    /**
+     * Build a nested predicate from a filter parameter.
+     *
+     * @param param    The filter parameter defining key, operator, and value.
+     * @param cb       The JPA criteria builder.
+     * @param path     The path representing the field being queried.
+     * @param subQuery The subquery to attach the predicate to.
+     * @return A predicate for the subquery.
+     */
     public Predicate getNestedQueryPredicate(
         QueryFilterParameter param,
         CriteriaBuilder cb,
@@ -24,6 +36,17 @@ public class NestedPredicateBuilder {
         return buildNestedPredicate(cb, path, subQuery, param.getOperator(), value);
     }
 
+    /**
+     * Build a nested predicate from a raw keychain, value, and expected type.
+     *
+     * @param keychain   The dotted keychain string, optionally suffixed with an operator symbol.
+     * @param cb         The JPA criteria builder.
+     * @param path       The path representing the field being queried.
+     * @param subQuery   The subquery to attach the predicate to.
+     * @param queryValue The raw string value to match against.
+     * @param type       The expected Java type of the field.
+     * @return A predicate for the subquery.
+     */
     public Predicate getNestedQueryPredicate(
         String keychain,
         CriteriaBuilder cb,
@@ -38,6 +61,16 @@ public class NestedPredicateBuilder {
         return buildNestedPredicate(cb, path, subQuery, operator, value);
     }
 
+    /**
+     * Build a nested predicate for an enum-typed field.
+     *
+     * @param cb         The JPA criteria builder.
+     * @param path       The path representing the enum field.
+     * @param subQuery   The subquery to attach the predicate to.
+     * @param field      The reflection field for the enum.
+     * @param queryValue The raw string value to match against.
+     * @return A predicate for the subquery.
+     */
     public Predicate getNestedQueryPredicateEnum(
         CriteriaBuilder cb,
         Path path,
@@ -73,9 +106,11 @@ public class NestedPredicateBuilder {
             switch (operator) {
                 case EQUAL -> subQuery.where(cb.equal(path, value));
                 case GREATER_THAN -> subQuery.where(cb.greaterThan(path, (Comparable) value));
-                case GREATER_THAN_OR_EQUAL_TO -> subQuery.where(cb.greaterThanOrEqualTo(path, (Comparable) value));
+                case GREATER_THAN_OR_EQUAL_TO ->
+                    subQuery.where(cb.greaterThanOrEqualTo(path, (Comparable) value));
                 case LESS_THAN -> subQuery.where(cb.lessThan(path, (Comparable) value));
-                case LESS_THAN_OR_EQUAL_TO -> subQuery.where(cb.lessThanOrEqualTo(path, (Comparable) value));
+                case LESS_THAN_OR_EQUAL_TO ->
+                    subQuery.where(cb.lessThanOrEqualTo(path, (Comparable) value));
                 default -> throw new IllegalArgumentException("Unsupported operator: " + operator);
             }
         }

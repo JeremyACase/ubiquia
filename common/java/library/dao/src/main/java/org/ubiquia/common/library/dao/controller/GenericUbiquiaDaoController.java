@@ -50,7 +50,7 @@ public abstract class GenericUbiquiaDaoController<
     @Autowired(required = false)
     protected MicroMeterHelper microMeterHelper;
     protected Class<T> persistedEntityClass;
-    protected Class<D> persistedDTOClass;
+    protected Class<D> persistedDtoClass;
     @Autowired
     private PageValidator pageValidator;
 
@@ -67,7 +67,7 @@ public abstract class GenericUbiquiaDaoController<
         this.persistedEntityClass = (Class<T>) ((ParameterizedType) this.getClass()
             .getGenericSuperclass()).getActualTypeArguments()[0];
 
-        this.persistedDTOClass = (Class<D>) ((ParameterizedType) this.getClass()
+        this.persistedDtoClass = (Class<D>) ((ParameterizedType) this.getClass()
             .getGenericSuperclass()).getActualTypeArguments()[1];
         this.getLogger().info("...initialized...");
     }
@@ -100,8 +100,10 @@ public abstract class GenericUbiquiaDaoController<
     public GenericPageImplementation<D> queryWithParams(
         @RequestParam("page") final Integer page,
         @RequestParam("size") final Integer size,
-        @RequestParam(value = "sort-descending", required = false, defaultValue = "true") final Boolean sortDescending,
-        @RequestParam(value = "sort-by-fields", required = false, defaultValue = "") final List<String> sortByFields,
+        @RequestParam(value = "sort-descending", required = false,
+            defaultValue = "true") final Boolean sortDescending,
+        @RequestParam(value = "sort-by-fields", required = false,
+            defaultValue = "") final List<String> sortByFields,
         HttpServletRequest httpServletRequest)
         throws NoSuchFieldException,
         JsonProcessingException {
@@ -127,6 +129,7 @@ public abstract class GenericUbiquiaDaoController<
 
     /**
      * Query for a model provided only an ID in the path.
+     *
      * @param id The ID to use to query the model.
      * @return The model if available, else a 204.
      * @throws NoSuchFieldException Exception from reflection.

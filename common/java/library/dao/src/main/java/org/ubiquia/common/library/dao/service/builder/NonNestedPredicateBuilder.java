@@ -9,6 +9,9 @@ import java.time.OffsetDateTime;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dao.QueryFilterParameter;
 
+/**
+ * A builder service for constructing JPA predicates for non-nested (direct field) queries.
+ */
 @Service
 public class NonNestedPredicateBuilder {
 
@@ -56,11 +59,10 @@ public class NonNestedPredicateBuilder {
             }
             break;
 
-            default: {
+            default:
                 throw new IllegalArgumentException("ERROR: Unsupported operator type for "
                     + "datetime: "
                     + parameter.getOperator());
-            }
         }
         return predicate;
     }
@@ -110,11 +112,10 @@ public class NonNestedPredicateBuilder {
             }
             break;
 
-            default: {
+            default:
                 throw new IllegalArgumentException("ERROR: Unsupported operator type for "
                     + "Integer: "
                     + parameter.getOperator());
-            }
         }
 
         return predicate;
@@ -165,11 +166,10 @@ public class NonNestedPredicateBuilder {
             }
             break;
 
-            default: {
+            default:
                 throw new IllegalArgumentException("ERROR: Unsupported operator type for "
                     + "Float: "
                     + parameter.getOperator());
-            }
         }
         return predicate;
     }
@@ -219,11 +219,10 @@ public class NonNestedPredicateBuilder {
             }
             break;
 
-            default: {
+            default:
                 throw new IllegalArgumentException("ERROR: Unsupported operator type for "
                     + "Double: "
                     + parameter.getOperator());
-            }
         }
         return predicate;
     }
@@ -259,10 +258,9 @@ public class NonNestedPredicateBuilder {
             }
             break;
 
-            default: {
+            default:
                 throw new IllegalArgumentException("ERROR: Unsupported operator type: "
                     + parameter.getOperator());
-            }
         }
         return predicate;
     }
@@ -291,10 +289,9 @@ public class NonNestedPredicateBuilder {
             }
             break;
 
-            default: {
+            default:
                 throw new IllegalArgumentException("ERROR: Unsupported operator type: "
                     + parameter.getOperator());
-            }
         }
         return predicate;
     }
@@ -350,10 +347,9 @@ public class NonNestedPredicateBuilder {
             }
             break;
 
-            default: {
+            default:
                 throw new IllegalArgumentException("ERROR: Unsupported operator type for String: "
                     + parameter.getOperator());
-            }
         }
         return predicate;
     }

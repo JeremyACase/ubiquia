@@ -21,6 +21,9 @@ public class ClassDeriver {
     private static final Logger logger = LoggerFactory.getLogger(ClassDeriver.class);
     private final Reflections reflections;
 
+    /**
+     * Initialize the ClassDeriver with a Reflections scanner scoped to the ubiquia package.
+     */
     public ClassDeriver() {
         this.reflections = new Reflections("org.ubiquia");
     }
@@ -56,7 +59,8 @@ public class ClassDeriver {
                 var subclasses = this.reflections.get(SubTypes.of(clazz).asClass());
                 for (var sub : subclasses) {
                     fields = FieldUtils.getAllFieldsList(sub);
-                    var subField = fields.stream().filter(x -> x.getName().equalsIgnoreCase(fieldName))
+                    var subField = fields.stream()
+                        .filter(x -> x.getName().equalsIgnoreCase(fieldName))
                         .findFirst();
                     if (subField.isPresent()) {
                         candidateClasses.add(sub);
@@ -143,8 +147,8 @@ public class ClassDeriver {
                         + candidateClasses
                     );
                 } else if (candidateClasses.size() == 1) {
-                    logger.debug("Found field name {} in subclass {} of parent class {}; assuming this class"
-                            + "as predicate...",
+                    logger.debug("Found field name {} in subclass {} of parent class {};"
+                            + " assuming this class as predicate...",
                         fieldName,
                         clazz,
                         candidateClasses.get(0).getSimpleName());
@@ -211,8 +215,8 @@ public class ClassDeriver {
                     + candidateClasses
                 );
             } else if (candidateClasses.size() == 1) {
-                logger.debug("Found field name {} in subclass {} of parent class {}; assuming this class"
-                        + "as predicate...",
+                logger.debug("Found field name {} in subclass {} of parent class {};"
+                        + " assuming this class as predicate...",
                     fieldName,
                     clazz,
                     candidateClasses.get(0).getSimpleName());
