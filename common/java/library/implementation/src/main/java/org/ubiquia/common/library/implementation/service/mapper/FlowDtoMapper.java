@@ -10,6 +10,7 @@ import org.ubiquia.common.model.ubiquia.dto.Flow;
 import org.ubiquia.common.model.ubiquia.entity.FlowEntity;
 
 
+/** Mapper service for converting {@link FlowEntity} to {@link Flow} DTOs. */
 @Service
 public class FlowDtoMapper extends GenericDtoMapper<FlowEntity, Flow> {
 

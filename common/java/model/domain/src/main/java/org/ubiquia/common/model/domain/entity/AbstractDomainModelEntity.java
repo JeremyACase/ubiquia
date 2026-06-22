@@ -12,6 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.ubiquia.common.model.domain.embeddable.KeyValuePair;
 
+/** Abstract base JPA entity for domain models, providing Ubiquia identity and audit fields. */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractDomainModelEntity {

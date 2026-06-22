@@ -10,6 +10,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.OverrideSettings;
 import org.ubiquia.common.model.ubiquia.entity.ComponentEntity;
 
 
+/** Mapper service for converting {@link ComponentEntity} to {@link Component} DTOs. */
 @Service
 public class ComponentDtoMapper extends GenericDtoMapper<
     ComponentEntity,

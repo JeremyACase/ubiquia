@@ -12,11 +12,18 @@ import org.ubiquia.common.model.ubiquia.entity.SyncEntity;
 
 
 /**
- * A service dedicated to mapping syncs
+ * A service dedicated to mapping syncs.
  */
 @Service
 public class SyncDtoMapper {
 
+    /**
+     * Map a list of sync entities to DTOs.
+     *
+     * @param froms The entities to map.
+     * @return A list of mapped {@link Sync} DTOs.
+     * @throws JsonProcessingException If payload deserialization fails.
+     */
     public List<Sync> map(final List<SyncEntity> froms) throws JsonProcessingException {
         var tos = new ArrayList<Sync>();
         if (Objects.nonNull(froms)) {
@@ -28,6 +35,13 @@ public class SyncDtoMapper {
         return tos;
     }
 
+    /**
+     * Map a set of sync entities to DTOs.
+     *
+     * @param froms The entities to map.
+     * @return A list of mapped {@link Sync} DTOs.
+     * @throws JsonProcessingException If payload deserialization fails.
+     */
     public List<Sync> map(final Set<SyncEntity> froms) throws JsonProcessingException {
         var tos = new ArrayList<Sync>();
         if (Objects.nonNull(froms)) {
@@ -39,6 +53,13 @@ public class SyncDtoMapper {
         return tos;
     }
 
+    /**
+     * Map a single sync entity to its DTO representation.
+     *
+     * @param from The entity to map from.
+     * @return The mapped {@link Sync} DTO, or null if the input is null.
+     * @throws JsonProcessingException If payload deserialization fails.
+     */
     public Sync map(final SyncEntity from) throws JsonProcessingException {
 
         Sync to = null;

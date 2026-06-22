@@ -6,6 +6,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
+/** Embeddable key-value pair used to attach arbitrary metadata to domain entities. */
 @Embeddable
 public class KeyValuePair {
 

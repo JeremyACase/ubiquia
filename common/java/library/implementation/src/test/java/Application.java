@@ -4,6 +4,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+/** Spring Boot test application entry point for the implementation library integration tests. */
 @SpringBootApplication
 @ComponentScan(basePackages = {"org.ubiquia"})
 @EntityScan(basePackages = {"org.ubiquia"})

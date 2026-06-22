@@ -9,6 +9,7 @@ import org.ubiquia.common.model.ubiquia.dto.ObjectMetadata;
 import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;
 
 
+/** Mapper service for converting {@link ObjectMetadataEntity} to {@link ObjectMetadata} DTOs. */
 @Service
 public class ObjectMetadataDtoMapper extends GenericDtoMapper<
     ObjectMetadataEntity,

@@ -1,5 +1,6 @@
 package org.ubiquia.common.model.domain.dto;
 
+/** DTO representing object storage metadata for a domain-managed file or artifact. */
 public class ObjectMetadataDto extends AbstractDomainModel {
 
     private String bucketName;

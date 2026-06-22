@@ -8,6 +8,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/** Spring MVC configuration for the implementation library integration test context. */
 @Configuration
 @EnableWebMvc
 public class Config implements WebMvcConfigurer {
@@ -24,6 +25,9 @@ public class Config implements WebMvcConfigurer {
         return new RestTemplate();
     }
 
+    /**
+     * Set the JVM default timezone to UTC after bean initialization.
+     */
     @PostConstruct
     public void init() {
         // Setting Spring Boot SetTimeZone

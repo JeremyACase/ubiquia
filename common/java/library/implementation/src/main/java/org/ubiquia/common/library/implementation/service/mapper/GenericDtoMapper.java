@@ -13,8 +13,7 @@ import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
 import org.ubiquia.common.model.ubiquia.entity.AbstractModelEntity;
 
 /**
- * A class dedicated to mapping from Amigos Event entities from the database to Data Transfer
- * Objects (DTO's.)
+ * A class dedicated to mapping entities from the database to Data Transfer Objects (DTOs).
  */
 @Service
 public abstract class GenericDtoMapper<

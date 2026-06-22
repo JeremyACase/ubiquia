@@ -11,6 +11,7 @@ import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
 
 
+/** Mapper service for converting {@link NodeEntity} to {@link Node} DTOs. */
 @Service
 public class NodeDtoMapper extends GenericDtoMapper<
     NodeEntity,

@@ -7,6 +7,7 @@ import org.ubiquia.common.model.ubiquia.dto.FlowMessage;
 import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.common.model.ubiquia.entity.FlowMessageEntity;
 
+/** Mapper service for converting {@link FlowMessageEntity} to {@link FlowMessage} DTOs. */
 @Service
 public class FlowMessageDtoMapper extends GenericDtoMapper<FlowMessageEntity, FlowMessage> {
 

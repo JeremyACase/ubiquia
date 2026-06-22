@@ -8,13 +8,14 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
 import org.ubiquia.common.model.ubiquia.entity.DomainDataContractEntity;
 
+/** Mapper service for converting {@link DomainDataContractEntity} to {@link DomainDataContract}. */
 @Service
 public class AgentCommunicationLanguageDtoMapper extends GenericDtoMapper<
     DomainDataContractEntity,
     DomainDataContract> {
 
     @Autowired
-    private GraphDtoMapper graphDTOMapper;
+    private GraphDtoMapper graphDtoMapper;
 
     @Override
     public DomainDataContract map(final DomainDataContractEntity from)

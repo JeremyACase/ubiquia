@@ -13,7 +13,7 @@ import org.ubiquia.common.model.ubiquia.entity.UpdateEntity;
 
 
 /**
- * A service dedicated to mapping updates
+ * A service dedicated to mapping updates.
  */
 @Service
 public class UpdateDtoMapper {
@@ -21,6 +21,13 @@ public class UpdateDtoMapper {
     @Autowired
     private AgentDtoMapper agentDtoMapper;
 
+    /**
+     * Map a list of update entities to DTOs.
+     *
+     * @param froms The entities to map.
+     * @return A list of mapped {@link Update} DTOs.
+     * @throws JsonProcessingException If payload deserialization fails.
+     */
     public List<Update> map(final List<UpdateEntity> froms) throws JsonProcessingException {
         var tos = new ArrayList<Update>();
         if (Objects.nonNull(froms)) {
@@ -32,6 +39,13 @@ public class UpdateDtoMapper {
         return tos;
     }
 
+    /**
+     * Map a set of update entities to DTOs.
+     *
+     * @param froms The entities to map.
+     * @return A list of mapped {@link Update} DTOs.
+     * @throws JsonProcessingException If payload deserialization fails.
+     */
     public List<Update> map(final Set<UpdateEntity> froms) throws JsonProcessingException {
         var tos = new ArrayList<Update>();
         if (Objects.nonNull(froms)) {
@@ -43,6 +57,13 @@ public class UpdateDtoMapper {
         return tos;
     }
 
+    /**
+     * Map a single update entity to its DTO representation.
+     *
+     * @param from The entity to map from.
+     * @return The mapped {@link Update} DTO, or null if the input is null.
+     * @throws JsonProcessingException If payload deserialization fails.
+     */
     public Update map(final UpdateEntity from) throws JsonProcessingException {
 
         Update to = null;

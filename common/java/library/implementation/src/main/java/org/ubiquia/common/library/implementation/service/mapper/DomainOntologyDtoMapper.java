@@ -13,6 +13,7 @@ import org.ubiquia.common.model.ubiquia.entity.DomainOntologyEntity;
 import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
 
 
+/** Mapper service for converting {@link DomainOntologyEntity} to {@link DomainOntology} DTOs. */
 @Service
 public class DomainOntologyDtoMapper extends GenericDtoMapper<
     DomainOntologyEntity,

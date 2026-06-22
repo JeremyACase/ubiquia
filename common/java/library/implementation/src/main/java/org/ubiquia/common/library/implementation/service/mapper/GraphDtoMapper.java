@@ -11,6 +11,7 @@ import org.ubiquia.common.model.ubiquia.dto.Graph;
 import org.ubiquia.common.model.ubiquia.dto.GraphEdge;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 
+/** Mapper service for converting {@link GraphEntity} to {@link Graph} DTOs. */
 @Service
 @Transactional
 public class GraphDtoMapper extends GenericDtoMapper<GraphEntity, Graph> {

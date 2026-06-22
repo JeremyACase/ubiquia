@@ -6,10 +6,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/** Unit tests for {@link ClockService} time management behavior. */
 public class ClockServiceTest {
 
     private ClockService clockService;
 
+    /**
+     * Instantiate a fresh {@link ClockService} before each test.
+     */
     @BeforeEach
     public void setup() {
         this.clockService = new ClockService();

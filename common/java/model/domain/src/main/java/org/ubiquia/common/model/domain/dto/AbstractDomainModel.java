@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import org.ubiquia.common.model.domain.embeddable.KeyValuePair;
 
+/** Abstract base DTO for domain models, carrying Ubiquia identity and timestamp fields. */
 public abstract class AbstractDomainModel {
 
     private String ubiquiaId = null;

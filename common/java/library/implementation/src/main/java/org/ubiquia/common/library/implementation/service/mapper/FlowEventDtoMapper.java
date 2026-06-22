@@ -8,13 +8,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.Flow;
-import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
 import org.ubiquia.common.model.ubiquia.dto.KeyValuePair;
+import org.ubiquia.common.model.ubiquia.dto.Node;
 import org.ubiquia.common.model.ubiquia.embeddable.FlowEventTimes;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 
 
+/** Mapper service for converting {@link FlowEventEntity} to {@link FlowEvent} DTOs. */
 @Service
 public class FlowEventDtoMapper extends GenericDtoMapper<FlowEventEntity, FlowEvent> {
 

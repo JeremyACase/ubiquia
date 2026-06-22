@@ -8,6 +8,7 @@ import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
 import org.ubiquia.common.model.ubiquia.entity.DomainDataContractEntity;
 
 
+/** Mapper service for converting {@link DomainDataContractEntity} to {@link DomainDataContract}. */
 @Service
 public class DomainDataContractDtoMapper extends GenericDtoMapper<
     DomainDataContractEntity,

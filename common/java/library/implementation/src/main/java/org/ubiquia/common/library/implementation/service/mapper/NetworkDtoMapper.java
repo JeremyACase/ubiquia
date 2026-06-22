@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.Network;
 import org.ubiquia.common.model.ubiquia.entity.NetworkEntity;
 
+/** Mapper service for converting {@link NetworkEntity} to {@link Network} DTOs. */
 @Service
 public class NetworkDtoMapper extends GenericDtoMapper<NetworkEntity, Network> {
 
