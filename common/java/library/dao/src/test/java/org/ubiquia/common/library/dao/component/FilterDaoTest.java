@@ -20,6 +20,9 @@ import org.ubiquia.common.model.ubiquia.dao.QueryOperatorType;
 import org.ubiquia.common.model.ubiquia.dao.SortType;
 
 
+/**
+ * Integration tests for {@link EntityDao} using a QueryFilter-based API.
+ */
 @SpringBootTest
 @Transactional
 public class FilterDaoTest {
@@ -36,6 +39,9 @@ public class FilterDaoTest {
     @Autowired
     private TestHelper testHelper;
 
+    /**
+     * Reset database state before each test.
+     */
     @BeforeEach
     public void setup() {
         this.testHelper.clearState();

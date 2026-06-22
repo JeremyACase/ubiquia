@@ -33,9 +33,11 @@ import org.ubiquia.common.library.implementation.service.visitor.PageValidator;
 import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 
+/** Unit tests for {@link GenericUbiquiaDaoController} using a mock-based test double. */
 @ExtendWith(MockitoExtension.class)
 public class GenericUbiquiaDaoControllerTest {
 
+    /** Minimal concrete subclass of {@link GenericUbiquiaDaoController} for testing. */
     static class TestController extends GenericUbiquiaDaoController<FlowEventEntity, FlowEvent> {
 
         private static final Logger logger = LoggerFactory.getLogger(TestController.class);
@@ -61,7 +63,8 @@ public class GenericUbiquiaDaoControllerTest {
         }
 
         @Override
-        public InterfaceEntityToDtoMapper<FlowEventEntity, FlowEvent> getDataTransferObjectMapper() {
+        public InterfaceEntityToDtoMapper<FlowEventEntity, FlowEvent>
+            getDataTransferObjectMapper() {
             return this.mapper;
         }
     }
@@ -89,6 +92,9 @@ public class GenericUbiquiaDaoControllerTest {
 
     private TestController controller;
 
+    /**
+     * Instantiate the test controller and wire mock dependencies via reflection.
+     */
     @BeforeEach
     public void setup() {
         this.controller = new TestController(this.entityDao, this.mapper);
@@ -112,7 +118,8 @@ public class GenericUbiquiaDaoControllerTest {
         this.controller.queryWithParams(0, 25, true, new ArrayList<>(), this.httpServletRequest);
 
         verify(this.microMeterHelper).startSample();
-        verify(this.microMeterHelper).endSample(this.timerSample, "queryWithParams", new ArrayList<>());
+        verify(this.microMeterHelper).endSample(
+            this.timerSample, "queryWithParams", new ArrayList<>());
     }
 
     @Test
@@ -126,7 +133,8 @@ public class GenericUbiquiaDaoControllerTest {
         this.controller.queryModelWithId("test-id");
 
         verify(this.microMeterHelper).startSample();
-        verify(this.microMeterHelper).endSample(this.timerSample, "queryModelWithId", new ArrayList<>());
+        verify(this.microMeterHelper).endSample(
+            this.timerSample, "queryModelWithId", new ArrayList<>());
     }
 
     @Test
@@ -141,7 +149,8 @@ public class GenericUbiquiaDaoControllerTest {
         when(this.mapper.map(anyList())).thenReturn(new ArrayList<>());
 
         Assertions.assertDoesNotThrow(() ->
-            this.controller.queryWithParams(0, 25, true, new ArrayList<>(), this.httpServletRequest));
+            this.controller.queryWithParams(
+                0, 25, true, new ArrayList<>(), this.httpServletRequest));
         Assertions.assertDoesNotThrow(() ->
             this.controller.queryModelWithId("test-id"));
     }

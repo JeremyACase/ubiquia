@@ -17,6 +17,7 @@ import org.ubiquia.common.library.dao.repository.PersonRepository;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 
+/** Factory service for generating test entity graphs used across DAO integration tests. */
 @Service
 public class DummyFactory {
 

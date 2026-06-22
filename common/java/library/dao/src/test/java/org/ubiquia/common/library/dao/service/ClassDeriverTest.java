@@ -15,6 +15,7 @@ import org.ubiquia.common.model.ubiquia.dao.QueryFilterParameter;
 import org.ubiquia.common.model.ubiquia.dao.QueryOperatorType;
 
 
+/** Integration tests for {@link ClassDeriver} subclass resolution logic. */
 @SpringBootTest
 public class ClassDeriverTest {
 
@@ -22,7 +23,7 @@ public class ClassDeriverTest {
     private ClassDeriver classDeriver;
 
     @Test
-    public void assertDerivesSubclass_IsValid() throws NoSuchFieldException {
+    public void assertDerivesSubclass_isValid() throws NoSuchFieldException {
 
         var parameter = new QueryFilterParameter();
         parameter.setKey("whiskersCount");

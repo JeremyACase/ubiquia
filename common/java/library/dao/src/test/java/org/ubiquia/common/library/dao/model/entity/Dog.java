@@ -2,6 +2,7 @@ package org.ubiquia.common.library.dao.model.entity;
 
 import jakarta.persistence.Entity;
 
+/** Test entity representing a dog, a subtype of {@link Animal}. */
 @Entity
 public class Dog extends Animal {
 

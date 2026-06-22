@@ -3,13 +3,13 @@ package org.ubiquia.common.library.dao.model.entity;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.List;
-
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.ubiquia.common.library.dao.model.enums.Color;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 
+/** Test entity representing a person who owns a collection of {@link Animal} pets. */
 @Entity
 public class Person {
 

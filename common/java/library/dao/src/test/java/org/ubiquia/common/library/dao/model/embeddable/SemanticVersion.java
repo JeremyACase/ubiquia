@@ -4,6 +4,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
+/** Embeddable semantic version value object used in test entities. */
 @Embeddable
 public class SemanticVersion {
 

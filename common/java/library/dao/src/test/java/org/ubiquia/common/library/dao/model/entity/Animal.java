@@ -11,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.ubiquia.common.library.dao.model.enums.Color;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 
+/** Test entity representing an animal owned by a {@link Person}. */
 @Entity
 public class Animal {
 

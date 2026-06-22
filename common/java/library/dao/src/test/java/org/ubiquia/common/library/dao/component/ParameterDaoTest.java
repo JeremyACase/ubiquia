@@ -16,6 +16,9 @@ import org.ubiquia.common.library.dao.service.DummyFactory;
 import org.ubiquia.common.library.dao.service.TestHelper;
 
 
+/**
+ * Integration tests for {@link EntityDao} using a parameter-map-based API.
+ */
 @SpringBootTest
 @Transactional
 public class ParameterDaoTest {
@@ -32,6 +35,9 @@ public class ParameterDaoTest {
     @Autowired
     private TestHelper testHelper;
 
+    /**
+     * Reset database state before each test.
+     */
     @BeforeEach
     public void setup() {
         this.testHelper.clearState();
@@ -81,20 +87,19 @@ public class ParameterDaoTest {
 
     @Test
     public void assertQueriesForNestedEmbeddedData_isValid() throws NoSuchFieldException {
-        var person = this.dummyFactory.generatePersonWithPets();
-
-        var params = new HashMap<String, String[]>();
         var major = new String[1];
         var minor = new String[1];
         var patch = new String[1];
-
         major[0] = "1";
         minor[0] = "2";
         patch[0] = "3";
 
+        var params = new HashMap<String, String[]>();
         params.put("version.major", major);
         params.put("version.minor", minor);
         params.put("version.patch", patch);
+
+        var person = this.dummyFactory.generatePersonWithPets();
 
         var records = this.personDataAccessObject.getPage(
             params,
