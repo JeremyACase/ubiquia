@@ -3,6 +3,7 @@ package org.ubiquia.common.model.ubiquia.dto;
 
 import jakarta.validation.constraints.NotNull;
 
+/** FlowMessage model. */
 public class FlowMessage extends AbstractModel {
 
     private FlowEvent flowEvent;

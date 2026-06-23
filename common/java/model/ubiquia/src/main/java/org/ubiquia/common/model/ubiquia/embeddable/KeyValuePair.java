@@ -6,6 +6,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
+/** KeyValuePair model. */
 @Embeddable
 public class KeyValuePair {
 

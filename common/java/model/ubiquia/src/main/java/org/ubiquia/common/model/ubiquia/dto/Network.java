@@ -2,6 +2,7 @@ package org.ubiquia.common.model.ubiquia.dto;
 
 import java.util.List;
 
+/** Network model. */
 public class Network extends AbstractModel {
 
     private List<Agent> agents;

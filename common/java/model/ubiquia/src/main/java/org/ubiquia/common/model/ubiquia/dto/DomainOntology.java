@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 
+/** DomainOntology model. */
 public class DomainOntology extends AbstractModel {
 
     private String name;

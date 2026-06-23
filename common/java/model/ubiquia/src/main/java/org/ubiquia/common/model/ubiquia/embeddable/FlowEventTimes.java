@@ -4,6 +4,7 @@ package org.ubiquia.common.model.ubiquia.embeddable;
 import jakarta.persistence.Embeddable;
 import java.time.OffsetDateTime;
 
+/** FlowEventTimes model. */
 @Embeddable
 public class FlowEventTimes {
 

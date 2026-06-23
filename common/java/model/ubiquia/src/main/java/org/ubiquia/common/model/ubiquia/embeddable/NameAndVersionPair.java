@@ -4,6 +4,7 @@ package org.ubiquia.common.model.ubiquia.embeddable;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 
+/** NameAndVersionPair model. */
 @Embeddable
 public class NameAndVersionPair {
 

@@ -3,6 +3,7 @@ package org.ubiquia.common.model.ubiquia.entity;
 
 import jakarta.persistence.*;
 
+/** ObjectMetadataEntity model. */
 @Entity
 public class ObjectMetadataEntity extends AbstractModelEntity {
 

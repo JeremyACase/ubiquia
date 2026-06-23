@@ -4,6 +4,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
+/** SemanticVersion model. */
 @Embeddable
 public class SemanticVersion {
 

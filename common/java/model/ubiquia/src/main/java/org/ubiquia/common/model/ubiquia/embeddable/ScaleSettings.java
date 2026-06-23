@@ -5,6 +5,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+/** ScaleSettings model. */
 @Embeddable
 public class ScaleSettings {
 

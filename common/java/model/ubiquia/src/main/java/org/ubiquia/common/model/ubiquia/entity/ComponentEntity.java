@@ -7,6 +7,7 @@ import java.util.Set;
 import org.ubiquia.common.model.ubiquia.embeddable.*;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 
+/** ComponentEntity model. */
 @Entity
 public class ComponentEntity extends AbstractModelEntity {
 
@@ -198,7 +199,8 @@ public class ComponentEntity extends AbstractModelEntity {
         return communicationServiceSettings;
     }
 
-    public void setCommunicationServiceSettings(CommunicationServiceSettings communicationServiceSettings) {
+    public void setCommunicationServiceSettings(
+        CommunicationServiceSettings communicationServiceSettings) {
         this.communicationServiceSettings = communicationServiceSettings;
     }
 

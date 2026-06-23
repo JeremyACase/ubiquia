@@ -5,6 +5,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 
+/** CommunicationServiceSettings model. */
 @Validated
 @Embeddable
 public class CommunicationServiceSettings {

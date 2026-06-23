@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.ubiquia.common.model.ubiquia.embeddable.FlowEventTimes;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 
+/** FlowEventEntity model. */
 @Validated
 @Entity
 public class FlowEventEntity extends AbstractModelEntity {

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.data.annotation.ReadOnlyProperty;
 
+/** IngressResponse model. */
 public class IngressResponse {
 
     private String id = null;
@@ -12,6 +13,7 @@ public class IngressResponse {
 
     private String payloadModelType = "IngressResponse";
 
+    /** Sets id. @param id the id @return this */
     public IngressResponse id(String id) {
         this.id = id;
         return this;
@@ -31,6 +33,7 @@ public class IngressResponse {
         this.id = id;
     }
 
+    /** Sets modelType. @param modelType the modelType @return this */
     public IngressResponse modelType(String modelType) {
         this.modelType = modelType;
         return this;

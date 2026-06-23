@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.List;
 
+/** Graph model. */
 public class Graph extends AbstractModel {
 
     private String name;

@@ -5,6 +5,7 @@ import jakarta.persistence.Embeddable;
 import java.util.ArrayList;
 import java.util.List;
 
+/** NodeSettings model. */
 @Embeddable
 public class NodeSettings {
 
@@ -56,7 +57,8 @@ public class NodeSettings {
         return backpressurePollFrequencyMilliseconds;
     }
 
-    public void setBackpressurePollFrequencyMilliseconds(Long backpressurePollFrequencyMilliseconds) {
+    public void setBackpressurePollFrequencyMilliseconds(
+        Long backpressurePollFrequencyMilliseconds) {
         this.backpressurePollFrequencyMilliseconds = backpressurePollFrequencyMilliseconds;
     }
 

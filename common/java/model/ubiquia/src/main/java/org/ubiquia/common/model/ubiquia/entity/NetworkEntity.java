@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import java.util.List;
 
+/** NetworkEntity model. */
 @Entity
 public class NetworkEntity extends AbstractModelEntity {
 

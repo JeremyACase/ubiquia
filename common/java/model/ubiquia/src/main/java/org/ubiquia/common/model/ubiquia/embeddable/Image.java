@@ -4,6 +4,7 @@ package org.ubiquia.common.model.ubiquia.embeddable;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 
+/** Image model. */
 @Embeddable
 public class Image {
 

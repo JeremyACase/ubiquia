@@ -4,6 +4,7 @@ package org.ubiquia.common.model.ubiquia.dto;
 import jakarta.validation.constraints.Pattern;
 import java.time.OffsetDateTime;
 
+/** Sync model. */
 public class Sync {
 
     private String id = null;

@@ -5,6 +5,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+/** LivenessProbe model. */
 @Embeddable
 public class LivenessProbe {
 

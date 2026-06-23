@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 
+/** UpdateEntity model. */
 @Entity
 public class UpdateEntity {
 

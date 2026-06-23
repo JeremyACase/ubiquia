@@ -1,6 +1,7 @@
 package org.ubiquia.common.model.ubiquia.dto;
 
 
+/** ObjectMetadata model. */
 public class ObjectMetadata extends AbstractModel {
 
     private String bucketName;

@@ -4,6 +4,7 @@ package org.ubiquia.common.model.ubiquia.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/** ComponentType enum. */
 public enum ComponentType {
 
     NONE("NONE"),

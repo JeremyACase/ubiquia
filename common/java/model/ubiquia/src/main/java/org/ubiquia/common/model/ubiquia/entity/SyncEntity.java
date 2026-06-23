@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 
+/** SyncEntity model. */
 @Entity
 public class SyncEntity {
 

@@ -3,6 +3,7 @@ package org.ubiquia.common.model.ubiquia.embeddable;
 
 import jakarta.persistence.Embeddable;
 
+/** Volume model. */
 @Embeddable
 public class Volume {
 

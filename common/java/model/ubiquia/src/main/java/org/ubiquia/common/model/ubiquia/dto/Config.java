@@ -4,6 +4,7 @@ package org.ubiquia.common.model.ubiquia.dto;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 
+/** Config model. */
 @Validated
 public class Config {
 

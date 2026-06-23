@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+/** FlowMessageEntity model. */
 @Entity
 public class FlowMessageEntity extends AbstractModelEntity {
 

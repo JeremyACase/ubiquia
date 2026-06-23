@@ -3,6 +3,7 @@ package org.ubiquia.common.model.ubiquia.embeddable;
 
 import jakarta.persistence.Embeddable;
 
+/** EnvironmentVariable model. */
 @Embeddable
 public class EnvironmentVariable {
 

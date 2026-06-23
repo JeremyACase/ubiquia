@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.38.8] - 2026-06-23
+### Fixed
+- Resolved all checkstyle linting warnings: added missing Javadoc comments on all public types
+  (DTOs, entities, embeddables, enums, and records), added Javadoc to builder-style methods in
+  `IngressResponse`, and wrapped long setter signatures to stay within the 100-character line limit.
+
 ## [0.38.1] - 2026-06-17
 ### Fixed
 - Resolved all Google Java Style checkstyle violations across main sources: missing Javadoc on types and methods, `CustomImportOrder`, `AbbreviationAsWordInName`, `LineLength`, `OperatorWrap`, `SummaryJavadoc`, `EmptyLineSeparator`

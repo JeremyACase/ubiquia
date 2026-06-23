@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 import org.springframework.validation.annotation.Validated;
 
+/** FlowEntity model. */
 @Validated
 @Entity
 public class FlowEntity extends AbstractModelEntity {

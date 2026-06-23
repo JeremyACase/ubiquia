@@ -11,6 +11,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 
+/** AbstractModel model. */
 @Schema(
     description = "An abstract model that is intended to be persisted in the database.")
 @JsonTypeInfo(

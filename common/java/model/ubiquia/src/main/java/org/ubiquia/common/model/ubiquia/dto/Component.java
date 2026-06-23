@@ -5,6 +5,7 @@ import java.util.List;
 import org.ubiquia.common.model.ubiquia.embeddable.*;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 
+/** Component model. */
 public class Component extends AbstractModel {
 
     private ComponentType componentType;
@@ -174,7 +175,8 @@ public class Component extends AbstractModel {
         return communicationServiceSettings;
     }
 
-    public void setCommunicationServiceSettings(CommunicationServiceSettings communicationServiceSettings) {
+    public void setCommunicationServiceSettings(
+        CommunicationServiceSettings communicationServiceSettings) {
         this.communicationServiceSettings = communicationServiceSettings;
     }
 

@@ -13,6 +13,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.domain.Persistable;
 import org.ubiquia.common.model.ubiquia.embeddable.KeyValuePair;
 
+/** AbstractModelEntity model. */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractModelEntity implements Persistable<String> {

@@ -9,6 +9,7 @@ import java.util.Set;
 import org.ubiquia.common.model.ubiquia.embeddable.*;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
 
+/** NodeEntity model. */
 @Entity
 public class NodeEntity extends AbstractModelEntity {
 
@@ -210,7 +211,8 @@ public class NodeEntity extends AbstractModelEntity {
         return communicationServiceSettings;
     }
 
-    public void setCommunicationServiceSettings(CommunicationServiceSettings communicationServiceSettings) {
+    public void setCommunicationServiceSettings(
+        CommunicationServiceSettings communicationServiceSettings) {
         this.communicationServiceSettings = communicationServiceSettings;
     }
 }

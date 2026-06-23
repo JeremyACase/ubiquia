@@ -4,6 +4,7 @@ package org.ubiquia.common.model.ubiquia.embeddable;
 import jakarta.persistence.Embeddable;
 import java.util.List;
 
+/** Cardinality model. */
 @Embeddable
 public class Cardinality {
 

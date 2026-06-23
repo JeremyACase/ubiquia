@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import org.ubiquia.common.model.ubiquia.enums.EgressType;
 import org.ubiquia.common.model.ubiquia.enums.HttpOutputType;
 
+/** EgressSettings model. */
 @Embeddable
 public class EgressSettings {
 

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import org.ubiquia.common.model.ubiquia.entity.ObjectMetadataEntity;
 
+/** Agent model. */
 public class Agent {
 
     private String id = null;

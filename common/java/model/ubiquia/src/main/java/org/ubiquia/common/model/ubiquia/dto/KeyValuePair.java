@@ -3,6 +3,7 @@ package org.ubiquia.common.model.ubiquia.dto;
 
 import jakarta.validation.constraints.NotNull;
 
+/** KeyValuePair model. */
 public class KeyValuePair {
 
     private String key = null;

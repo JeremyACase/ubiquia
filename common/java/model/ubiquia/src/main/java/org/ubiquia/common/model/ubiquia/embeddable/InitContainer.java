@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 
+/** InitContainer model. */
 @Embeddable
 public class InitContainer {
 

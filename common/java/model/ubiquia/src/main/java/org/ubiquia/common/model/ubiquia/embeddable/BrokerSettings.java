@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 import org.ubiquia.common.model.ubiquia.enums.BrokerType;
 
+/** BrokerSettings model. */
 @Validated
 @Embeddable
 public class BrokerSettings {

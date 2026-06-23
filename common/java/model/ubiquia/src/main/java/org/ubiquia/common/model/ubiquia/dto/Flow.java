@@ -4,6 +4,7 @@ package org.ubiquia.common.model.ubiquia.dto;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
 
+/** Flow model. */
 @Validated
 public class Flow extends AbstractModel {
 

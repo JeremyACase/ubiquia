@@ -3,6 +3,7 @@ package org.ubiquia.common.model.ubiquia.dto;
 
 import jakarta.validation.constraints.NotNull;
 
+/** DomainDataContract model. */
 public class DomainDataContract extends AbstractModel {
 
     private Object schema;

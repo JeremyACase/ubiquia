@@ -3,6 +3,7 @@ package org.ubiquia.common.model.ubiquia.dto;
 import java.util.List;
 import org.ubiquia.common.model.ubiquia.embeddable.FlowEventTimes;
 
+/** FlowEvent model. */
 public class FlowEvent extends AbstractModel {
 
     private Flow flow;

@@ -4,6 +4,7 @@ package org.ubiquia.common.model.ubiquia.embeddable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Embeddable;
 
+/** SubSchema model. */
 @Embeddable
 public class SubSchema {
 

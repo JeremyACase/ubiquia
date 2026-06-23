@@ -7,6 +7,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 
+/** DomainDataContractEntity model. */
 @Entity
 public class DomainDataContractEntity extends AbstractModelEntity {
 

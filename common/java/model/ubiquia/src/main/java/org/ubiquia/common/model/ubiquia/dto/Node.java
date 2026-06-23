@@ -6,6 +6,7 @@ import java.util.List;
 import org.ubiquia.common.model.ubiquia.embeddable.*;
 import org.ubiquia.common.model.ubiquia.enums.NodeType;
 
+/** Node model. */
 public class Node extends AbstractModel {
 
     private String name;
@@ -181,7 +182,8 @@ public class Node extends AbstractModel {
         return communicationServiceSettings;
     }
 
-    public void setCommunicationServiceSettings(CommunicationServiceSettings communicationServiceSettings) {
+    public void setCommunicationServiceSettings(
+        CommunicationServiceSettings communicationServiceSettings) {
         this.communicationServiceSettings = communicationServiceSettings;
     }
 }
