@@ -13,10 +13,12 @@ import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 import org.ubiquia.common.model.ubiquia.dto.AbstractModel;
 
+/** GenericUbiquiaPostAndRetriever component. */
 @Service
 public class GenericUbiquiaPostAndRetriever<T extends AbstractModel> implements InterfaceLogger {
 
-    private static final Logger logger = LoggerFactory.getLogger(GenericUbiquiaPostAndRetriever.class);
+    private static final Logger logger = LoggerFactory
+        .getLogger(GenericUbiquiaPostAndRetriever.class);
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -29,6 +31,7 @@ public class GenericUbiquiaPostAndRetriever<T extends AbstractModel> implements 
         return logger;
     }
 
+    /** Posts an object and retrieves the result. */
     public T postAndRetrieve(
         final String postUrl,
         final String getUrl,

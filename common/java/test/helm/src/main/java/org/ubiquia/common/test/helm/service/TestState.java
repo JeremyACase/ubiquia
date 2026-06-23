@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+/** Tracks the current state of helm test execution. */
 @Service
 public class TestState {
 
@@ -14,6 +15,7 @@ public class TestState {
     private Boolean passed;
     private List<String> failures;
 
+    /** Initializes test state with an empty failure list and passed set to true. */
     public TestState() {
         this.failures = new ArrayList<>();
         this.passed = true;
@@ -23,6 +25,7 @@ public class TestState {
         return passed;
     }
 
+    /** Records a test failure and marks the overall test run as failed. */
     public void addFailure(final String failureReason) {
         if (this.getPassed()) {
             logger.info("Setting state of testing passed to FALSE...");

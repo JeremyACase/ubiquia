@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.test.helm.interfaces.InterfaceTestManager;
 
+/** Abstract base class for test managers. */
 @Service
 public abstract class AbstractTestManager implements InterfaceTestManager {
 
@@ -17,6 +18,7 @@ public abstract class AbstractTestManager implements InterfaceTestManager {
     @Autowired
     private TestState testState;
 
+    /** Runs all registered test modules and exits with the appropriate code. */
     public void runTests() {
 
         logger.info("Proceeding to run tests...");

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.test.helm.interfaces.InterfaceHelmTestModule;
 
+/** Manages registration of helm test modules. */
 @Service
 public class TestRegistrar {
 
@@ -15,6 +16,7 @@ public class TestRegistrar {
 
     private List<InterfaceHelmTestModule> registeredTestModules;
 
+    /** Registers a test module. */
     public void registerModule(final InterfaceHelmTestModule testModule) {
 
         logger.info("Registering test module {}...",

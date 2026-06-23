@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.38.9] - 2026-06-23
+### Fixed
+- Resolved all checkstyle linting warnings: added missing Javadoc comments on all public types and
+  non-property methods across `component/`, `interfaces/`, and `service/`; wrapped long `logger`
+  field declarations to stay within the 100-character line limit.
+
 ## [0.35.0] - 2026-05-27
 ### Added
 - `integration/yugabyte/ubiquia_test_heavyweight_yugabyte.yaml`: Helm test for the YugabyteDB heavyweight deployment tier; waits for core-flow-service to become healthy, then asserts the `/actuator/health` response contains `"PostgreSQL"` (YugabyteDB YSQL) and `"status":"UP"`; gated by `testing.yugabyte.enabled`

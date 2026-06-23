@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.test.helm.interfaces.InterfaceHelmTestModule;
 
+/** Abstract base class for helm test modules. */
 @Service
 public abstract class AbstractHelmTestModule implements InterfaceHelmTestModule, InterfaceLogger {
 

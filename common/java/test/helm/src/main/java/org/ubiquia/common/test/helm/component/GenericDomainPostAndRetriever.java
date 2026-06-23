@@ -10,10 +10,12 @@ import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.library.api.interfaces.InterfaceLogger;
 import org.ubiquia.common.model.ubiquia.IngressResponse;
 
+/** GenericDomainPostAndRetriever component. */
 @Service
 public class GenericDomainPostAndRetriever<T> implements InterfaceLogger {
 
-    private static final Logger logger = LoggerFactory.getLogger(GenericDomainPostAndRetriever.class);
+    private static final Logger logger = LoggerFactory
+        .getLogger(GenericDomainPostAndRetriever.class);
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -26,6 +28,7 @@ public class GenericDomainPostAndRetriever<T> implements InterfaceLogger {
         return logger;
     }
 
+    /** Posts an object and retrieves the result. */
     public T postAndRetrieve(
         final String postUrl,
         final String getUrl,
