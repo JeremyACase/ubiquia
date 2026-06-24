@@ -15,8 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.RestTemplate;
 import org.ubiquia.common.library.api.config.AgentConfig;
 import org.ubiquia.common.library.api.repository.AgentRepository;
@@ -35,7 +35,7 @@ import org.ubiquia.core.flow.service.registrar.FlowMessageRegistrar;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class FlowEventSynchronizationServiceTest {
 
-    @MockBean
+    @MockitoBean
     private RestTemplate restTemplate;
 
     @Autowired

@@ -12,6 +12,7 @@ import org.ubiquia.test.flow.service.module.ComponentDeploymentTestModule;
 import org.ubiquia.test.flow.service.module.ComponentTeardownTestModule;
 import org.ubiquia.test.flow.service.module.FlowClusterSyncTestModule;
 
+/** Registers and runs all test modules for the test flow service. */
 @Service
 public class TestManager extends AbstractTestManager {
 
@@ -36,6 +37,7 @@ public class TestManager extends AbstractTestManager {
         this.testRegistrar.registerModule(this.flowClusterSyncTestModule);
     }
 
+    /** Registers all test modules and runs them once the application is ready. */
     @EventListener(ApplicationReadyEvent.class)
     public void registerAndRunTests() {
         this.registerTests();

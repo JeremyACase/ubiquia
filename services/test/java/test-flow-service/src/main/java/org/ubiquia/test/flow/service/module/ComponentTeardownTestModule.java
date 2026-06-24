@@ -12,6 +12,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.GraphSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
 
+/** Test module that tears down a previously deployed component graph. */
 @Service
 public class ComponentTeardownTestModule extends AbstractHelmTestModule {
 

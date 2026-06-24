@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+/** Spring configuration for the test flow service. */
 @Configuration
 public class Config {
 
@@ -23,6 +24,7 @@ public class Config {
         return new RestTemplate();
     }
 
+    /** Sets the JVM default timezone to UTC on startup. */
     @PostConstruct
     public void init() {
         // Setting Spring Boot SetTimeZone

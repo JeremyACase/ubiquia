@@ -7,12 +7,12 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import java.util.Objects;
 import org.ubiquia.common.library.api.config.FlowServiceConfig;
 import org.ubiquia.common.model.ubiquia.GenericPageImplementation;
 import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
 
-import java.util.Objects;
 /**
  * Verifies that the flow service has persisted entities that are candidates for cluster
  * synchronization. This confirms the data layer underpinning {@code ModelSynchronizationService}

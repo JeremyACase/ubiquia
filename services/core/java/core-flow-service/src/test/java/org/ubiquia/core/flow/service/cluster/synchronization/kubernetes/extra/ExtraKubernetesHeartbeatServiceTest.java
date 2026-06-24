@@ -16,11 +16,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,7 +38,7 @@ public class ExtraKubernetesHeartbeatServiceTest {
     private static final String PEER_A = "http://extra-peer-a:8080";
     private static final String PEER_B = "http://extra-peer-b:8080";
 
-    @MockBean
+    @MockitoBean
     private TaskScheduler taskScheduler;
 
     @Autowired

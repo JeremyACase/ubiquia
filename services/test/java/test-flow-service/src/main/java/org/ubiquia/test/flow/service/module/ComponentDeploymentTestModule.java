@@ -25,10 +25,12 @@ import org.ubiquia.common.model.ubiquia.embeddable.GraphSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
 
+/** Test module that deploys a component graph and verifies Kubernetes deployment events. */
 @Service
 public class ComponentDeploymentTestModule extends AbstractHelmTestModule {
 
-    private static final Logger logger = LoggerFactory.getLogger(ComponentDeploymentTestModule.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(ComponentDeploymentTestModule.class);
 
     @Autowired
     private ObjectMapper objectMapper;
