@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+/** Application configuration. */
 @Configuration
 public class Config {
 
@@ -23,6 +24,7 @@ public class Config {
         return new RestTemplate();
     }
 
+    /** Sets the default JVM timezone to UTC. */
     @PostConstruct
     public void init() {
         // Setting Spring Boot SetTimeZone

@@ -21,10 +21,12 @@ import org.ubiquia.common.test.helm.component.GenericUbiquiaPostAndRetriever;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
 import org.ubiquia.test.belief.state.generator.service.Cache;
 
+/** Test module that registers a domain ontology with the flow service. */
 @Service
 public class DomainOntologyRegistrationTestModule extends AbstractHelmTestModule {
 
-    private static final Logger logger = LoggerFactory.getLogger(DomainOntologyRegistrationTestModule.class);
+    private static final Logger logger = LoggerFactory
+        .getLogger(DomainOntologyRegistrationTestModule.class);
 
     @Autowired
     private Cache cache;

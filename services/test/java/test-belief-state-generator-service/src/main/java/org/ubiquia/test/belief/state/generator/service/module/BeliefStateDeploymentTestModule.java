@@ -24,10 +24,12 @@ import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
 import org.ubiquia.common.test.helm.service.AbstractHelmTestModule;
 import org.ubiquia.test.belief.state.generator.service.Cache;
 
+/** Test module that verifies belief state deployment via the Kubernetes API. */
 @Service
 public class BeliefStateDeploymentTestModule extends AbstractHelmTestModule {
 
-    private static final Logger logger = LoggerFactory.getLogger(BeliefStateDeploymentTestModule.class);
+    private static final Logger logger = LoggerFactory
+        .getLogger(BeliefStateDeploymentTestModule.class);
 
     @Autowired
     private BeliefStateGeneratorServiceConfig beliefStateGeneratorServiceConfig;

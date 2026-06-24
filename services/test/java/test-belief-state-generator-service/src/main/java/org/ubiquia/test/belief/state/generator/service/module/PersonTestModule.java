@@ -22,6 +22,7 @@ import org.ubiquia.test.belief.state.generator.model.Name;
 import org.ubiquia.test.belief.state.generator.model.Person;
 import org.ubiquia.test.belief.state.generator.service.Cache;
 
+/** Test module for Person belief state CRUD operations. */
 @Service
 public class PersonTestModule extends AbstractHelmTestModule {
 

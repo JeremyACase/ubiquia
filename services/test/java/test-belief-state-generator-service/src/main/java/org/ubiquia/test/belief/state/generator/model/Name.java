@@ -14,6 +14,7 @@
 package org.ubiquia.test.belief.state.generator.model;
 
 
+/** Name model. */
 public class Name {
 
     private String firstName;

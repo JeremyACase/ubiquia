@@ -69,7 +69,8 @@ class BeliefStateGenerationSupportProcessorTest {
     void supportTemplate_destinationPathsTargetGeneratedDirectory() {
         for (var template : BeliefStateGenerationSupportProcessor.SupportTemplate.values()) {
             assertThat(template.destinationPath)
-                .as("SupportTemplate.%s.destinationPath should be under generated/", template.name())
+                .as("SupportTemplate.%s.destinationPath should be under generated/",
+                    template.name())
                 .startsWith("generated/");
         }
     }

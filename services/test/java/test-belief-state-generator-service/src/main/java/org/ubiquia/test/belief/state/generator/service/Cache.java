@@ -5,6 +5,7 @@ import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.test.belief.state.generator.model.Animal;
 import org.ubiquia.test.belief.state.generator.model.Person;
 
+/** Cache for shared test state across test modules. */
 @Service
 public class Cache {
 

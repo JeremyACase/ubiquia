@@ -228,18 +228,18 @@ class BeliefStateOperatorTest {
     // -------------------------------------------------------------------------
 
     @Test
-    void deleteBeliefStateResources_deletesDeploymentViaDeploymentClientAndServiceViaServiceClient() {
-        var dList = new V1DeploymentList();
-        dList.setItems(List.of(deploymentNamed("dep-1")));
+    void deleteBeliefStateResources_deletesDeploymentAndServiceViaCorrectClients() {
+        var depList = new V1DeploymentList();
+        depList.setItems(List.of(deploymentNamed("dep-1")));
         var depListResponse = mock(KubernetesApiResponse.class);
-        when(depListResponse.getObject()).thenReturn(dList);
+        when(depListResponse.getObject()).thenReturn(depList);
         when(rawDeploymentApi.list(eq("test-ns"), any(ListOptions.class)))
             .thenReturn(depListResponse);
 
-        var sList = new V1ServiceList();
-        sList.setItems(List.of(serviceNamed("svc-1")));
+        var svcList = new V1ServiceList();
+        svcList.setItems(List.of(serviceNamed("svc-1")));
         var svcListResponse = mock(KubernetesApiResponse.class);
-        when(svcListResponse.getObject()).thenReturn(sList);
+        when(svcListResponse.getObject()).thenReturn(svcList);
         when(rawServiceApi.list(eq("test-ns"), any(ListOptions.class)))
             .thenReturn(svcListResponse);
 
@@ -254,17 +254,17 @@ class BeliefStateOperatorTest {
 
     @Test
     void deleteBeliefStateResources_usesBeliedStateEqualsSelector() {
-        var dList = new V1DeploymentList();
-        dList.setItems(List.of());
+        var depList = new V1DeploymentList();
+        depList.setItems(List.of());
         var depListResponse = mock(KubernetesApiResponse.class);
-        when(depListResponse.getObject()).thenReturn(dList);
+        when(depListResponse.getObject()).thenReturn(depList);
         when(rawDeploymentApi.list(eq("test-ns"), any(ListOptions.class)))
             .thenReturn(depListResponse);
 
-        var sList = new V1ServiceList();
-        sList.setItems(List.of());
+        var svcList = new V1ServiceList();
+        svcList.setItems(List.of());
         var svcListResponse = mock(KubernetesApiResponse.class);
-        when(svcListResponse.getObject()).thenReturn(sList);
+        when(svcListResponse.getObject()).thenReturn(svcList);
         when(rawServiceApi.list(eq("test-ns"), any(ListOptions.class)))
             .thenReturn(svcListResponse);
 
@@ -314,13 +314,12 @@ class BeliefStateOperatorTest {
 
     @Test
     void teardown_whenUbiquiaDeploymentPresent_doesNotTriggerCleanup() throws Exception {
-        var spy = spy(operator);
-
         var getResponse = mock(KubernetesApiResponse.class);
         when(getResponse.getHttpStatusCode()).thenReturn(HttpStatus.OK.value());
         when(getResponse.isSuccess()).thenReturn(true);
         when(rawDeploymentApi.get("test-ns", UBIQUIA_DEPLOYMENT_NAME)).thenReturn(getResponse);
 
+        var spy = spy(operator);
         spy.teardown();
 
         verify(spy, never()).tryDeleteAllDeployedBeliefStateResources();

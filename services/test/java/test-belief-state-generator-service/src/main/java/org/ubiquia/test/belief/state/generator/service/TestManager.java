@@ -10,6 +10,7 @@ import org.ubiquia.common.test.helm.service.AbstractTestManager;
 import org.ubiquia.common.test.helm.service.TestRegistrar;
 import org.ubiquia.test.belief.state.generator.service.module.*;
 
+/** Orchestrates registration and execution of all belief state generator test modules. */
 @Service
 public class TestManager extends AbstractTestManager {
 
@@ -45,6 +46,7 @@ public class TestManager extends AbstractTestManager {
         //this.testRegistrar.registerModule(this.beliefStateTeardownTestModule);
     }
 
+    /** Registers and runs all tests once the application context is ready. */
     @EventListener(ApplicationReadyEvent.class)
     public void registerAndRunTests() {
         this.registerTests();

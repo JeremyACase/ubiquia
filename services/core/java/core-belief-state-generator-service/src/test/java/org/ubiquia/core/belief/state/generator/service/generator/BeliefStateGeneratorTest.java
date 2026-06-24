@@ -13,6 +13,7 @@ import org.ubiquia.common.model.ubiquia.dto.DomainDataContract;
 import org.ubiquia.common.model.ubiquia.dto.DomainOntology;
 import org.ubiquia.common.model.ubiquia.embeddable.SemanticVersion;
 
+/** Tests for BeliefStateGenerator. */
 @SpringBootTest
 public class BeliefStateGeneratorTest {
 

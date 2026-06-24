@@ -27,8 +27,6 @@ class BeliefStateDeploymentBuilderTest {
     private DomainOntology domainOntology;
 
     private static V1Deployment baseUbiquiaDeployment() {
-        var deployment = new V1Deployment();
-
         var metadata = new V1ObjectMeta();
         metadata.setLabels(new HashMap<>());
         metadata.getLabels().put("app", "ubiquia");
@@ -36,7 +34,6 @@ class BeliefStateDeploymentBuilderTest {
         metadata.getLabels().put("app.kubernetes.io/managed-by", "helm");
         metadata.setAnnotations(new HashMap<>());
         metadata.getAnnotations().put("example-annotation", "example-value");
-        deployment.setMetadata(metadata);
 
         var selector = new V1LabelSelector();
         selector.setMatchLabels(new HashMap<>());
@@ -51,8 +48,10 @@ class BeliefStateDeploymentBuilderTest {
             List.of(new V1LocalObjectReference().name("my-registry-secret"))
         );
         template.setSpec(podSpec);
-
         spec.setTemplate(template);
+
+        var deployment = new V1Deployment();
+        deployment.setMetadata(metadata);
         deployment.setSpec(spec);
 
         return deployment;

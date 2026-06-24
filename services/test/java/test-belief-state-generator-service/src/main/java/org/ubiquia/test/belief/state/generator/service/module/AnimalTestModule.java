@@ -18,6 +18,7 @@ import org.ubiquia.test.belief.state.generator.model.Animal;
 import org.ubiquia.test.belief.state.generator.model.Name;
 import org.ubiquia.test.belief.state.generator.service.Cache;
 
+/** Test module for Animal belief state CRUD operations. */
 @Service
 public class AnimalTestModule extends AbstractHelmTestModule {
 

@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.38.10] - 2026-06-23
+### Fixed
+- Resolved all checkstyle linting warnings in test sources: added missing Javadoc on
+  `BeliefStateGeneratorTest`, wrapped a long `.as(...)` assertion in
+  `BeliefStateGenerationSupportProcessorTest`, renamed `dList`/`sList` to `depList`/`svcList` to
+  satisfy the local variable naming pattern in `BeliefStateOperatorTest`, shortened an over-length
+  test method name, moved `spy` and `deployment` variable declarations adjacent to their first use
+  to satisfy `VariableDeclarationUsageDistance`.
+
 ## [0.37.1] - 2026-06-15
 ### Fixed
 - `KeyValuePairEntity.key`: field mapped to SQL reserved word `key` as a bare column name; `UbiquiaDomainEntityGenerator.attachColumnAnnotationsToEmbeddables()` now detects reserved-word field names on embeddable models and emits `@Column(name = "pair_<field>")`, resolving H2 syntax errors at runtime

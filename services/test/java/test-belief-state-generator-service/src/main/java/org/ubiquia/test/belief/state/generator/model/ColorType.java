@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Gets or Sets ColorType
+ * Gets or Sets ColorType.
  */
 public enum ColorType {
 
@@ -40,6 +40,7 @@ public enum ColorType {
         this.value = value;
     }
 
+    /** Creates a ColorType from its string value. */
     @JsonCreator
     public static ColorType fromValue(String value) {
         for (ColorType b : ColorType.values()) {
