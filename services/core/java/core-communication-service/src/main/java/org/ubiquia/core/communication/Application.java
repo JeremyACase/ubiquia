@@ -11,18 +11,15 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /**
  * Entry point for the Ubiquia Communication Service.
  *
- * <p>
- * This Spring Boot application:
- * </p>
+ * <p>This Spring Boot application:
  * <ul>
- *   <li>Excludes {@link DataSourceAutoConfiguration} since this service does not use a local datasource.</li>
+ *   <li>Excludes {@link DataSourceAutoConfiguration} since this service does not use a
+ *       local datasource.</li>
  *   <li>Enables scheduled tasks via {@link EnableScheduling} (e.g., background pollers).</li>
  *   <li>Scans multiple base packages for components, APIs, and shared implementations.</li>
  * </ul>
  *
- * <p>
- * The {@link ObjectMapper} is autowired for JSON (de)serialization needs across the service.
- * </p>
+ * <p>The {@link ObjectMapper} is autowired for JSON (de)serialization needs across the service.
  */
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @ComponentScan(basePackages = {

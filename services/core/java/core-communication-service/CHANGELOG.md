@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.38.11] - 2026-06-23
+### Fixed
+- Resolved all checkstyle linting warnings across main and test sources: inlined `<p>` Javadoc
+  paragraph tags, fixed `@return` tag continuation indentation in
+  `BeliefStateGeneratorControllerProxy`, renamed `baseOpenAPI` → `baseOpenApi` to satisfy
+  `AbbreviationAsWordInName`, wrapped long Javadoc lines in `Config` and `Application`, added
+  missing Javadoc on types and methods in `InterfaceUbiquiaDaoControllerProxy`,
+  `MockWebServerTestConfig`, and `DummyFactory`.
+
 ## [0.38.0] - 2026-06-16
 ### Added
 - `HttpProxyConnectionBuilder`: fluent Builder for `HttpURLConnection`; encapsulates method, header-copy, body-stream, connect/read timeout, and `Accept-Encoding: identity` setup; replaces ad-hoc connection setup scattered across `DeployedNodeProxyController` and `DeployedComponentProxyController`

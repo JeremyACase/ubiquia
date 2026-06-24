@@ -17,6 +17,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.SubSchema;
 import org.ubiquia.common.model.ubiquia.enums.ComponentType;
 
 
+/** Factory for generating dummy test data. */
 @Service
 public class DummyFactory {
 
@@ -66,6 +67,7 @@ public class DummyFactory {
         return adapter;
     }
 
+    /** Generates a dummy DomainOntology for testing. */
     public DomainOntology generateDomainOntology() throws IOException {
 
         var graphs = new ArrayList<Graph>();
@@ -86,6 +88,7 @@ public class DummyFactory {
 
     }
 
+    /** Generates a dummy DomainDataContract for testing. */
     public DomainDataContract generateDomainContract() throws IOException {
 
         var schemaPath = Paths.get(this.schemaFilepath);

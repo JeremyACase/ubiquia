@@ -10,8 +10,7 @@ import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
  * Proxy controller that routes communication-service requests to the Flow Service
  * <em>event</em> endpoints.
  *
- * <p>
- * This controller mounts under
+ * <p>This controller mounts under
  * {@code /ubiquia/communication-service/flow-service/graph} as a façade, but
  * configures its downstream base URL to {@code /ubiquia/flow-service/event}.
  * All proxy mechanics (forwarding method/headers/query/body, reactive I/O, and
@@ -26,8 +25,7 @@ import org.ubiquia.common.model.ubiquia.dto.FlowEvent;
  *       {@code proxyToPostEndpoint(...)} in the base class) to reach the Flow Service.</li>
  * </ul>
  *
- * <p>
- * Downstream host/port are sourced from {@link FlowServiceConfig}.
+ * <p>Downstream host/port are sourced from {@link FlowServiceConfig}.
  * </p>
  */
 @RestController

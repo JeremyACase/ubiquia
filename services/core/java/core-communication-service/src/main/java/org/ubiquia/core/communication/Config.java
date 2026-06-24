@@ -25,7 +25,8 @@ import org.springframework.web.reactive.function.client.WebClient;
  *   <li>A classic blocking {@link RestTemplate} for simple HTTP calls.</li>
  *   <li>OpenAPI metadata ({@link OpenAPI}) for Swagger / API docs.</li>
  *   <li>Global timezone initialization (UTC).</li>
- *   <li>Micrometer {@link MeterRegistry} and {@link TimedAspect} for metrics and method timing.</li>
+ *   <li>Micrometer {@link MeterRegistry} and {@link TimedAspect} for metrics and method
+ *       timing.</li>
  * </ul>
  */
 @Configuration
@@ -62,7 +63,7 @@ public class Config {
      * @return an {@link OpenAPI} instance populated with title, version, and description
      */
     @Bean
-    public OpenAPI baseOpenAPI() {
+    public OpenAPI baseOpenApi() {
         return new OpenAPI().info(new Info()
             .title("Ubiquia Communication Service")
             .version("0.1.0")
@@ -94,7 +95,8 @@ public class Config {
     }
 
     /**
-     * Enables the {@link TimedAspect} so methods annotated with {@code @Timed} are recorded by Micrometer.
+     * Enables the {@link TimedAspect} so methods annotated with {@code @Timed} are recorded
+     * by Micrometer.
      *
      * @param registry the {@link MeterRegistry} used to publish timing metrics
      * @return the {@link TimedAspect} AOP advice bean

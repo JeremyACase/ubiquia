@@ -16,8 +16,7 @@ import reactor.core.publisher.Mono;
  * Proxy controller that routes communication-service requests to the Flow Service
  * <em>Agent Communication Language (ACL)</em> endpoints.
  *
- * <p>
- * Mounted at {@code /ubiquia/communication-service/flow-service/agent-communication-language},
+ * <p>Mounted at {@code /ubiquia/communication-service/flow-service/agent-communication-language},
  * this façade forwards requests to the downstream Flow Service base
  * {@code /ubiquia/flow-service/agent-communication-language}. All proxy mechanics
  * (propagating method, headers, query params, body; reactive I/O; response handling)

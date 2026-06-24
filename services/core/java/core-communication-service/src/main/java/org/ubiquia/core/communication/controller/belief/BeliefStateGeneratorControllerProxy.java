@@ -14,6 +14,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.BeliefStateGeneration;
 import org.ubiquia.core.communication.interfaces.InterfaceUbiquiaDaoControllerProxy;
 import reactor.core.publisher.Mono;
 
+/** Proxy controller that forwards belief-state requests to the Belief State Generator service. */
 @RestController
 @RequestMapping("/ubiquia/core/communication-service/belief-state-generator-service")
 public class BeliefStateGeneratorControllerProxy implements InterfaceUbiquiaDaoControllerProxy {
@@ -38,7 +39,7 @@ public class BeliefStateGeneratorControllerProxy implements InterfaceUbiquiaDaoC
      *
      * @param body the {@link BeliefStateGeneration} request payload describing what to generate
      * @return a {@link Mono} emitting the downstream {@link ResponseEntity} with the
-     * resulting {@link BeliefStateGeneration}, or an error if the call fails
+     *     resulting {@link BeliefStateGeneration}, or an error if the call fails
      */
     @PostMapping("/belief-state/generate")
     public Mono<ResponseEntity<BeliefStateGeneration>> proxyGenerate(
@@ -74,7 +75,7 @@ public class BeliefStateGeneratorControllerProxy implements InterfaceUbiquiaDaoC
      *
      * @param body the {@link BeliefStateGeneration} identifying what to tear down
      * @return a {@link Mono} emitting the downstream {@link ResponseEntity} with the
-     * resulting {@link BeliefStateGeneration}, or an error if the call fails
+     *     resulting {@link BeliefStateGeneration}, or an error if the call fails
      */
     @PostMapping("/belief-state/teardown")
     public Mono<ResponseEntity<BeliefStateGeneration>> proxyTeardown(
