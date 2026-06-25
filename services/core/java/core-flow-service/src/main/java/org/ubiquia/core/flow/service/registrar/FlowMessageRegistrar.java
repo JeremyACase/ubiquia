@@ -52,7 +52,7 @@ public class FlowMessageRegistrar {
         }
 
         var nodeEntity = nodeOpt.get();
-        var graphEntity = nodeEntity.getGraph();
+        var graphEntity = nodeEntity.getParentGraph();
 
         var flowEntity = new FlowEntity();
         flowEntity.setGraph(graphEntity);

@@ -4,7 +4,6 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.dto.Node;
-import org.ubiquia.common.model.ubiquia.enums.NodeType;
 import org.ubiquia.core.flow.component.node.AbstractNode;
 
 /** Determines whether a node acts as a passthrough (no component processing). */
@@ -21,8 +20,7 @@ public class NodePassthroughLogic {
         var nodeContext = node.getNodeContext();
 
         var type = nodeContext.getNodeType();
-        var isHidden = NodeType.HIDDEN.equals(type);
-        if (!this.nodeTypeLogic.isTerminalNodeType(type) && !isHidden) {
+        if (!this.nodeTypeLogic.isTerminalNodeType(type)) {
 
             if (this.nodeTypeLogic.nodeTypeIsValidPassthrough(type)
                 && Objects.isNull(nodeContext.getComponent())) {
@@ -41,7 +39,7 @@ public class NodePassthroughLogic {
         if (!this.nodeTypeLogic.isTerminalNodeType(type)) {
 
             if (!this.nodeTypeLogic.nodeTypeIsValidPassthrough(type)
-                && Objects.isNull(node.getComponent())) {
+                && Objects.isNull(node.getTargetComponent())) {
                 isPassthrough = true;
             }
         }

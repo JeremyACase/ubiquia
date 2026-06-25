@@ -70,7 +70,7 @@ public class TestHelper {
 
         var nodeEntity = this
             .nodeRepository
-            .findByGraphNameAndName(graphName, nodeName)
+            .findByParentGraphNameAndName(graphName, nodeName)
             .get();
 
         var node = nodeMap

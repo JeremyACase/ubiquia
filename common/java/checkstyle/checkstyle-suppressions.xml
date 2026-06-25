@@ -9,7 +9,7 @@
               lines="32"/>
     <suppress checks="LineLength"
               files="GraphRepository\.java"
-              lines="12,20"/>
+              lines="12,20,25"/>
     <suppress checks="LineLength"
               files="AgentFinder\.java"
               lines="31"/>

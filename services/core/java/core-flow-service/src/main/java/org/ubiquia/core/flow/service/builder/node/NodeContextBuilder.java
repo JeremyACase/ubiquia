@@ -61,7 +61,7 @@ public class NodeContextBuilder {
         context.setGraph(this.graphDtoMapper.map(graphEntity));
         context.setGraphSettings(graphDeployment.getGraphSettings());
         context.setPollSettings(node.getPollSettings());
-        context.setComponent(node.getComponent());
+        context.setComponent(node.getTargetComponent());
 
         if (Objects.isNull(context.getComponent())) {
             var componentRecord = this.componentRepository
@@ -91,9 +91,9 @@ public class NodeContextBuilder {
         final Node nodeData)
         throws URISyntaxException {
 
-        if (Objects.nonNull(nodeData.getComponent())) {
+        if (Objects.nonNull(nodeData.getTargetComponent())) {
 
-            switch (nodeData.getComponent().getComponentType()) {
+            switch (nodeData.getTargetComponent().getComponentType()) {
 
                 // If we have a Kubernetes service to use...
                 case POD: {
@@ -116,8 +116,8 @@ public class NodeContextBuilder {
                     }
 
             }
-        } else if (this.nodeTypeLogic.nodeTypeRequiresEndpoint(
-            nodeData.getNodeType())) {
+        } else if (this.nodeTypeLogic.nodeTypeRequiresEndpoint(nodeData.getNodeType())
+            && Objects.nonNull(nodeData.getEndpoint())) {
 
             var uri = new URI(nodeData.getEndpoint());
             nodeContext.setEndpointUri(uri);

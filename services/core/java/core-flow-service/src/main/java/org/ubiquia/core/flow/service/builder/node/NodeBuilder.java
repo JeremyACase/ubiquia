@@ -103,7 +103,7 @@ public class NodeBuilder {
 
         logger.info("...determining if node has an endpoint to build...");
 
-        var componentData = nodeData.getComponent();
+        var componentData = nodeData.getTargetComponent();
         var nodeContext = node.getNodeContext();
 
         var isPassthrough = this.nodePassthroughLogic.isPassthrough(node);
@@ -145,7 +145,8 @@ public class NodeBuilder {
                         }
 
                 }
-            } else if (this.nodeTypeLogic.nodeTypeRequiresEndpoint(nodeData.getNodeType())) {
+            } else if (this.nodeTypeLogic.nodeTypeRequiresEndpoint(nodeData.getNodeType())
+                && Objects.nonNull(nodeData.getEndpoint())) {
                 logger.info("...building user-provided endpoint for node...");
                 var uri = new URI(nodeData.getEndpoint());
                 nodeContext.setEndpointUri(uri);

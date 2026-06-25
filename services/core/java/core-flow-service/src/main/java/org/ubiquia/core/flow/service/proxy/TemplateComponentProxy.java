@@ -112,7 +112,7 @@ public class TemplateComponentProxy {
 
             var entity = record.get();
             var jsonSchema = entity
-                .getGraph()
+                .getParentGraph()
                 .getDomainOntology()
                 .getDomainDataContract()
                 .getSchema();
@@ -131,7 +131,7 @@ public class TemplateComponentProxy {
                 throw new RuntimeException("ERROR: Cannot find subschema named  '"
                     + entity.getOutputSubSchema().getModelName()
                     + "' in agent communication language named '"
-                    + entity.getGraph().getDomainOntology().getName()
+                    + entity.getParentGraph().getDomainOntology().getName()
                     + "'!");
             }
             var jsonSubSchema = schema.getSubSchemas().get(match.get());

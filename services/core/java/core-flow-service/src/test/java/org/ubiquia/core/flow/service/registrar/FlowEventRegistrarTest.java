@@ -168,7 +168,7 @@ public class FlowEventRegistrarTest {
         this.testHelper.registerAndDeploy(ontology, graph);
 
         var nodeEntity = this.nodeRepository
-            .findByGraphNameAndName(graph.getName(), node.getName())
+            .findByParentGraphNameAndName(graph.getName(), node.getName())
             .orElseThrow();
 
         var nodeDto = new Node();

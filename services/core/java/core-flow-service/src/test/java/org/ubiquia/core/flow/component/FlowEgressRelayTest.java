@@ -100,7 +100,7 @@ public class FlowEgressRelayTest {
         this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var nodeEntity = this.nodeRepository
-            .findByGraphNameAndName(graph.getName(), node.getName())
+            .findByParentGraphNameAndName(graph.getName(), node.getName())
             .orElseThrow();
 
         var nodeDto = new Node();
@@ -137,7 +137,7 @@ public class FlowEgressRelayTest {
         this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var nodeEntity = this.nodeRepository
-            .findByGraphNameAndName(graph.getName(), node.getName())
+            .findByParentGraphNameAndName(graph.getName(), node.getName())
             .orElseThrow();
 
         var nodeDto = new Node();

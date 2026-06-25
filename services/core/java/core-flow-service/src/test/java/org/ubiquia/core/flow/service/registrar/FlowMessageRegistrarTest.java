@@ -63,7 +63,7 @@ public class FlowMessageRegistrarTest {
         this.testHelper.registerAndDeploy(domainOntology, graph);
 
         var nodeEntity = this.nodeRepository
-            .findByGraphNameAndName(graph.getName(), node.getName())
+            .findByParentGraphNameAndName(graph.getName(), node.getName())
             .orElseThrow();
 
         var nodeDto = new Node();
@@ -122,7 +122,7 @@ public class FlowMessageRegistrarTest {
         this.testHelper.registerAndDeploy(ontology, graph);
 
         var nodeEntity = this.nodeRepository
-            .findByGraphNameAndName(graph.getName(), node.getName())
+            .findByParentGraphNameAndName(graph.getName(), node.getName())
             .orElseThrow();
         var seedMsg = new FlowMessage();
         var seedNode = new Node();
@@ -159,7 +159,7 @@ public class FlowMessageRegistrarTest {
         this.testHelper.registerAndDeploy(ontology, graph);
 
         var nodeEntity = this.nodeRepository
-            .findByGraphNameAndName(graph.getName(), node.getName())
+            .findByParentGraphNameAndName(graph.getName(), node.getName())
             .orElseThrow();
         var seedMsg = new FlowMessage();
         var seedNode = new Node();
@@ -196,7 +196,7 @@ public class FlowMessageRegistrarTest {
         this.testHelper.registerAndDeploy(ontology, graph);
 
         var nodeEntity = this.nodeRepository
-            .findByGraphNameAndName(graph.getName(), node.getName())
+            .findByParentGraphNameAndName(graph.getName(), node.getName())
             .orElseThrow();
         var seedMsg = new FlowMessage();
         var seedNode = new Node();

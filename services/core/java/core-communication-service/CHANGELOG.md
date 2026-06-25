@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.39.0] - 2026-06-25
+### Changed
+- `DummyFactory`: updated ignored fields in `Node` instancio configuration from `getGraph` / `getComponent` to `getParentGraph` / `getTargetComponent`; added `getTargetGraph` to the ignore list
+
 ## [0.38.11] - 2026-06-23
 ### Fixed
 - Resolved all checkstyle linting warnings across main and test sources: inlined `<p>` Javadoc

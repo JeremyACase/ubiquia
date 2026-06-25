@@ -18,6 +18,7 @@ import org.ubiquia.common.model.ubiquia.embeddable.EgressSettings;
 import org.ubiquia.common.model.ubiquia.embeddable.NodeSettings;
 import org.ubiquia.common.model.ubiquia.entity.GraphEntity;
 import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
+import org.ubiquia.core.flow.repository.GraphRepository;
 import org.ubiquia.core.flow.repository.NodeRepository;
 import org.ubiquia.core.flow.service.logic.node.NodeTypeLogic;
 
@@ -28,6 +29,9 @@ import org.ubiquia.core.flow.service.logic.node.NodeTypeLogic;
 public class NodeRegistrar {
 
     private static final Logger logger = LoggerFactory.getLogger(NodeRegistrar.class);
+
+    @Autowired
+    private GraphRepository graphRepository;
 
     @Autowired
     private NodeRepository nodeRepository;
@@ -213,7 +217,7 @@ public class NodeRegistrar {
         if (Objects.nonNull(node.getId())) {
             nodeEntity.setId(node.getId());
         }
-        nodeEntity.setGraph(graphEntity);
+        nodeEntity.setParentGraph(graphEntity);
         nodeEntity.setCommunicationServiceSettings(node.getCommunicationServiceSettings());
         nodeEntity.setNodeType(node.getNodeType());
         nodeEntity.setName(node.getName());
@@ -247,6 +251,42 @@ public class NodeRegistrar {
 
         nodeEntity.setOutputSubSchema(node.getOutputSubSchema());
 
+        this.tryLinkTargetGraph(nodeEntity, node, graphEntity);
+
         return nodeEntity;
+    }
+
+    /**
+     * If the node registration specifies a targetGraph by name, resolve it to a GraphEntity
+     * within the same domain ontology and persist the link.
+     *
+     * @param nodeEntity  The node entity being built.
+     * @param node        The node registration DTO.
+     * @param graphEntity The graph entity the node belongs to.
+     */
+    private void tryLinkTargetGraph(
+        final NodeEntity nodeEntity,
+        final Node node,
+        final GraphEntity graphEntity) {
+
+        if (Objects.nonNull(node.getTargetGraph())
+            && Objects.nonNull(node.getTargetGraph().getName())
+            && Objects.nonNull(graphEntity.getDomainOntology())) {
+
+            var targetGraphName = node.getTargetGraph().getName();
+            var domainOntologyId = graphEntity.getDomainOntology().getId();
+            var targetGraphRecord = this.graphRepository
+                .findByNameAndDomainOntologyId(targetGraphName, domainOntologyId);
+
+            if (targetGraphRecord.isPresent()) {
+                nodeEntity.setTargetGraph(targetGraphRecord.get());
+                logger.info("...linked node '{}' to target graph '{}'.",
+                    node.getName(), targetGraphName);
+            } else {
+                logger.warn("...could not find target graph '{}' in domain ontology '{}';"
+                        + " targetGraph will not be set for node '{}'.",
+                    targetGraphName, domainOntologyId, node.getName());
+            }
+        }
     }
 }

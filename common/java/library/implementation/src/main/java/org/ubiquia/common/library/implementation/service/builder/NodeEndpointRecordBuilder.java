@@ -25,8 +25,8 @@ public class NodeEndpointRecordBuilder {
         return new URI(
             "http",
             null,
-            node.getComponent().getName().toLowerCase(),
-            node.getComponent().getPort(),
+            node.getTargetComponent().getName().toLowerCase(),
+            node.getTargetComponent().getPort(),
             node.getEndpoint(),
             null,
             null

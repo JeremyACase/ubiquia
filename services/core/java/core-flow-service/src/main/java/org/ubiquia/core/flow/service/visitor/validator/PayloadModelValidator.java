@@ -103,7 +103,7 @@ public class PayloadModelValidator {
             if (Objects.nonNull(nodeEntity.getOutputSubSchema())) {
 
                 var jsonSchema = nodeEntity
-                    .getGraph()
+                    .getParentGraph()
                     .getDomainOntology()
                     .getDomainDataContract()
                     .getSchema();
@@ -123,7 +123,7 @@ public class PayloadModelValidator {
                     throw new RuntimeException("ERROR: Cannot find output subschema named  '"
                         + nodeEntity.getOutputSubSchema().getModelName()
                         + "' in data contract named '"
-                        + nodeEntity.getGraph().getDomainOntology().getName()
+                        + nodeEntity.getParentGraph().getDomainOntology().getName()
                         + "'!");
                 }
 
@@ -160,7 +160,7 @@ public class PayloadModelValidator {
 
             var nodeEntity = record.get();
             var jsonSchema = nodeEntity
-                .getGraph()
+                .getParentGraph()
                 .getDomainOntology()
                 .getDomainDataContract()
                 .getSchema();
@@ -192,7 +192,7 @@ public class PayloadModelValidator {
                 throw new RuntimeException("ERROR: Cannot find match any input subschema  '"
                     + schemas
                     + "' in ACL named '"
-                    + nodeEntity.getGraph().getDomainOntology().getName()
+                    + nodeEntity.getParentGraph().getDomainOntology().getName()
                     + "'!");
             }
 

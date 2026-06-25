@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.39.0] - 2026-06-25
+### Changed
+- `NodeEndpointRecordBuilder`: updated to use `node.getTargetComponent()` (renamed from `getComponent()`)
+- `NodeDtoMapper`: updated both `map()` overloads to use `getTargetComponent()` / `setTargetComponent()` (renamed from `getComponent()` / `setComponent()`)
+
 ## [0.33.0] - 2026-05-25
 ### Changed
 - `GenericDtoMapper.setAbstractEntityFields()`: removed `SyncDtoMapper` injection and `setSyncs()` call; the `syncs` field on `AbstractModel` is no longer populated during entity egress to avoid triggering an unbounded lazy-load; query `GET /sync/query/params?sourceAgent.id=<uuid>` instead
