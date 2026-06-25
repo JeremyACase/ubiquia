@@ -24,7 +24,7 @@ public class GraphEntity extends AbstractModelEntity {
     @JoinColumn(name = "domain_ontology_graph_join_id", nullable = false)
     private DomainOntologyEntity domainOntology;
 
-    @OneToMany(mappedBy = "graph", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @OneToMany(mappedBy = "parentGraph", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private Set<NodeEntity> nodes;
 
     @OneToMany(mappedBy = "graph", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)

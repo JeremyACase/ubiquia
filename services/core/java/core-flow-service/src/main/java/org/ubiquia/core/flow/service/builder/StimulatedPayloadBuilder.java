@@ -83,7 +83,7 @@ public class StimulatedPayloadBuilder {
             var nodeEntity = record.get();
 
             var jsonSchema = nodeEntity
-                .getGraph()
+                .getParentGraph()
                 .getDomainOntology()
                 .getDomainDataContract()
                 .getSchema();
@@ -109,7 +109,7 @@ public class StimulatedPayloadBuilder {
                 throw new RuntimeException("ERROR: Cannot find subschema named  '"
                     + inputSchema.getModelName()
                     + "' in domain ontology named '"
-                    + nodeEntity.getGraph().getDomainOntology().getName()
+                    + nodeEntity.getParentGraph().getDomainOntology().getName()
                     + "'!");
             }
             var jsonSubSchema = schema.getSubSchemas().get(match.get());

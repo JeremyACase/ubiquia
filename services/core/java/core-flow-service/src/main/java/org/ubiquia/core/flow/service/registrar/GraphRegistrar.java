@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,112 +127,94 @@ public class GraphRegistrar {
 
         for (var component : graph.getComponents()) {
             if (Objects.nonNull(component.getNode())) {
-
-                var nodeRecord = nodeEntities
-                    .stream()
-                    .filter(x -> x
-                        .getName()
-                        .equals(component.getNode().getName()))
-                    .findFirst();
-
-                if (nodeRecord.isEmpty()) {
-                    throw new IllegalArgumentException("ERROR: Could not find node named: "
-                        + component.getNode().getName());
-                }
-                var nodeEntity = nodeRecord.get();
+                var nodeEntity = this
+                    .findNodeEntityByName(nodeEntities, component.getNode().getName())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                        "ERROR: Could not find node named: " + component.getNode().getName()));
 
                 logger.info("...component named {} is adapted to node {}; connecting...",
-                    component.getName(),
-                    nodeEntity.getName());
+                    component.getName(), nodeEntity.getName());
 
-                if (Objects.nonNull(nodeEntity.getComponent())) {
+                if (Objects.nonNull(nodeEntity.getTargetComponent())) {
                     throw new IllegalArgumentException("ERROR: Node is already adapted to "
                         + "component named: "
-                        + nodeEntity.getComponent().getNode());
+                        + nodeEntity.getTargetComponent().getNode());
                 }
 
-                var componentRecord = componentEntities
-                    .stream()
-                    .filter(x -> x
-                        .getName()
-                        .equals(component.getName()))
-                    .findFirst();
+                var componentEntity = this
+                    .findComponentEntityByName(componentEntities, component.getName())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                        "ERROR: Could not find component named: " + component.getNode().getName()));
 
-                if (componentRecord.isEmpty()) {
-                    throw new IllegalArgumentException("ERROR: Could not find component named: "
-                        + component.getNode().getName());
-                }
-                var componentEntity = componentRecord.get();
-
-                nodeEntity.setComponent(componentEntity);
-                nodeEntity = this.nodeRepository.save(nodeEntity);
-                componentEntity.setNode(nodeEntity);
-                this.componentRepository.save(componentEntity);
-                logger.info("...completed adapting node to component.");
+                this.linkNodeToComponent(nodeEntity, componentEntity);
             }
         }
 
-        // Also handle synced DTOs where component.node is null but node.component is set
+        // Also handle synced DTOs where component.node is null but node.targetComponent is set
         for (var node : graph.getNodes()) {
-            if (Objects.nonNull(node.getComponent())) {
-
-                var nodeRecord = nodeEntities
-                    .stream()
-                    .filter(x -> x.getName().equals(node.getName()))
-                    .findFirst();
-
-                if (nodeRecord.isEmpty()) {
+            if (Objects.nonNull(node.getTargetComponent())) {
+                var nodeEntityOpt = this.findNodeEntityByName(nodeEntities, node.getName());
+                if (nodeEntityOpt.isEmpty()) {
                     continue;
                 }
-                var nodeEntity = nodeRecord.get();
-
-                if (Objects.nonNull(nodeEntity.getComponent())) {
+                var nodeEntity = nodeEntityOpt.get();
+                if (Objects.nonNull(nodeEntity.getTargetComponent())) {
                     continue;
                 }
 
-                var componentRecord = componentEntities
-                    .stream()
-                    .filter(x -> x.getName().equals(node.getComponent().getName()))
-                    .findFirst();
-
-                if (componentRecord.isEmpty()) {
+                var componentEntityOpt = this.findComponentEntityByName(
+                    componentEntities, node.getTargetComponent().getName());
+                if (componentEntityOpt.isEmpty()) {
                     continue;
                 }
-                var componentEntity = componentRecord.get();
 
                 logger.info("...node {} adapted to component {} (via node→component link)...",
-                    nodeEntity.getName(), componentEntity.getName());
-
-                nodeEntity.setComponent(componentEntity);
-                nodeEntity = this.nodeRepository.save(nodeEntity);
-                componentEntity.setNode(nodeEntity);
-                this.componentRepository.save(componentEntity);
-                logger.info("...completed adapting node to component.");
+                    nodeEntity.getName(), componentEntityOpt.get().getName());
+                this.linkNodeToComponent(nodeEntity, componentEntityOpt.get());
             }
         }
 
         // Final pass: match unlinked components to unlinked nodes by name
         for (var componentEntity : componentEntities) {
             if (Objects.isNull(componentEntity.getNode())) {
-                var nodeRecord = nodeEntities
+                var nodeEntityOpt = nodeEntities
                     .stream()
-                    .filter(x -> Objects.isNull(x.getComponent())
+                    .filter(x -> Objects.isNull(x.getTargetComponent())
                         && x.getName().equals(componentEntity.getName()))
                     .findFirst();
-                if (nodeRecord.isPresent()) {
-                    var nodeEntity = nodeRecord.get();
+                if (nodeEntityOpt.isPresent()) {
+                    var nodeEntity = nodeEntityOpt.get();
                     logger.info("...auto-linking component {} to node {} by name match...",
                         componentEntity.getName(), nodeEntity.getName());
-                    nodeEntity.setComponent(componentEntity);
-                    nodeEntity = this.nodeRepository.save(nodeEntity);
-                    componentEntity.setNode(nodeEntity);
-                    this.componentRepository.save(componentEntity);
-                    logger.info("...completed auto-linking.");
+                    this.linkNodeToComponent(nodeEntity, componentEntity);
                 }
             }
         }
 
         logger.info("...completed adapting nodes to components.");
+    }
+
+    private void linkNodeToComponent(NodeEntity nodeEntity, ComponentEntity componentEntity) {
+        nodeEntity.setTargetComponent(componentEntity);
+        this.nodeRepository.save(nodeEntity);
+        componentEntity.setNode(nodeEntity);
+        this.componentRepository.save(componentEntity);
+        logger.info("...completed adapting node {} to component {}.",
+            nodeEntity.getName(), componentEntity.getName());
+    }
+
+    private Optional<NodeEntity> findNodeEntityByName(
+        List<NodeEntity> nodeEntities, String name) {
+        return nodeEntities.stream()
+            .filter(x -> x.getName().equals(name))
+            .findFirst();
+    }
+
+    private Optional<ComponentEntity> findComponentEntityByName(
+        List<ComponentEntity> componentEntities, String name) {
+        return componentEntities.stream()
+            .filter(x -> x.getName().equals(name))
+            .findFirst();
     }
 
     /**

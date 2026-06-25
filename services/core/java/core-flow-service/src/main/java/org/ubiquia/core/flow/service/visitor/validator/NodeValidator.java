@@ -135,6 +135,7 @@ public class NodeValidator {
      */
     public void tryValidateEgressNode(final Node node) {
         this.tryValidateNodeSettings(node);
+        this.validateNodeDoesNotHaveBothTargets(node);
         this.validateNodeHasNoComponent(node);
         this.validateNodeHasNoDownstreamNodes(node);
         this.validateNodeHasSingleUpstreamNode(node);
@@ -150,6 +151,7 @@ public class NodeValidator {
      */
     public void tryValidateMergeNode(final Node node) {
         this.tryValidateNodeSettings(node);
+        this.validateNodeDoesNotHaveBothTargets(node);
         this.validateNodeHasEgressSettings(node);
         this.validateNodeIsNotPassthroughWithoutDownstreamNodes(node);
         logger.info("...validated...");
@@ -162,6 +164,7 @@ public class NodeValidator {
      */
     public void tryValidatePollNode(final Node node) {
         this.tryValidateNodeSettings(node);
+        this.validateNodeDoesNotHaveBothTargets(node);
         this.validateNodeHasNoUpstreamNodes(node);
         this.validateNodeHasPollSettings(node);
         this.validateNodeHasSingleInputSubSchema(node);
@@ -192,6 +195,7 @@ public class NodeValidator {
      */
     public void tryValidatePushNode(final Node node) {
         this.tryValidateNodeSettings(node);
+        this.validateNodeDoesNotHaveBothTargets(node);
         this.validateNodeHasNoUpstreamNodes(node);
         this.validateNodeHasEgressSettings(node);
         this.validateNodeHasSingleInputSubSchema(node);
@@ -222,7 +226,8 @@ public class NodeValidator {
      */
     public void tryValidateHiddenNode(final Node node) {
         this.tryValidateNodeSettings(node);
-        this.validateNodeHasSingleUpstreamNode(node);
+        this.validateNodeDoesNotHaveBothTargets(node);
+        this.validateNodeHasAtMostOneUpstreamNode(node);
         this.validateNodeHasEgressSettings(node);
         this.validateNodeHasSingleInputSubSchema(node);
         this.validateNodeIsNotPassthroughWithoutDownstreamNodes(node);
@@ -236,6 +241,7 @@ public class NodeValidator {
      */
     public void tryValidateSubscribeNode(final Node node) {
         this.tryValidateNodeSettings(node);
+        this.validateNodeDoesNotHaveBothTargets(node);
         this.validateNodeHasEgressSettings(node);
         this.validateNodeHasNoUpstreamNodes(node);
         this.validateNodeHasSingleInputSubSchema(node);
@@ -394,6 +400,23 @@ public class NodeValidator {
     }
 
     /**
+     * Validate that a node has at most one upstream node, permitting zero for ingress use.
+     *
+     * @param node The node to validate.
+     */
+    private void validateNodeHasAtMostOneUpstreamNode(final Node node) {
+
+        logger.info("...validating node named {} has at most one upstream node...",
+            node.getName());
+
+        if (node.getUpstreamNodes().size() > 1) {
+            throw new IllegalArgumentException("ERROR: "
+                + node.getNodeType()
+                + " type node is required to have at most one upstream node!");
+        }
+    }
+
+    /**
      * Validate than an node has no downstream nodes.
      *
      * @param node The node to validate.
@@ -433,13 +456,26 @@ public class NodeValidator {
      *
      * @param node The node to validate for.
      */
+    private void validateNodeDoesNotHaveBothTargets(final Node node) {
+
+        logger.info("...validating node named {} does not have both"
+                + " a targetComponent and targetGraph...",
+            node.getName());
+
+        if (Objects.nonNull(node.getTargetComponent()) && Objects.nonNull(node.getTargetGraph())) {
+            throw new IllegalArgumentException("ERROR: Node named '"
+                + node.getName()
+                + "' cannot have both a targetComponent and a targetGraph set.");
+        }
+    }
+
     private void validateNodeHasNoComponent(final Node node) {
 
         logger.info("...validating node named {} has "
                 + "no component...",
             node.getName());
 
-        if (Objects.nonNull(node.getComponent())) {
+        if (Objects.nonNull(node.getTargetComponent())) {
             throw new IllegalArgumentException("ERROR: "
                 + node.getNodeType()
                 + " type node is not allowed to "

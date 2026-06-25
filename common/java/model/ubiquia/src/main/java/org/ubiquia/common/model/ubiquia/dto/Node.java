@@ -19,7 +19,9 @@ public class Node extends AbstractModel {
 
     private BrokerSettings brokerSettings;
 
-    private Component component;
+    private Component targetComponent;
+
+    private Graph targetGraph;
 
     private CommunicationServiceSettings communicationServiceSettings;
 
@@ -29,7 +31,7 @@ public class Node extends AbstractModel {
 
     private EgressSettings egressSettings;
 
-    private Graph graph;
+    private Graph parentGraph;
 
     private List<SubSchema> inputSubSchemas;
 
@@ -43,12 +45,20 @@ public class Node extends AbstractModel {
 
     private List<Node> downstreamNodes;
 
-    public Component getComponent() {
-        return component;
+    public Component getTargetComponent() {
+        return targetComponent;
     }
 
-    public void setComponent(Component component) {
-        this.component = component;
+    public void setTargetComponent(Component targetComponent) {
+        this.targetComponent = targetComponent;
+    }
+
+    public Graph getTargetGraph() {
+        return targetGraph;
+    }
+
+    public void setTargetGraph(Graph targetGraph) {
+        this.targetGraph = targetGraph;
     }
 
     public String getDescription() {
@@ -67,12 +77,12 @@ public class Node extends AbstractModel {
         this.endpoint = endpoint;
     }
 
-    public Graph getGraph() {
-        return graph;
+    public Graph getParentGraph() {
+        return parentGraph;
     }
 
-    public void setGraph(Graph graph) {
-        this.graph = graph;
+    public void setParentGraph(Graph parentGraph) {
+        this.parentGraph = parentGraph;
     }
 
     @NotNull

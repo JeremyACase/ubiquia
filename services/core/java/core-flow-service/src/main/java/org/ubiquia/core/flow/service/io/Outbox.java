@@ -1,16 +1,19 @@
 package org.ubiquia.core.flow.service.io;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ubiquia.common.model.ubiquia.entity.FlowEventEntity;
 import org.ubiquia.common.model.ubiquia.entity.FlowMessageEntity;
+import org.ubiquia.common.model.ubiquia.entity.NodeEntity;
 import org.ubiquia.core.flow.repository.FlowEventRepository;
 import org.ubiquia.core.flow.repository.FlowMessageRepository;
 import org.ubiquia.core.flow.repository.NodeRepository;
@@ -38,7 +41,6 @@ public class Outbox {
      *
      * @param flowEventEntity   The event associated with the response.
      * @param componentResponse The response from the agent.
-     * @throws JsonProcessingException Exceptions from processing payloads.
      */
     @Transactional
     public void tryQueueMessage(
@@ -48,35 +50,57 @@ public class Outbox {
         logger.debug("Received an event with ID {} to queue up for outbox...",
             flowEventEntity.getId());
 
-        var targetNodeRecord = this
-            .nodeRepository
-            .findById(flowEventEntity.getNode().getId());
+        var node = this.nodeRepository.findById(flowEventEntity.getNode().getId()).get();
 
-        if (!targetNodeRecord.get().getDownstreamNodes().isEmpty()) {
-
-            var eventTimes = flowEventEntity.getFlowEventTimes();
-            eventTimes.setSentToOutboxTime(OffsetDateTime.now());
-            for (var nodeEntity : targetNodeRecord.get().getDownstreamNodes()) {
-                logger.debug("Creating an outbox message for event id {} for target node {}",
-                    flowEventEntity.getId(),
-                    nodeEntity.getName());
-                var message = new FlowMessageEntity();
-                message.setFlowEvent(flowEventEntity);
-                message.setPayload(componentResponse);
-                message.setTags(new HashSet<>());
-                message.setTargetNode(nodeEntity);
-                message = this.flowMessageRepository.save(message);
-                nodeEntity.getOutboxFlowMessages().add(message);
-                this.nodeRepository.save(nodeEntity);
-                flowEventEntity.getFlowMessages().add(message);
-            }
-            eventTimes.setEventCompleteTime(OffsetDateTime.now());
+        if (!node.getDownstreamNodes().isEmpty()) {
+            this.queueMessagesForNodes(
+                flowEventEntity,
+                new ArrayList<>(node.getDownstreamNodes()),
+                componentResponse);
+        } else if (Objects.nonNull(node.getTargetGraph())) {
+            var entryNodes = this.nodeRepository
+                .findByParentGraphIdAndUpstreamNodesIsEmpty(node.getTargetGraph().getId());
+            this.queueMessagesForNodes(flowEventEntity, entryNodes, componentResponse);
         } else {
-            logger.debug("No downstream nodes for nodes named {}; not creating "
-                    + "an outbox message...",
-                flowEventEntity.getNode().getName());
+            logger.debug("No downstream nodes or target graph for node named {}; "
+                    + "not creating an outbox message...",
+                node.getName());
         }
+
         this.flowEventRepository.save(flowEventEntity);
         logger.debug("...Completed processing of event.");
+    }
+
+    private void queueMessagesForNodes(
+        FlowEventEntity flowEventEntity,
+        final List<NodeEntity> targets,
+        final String componentResponse) {
+
+        var eventTimes = flowEventEntity.getFlowEventTimes();
+        eventTimes.setSentToOutboxTime(OffsetDateTime.now());
+        for (var target : targets) {
+            this.queueMessageForNode(flowEventEntity, target, componentResponse);
+        }
+        eventTimes.setEventCompleteTime(OffsetDateTime.now());
+    }
+
+    private void queueMessageForNode(
+        FlowEventEntity flowEventEntity,
+        NodeEntity nodeEntity,
+        final String payload) {
+
+        logger.debug("Creating an outbox message for event id {} for target node {}",
+            flowEventEntity.getId(),
+            nodeEntity.getName());
+
+        var message = new FlowMessageEntity();
+        message.setFlowEvent(flowEventEntity);
+        message.setPayload(payload);
+        message.setTags(new HashSet<>());
+        message.setTargetNode(nodeEntity);
+        message = this.flowMessageRepository.save(message);
+        nodeEntity.getOutboxFlowMessages().add(message);
+        this.nodeRepository.save(nodeEntity);
+        flowEventEntity.getFlowMessages().add(message);
     }
 }

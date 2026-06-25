@@ -36,7 +36,7 @@ public class NodeDtoMapper extends GenericDtoMapper<
             to.setNodeType(from.getNodeType());
             to.setFlowEvents(new ArrayList<>());
             to.setBrokerSettings(from.getBrokerSettings());
-            to.setComponent(this.componentDtoMapper.map(from.getComponent()));
+            to.setTargetComponent(this.componentDtoMapper.map(from.getTargetComponent()));
             to.setDownstreamNodes(this.mapUpstreamOrDownstreamAdapters(
                 from.getDownstreamNodes()));
             to.setDescription(from.getDescription());
@@ -80,7 +80,7 @@ public class NodeDtoMapper extends GenericDtoMapper<
             super.setAbstractEntityFields(from, to);
             to.setName(from.getName());
             to.setNodeType(from.getNodeType());
-            to.setComponent(this.componentDtoMapper.map(from.getComponent()));
+            to.setTargetComponent(this.componentDtoMapper.map(from.getTargetComponent()));
             to.setDescription(from.getDescription());
             to.setEgressSettings(from.getEgressSettings());
             to.setEndpoint(from.getEndpoint());

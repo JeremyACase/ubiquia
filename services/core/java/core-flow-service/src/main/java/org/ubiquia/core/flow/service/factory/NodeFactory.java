@@ -51,7 +51,7 @@ public class NodeFactory {
 
         logger.info("...completed building node {} for graph {}...",
             nodeEntity.getName(),
-            nodeEntity.getGraph().getName());
+            nodeEntity.getParentGraph().getName());
         return node;
     }
 

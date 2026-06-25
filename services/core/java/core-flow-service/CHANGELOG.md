@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.39.0] - 2026-06-25
+### Added
+- `GraphRepository.findByNameAndDomainOntologyId`: new query method for resolving a graph by name scoped to a domain ontology
+- `NodeRepository.findByParentGraphIdAndUpstreamNodesIsEmpty`: new query method for finding entry nodes (no upstream nodes) in a given graph; used by cross-graph outbox routing
+- `NodeRegistrar.tryLinkTargetGraph`: resolves a node's `targetGraph` by name and domain ontology ID at registration time and persists the link
+- `NodeValidator.validateNodeDoesNotHaveBothTargets`: new validation ensuring a node cannot have both `targetComponent` and `targetGraph` set simultaneously; applied to EGRESS, MERGE, POLL, PUSH, HIDDEN, and SUBSCRIBE node types
+- `NodeValidator.validateNodeHasAtMostOneUpstreamNode`: allows HIDDEN nodes to have zero or one upstream nodes (previously required exactly one)
+
+### Changed
+- `NodeRepository`: renamed `findByGraphNameAndName` → `findByParentGraphNameAndName` to match entity field rename
+- `Outbox.tryQueueMessage`: extended cross-graph routing — when a node has no downstream nodes but has a `targetGraph`, messages are queued for all entry nodes of that target graph
+- `Outbox`: extracted `queueMessagesForNodes` and `queueMessageForNode` private helpers; removed checked `JsonProcessingException` from `tryQueueMessage` signature
+- `NodeContextBuilder`: updated to use `getTargetComponent()` (renamed from `getComponent()`); added null-check on `nodeData.getEndpoint()` before building user-provided endpoint URI
+- `NodeBuilder`: updated to use `getTargetComponent()`; added null-check on `nodeData.getEndpoint()` before URI construction
+- `NodePassthroughLogic`: removed special-case exclusion for `NodeType.HIDDEN`; updated to use `getTargetComponent()`
+- `NodeManager`: updated all `getComponent()` calls to `getTargetComponent()`
+- `NodeFactory`: updated log statement to use `getParentGraph()`
+- `GraphRegistrar`: extracted `linkNodeToComponent`, `findNodeEntityByName`, and `findComponentEntityByName` private helpers; updated all field references from `component` → `targetComponent`
+- `StimulatedPayloadBuilder`, `TemplateComponentProxy`, `PayloadModelValidator`, `FlowMessageRegistrar`: updated `getGraph()` → `getParentGraph()`
+- Test infrastructure: updated all `findByGraphNameAndName` calls to `findByParentGraphNameAndName`; updated `DummyFactory` ignore-field references to `getParentGraph`, `getTargetComponent`, and `getTargetGraph`
+
 ## [0.38.4] - 2026-06-19
 ### Changed
 - Resolved all Google Java Style checkstyle warnings across `core-flow-service` test sources: added missing Javadoc on all public test classes and setup/test methods, added `final` to variables flagged by `VariableDeclarationUsageDistance` (`graph`, `countBefore`, `countAfterFirst`, `networkCountBefore`, `existingNetworkId`), renamed methods with consecutive-uppercase abbreviations (`assertPOSTsToEndpoint_isValid` → `assertPostsToEndpoint_isValid`, `assertPUTsToEndpoint_isValid` → `assertPutsToEndpoint_isValid`, etc.), corrected lexicographical import ordering in `ClusterSynchronizationServiceTest` and `StamperTest`, and wrapped lines exceeding 100 characters.

@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.39.0] - 2026-06-25
+### Added
+- `NodeEntity`: new `targetGraph` (`@OneToOne`) field with join column `target_graph_node_join_id`; allows a node to reference another graph as its routing target for cross-graph data flow
+- `Node` DTO: new `targetGraph` field (`Graph`) with corresponding getter/setter
+
+### Changed
+- `NodeEntity`: renamed `component` → `targetComponent` (join column unchanged: `component_node_join_id`); renamed `graph` → `parentGraph` (join column unchanged: `graph_node_join_id`)
+- `Node` DTO: renamed `component` → `targetComponent` and `graph` → `parentGraph` with corresponding getter/setter renames
+- `ComponentEntity`: updated `@OneToOne(mappedBy = ...)` from `"component"` to `"targetComponent"`
+- `GraphEntity`: updated `@OneToMany(mappedBy = ...)` for `nodes` from `"graph"` to `"parentGraph"`
+
 ## [0.38.8] - 2026-06-23
 ### Fixed
 - Resolved all checkstyle linting warnings: added missing Javadoc comments on all public types

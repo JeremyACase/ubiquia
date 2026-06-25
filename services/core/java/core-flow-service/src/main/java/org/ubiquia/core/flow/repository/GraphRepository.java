@@ -16,6 +16,11 @@ public interface GraphRepository
         final Integer minor,
         final Integer patch);
 
+    /** Finds a graph by name scoped to a specific domain ontology. */
+    Optional<GraphEntity> findByNameAndDomainOntologyId(
+        final String graphName,
+        final String domainOntologyId);
+
     /** Finds a deployed graph by name, ontology name, semantic version, and deploying agent ID. */
     Optional<GraphEntity> findByNameAndDomainOntologyNameAndDomainOntologyVersionMajorAndDomainOntologyVersionMinorAndDomainOntologyVersionPatchAndAgentsDeployingGraphId(
         final String graphName,

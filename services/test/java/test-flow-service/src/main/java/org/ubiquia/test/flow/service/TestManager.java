@@ -10,6 +10,7 @@ import org.ubiquia.common.test.helm.service.AbstractTestManager;
 import org.ubiquia.common.test.helm.service.TestRegistrar;
 import org.ubiquia.test.flow.service.module.ComponentDeploymentTestModule;
 import org.ubiquia.test.flow.service.module.ComponentTeardownTestModule;
+import org.ubiquia.test.flow.service.module.CrossGraphDataFlowTestModule;
 import org.ubiquia.test.flow.service.module.FlowClusterSyncTestModule;
 
 /** Registers and runs all test modules for the test flow service. */
@@ -25,6 +26,9 @@ public class TestManager extends AbstractTestManager {
     private ComponentTeardownTestModule componentTeardownTestModule;
 
     @Autowired
+    private CrossGraphDataFlowTestModule crossGraphDataFlowTestModule;
+
+    @Autowired
     private FlowClusterSyncTestModule flowClusterSyncTestModule;
 
     @Autowired
@@ -35,6 +39,7 @@ public class TestManager extends AbstractTestManager {
         this.testRegistrar.registerModule(this.componentDeploymentTestModule);
         this.testRegistrar.registerModule(this.componentTeardownTestModule);
         this.testRegistrar.registerModule(this.flowClusterSyncTestModule);
+        this.testRegistrar.registerModule(this.crossGraphDataFlowTestModule);
     }
 
     /** Registers all test modules and runs them once the application is ready. */

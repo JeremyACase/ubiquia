@@ -26,7 +26,11 @@ public class NodeEntity extends AbstractModelEntity {
 
     @OneToOne
     @JoinColumn(name = "component_node_join_id", nullable = true)
-    private ComponentEntity component;
+    private ComponentEntity targetComponent;
+
+    @OneToOne
+    @JoinColumn(name = "target_graph_node_join_id", nullable = true)
+    private GraphEntity targetGraph;
 
     private String description;
 
@@ -36,7 +40,7 @@ public class NodeEntity extends AbstractModelEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "graph_node_join_id", nullable = false)
-    private GraphEntity graph;
+    private GraphEntity parentGraph;
 
     @ElementCollection
     private Set<SubSchema> inputSubSchemas;
@@ -66,12 +70,20 @@ public class NodeEntity extends AbstractModelEntity {
     @OneToMany(mappedBy = "targetNode", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     private List<FlowMessageEntity> outboxFlowMessages;
 
-    public ComponentEntity getComponent() {
-        return component;
+    public ComponentEntity getTargetComponent() {
+        return targetComponent;
     }
 
-    public void setComponent(ComponentEntity component) {
-        this.component = component;
+    public void setTargetComponent(ComponentEntity targetComponent) {
+        this.targetComponent = targetComponent;
+    }
+
+    public GraphEntity getTargetGraph() {
+        return targetGraph;
+    }
+
+    public void setTargetGraph(GraphEntity targetGraph) {
+        this.targetGraph = targetGraph;
     }
 
     public String getDescription() {
@@ -91,12 +103,12 @@ public class NodeEntity extends AbstractModelEntity {
     }
 
     @NotNull
-    public GraphEntity getGraph() {
-        return graph;
+    public GraphEntity getParentGraph() {
+        return parentGraph;
     }
 
-    public void setGraph(GraphEntity graph) {
-        this.graph = graph;
+    public void setParentGraph(GraphEntity parentGraph) {
+        this.parentGraph = parentGraph;
     }
 
     @NotNull

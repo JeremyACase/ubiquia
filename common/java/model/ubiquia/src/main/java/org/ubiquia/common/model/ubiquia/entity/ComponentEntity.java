@@ -56,7 +56,7 @@ public class ComponentEntity extends AbstractModelEntity {
 
     private LivenessProbe livenessProbe;
 
-    @OneToOne(mappedBy = "component", optional = true)
+    @OneToOne(mappedBy = "targetComponent", optional = true)
     private NodeEntity node;
 
     @ManyToOne(fetch = FetchType.LAZY)

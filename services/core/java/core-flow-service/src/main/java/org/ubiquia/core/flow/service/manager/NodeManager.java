@@ -76,15 +76,15 @@ public class NodeManager {
                     nodeEntity.getName(),
                     graphEntity);
 
-            } else if (Objects.nonNull(nodeEntity.getComponent())
+            } else if (Objects.nonNull(nodeEntity.getTargetComponent())
                 && this.componentCardinalityVisitor.hasMatchingCardinality(
-                    nodeEntity.getComponent().getName(), graphDeployment)
+                    nodeEntity.getTargetComponent().getName(), graphDeployment)
                 && !this.componentCardinalityVisitor.isCardinalityEnabled(
-                    nodeEntity.getComponent().getName(), graphDeployment)) {
+                    nodeEntity.getTargetComponent().getName(), graphDeployment)) {
 
                 logger.info("...skipping node {} — component {} has cardinality < 1.",
                     nodeEntity.getName(),
-                    nodeEntity.getComponent().getName());
+                    nodeEntity.getTargetComponent().getName());
 
             } else {
                 this.deployNodeFor(nodeEntity, graphEntity, graphDeployment);
